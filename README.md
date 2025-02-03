@@ -1,6 +1,11 @@
 # Signal Android 
 
 Just my changes for Signal-Assistant. It doesn't need much. I will probably either extend or reduce custom functionality in the future depending on different needs, but this is essentially a fork that is focused on making auto-reply bots that work through notifications work with some additional group controls.
+
+## Current features
+
+- Basically all from Signal-JW
+
 ## Contributing Bug reports
 We use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
 
