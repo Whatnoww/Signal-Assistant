@@ -7,7 +7,7 @@ Just my changes for Signal-Assistant. It doesn't need much. I will probably eith
 - Basically all from Signal-JW
 
 ## Contributing Bug reports
-We use GitHub for bug tracking. Please search the existing issues for your bug and create a new one if the issue is not yet tracked!
+We use GitHub for bug tracking. Only report issues that happen here if they also happen on the stock client.
 
 https://github.com/signalapp/Signal-Android/issues
 
