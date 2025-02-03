@@ -25,6 +25,14 @@ val canonicalVersionName = "7.32.2"
 val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 
+// JW: re-added
+val abiPostFix: Map<String, Int> = mapOf(
+  "universal" to 0,
+  "armeabi-v7a" to 1,
+  "arm64-v8a" to 2,
+  "x86" to 3,
+  "x86_64" to 4
+)
 val keystores: Map<String, Properties?> = mapOf("debug" to loadKeystoreProperties("keystore.debug.properties"))
 
 val selectableVariants = listOf(
@@ -484,6 +492,7 @@ dependencies {
   implementation(project(":photoview"))
   implementation(project(":core-ui"))
 
+  implementation("net.lingala.zip4j:zip4j:2.11.5") // JW: added															   
   implementation(libs.androidx.fragment.ktx)
   implementation(libs.androidx.fragment.compose)
   implementation(libs.androidx.appcompat) {
