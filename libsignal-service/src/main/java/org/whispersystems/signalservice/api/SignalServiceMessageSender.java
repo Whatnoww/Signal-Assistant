@@ -1009,7 +1009,7 @@ public class SignalServiceMessageSender {
     Content.Builder     container   = new Content.Builder();
     DataMessage.Builder dataMessage = createDataMessage(message);
 
-    if (dataMessage.body != null && Utf8.size(dataMessage.body) > 2048) {
+    if (dataMessage.body != null && Utf8.size(dataMessage.body) > 9500) {
       throw new ContentTooLargeException(Utf8.size(dataMessage.body));
     }
 
