@@ -611,10 +611,10 @@
     <string name="ConversationFragment__save_to_phone">Сохранить на телефоне?</string>
     <!-- Dialog message explaining that media will be saved to your phone and can potentially be accessed by other phones. -->
     <plurals name="ConversationFragment__this_media_will_be_saved">
-        <item quantity="one">This media will be saved to your phone\'s storage. Other apps may be able to access it depending on your phone\'s permissions.</item>
-        <item quantity="few">This media will be saved to your phone\'s storage. Other apps may be able to access it depending on your phone\'s permissions.</item>
-        <item quantity="many">This media will be saved to your phone\'s storage. Other apps may be able to access it depending on your phone\'s permissions.</item>
-        <item quantity="other">This media will be saved to your phone\'s storage. Other apps may be able to access it depending on your phone\'s permissions.</item>
+        <item quantity="one">Этот медиафайл будет сохранён в списке контактов вашего телефона. Он может быть доступен для других приложений в зависимости от разрешений вашего телефона.</item>
+        <item quantity="few">Эти медиафайлы будут сохранены в списке контактов вашего телефона. Они могут быть доступны для других приложений в зависимости от разрешений вашего телефона.</item>
+        <item quantity="many">Эти медиафайлы будут сохранены в списке контактов вашего телефона. Они могут быть доступны для других приложений в зависимости от разрешений вашего телефона.</item>
+        <item quantity="other">Эти медиафайлы будут сохранены в списке контактов вашего телефона. Они могут быть доступны для других приложений в зависимости от разрешений вашего телефона.</item>
     </plurals>
     <!-- Checkbox shown in dialog to not show the dialog again in future cases -->
     <string name="ConversationFragment_dont_show_again">Больше не показывать</string>
@@ -973,17 +973,17 @@
     <string name="DateUtils_tonight">Сегодня вечером</string>
     <!-- Used when showing the time a device was linked. %1$s is replaced with the date while %2$s is replaced with the time. e.g. on Jan 15 at 9:00pm -->
     <plurals name="DateUtils_date_time_at">
-        <item quantity="one">on %1$s at %2$s</item>
-        <item quantity="few">on %1$s at %2$s</item>
-        <item quantity="many">on %1$s at %2$s</item>
-        <item quantity="other">on %1$s at %2$s</item>
+        <item quantity="one">%1$s в %2$s</item>
+        <item quantity="few">%1$s в %2$s</item>
+        <item quantity="many">%1$s в %2$s</item>
+        <item quantity="other">%1$s в %2$s</item>
     </plurals>
     <!-- Used when showing the time a device was linked. e.g. at 9:00pm -->
     <plurals name="DateUtils_time_at">
-        <item quantity="one">at %1$s</item>
-        <item quantity="few">at %1$s</item>
-        <item quantity="many">at %1$s</item>
-        <item quantity="other">at %1$s</item>
+        <item quantity="one">в %1$s</item>
+        <item quantity="few">в %1$s</item>
+        <item quantity="many">в %1$s</item>
+        <item quantity="other">в %1$s</item>
     </plurals>
 
     <!-- Scheduled Messages -->
@@ -1031,7 +1031,7 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Используйте Signal на компьютере или iPad. Ваши сообщения будут синхронизированы с вашими связанными устройствами.</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Используйте эту учётную запись Signal на компьютере или iPad.</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">Привязать новое устройство</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
@@ -1071,6 +1071,21 @@
     <string name="LinkDeviceFragment__tap_continue_and_enter_phone">Нажмите «Продолжить» и введите разблокировку телефона для подтверждения. Не вводите свой Пин-код Signal.</string>
     <!-- Button that dismisses the bottom sheet -->
     <string name="LinkDeviceFragment__continue">Продолжить</string>
+    <!-- Option on button to contact support -->
+    <string name="LinkDeviceFragment__contact_support">Связаться с поддержкой</string>
+    <!-- Title of dialog asking users if they want to submit debug logs when contacting support -->
+    <string name="LinkDeviceFragment__submit_debug_log">Отправить журналы отладки?</string>
+    <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
+    <string name="LinkDeviceFragment__your_debug_logs">Ваши журналы отладки помогут нам быстрее устранить проблему. Отправка журналов не является обязательной.</string>
+    <!-- Button option to submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_with_debug">Отправить с журналом отладки</string>
+    <!-- Button option to not submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_without_debug">Отправить без журнала отладки</string>
+    <!-- Button option to dismiss dialog -->
+    <string name="LinkDeviceFragment__cancel">Отменить</string>
+    <!-- Email subject when contacting support on a linked device syncing issue -->
+    <string name="LinkDeviceFragment__link_sync_failure_support_email">Не удалось экспортировать Android Link&amp;Sync</string>
+  <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__link_sync_failure_support_email_filter" translatable="false">Android Link&amp;Sync Export Failed</string> -->
     <!-- Title of a dialog letting the user know that syncing messages to their linked device failed -->
     <string name="LinkDeviceFragment__sync_failure_title">Не удалось синхронизировать сообщения</string>
     <!-- Body of a dialog letting the user know that syncing messages to their linked device failed -->
@@ -1093,7 +1108,7 @@
     <!-- Dialog title shown when a device is unlinked -->
     <string name="LinkDeviceFragment__device_unlinked">Устройство отвязано</string>
     <!-- Dialog body shown when a device is unlinked where %1$s is the date and time the device was originally linked (eg Jan 15 at 9:00pm) -->
-    <string name="LinkDeviceFragment__the_device_that_was">The device that was linked %1$s is no longer linked.</string>
+    <string name="LinkDeviceFragment__the_device_that_was">Устройство, которое было привязано %1$s, больше не связано.</string>
     <!-- Button to dismiss dialog -->
     <string name="LinkDeviceFragment__ok">ОК</string>
 
@@ -1144,7 +1159,7 @@
     <!-- Title of notification telling users that a device was linked to their account -->
     <string name="NewLinkedDeviceNotification__you_linked_new_device">Вы привязали новое устройство</string>
     <!-- Message body of notification telling users that a device was linked to their account. %1$s is the time it was linked -->
-    <string name="NewLinkedDeviceNotification__a_new_device_was_linked">A new device was linked to your account %1$s. Tap to view.</string>
+    <string name="NewLinkedDeviceNotification__a_new_device_was_linked">Новое устройство было привязано к вашей учётной записи в %1$s. Нажмите, чтобы посмотреть.</string>
 
     <!-- DeviceListActivity -->
     <string name="DeviceListActivity_unlink_s">Отвязать «%1$s»?</string>
@@ -1796,7 +1811,7 @@
     <string name="Megaphones_add_a_profile_photo">Фото профиля</string>
 
     <!-- Message body of megaphone telling users that a device was linked to their account. %1$s is the time it was linked -->
-    <string name="NewLinkedDeviceMegaphone__a_new_device_was_linked">A new device was linked to your account %1$s.</string>
+    <string name="NewLinkedDeviceMegaphone__a_new_device_was_linked">Новое устройство было привязано к вашей учётной записи в %1$s.</string>
     <!-- Button shown on megaphone that will redirect to the linked devices screen -->
     <string name="NewLinkedDeviceMegaphone__view_device">Посмотреть устройство</string>
     <!-- Button shown on megaphone to acknowledge and dismiss the megaphone -->
@@ -2047,6 +2062,7 @@
 
     <!-- GV2 group link deny -->
     <string name="MessageRecord_your_request_to_join_the_group_has_been_denied_by_an_admin">Ваш запрос на присоединение к группе был отклонён администратором.</string>
+    <string name="MessageRecord_you_denied_a_request_to_join_the_group_from_s">Вы отклонили запрос на присоединение к группе от %1$s.</string>
     <string name="MessageRecord_s_denied_a_request_to_join_the_group_from_s">%1$s отклонил(-а) запрос на присоединение к группе от %2$s.</string>
     <string name="MessageRecord_a_request_to_join_the_group_from_s_has_been_denied">Запрос на присоединение к группе от %1$s был отклонён.</string>
     <string name="MessageRecord_you_canceled_your_request_to_join_the_group">Вы отменили свой запрос на присоединение к группе.</string>
@@ -2092,7 +2108,7 @@
     <!-- Chat log text for an ongoing group call only the local user has joined with a placeholder for formatted time -->
     <string name="MessageRecord_you_are_in_the_call_s1">Вы участвуете в звонке · %1$s</string>
     <!-- Chat log text for an ongoing group call with you and another participant where %1$s is the short display name of the other user and %2$s is the formatted time -->
-    <string name="MessageRecord_s_and_you_are_in_the_call_s1">%1$s and you are in the call · %2$s</string>
+    <string name="MessageRecord_s_and_you_are_in_the_call_s1">%1$s и вы участвуете в звонке · %2$s</string>
     <!-- Chat log text for an ongoing group call with two participants with two placeholders for the short display name of the users that joined and a placeholder for formatted time -->
     <string name="MessageRecord_s_and_s_are_in_the_call_s1">%1$s и %2$s участвуют в звонке · %3$s</string>
     <!-- Chat log text for an ongoing group call that has one participant -->
@@ -2100,7 +2116,7 @@
     <!-- Chat log text for an ongoing group call only the local user has joined -->
     <string name="MessageRecord_you_are_in_the_call">Вы участвуете в звонке</string>
     <!-- Chat log text for an ongoing group call with you and another participant where %1$s is the short display name of the other user -->
-    <string name="MessageRecord_s_and_you_are_in_the_call">%1$s and you are in the call</string>
+    <string name="MessageRecord_s_and_you_are_in_the_call">%1$s и вы участвуете в звонке</string>
     <!-- Chat log text for an ongoing group call with two participants with two placeholders, each for the short display name of the users that joined -->
     <string name="MessageRecord_s_and_s_are_in_the_call">%1$s и %2$s участвуют в звонке</string>
     <!-- Chat log text for a group call that ended within the last 5 minutes -->
@@ -2241,7 +2257,7 @@
     <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_linked_already">К сожалению, у вас уже привязано слишком много устройств, попробуйте отвязать некоторые из них</string>
     <string name="DeviceActivity_sorry_this_is_not_a_valid_device_link_qr_code">К сожалению, это неправильный QR-код для привязки устройства.</string>
     <string name="DeviceProvisioningActivity_link_a_signal_device">Привязать устройство Signal?</string>
-    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">To link a desktop or iPad to this Signal account, go to Linked Devices and tap \"Link a New Device\"and scan the QR code again. Make sure you only scan QR codes that come directly from Signal.</string>
+    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">Чтобы привязать ПК или iPad к этой учётной записи Signal, перейдите в раздел «Связанные устройства», нажмите «Привязать новое устройство» и просканируйте QR-код ещё раз. Убедитесь, что вы сканируете только те QR-коды, которые приходят непосредственно от Signal.</string>
 
     <string name="DeviceActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code">Signal требуется разрешение на доступ к камере для сканирования QR-кода, но оно было вами отклонено. Нажмите «Продолжить», чтобы перейти в настройки приложения, откройте «Разрешения» и включите «Камера».</string>
     <string name="DeviceActivity_unable_to_scan_a_qr_code_without_the_camera_permission">Не удалось отсканировать QR-код из-за отсутствия доступа к камере</string>
@@ -2622,11 +2638,11 @@
     <string name="CallOverflowPopupWindow__expand_snackbar_accessibility_label">Развернуть вид поднявших руку</string>
 
     <!-- Toolbar title of country picker selection page -->
-    <string name="CountryCodeFragment__your_country">Your country</string>
+    <string name="CountryCodeFragment__your_country">Ваша страна</string>
     <!-- Hint text in search bar to either enter in a country name or number -->
-    <string name="CountryCodeFragment__search_by">Search by name or number</string>
+    <string name="CountryCodeFragment__search_by">Поиск по названию или коду страны</string>
     <!-- Text shown when displaying a list of countries that indicates an unknown country    -->
-    <string name="CountryCodeFragment__unknown_country">Unknown country</string>
+    <string name="CountryCodeFragment__unknown_country">Неизвестная страна</string>
 
     <!-- AboutSheet -->
     <!-- Displayed in a sheet row and allows user to open signal connection explanation on tap -->
@@ -2723,9 +2739,9 @@
     <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
     <string name="RegistrationActivity_you_will_receive_a_verification_code">Вы получите код подтверждения. Вашим оператором может взиматься плата за входящее SMS.</string>
     <!-- Hint text to select a country -->
-    <string name="RegistrationActivity_select_a_country">Select a country</string>
+    <string name="RegistrationActivity_select_a_country">Выберите страну</string>
     <!-- Hint text explaining that this is where the country code should go -->
-    <string name="RegistrationActivity_default_country_code">+0</string>
+    <string name="RegistrationActivity_default_country_code">0</string>
     <string name="RegistrationActivity_you_will_receive_a_call_to_verify_this_number">Вы получите звонок, чтобы подтвердить этот номер.</string>
     <string name="RegistrationActivity_edit_number">Изменить номер</string>
     <string name="RegistrationActivity_missing_google_play_services">Отсутствуют Службы Google Play</string>
@@ -3951,6 +3967,8 @@
     <string name="preferences__language">Язык (Language)</string>
     <string name="preferences__signal_messages_and_calls">Звонки и сообщения Signal</string>
     <string name="preferences__advanced_pin_settings">Расширенные настройки PIN-кода</string>
+    <!-- Title of toolbar for the advanced pin settings screen -->
+    <string name="preferences__advanced_pin_settings_title">Расширенные настройки PIN-кода</string>
     <string name="preferences__free_private_messages_and_calls">Бесплатные приватные сообщения и звонки пользователям Signal</string>
     <string name="preferences__submit_debug_log">Отправить журнал отладки</string>
     <string name="preferences__delete_account">Удалить учётную запись</string>
@@ -4059,6 +4077,7 @@
     <string name="preferences_connection_failed">Подключение не удалось</string>
     <string name="preferences_couldnt_connect_to_the_proxy">Не удалось подключиться к прокси. Проверьте адрес прокси и попробуйте ещё раз.</string>
     <string name="preferences_you_are_connected_to_the_proxy">Вы подключены к прокси. Вы можете отключить прокси в любое время в настройках.</string>
+    <!-- Title of alert dialog after a successful connection to the proxy -->
     <string name="preferences_success">Успех</string>
     <string name="preferences_failed_to_connect">Не удалось подключиться</string>
     <string name="preferences_enter_proxy_address">Введите адрес прокси</string>
@@ -4680,6 +4699,7 @@
     <string name="BackupDialog_copied_to_clipboard">Скопировано в буфер обмена</string>
     <string name="BackupDialog_no_file_picker_available">Нет приложения для выбора файлов.</string>
     <string name="BackupDialog_enter_backup_passphrase_to_verify">Введите парольную фразу своей резервной копии, чтобы проверить её</string>
+    <!-- Confirmation button text on an alert dialog to verify whether the entered backup phrase was correct -->
     <string name="BackupDialog_verify">Подтверждение</string>
     <string name="BackupDialog_you_successfully_entered_your_backup_passphrase">Вы успешно ввели парольную фразу своей резервной копии</string>
     <string name="BackupDialog_passphrase_was_not_correct">Парольная фраза была неправильной</string>
@@ -4704,6 +4724,7 @@
     <string name="RegistrationActivity_code_support_subject">Регистрация в Signal - код подтверждения для Android</string>
     <string name="RegistrationActivity_incorrect_code">Неверный код</string>
     <string name="BackupUtil_never">Никогда</string>
+    <!-- Subtext below last backup time when we do not know when the last backup was -->
     <string name="BackupUtil_unknown">Неизвестно</string>
     <!-- Phone number heading displayed as a screen title -->
     <string name="preferences_app_protection__phone_number">Номер телефона</string>
@@ -4888,6 +4909,7 @@
     <string name="DeviceTransferSetup__try_turning_wifi_off_and_on_on_both_devices">Попробуйте отключить и включить Wi-Fi на обоих устройствах.</string>
     <string name="DeviceTransferSetup__make_sure_both_devices_are_in_transfer_mode">Убедитесь, что оба устройства находятся в режиме переноса.</string>
     <string name="DeviceTransferSetup__go_to_support_page">Перейти на страницу поддержки</string>
+    <!-- Button text when a device transfer could not occur and to try again -->
     <string name="DeviceTransferSetup__try_again">Попробовать ещё раз</string>
     <string name="DeviceTransferSetup__waiting_for_other_device">Ожидание другого устройства</string>
     <string name="DeviceTransferSetup__tap_continue_on_your_other_device_to_start_the_transfer">Нажмите «Продолжить» на другом устройстве, чтобы начать перенос.</string>
@@ -5409,6 +5431,7 @@
 
     <!-- ChangeNumberVerifyFragment -->
     <string name="ChangeNumberVerifyFragment__change_number">Изменить номер</string>
+    <!-- Text shown when verifying a new phone number where %1$s is the number being changed -->
     <string name="ChangeNumberVerifyFragment__verifying_s">Проверка %1$s</string>
     <string name="ChangeNumberVerifyFragment__captcha_required">Требуется CAPTCHA</string>
 
@@ -5798,6 +5821,7 @@
     <string name="ConversationSettingsFragment__permissions">Разрешения</string>
     <string name="ConversationSettingsFragment__requests_and_invites">Запросы и приглашения</string>
     <string name="ConversationSettingsFragment__group_link">Ссылка на группу</string>
+    <!-- Option in conversation settings to add a user as a contact -->
     <string name="ConversationSettingsFragment__add_as_a_contact">Добавить в контакты</string>
     <string name="ConversationSettingsFragment__unmute">Включить звук</string>
     <!-- The subtitle for a settings item that describes how long the user\'s chat is muted. If a chat is muted, you will not receive notifications unless @mentioned. The placeholder represents a time (e.g. 10pm, March 4, etc). -->
@@ -5913,6 +5937,7 @@
     <string name="ShareInterstitialActivity__share">Поделиться</string>
 
     <!-- DSLSettingsToolbar -->
+    <!-- Content description describing the back arrow on toolbars -->
     <string name="DSLSettingsToolbar__navigate_up">Перейти назад</string>
     <string name="MultiselectForwardFragment__forward_to">Переслать</string>
     <!-- Displayed when sharing content to people via the fragment -->
@@ -5923,6 +5948,7 @@
     <string name="MultiselectForwardFragment__videos_will_be_trimmed">Видео будут сокращены до 30-секундных клипов и отправлены в виде нескольких историй.</string>
     <!-- Displayed when user selects a video that cannot be sent as a story -->
     <string name="MultiselectForwardFragment__videos_sent_to_stories_cant">Видео, отправленные в истории, не могут быть длиннее 30 секунд.</string>
+    <!-- Body in alert dialog telling users that messages are now sent immediately -->
     <string name="MultiselectForwardFragment__forwarded_messages_are_now">Пересылаемые сообщения теперь отправляются сразу.</string>
     <plurals name="MultiselectForwardFragment_send_d_messages">
         <item quantity="one">Отправить %1$d сообщение</item>
@@ -6026,7 +6052,7 @@
     <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
     <string name="MediaCaptureFragment_device_link_dialog_title">Привязать устройство?</string>
     <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">It looks like you\'re trying to link a Signal device. Tap continue and then tap \"Link a New Device\" and scan the QR code again.</string>
+    <string name="MediaCaptureFragment_it_looks_like_youre_trying">Похоже, вы пытаетесь привязать устройство Signal. Нажмите «Продолжить», затем «Привязать новое устройство» и снова просканируйте QR-код.</string>
     <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
     <string name="MediaCaptureFragment_device_link_dialog_continue">Продолжить</string>
 
@@ -6121,6 +6147,7 @@
 
     <string name="MySupportPreference__s_per_month">%1$s/месяц</string>
     <string name="MySupportPreference__renews_s">Продлится %1$s</string>
+    <!-- Subtitle shown when processing a donation transaction -->
     <string name="MySupportPreference__processing_transaction">Обрабатываем транзакцию…</string>
     <!-- Displayed on "My Support" screen when user badge failed to be added to their account -->
     <string name="MySupportPreference__couldnt_add_badge_s">Не удалось добавить значок. %1$s</string>
@@ -6533,7 +6560,7 @@
     <string name="StoriesLandingItem__info">Информация</string>
     <!-- Label when a story is pending sending -->
     <string name="StoriesLandingItem__sending">Отправляется…</string>
-    <!-- Label when multiple stories are pending sending -->
+    <!-- Label when multiple stories are pending sending where %1$d is the number of stories being sent -->
     <string name="StoriesLandingItem__sending_d">Отправляем %1$d…</string>
     <!-- Label when a story fails to send due to networking -->
     <string name="StoriesLandingItem__send_failed">Отправка не удалась</string>
@@ -8424,19 +8451,25 @@
     <!-- Backup key not known bottom sheet button to skip backup key entry and resume normal reregistration -->
     <string name="EnterBackupKey_skip_and_dont_restore">Пропустить и не восстанавливать</string>
     <!-- Dialog title shown when entered AEP doesn\'t work to register with provided e164 -->
-    <string name="EnterBackupKey_incorrect_backup_key_title">Incorrect backup key</string>
+    <string name="EnterBackupKey_incorrect_backup_key_title">Неправильный резервный ключ</string>
     <!-- Dialog message shown when entered AEP doesn\'t work to register with provided e164 -->
-    <string name="EnterBackupKey_incorrect_backup_key_message">Make sure you\'re registering with the same phone number and 64-character backup key you saved when enabling Signal backups. Backups can not be recovered without this key.</string>
+    <string name="EnterBackupKey_incorrect_backup_key_message">Убедитесь, что регистрируетесь с тем же номером телефона и 64-значным резервным ключом, которые сохранили при включении резервного копирования Signal. Резервные копии не могут быть восстановлены без этого ключа.</string>
     <!-- Dialog positive button text to try entering their backup key again -->
     <string name="EnterBackupKey_try_again">Попробовать ещё раз</string>
     <!-- Dialog negative button text to get help with backup key -->
-    <string name="EnterBackupKey_backup_key_help">Backup key help</string>
+    <string name="EnterBackupKey_backup_key_help">Помощь с резервным ключом</string>
     <!-- Text field error text when the backup key provided has been confirmed invalid -->
-    <string name="EnterBackupKey_incorrect_backup_key_error">Incorrect backup key</string>
+    <string name="EnterBackupKey_incorrect_backup_key_error">Неправильный резервный ключ</string>
     <!-- Text field error text when the backup key is too long -->
-    <string name="EnterBackupKey_too_long_error">Too long (%1$d/%2$d)</string>
+    <string name="EnterBackupKey_too_long_error">Слишком длинный (%1$d/%2$d)</string>
     <!-- Text field error when the backup key is invalid -->
-    <string name="EnterBackupKey_invalid_backup_key_error">Invalid backup key</string>
+    <string name="EnterBackupKey_invalid_backup_key_error">Недействительный резервный ключ</string>
+    <!-- Dialog title shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_not_found">Резервная копия не найдена</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">Вы правильно ввели резервный ключ, но с ним не связана никакая резервная копия. Если у вас есть старый телефон, убедитесь, что резервное копирование включено и было завершено, и повторите попытку.</string>
+    <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
+    <string name="EnterBackupKey_skip_restore">Пропустить восстановление</string>
 
     <!-- Title for restore via qr screen -->
     <string name="RestoreViaQr_title">Отсканируйте этот код с помощью старого телефона</string>

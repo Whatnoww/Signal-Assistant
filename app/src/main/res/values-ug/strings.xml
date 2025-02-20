@@ -962,7 +962,7 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Signal نى ئۈستەليۈزى ياكى iPad دە ئىشلىتىڭ. ئۇچۇرلىرىڭىز ئۇلانغان ئۈسكۈنىلىرىڭىزگە ماسقەدەملىنىدۇ.</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">بۇ Signal ھېساباتىنى ئۈستەل يۈزى ياكى iPad دە ئىشلىتىڭ.</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">يېڭى ئۈسكۈنە باغلاش</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
@@ -1002,6 +1002,21 @@
     <string name="LinkDeviceFragment__tap_continue_and_enter_phone">«داۋاملاشتۇرۇڭ» نى چېكىڭ ۋە جەزملەشتۈرۈش ئۈچۈن تېلېفونىڭىزنىڭ قۇلۇپلاش نۇمۇرۇنى كىرگۈزۈڭ. Signal PIN نومۇرىڭىزنى كىرگۈزۈڭ.</string>
     <!-- Button that dismisses the bottom sheet -->
     <string name="LinkDeviceFragment__continue">داۋاملاشتۇرۇش</string>
+    <!-- Option on button to contact support -->
+    <string name="LinkDeviceFragment__contact_support">ياردەم خادىمى بىلەن ئالاقىلىشىش</string>
+    <!-- Title of dialog asking users if they want to submit debug logs when contacting support -->
+    <string name="LinkDeviceFragment__submit_debug_log">كاشىلا ھەل قىلىش خاتىرىسىنى يوللامسىز؟</string>
+    <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
+    <string name="LinkDeviceFragment__your_debug_logs">سازلاش خاتىرىڭىز مەسىلىنى تېخىمۇ تېز ھەل قىلىشىمىزغا ياردەم بېرىدۇ. خاتىرە يوللاش ئىختىيارىي.</string>
+    <!-- Button option to submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_with_debug">سازلاش خاتىرىسىنى قوشۇپ يوللا</string>
+    <!-- Button option to not submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_without_debug">سازلاش خاتىرەسىز يوللا</string>
+    <!-- Button option to dismiss dialog -->
+    <string name="LinkDeviceFragment__cancel">بىكار قىلىش</string>
+    <!-- Email subject when contacting support on a linked device syncing issue -->
+    <string name="LinkDeviceFragment__link_sync_failure_support_email">ئاندىرويىدنڭ Link&amp;Sync ئېكسپورتى مەغلۇپ بولدى</string>
+  <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__link_sync_failure_support_email_filter" translatable="false">Android Link&amp;Sync Export Failed</string> -->
     <!-- Title of a dialog letting the user know that syncing messages to their linked device failed -->
     <string name="LinkDeviceFragment__sync_failure_title">ئۇچۇر ماسقەدەملەش مەغلۇپ بولدى</string>
     <!-- Body of a dialog letting the user know that syncing messages to their linked device failed -->
@@ -1870,6 +1885,7 @@
 
     <!-- GV2 group link deny -->
     <string name="MessageRecord_your_request_to_join_the_group_has_been_denied_by_an_admin">گۇرۇپپىغا قوشۇلۇش ئىلتىماسىڭىزنى بىر باشقۇرغۇچى رەت قىلدى.</string>
+    <string name="MessageRecord_you_denied_a_request_to_join_the_group_from_s">«%1$s» نىڭ گۇرۇپپىغا قوشۇلۇش ئىلتىماسىنى رەت قىلدىڭىز.</string>
     <string name="MessageRecord_s_denied_a_request_to_join_the_group_from_s">%2$s نىڭ گۇرۇپپىغا قوشۇلۇش ئىلتىماسىنى %1$s رەت قىلدى.</string>
     <string name="MessageRecord_a_request_to_join_the_group_from_s_has_been_denied">%1$s نىڭ گۇرۇپپىغا قوشۇلۇش ئىلتىماسى رەت قىلىندى.</string>
     <string name="MessageRecord_you_canceled_your_request_to_join_the_group">گۇرۇپپىغا قوشۇلۇش ئىلتىماسىڭىزدىن ۋاز كەچتىڭىز.</string>
@@ -2046,7 +2062,7 @@
     <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_linked_already">كەچۈرۈڭ، ئۇلانغان ئۈسكۈنىلىرىڭىز بەك كۆپ بولۇپ كەتتى، بەزىلىرىنى چىقىرىۋېتىڭ</string>
     <string name="DeviceActivity_sorry_this_is_not_a_valid_device_link_qr_code">كەچۈرۈڭ، بۇ ئىناۋەتلىك بولغان ئۈسكۈنە ئۇلانمىسى QR كودى ئەمەس.</string>
     <string name="DeviceProvisioningActivity_link_a_signal_device">بىر Signal ئۈسكۈنىسى ئۇلامسىز؟</string>
-    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">To link a desktop or iPad to this Signal account, go to Linked Devices and tap \"Link a New Device\"and scan the QR code again. Make sure you only scan QR codes that come directly from Signal.</string>
+    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">ئۈستەل يۈزى ياكى iPad نى بۇ سىگنال ھېساباتىغا ئۇلاش ئۈچۈن ، «ئۇلانغان ئۈسكۈنىلەر»گە كىرىپ «بىر يېڭى ئۈسكۈنىنى ئۇلاش» نى چېكىپ ، QR كودىنى قايتا سكاننېرلاڭ. پەقەت Signal دىنلا كەلگەن QR كودىنى سكاننېرلاڭ.</string>
 
     <string name="DeviceActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code">QR كودىنى سايىلەش ئۈچۈن Signal كامېرا ھوقۇقىغا موھتاج ، ئەمما ئۇ مەڭگۈلۈك رەت قىلىندى. ئەپ تەڭشەكلىرىدىن، «ھوقۇقلار» نى تاللاپ ۋە «كامېرا» نى قوزغىتىڭ. </string>
     <string name="DeviceActivity_unable_to_scan_a_qr_code_without_the_camera_permission">كامېرا ھوقۇقى بولمىغاچقا QR كودىنى سايىلىغىلى بولمىدى</string>
@@ -2376,11 +2392,11 @@
     <string name="CallOverflowPopupWindow__expand_snackbar_accessibility_label">قول كۆتۈرۈش كۆرۈنۈشىنى يېيىش</string>
 
     <!-- Toolbar title of country picker selection page -->
-    <string name="CountryCodeFragment__your_country">Your country</string>
+    <string name="CountryCodeFragment__your_country">دۆلىتىڭىزنى تاللاڭ</string>
     <!-- Hint text in search bar to either enter in a country name or number -->
-    <string name="CountryCodeFragment__search_by">Search by name or number</string>
+    <string name="CountryCodeFragment__search_by">فامىلە ياكى تېلېفون نومۇرىنىڭ دۆلەت باش نۇمۇرى بويىچە ئىزدەڭ</string>
     <!-- Text shown when displaying a list of countries that indicates an unknown country    -->
-    <string name="CountryCodeFragment__unknown_country">Unknown country</string>
+    <string name="CountryCodeFragment__unknown_country">نامەلۇم دۆلەت</string>
 
     <!-- AboutSheet -->
     <!-- Displayed in a sheet row and allows user to open signal connection explanation on tap -->
@@ -2460,11 +2476,11 @@
     <!-- Dialog message shown when we need to verify sms and carrier rates may apply. -->
     <string name="RegistrationActivity_a_verification_code_will_be_sent_to_this_number">دەلىللەش كودى بۇ نومۇرغا يوللىنىدۇ. ئۇچۇر ھەققى چىقىشى مۇمكىن.</string>
     <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
-    <string name="RegistrationActivity_you_will_receive_a_verification_code">You will receive a verification code. Carrier rates may apply.</string>
+    <string name="RegistrationActivity_you_will_receive_a_verification_code">سىز بىر دەلىللەش كودى تاپشۇرۇۋالىسىز. كۆچمە خەۋەرلىشىش ھەققى ئېلىنىشى مۇمكىن.</string>
     <!-- Hint text to select a country -->
-    <string name="RegistrationActivity_select_a_country">Select a country</string>
+    <string name="RegistrationActivity_select_a_country">بىر دۆلەتنى تاللاڭ</string>
     <!-- Hint text explaining that this is where the country code should go -->
-    <string name="RegistrationActivity_default_country_code">+0</string>
+    <string name="RegistrationActivity_default_country_code">0</string>
     <string name="RegistrationActivity_you_will_receive_a_call_to_verify_this_number">بۇ نومۇرنى دەلىللەش ئۈچۈن بىر تېلېفون تاپشۇرۇۋالىسىز.</string>
     <string name="RegistrationActivity_edit_number">نومۇرنى تەھرىرلەش</string>
     <string name="RegistrationActivity_missing_google_play_services">Google Play مۇلازىمەتلىرى كەم</string>
@@ -3642,6 +3658,8 @@
     <string name="preferences__language">تىل</string>
     <string name="preferences__signal_messages_and_calls">Signal ئۇچۇر ۋە چاقىرىشلىرى</string>
     <string name="preferences__advanced_pin_settings">ئالىي PIN تەڭشەكلىرى</string>
+    <!-- Title of toolbar for the advanced pin settings screen -->
+    <string name="preferences__advanced_pin_settings_title">ئالىي PIN تەڭشەكلىرى</string>
     <string name="preferences__free_private_messages_and_calls">Signal ئىشلەتكۈچىلىرىگە ھەقسىز شەخسىي ئۇچۇرلار ۋە چاقىرىقلار</string>
     <string name="preferences__submit_debug_log">سازلاش خاتىرە يوللا</string>
     <string name="preferences__delete_account">ھېساباتنى ئۆچۈر</string>
@@ -3744,6 +3762,7 @@
     <string name="preferences_connection_failed">باغلىنالمىدى</string>
     <string name="preferences_couldnt_connect_to_the_proxy">ۋاكالەتچىگە باغلىنالمىدى. ۋاكالەتچى ئادرېسىنى تەكشۈرۈپ ئاندىن قايتا سىناڭ.</string>
     <string name="preferences_you_are_connected_to_the_proxy">ۋاكالەتچىگە باغلاندىڭىز. خالىغان ۋاقىتتا تەڭشەكلەردىن ۋاكالەتچىنى تاقىۋېتەلەيسىز.</string>
+    <!-- Title of alert dialog after a successful connection to the proxy -->
     <string name="preferences_success">مۇۋەپپەقىيەتلىك</string>
     <string name="preferences_failed_to_connect">باغلىنالمىدى</string>
     <string name="preferences_enter_proxy_address">ۋاكالەتچى ئادرېسنى كىرگۈزۈڭ</string>
@@ -4338,6 +4357,7 @@
     <string name="BackupDialog_copied_to_clipboard">چاپلاش تاختىسىغا كۆچۈردى</string>
     <string name="BackupDialog_no_file_picker_available">ئىشلەتكۈدەك ھۆججەت تاللىغۇچى يوق.</string>
     <string name="BackupDialog_enter_backup_passphrase_to_verify">دەلىللەش ئۈچۈن زاپاسلاش ئىم ئىبارىسىنى كىرگۈزۈڭ</string>
+    <!-- Confirmation button text on an alert dialog to verify whether the entered backup phrase was correct -->
     <string name="BackupDialog_verify">دەلىللەش</string>
     <string name="BackupDialog_you_successfully_entered_your_backup_passphrase">زاپاسلاش ئىم ئىبارىسىنى توغرا كىرگۈزدىڭىز</string>
     <string name="BackupDialog_passphrase_was_not_correct">ئىم ئىبارىسى توغرا ئەمەس</string>
@@ -4362,6 +4382,7 @@
     <string name="RegistrationActivity_code_support_subject">Signal تىزىملىتىش - Android ئۈچۈن دەلىللەش كودى</string>
     <string name="RegistrationActivity_incorrect_code">خاتا كود</string>
     <string name="BackupUtil_never">ھەرگىز</string>
+    <!-- Subtext below last backup time when we do not know when the last backup was -->
     <string name="BackupUtil_unknown">نامەلۇم</string>
     <!-- Phone number heading displayed as a screen title -->
     <string name="preferences_app_protection__phone_number">تېلېفون نومۇرىڭىز</string>
@@ -4546,6 +4567,7 @@
     <string name="DeviceTransferSetup__try_turning_wifi_off_and_on_on_both_devices">ئىككىلا ئۈسكىنىدە Wi-Fi نى ئېتىۋېتىپ ئاندىن ئېچىپ سىناپ بېقىڭ.</string>
     <string name="DeviceTransferSetup__make_sure_both_devices_are_in_transfer_mode">ھەر ئىككى ئۈسكىنىنىڭ يۆتكەش ھالىتىدە بولىشىغا كاپالەت قىلىڭ.</string>
     <string name="DeviceTransferSetup__go_to_support_page">قوللاش تور بېتىگە بار</string>
+    <!-- Button text when a device transfer could not occur and to try again -->
     <string name="DeviceTransferSetup__try_again">قايتا سىناڭ</string>
     <string name="DeviceTransferSetup__waiting_for_other_device">باشقا ئۈسكىنىنى ساقلاۋاتىدۇ</string>
     <string name="DeviceTransferSetup__tap_continue_on_your_other_device_to_start_the_transfer">يەنە بىر ئۈسكىنىڭزدە داۋاملاشتۇرنى چېكىپ يۆتكەشنى باشلىتىڭ.</string>
@@ -5043,6 +5065,7 @@
 
     <!-- ChangeNumberVerifyFragment -->
     <string name="ChangeNumberVerifyFragment__change_number">نومۇرنى ئۆزگەرت</string>
+    <!-- Text shown when verifying a new phone number where %1$s is the number being changed -->
     <string name="ChangeNumberVerifyFragment__verifying_s">‏%1$s نى دەلىللەۋاتىدۇ </string>
     <string name="ChangeNumberVerifyFragment__captcha_required">تەستىق بەلگىسى لازىم</string>
 
@@ -5411,6 +5434,7 @@
     <string name="ConversationSettingsFragment__permissions">ھوقۇقلار</string>
     <string name="ConversationSettingsFragment__requests_and_invites">ئىلتىماس ۋە تەكلىپلەر</string>
     <string name="ConversationSettingsFragment__group_link">گۇرۇپپا ئۇلانمىسى</string>
+    <!-- Option in conversation settings to add a user as a contact -->
     <string name="ConversationSettingsFragment__add_as_a_contact">ئالاقەداش سۈپىتىدە قوش</string>
     <string name="ConversationSettingsFragment__unmute">ئۈنلۈك</string>
     <!-- The subtitle for a settings item that describes how long the user\'s chat is muted. If a chat is muted, you will not receive notifications unless @mentioned. The placeholder represents a time (e.g. 10pm, March 4, etc). -->
@@ -5523,6 +5547,7 @@
     <string name="ShareInterstitialActivity__share">ھەمبەھىرلە</string>
 
     <!-- DSLSettingsToolbar -->
+    <!-- Content description describing the back arrow on toolbars -->
     <string name="DSLSettingsToolbar__navigate_up">يۇقىرىغا يېتەكلە</string>
     <string name="MultiselectForwardFragment__forward_to">گە ئۇلاپ يوللا</string>
     <!-- Displayed when sharing content to people via the fragment -->
@@ -5533,6 +5558,7 @@
     <string name="MultiselectForwardFragment__videos_will_be_trimmed">ۋىدېيولار 30 سېكۇنتلۇق قىسقا سىنلارغا بۆلىنىپ، كۆپ ھېكايە شەكلىدە يوللىنىدۇ.</string>
     <!-- Displayed when user selects a video that cannot be sent as a story -->
     <string name="MultiselectForwardFragment__videos_sent_to_stories_cant">ھېكايىلەرگە يوللانغان ۋىدېيولار 30 سېكۇنتتىن ئۇزۇن بولماسلىقى كېرەك.</string>
+    <!-- Body in alert dialog telling users that messages are now sent immediately -->
     <string name="MultiselectForwardFragment__forwarded_messages_are_now">ئۇلاپ يوللانغان ئۇچۇرلار ئەمدى دەرھال ئەۋەتىلىدۇ.</string>
     <plurals name="MultiselectForwardFragment_send_d_messages">
         <item quantity="other">%1$d ئۇچۇر يوللاش</item>
@@ -5618,7 +5644,7 @@
     <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
     <string name="MediaCaptureFragment_device_link_dialog_title">ئۈسكۈنە ئۇلامسىز؟</string>
     <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">It looks like you\'re trying to link a Signal device. Tap continue and then tap \"Link a New Device\" and scan the QR code again.</string>
+    <string name="MediaCaptureFragment_it_looks_like_youre_trying">بىر Signal ئۈسكۈنىسىنى ئۇلىماقچى بولغاندەك تۇرىسىز. داۋاملاشتۇرۇشنى چېكىپ ئاندىن «يېڭى ئۈسكۈنىنى ئۇلاش» نى چېكىڭ ھەمدە QR كودىنى قايتا سىكانېرلاڭ.</string>
     <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
     <string name="MediaCaptureFragment_device_link_dialog_continue">داۋاملاشتۇرۇش</string>
 
@@ -5713,6 +5739,7 @@
 
     <string name="MySupportPreference__s_per_month">%1$s/ئايلىق</string>
     <string name="MySupportPreference__renews_s">يېڭىلىنىش ۋاقتى %1$s</string>
+    <!-- Subtitle shown when processing a donation transaction -->
     <string name="MySupportPreference__processing_transaction">پۇل ئاغدۇرۇشنى بىر تەرەپ قىلىۋاتىدۇ…</string>
     <!-- Displayed on "My Support" screen when user badge failed to be added to their account -->
     <string name="MySupportPreference__couldnt_add_badge_s">ئىزنەك قوشقىلى بولمىدى. %1$s</string>
@@ -6125,7 +6152,7 @@
     <string name="StoriesLandingItem__info">ئۇچۇر</string>
     <!-- Label when a story is pending sending -->
     <string name="StoriesLandingItem__sending">ئەۋەتىلىۋاتىدۇ…</string>
-    <!-- Label when multiple stories are pending sending -->
+    <!-- Label when multiple stories are pending sending where %1$d is the number of stories being sent -->
     <string name="StoriesLandingItem__sending_d">«%1$d» نى يوللاۋاتىدۇ…</string>
     <!-- Label when a story fails to send due to networking -->
     <string name="StoriesLandingItem__send_failed">ئەۋەتەلمىدى</string>
@@ -7921,6 +7948,12 @@
     <string name="EnterBackupKey_too_long_error">بەك ئۇزۇن (%2$d/%1$d)</string>
     <!-- Text field error when the backup key is invalid -->
     <string name="EnterBackupKey_invalid_backup_key_error">ئىناۋەتسىز زاپاسلاش ئاچقۇچى</string>
+    <!-- Dialog title shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_not_found">زاپاسلاش تېپىلمىدى</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">سىز كىرگۈزگەن زاپاسلاش ئاچقۇچى توغرا ، ئەمما ئۇنىڭدا زاپاسلاشقا ئائىت مەلۇماتلار يوق. ئەگەر كونا تېلېفونىڭىز يەنىلا بولسا ، زاپاسلاشنىڭ قوزغىتىلغانلىقىنى ۋە بىر قېتىملىق زاپاسلاشنىڭ تاماملانغانلىقىنى جەزملەشتۈرۈڭ ھەمدە قايتا سىناڭ.</string>
+    <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
+    <string name="EnterBackupKey_skip_restore">ئەسلىگە كەلتۈرۈشتى ئاتلاڭ</string>
 
     <!-- Title for restore via qr screen -->
     <string name="RestoreViaQr_title">كونا تېلېفونىڭىز بىلەن بۇ كودنى سىكانىرلاڭ</string>

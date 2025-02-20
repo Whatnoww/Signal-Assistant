@@ -37,6 +37,7 @@ import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import org.signal.core.util.ThreadUtil
+import org.signal.core.util.getParcelableCompat
 import org.signal.core.util.isNotNullOrBlank
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.LoggingFragment
@@ -58,6 +59,7 @@ import org.thoughtcrime.securesms.registration.ui.RegistrationCheckpoint
 import org.thoughtcrime.securesms.registration.ui.RegistrationState
 import org.thoughtcrime.securesms.registration.ui.RegistrationViewModel
 import org.thoughtcrime.securesms.registration.ui.countrycode.Country
+import org.thoughtcrime.securesms.registration.ui.countrycode.CountryCodeFragment
 import org.thoughtcrime.securesms.registration.ui.toE164
 import org.thoughtcrime.securesms.registration.util.CountryPrefix
 import org.thoughtcrime.securesms.util.CommunicationActions
@@ -109,6 +111,14 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
       moveToCountryPickerScreen()
     }
 
+    parentFragmentManager.setFragmentResultListener(
+      CountryCodeFragment.REQUEST_KEY_COUNTRY,
+      this
+    ) { _, bundle ->
+      val country: Country = bundle.getParcelableCompat(CountryCodeFragment.RESULT_COUNTRY, Country::class.java)!!
+      fragmentViewModel.setCountry(country.countryCode, country)
+    }
+
     spinnerAdapter = ArrayAdapter<CountryPrefix>(
       requireContext(),
       R.layout.registration_country_code_dropdown_item,
@@ -125,7 +135,6 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
     sharedViewModel.uiState.observe(viewLifecycleOwner) { sharedState ->
       presentRegisterButton(sharedState)
       updateEnabledControls(sharedState.inProgress, sharedState.isReRegister)
-      updateCountrySelection(sharedState.country)
 
       sharedState.networkError?.let {
         presentNetworkError(it)
@@ -163,14 +172,17 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
       .map { it.phoneNumberRegionCode }
       .distinctUntilChanged()
       .observe(viewLifecycleOwner) { regionCode ->
-        currentPhoneNumberFormatter = PhoneNumberUtil.getInstance().getAsYouTypeFormatter(regionCode)
-        reformatText(phoneNumberInputLayout.text)
-        phoneNumberInputLayout.requestFocus()
+        if (regionCode.isNotNullOrBlank()) {
+          currentPhoneNumberFormatter = PhoneNumberUtil.getInstance().getAsYouTypeFormatter(regionCode)
+          reformatText(phoneNumberInputLayout.text)
+          phoneNumberInputLayout.requestFocus()
+        }
       }
 
     fragmentViewModel.uiState.observe(viewLifecycleOwner) { fragmentState ->
       if (fragmentViewModel.isEnteredNumberPossible(fragmentState)) {
         sharedViewModel.setPhoneNumber(fragmentViewModel.parsePhoneNumber(fragmentState))
+        sharedViewModel.nationalNumber = ""
       } else {
         sharedViewModel.setPhoneNumber(null)
       }
@@ -185,12 +197,16 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
     initializeInputFields()
 
     val existingPhoneNumber = sharedViewModel.phoneNumber
+    val existingNationalNumber = sharedViewModel.nationalNumber
     if (existingPhoneNumber != null) {
       fragmentViewModel.restoreState(existingPhoneNumber)
       spinnerView.setText(existingPhoneNumber.countryCode.toString())
       phoneNumberInputLayout.setText(existingPhoneNumber.nationalNumber.toString())
+    } else if (spinnerView.text?.isEmpty() == true) {
+      spinnerView.setText(fragmentViewModel.getDefaultCountryCode(requireContext()).toString())
+      phoneNumberInputLayout.setText(existingNationalNumber)
     } else {
-      spinnerView.setText(fragmentViewModel.countryPrefix().toString())
+      phoneNumberInputLayout.setText(existingNationalNumber)
     }
 
     ViewUtil.focusAndShowKeyboard(phoneNumberInputLayout)
@@ -198,11 +214,16 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
 
   private fun updateCountrySelection(country: Country?) {
     if (country != null) {
+      binding.countryEmoji.visible = true
       binding.countryEmoji.text = country.emoji
       binding.country.text = country.name
-      binding.countryCode.editText?.setText(country.countryCode)
+      if (spinnerView.text.toString() != country.countryCode.toString()) {
+        spinnerView.setText(country.countryCode.toString())
+      }
+    } else {
+      binding.countryEmoji.visible = false
+      binding.country.text = getString(R.string.RegistrationActivity_select_a_country)
     }
-    sharedViewModel.clearCountry()
   }
 
   private fun reformatText(text: Editable?) {
@@ -239,16 +260,13 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
 
   private fun initializeInputFields() {
     binding.countryCode.editText?.addTextChangedListener { s ->
-      if (s.isNotNullOrBlank()) {
-        val formatted = s.toString().replace("+", "").let { "+$it" }
-        if (formatted != s.toString()) {
-          s.replace(0, s.length, formatted)
-        }
-      }
       val sanitized = s.toString().filter { c -> c.isDigit() }
       if (sanitized.isNotNullOrBlank()) {
         val countryCode: Int = sanitized.toInt()
         fragmentViewModel.setCountry(countryCode)
+      } else {
+        binding.countryCode.editText?.setHint(R.string.RegistrationActivity_default_country_code)
+        fragmentViewModel.clearCountry()
       }
     }
 
@@ -256,6 +274,7 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
       afterTextChanged = {
         reformatText(it)
         fragmentViewModel.setPhoneNumber(it?.toString())
+        sharedViewModel.nationalNumber = it?.toString() ?: ""
       }
     )
 
@@ -654,7 +673,7 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
   }
 
   private fun moveToCountryPickerScreen() {
-    findNavController().safeNavigate(R.id.action_countryPicker)
+    findNavController().safeNavigate(EnterPhoneNumberFragmentDirections.actionCountryPicker(fragmentViewModel.country))
   }
 
   private fun popBackStack() {

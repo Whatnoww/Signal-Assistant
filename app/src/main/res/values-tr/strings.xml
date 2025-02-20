@@ -589,8 +589,8 @@
     <string name="ConversationFragment__save_to_phone">Telefona kaydedilsin mi?</string>
     <!-- Dialog message explaining that media will be saved to your phone and can potentially be accessed by other phones. -->
     <plurals name="ConversationFragment__this_media_will_be_saved">
-        <item quantity="one">This media will be saved to your phone\'s storage. Other apps may be able to access it depending on your phone\'s permissions.</item>
-        <item quantity="other">This media will be saved to your phone\'s storage. Other apps may be able to access it depending on your phone\'s permissions.</item>
+        <item quantity="one">Bu medya telefonunun depolama alanına kaydedilecektir. Diğer uygulamalar bu alana telefonunun izinlerine göre erişebilir.</item>
+        <item quantity="other">Bu medya telefonunun depolama alanına kaydedilecektir. Diğer uygulamalar bu alana telefonunun izinlerine göre erişebilir.</item>
     </plurals>
     <!-- Checkbox shown in dialog to not show the dialog again in future cases -->
     <string name="ConversationFragment_dont_show_again">Tekrar gösterme</string>
@@ -931,13 +931,13 @@
     <string name="DateUtils_tonight">Bu gece</string>
     <!-- Used when showing the time a device was linked. %1$s is replaced with the date while %2$s is replaced with the time. e.g. on Jan 15 at 9:00pm -->
     <plurals name="DateUtils_date_time_at">
-        <item quantity="one">on %1$s at %2$s</item>
-        <item quantity="other">on %1$s at %2$s</item>
+        <item quantity="one">%1$s %2$s tarihinde</item>
+        <item quantity="other">%1$s %2$s tarihinde</item>
     </plurals>
     <!-- Used when showing the time a device was linked. e.g. at 9:00pm -->
     <plurals name="DateUtils_time_at">
-        <item quantity="one">at %1$s</item>
-        <item quantity="other">at %1$s</item>
+        <item quantity="one">%1$s saatinde</item>
+        <item quantity="other">%1$s saatinde</item>
     </plurals>
 
     <!-- Scheduled Messages -->
@@ -985,7 +985,7 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Signal\'i masaüstünde veya iPad\'de kullan. Mesajların bağlı cihazlarınla senkronize edilir.</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Bu Signal hesabını masaüstünde veya iPad\'de kullan.</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">Yeni bir cihaz bağla</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
@@ -1025,6 +1025,21 @@
     <string name="LinkDeviceFragment__tap_continue_and_enter_phone">Devam düğmesine dokun ve onaylamak için telefonunun şifresini gir. Signal PIN\'ini girme.</string>
     <!-- Button that dismisses the bottom sheet -->
     <string name="LinkDeviceFragment__continue">Devam et</string>
+    <!-- Option on button to contact support -->
+    <string name="LinkDeviceFragment__contact_support">Destekle iletişime geç</string>
+    <!-- Title of dialog asking users if they want to submit debug logs when contacting support -->
+    <string name="LinkDeviceFragment__submit_debug_log">Hata ayıklama günlüğü gönderilsin mi?</string>
+    <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
+    <string name="LinkDeviceFragment__your_debug_logs">Hata ayıklama günlükleriniz sorununuzu çözmemizi hızlandıracaktır. Günlüklerinizi göndermeniz isteğe bağlıdır.</string>
+    <!-- Button option to submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_with_debug">Hata Ayıklama Günlüğü ile gönder</string>
+    <!-- Button option to not submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_without_debug">Hata Ayıklama Günlüğü olmadan gönder</string>
+    <!-- Button option to dismiss dialog -->
+    <string name="LinkDeviceFragment__cancel">İptal</string>
+    <!-- Email subject when contacting support on a linked device syncing issue -->
+    <string name="LinkDeviceFragment__link_sync_failure_support_email">Android Dışa Aktarımı (Link&amp;Sync) başarısız oldu</string>
+  <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__link_sync_failure_support_email_filter" translatable="false">Android Link&amp;Sync Export Failed</string> -->
     <!-- Title of a dialog letting the user know that syncing messages to their linked device failed -->
     <string name="LinkDeviceFragment__sync_failure_title">Mesaj senkronizasyonu başarısız oldu</string>
     <!-- Body of a dialog letting the user know that syncing messages to their linked device failed -->
@@ -1047,7 +1062,7 @@
     <!-- Dialog title shown when a device is unlinked -->
     <string name="LinkDeviceFragment__device_unlinked">Cihazın bağlantısı kaldırıldı</string>
     <!-- Dialog body shown when a device is unlinked where %1$s is the date and time the device was originally linked (eg Jan 15 at 9:00pm) -->
-    <string name="LinkDeviceFragment__the_device_that_was">The device that was linked %1$s is no longer linked.</string>
+    <string name="LinkDeviceFragment__the_device_that_was">%1$s tarihinde bağlı olan cihaz artık bağlı değil.</string>
     <!-- Button to dismiss dialog -->
     <string name="LinkDeviceFragment__ok">TAMAM</string>
 
@@ -1098,7 +1113,7 @@
     <!-- Title of notification telling users that a device was linked to their account -->
     <string name="NewLinkedDeviceNotification__you_linked_new_device">Yeni bir cihaz bağladın</string>
     <!-- Message body of notification telling users that a device was linked to their account. %1$s is the time it was linked -->
-    <string name="NewLinkedDeviceNotification__a_new_device_was_linked">A new device was linked to your account %1$s. Tap to view.</string>
+    <string name="NewLinkedDeviceNotification__a_new_device_was_linked">%1$s saatinde hesabına yeni bir cihaz bağlandı. Görüntülemek için dokun.</string>
 
     <!-- DeviceListActivity -->
     <string name="DeviceListActivity_unlink_s">\"%1$s\" bağlantısı kaldırılsın mı?</string>
@@ -1340,8 +1355,8 @@
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">Bu kullanıcı eski bir gruba eklenemez.</string>
     <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="one">\"%1$s\" üye \"%2$s\" grubuna eklensin mi?</item>
-        <item quantity="other">%3$d üye \"%2$s\" grubuna eklensin mi?</item>
+        <item quantity="one">\"%1$s\" adlı üye \"%2$s\" grubuna eklensin mi?</item>
+        <item quantity="other">\"%2$s\" grubuna %3$d üye eklensin mi?</item>
     </plurals>
     <string name="AddMembersActivity__add">Ekle</string>
     <string name="AddMembersActivity__add_members">Üye ekle</string>
@@ -1694,7 +1709,7 @@
     <string name="Megaphones_add_a_profile_photo">Profil fotoğrafı</string>
 
     <!-- Message body of megaphone telling users that a device was linked to their account. %1$s is the time it was linked -->
-    <string name="NewLinkedDeviceMegaphone__a_new_device_was_linked">A new device was linked to your account %1$s.</string>
+    <string name="NewLinkedDeviceMegaphone__a_new_device_was_linked">%1$s saatinde hesabına yeni bir cihaz bağlandı.</string>
     <!-- Button shown on megaphone that will redirect to the linked devices screen -->
     <string name="NewLinkedDeviceMegaphone__view_device">Cihazı görüntüle</string>
     <!-- Button shown on megaphone to acknowledge and dismiss the megaphone -->
@@ -1929,6 +1944,7 @@
 
     <!-- GV2 group link deny -->
     <string name="MessageRecord_your_request_to_join_the_group_has_been_denied_by_an_admin">Gruba katılma isteğiniz bir yönetici tarafından reddedildi.</string>
+    <string name="MessageRecord_you_denied_a_request_to_join_the_group_from_s">%1$s kişisinin gruba katılma isteğini reddettiniz.</string>
     <string name="MessageRecord_s_denied_a_request_to_join_the_group_from_s">%1$s, %2$s kişisinin gruba katılma isteğini reddetti.</string>
     <string name="MessageRecord_a_request_to_join_the_group_from_s_has_been_denied">%1$s kişisinin gruba katılma isteği reddedildi.</string>
     <string name="MessageRecord_you_canceled_your_request_to_join_the_group">Gruba katılma isteğinizi iptal ettiniz.</string>
@@ -1974,7 +1990,7 @@
     <!-- Chat log text for an ongoing group call only the local user has joined with a placeholder for formatted time -->
     <string name="MessageRecord_you_are_in_the_call_s1">Aramadasın · %1$s</string>
     <!-- Chat log text for an ongoing group call with you and another participant where %1$s is the short display name of the other user and %2$s is the formatted time -->
-    <string name="MessageRecord_s_and_you_are_in_the_call_s1">%1$s and you are in the call · %2$s</string>
+    <string name="MessageRecord_s_and_you_are_in_the_call_s1">%1$s ve sen bir aramadasınız · %2$s</string>
     <!-- Chat log text for an ongoing group call with two participants with two placeholders for the short display name of the users that joined and a placeholder for formatted time -->
     <string name="MessageRecord_s_and_s_are_in_the_call_s1">%1$s ve %2$s aramada · %3$s</string>
     <!-- Chat log text for an ongoing group call that has one participant -->
@@ -1982,7 +1998,7 @@
     <!-- Chat log text for an ongoing group call only the local user has joined -->
     <string name="MessageRecord_you_are_in_the_call">Aramadasın</string>
     <!-- Chat log text for an ongoing group call with you and another participant where %1$s is the short display name of the other user -->
-    <string name="MessageRecord_s_and_you_are_in_the_call">%1$s and you are in the call</string>
+    <string name="MessageRecord_s_and_you_are_in_the_call">%1$s ve sen bir aramadasınız</string>
     <!-- Chat log text for an ongoing group call with two participants with two placeholders, each for the short display name of the users that joined -->
     <string name="MessageRecord_s_and_s_are_in_the_call">%1$s ve %2$s aramada</string>
     <!-- Chat log text for a group call that ended within the last 5 minutes -->
@@ -2111,7 +2127,7 @@
     <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_linked_already">Üzgünüz, halihazırda bağlı olan çok fazla cihazınız var. Bazılarını kaldırmayı deneyin.</string>
     <string name="DeviceActivity_sorry_this_is_not_a_valid_device_link_qr_code">Üzgünüz, bu geçerli bir cihaz bağlama karekodu değil.</string>
     <string name="DeviceProvisioningActivity_link_a_signal_device">Bir Signal cihazı bağlansın mı?</string>
-    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">To link a desktop or iPad to this Signal account, go to Linked Devices and tap \"Link a New Device\"and scan the QR code again. Make sure you only scan QR codes that come directly from Signal.</string>
+    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">Bu Signal hesabına bir masaüstü veya iPad bağlamak için Bağlı Cihazlar\'a git ve \"Yeni Bir Cihaz Bağla\"ya dokunup kare kodu tekrar tara. Yalnızca doğrudan Signal\'den gelen kare kodları taradığından emin ol.</string>
 
     <string name="DeviceActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code">Signal, bir karekod taramak için Kamera iznine ihtiyaç duyar, fakat bu izin kalıcı olarak reddedilmiş. Lütfen uygulama ayarları menüsüne girip \"İzinler\" kısmını seçin, ve \"Kamera\"yı etkinleştirin.</string>
     <string name="DeviceActivity_unable_to_scan_a_qr_code_without_the_camera_permission">Kamera izni olmadan karekod taranamıyor.</string>
@@ -2458,11 +2474,11 @@
     <string name="CallOverflowPopupWindow__expand_snackbar_accessibility_label">Kaldırılmış el görünümünü genişlet</string>
 
     <!-- Toolbar title of country picker selection page -->
-    <string name="CountryCodeFragment__your_country">Your country</string>
+    <string name="CountryCodeFragment__your_country">Ülken</string>
     <!-- Hint text in search bar to either enter in a country name or number -->
-    <string name="CountryCodeFragment__search_by">Search by name or number</string>
+    <string name="CountryCodeFragment__search_by">İsim ya da ülke koduna göre ara</string>
     <!-- Text shown when displaying a list of countries that indicates an unknown country    -->
-    <string name="CountryCodeFragment__unknown_country">Unknown country</string>
+    <string name="CountryCodeFragment__unknown_country">Bilinmeyen Ülke</string>
 
     <!-- AboutSheet -->
     <!-- Displayed in a sheet row and allows user to open signal connection explanation on tap -->
@@ -2549,9 +2565,9 @@
     <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
     <string name="RegistrationActivity_you_will_receive_a_verification_code">Doğrulama kodu alacaksınız. Tarife ücreti uygulanabilir.</string>
     <!-- Hint text to select a country -->
-    <string name="RegistrationActivity_select_a_country">Select a country</string>
+    <string name="RegistrationActivity_select_a_country">Bir ülke seç</string>
     <!-- Hint text explaining that this is where the country code should go -->
-    <string name="RegistrationActivity_default_country_code">+0</string>
+    <string name="RegistrationActivity_default_country_code">0</string>
     <string name="RegistrationActivity_you_will_receive_a_call_to_verify_this_number">Bu numarayı doğrulamak için bir arama alacaksınız.</string>
     <string name="RegistrationActivity_edit_number">Numarayı düzenle</string>
     <string name="RegistrationActivity_missing_google_play_services">Google Play Hizmetleri eksik</string>
@@ -3745,6 +3761,8 @@
     <string name="preferences__language">Dil</string>
     <string name="preferences__signal_messages_and_calls">Signal iletileri ve aramaları</string>
     <string name="preferences__advanced_pin_settings">Gelişmiş PIN ayarları</string>
+    <!-- Title of toolbar for the advanced pin settings screen -->
+    <string name="preferences__advanced_pin_settings_title">Gelişmiş PIN ayarları</string>
     <string name="preferences__free_private_messages_and_calls">Signal kullanıcılarına ücretsiz özel iletiler ve aramalar</string>
     <string name="preferences__submit_debug_log">Hata ayıklama günlüğünü gönder</string>
     <string name="preferences__delete_account">Hesabı sil</string>
@@ -3849,6 +3867,7 @@
     <string name="preferences_connection_failed">Bağlantı başarısız</string>
     <string name="preferences_couldnt_connect_to_the_proxy">Vekil sunucuya bağlanılamadı. Vekil adresinizi kontrol edin ve tekrar deneyin.</string>
     <string name="preferences_you_are_connected_to_the_proxy">Vekil sunucuya bağlandınız. Vekil sunucuyu istediğiniz zaman Ayarlar\'dan kapatabilirsiniz.</string>
+    <!-- Title of alert dialog after a successful connection to the proxy -->
     <string name="preferences_success">Başarılı</string>
     <string name="preferences_failed_to_connect">Bağlanılamadı</string>
     <string name="preferences_enter_proxy_address">Vekil sunucu adresi girin</string>
@@ -4452,6 +4471,7 @@
     <string name="BackupDialog_copied_to_clipboard">Panoya kopyalandı</string>
     <string name="BackupDialog_no_file_picker_available">Herhangi bir dosya seçicisi yok.</string>
     <string name="BackupDialog_enter_backup_passphrase_to_verify">Doğrulamak için yedek parolanızı girin</string>
+    <!-- Confirmation button text on an alert dialog to verify whether the entered backup phrase was correct -->
     <string name="BackupDialog_verify">Doğrula</string>
     <string name="BackupDialog_you_successfully_entered_your_backup_passphrase">Yedek parolanızı doğru girdiniz</string>
     <string name="BackupDialog_passphrase_was_not_correct">Parolanız doğru değil</string>
@@ -4476,6 +4496,7 @@
     <string name="RegistrationActivity_code_support_subject">Signal Kaydı - Android için Doğrulama Kodu</string>
     <string name="RegistrationActivity_incorrect_code">Geçersiz kod</string>
     <string name="BackupUtil_never">Asla</string>
+    <!-- Subtext below last backup time when we do not know when the last backup was -->
     <string name="BackupUtil_unknown">Bilinmiyor</string>
     <!-- Phone number heading displayed as a screen title -->
     <string name="preferences_app_protection__phone_number">Telefon numarası</string>
@@ -4660,6 +4681,7 @@
     <string name="DeviceTransferSetup__try_turning_wifi_off_and_on_on_both_devices">Wi-Fi\'yi her iki aygıtta kapatıp açmayı deneyin</string>
     <string name="DeviceTransferSetup__make_sure_both_devices_are_in_transfer_mode">Her iki aygıtın aktarım kipinde olduğundan emin olun.</string>
     <string name="DeviceTransferSetup__go_to_support_page">Destek sayfasına git</string>
+    <!-- Button text when a device transfer could not occur and to try again -->
     <string name="DeviceTransferSetup__try_again">Tekrar dene</string>
     <string name="DeviceTransferSetup__waiting_for_other_device">Diğer cihaz bekleniyor</string>
     <string name="DeviceTransferSetup__tap_continue_on_your_other_device_to_start_the_transfer">Aktarmayı başlatmak için diğer cihazınızda Devam seçeneğine dokunun.</string>
@@ -5165,6 +5187,7 @@
 
     <!-- ChangeNumberVerifyFragment -->
     <string name="ChangeNumberVerifyFragment__change_number">Numarayı Değiştir</string>
+    <!-- Text shown when verifying a new phone number where %1$s is the number being changed -->
     <string name="ChangeNumberVerifyFragment__verifying_s">%1$s doğrulanıyor</string>
     <string name="ChangeNumberVerifyFragment__captcha_required">Captcha gerekli</string>
 
@@ -5540,6 +5563,7 @@
     <string name="ConversationSettingsFragment__permissions">İzinler</string>
     <string name="ConversationSettingsFragment__requests_and_invites">İstekler ve davetler</string>
     <string name="ConversationSettingsFragment__group_link">Grup bağlantısı</string>
+    <!-- Option in conversation settings to add a user as a contact -->
     <string name="ConversationSettingsFragment__add_as_a_contact">Kişi olarak ekle</string>
     <string name="ConversationSettingsFragment__unmute">Sesi aç</string>
     <!-- The subtitle for a settings item that describes how long the user\'s chat is muted. If a chat is muted, you will not receive notifications unless @mentioned. The placeholder represents a time (e.g. 10pm, March 4, etc). -->
@@ -5653,6 +5677,7 @@
     <string name="ShareInterstitialActivity__share">Paylaş</string>
 
     <!-- DSLSettingsToolbar -->
+    <!-- Content description describing the back arrow on toolbars -->
     <string name="DSLSettingsToolbar__navigate_up">Yukarı git</string>
     <string name="MultiselectForwardFragment__forward_to">Yönlendir</string>
     <!-- Displayed when sharing content to people via the fragment -->
@@ -5663,6 +5688,7 @@
     <string name="MultiselectForwardFragment__videos_will_be_trimmed">Videolar 30 saniyelik kliplere bölünecek ve birden fazla Hikaye olarak gönderilecek.</string>
     <!-- Displayed when user selects a video that cannot be sent as a story -->
     <string name="MultiselectForwardFragment__videos_sent_to_stories_cant">Hikayelere gönderilen videolar 30 saniyeden uzun olamaz.</string>
+    <!-- Body in alert dialog telling users that messages are now sent immediately -->
     <string name="MultiselectForwardFragment__forwarded_messages_are_now">Yönlendirilen iletiler artık anında gidiyor.</string>
     <plurals name="MultiselectForwardFragment_send_d_messages">
         <item quantity="one">%1$d ileti gönder</item>
@@ -5754,7 +5780,7 @@
     <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
     <string name="MediaCaptureFragment_device_link_dialog_title">Cihaz bağlansın mı?</string>
     <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">It looks like you\'re trying to link a Signal device. Tap continue and then tap \"Link a New Device\" and scan the QR code again.</string>
+    <string name="MediaCaptureFragment_it_looks_like_youre_trying">Signal cihazını bağlamaya çalışıyorsun gibi görünüyor. Devam et\'e dokun ve ardından \"Yeni Bir Cihaz Bağla\"ya dokun ve kare kodu tekrar tara.</string>
     <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
     <string name="MediaCaptureFragment_device_link_dialog_continue">Devam et</string>
 
@@ -5849,6 +5875,7 @@
 
     <string name="MySupportPreference__s_per_month">%1$s/ay</string>
     <string name="MySupportPreference__renews_s">%1$s tarihinde yenilenir</string>
+    <!-- Subtitle shown when processing a donation transaction -->
     <string name="MySupportPreference__processing_transaction">İşlem gerçekleştiriliyor…</string>
     <!-- Displayed on "My Support" screen when user badge failed to be added to their account -->
     <string name="MySupportPreference__couldnt_add_badge_s">Rozet eklenemedi. %1$s</string>
@@ -6261,7 +6288,7 @@
     <string name="StoriesLandingItem__info">Bilgi</string>
     <!-- Label when a story is pending sending -->
     <string name="StoriesLandingItem__sending">Gönderiliyor…</string>
-    <!-- Label when multiple stories are pending sending -->
+    <!-- Label when multiple stories are pending sending where %1$d is the number of stories being sent -->
     <string name="StoriesLandingItem__sending_d">%1$dgönderiliyor…</string>
     <!-- Label when a story fails to send due to networking -->
     <string name="StoriesLandingItem__send_failed">Gönderme başarısız</string>
@@ -8080,19 +8107,25 @@
     <!-- Backup key not known bottom sheet button to skip backup key entry and resume normal reregistration -->
     <string name="EnterBackupKey_skip_and_dont_restore">Atla ve geri yükleme</string>
     <!-- Dialog title shown when entered AEP doesn\'t work to register with provided e164 -->
-    <string name="EnterBackupKey_incorrect_backup_key_title">Incorrect backup key</string>
+    <string name="EnterBackupKey_incorrect_backup_key_title">Hatalı yedekleme anahtarı</string>
     <!-- Dialog message shown when entered AEP doesn\'t work to register with provided e164 -->
-    <string name="EnterBackupKey_incorrect_backup_key_message">Make sure you\'re registering with the same phone number and 64-character backup key you saved when enabling Signal backups. Backups can not be recovered without this key.</string>
+    <string name="EnterBackupKey_incorrect_backup_key_message">Signal yedeklemelerini etkinleştirirken kaydettiğin aynı telefon numarası ve 64 karakterlik yedekleme anahtarıyla kaydolduğundan emin ol. Yedekler bu anahtar olmadan kurtarılamaz.</string>
     <!-- Dialog positive button text to try entering their backup key again -->
     <string name="EnterBackupKey_try_again">Tekrar dene</string>
     <!-- Dialog negative button text to get help with backup key -->
-    <string name="EnterBackupKey_backup_key_help">Backup key help</string>
+    <string name="EnterBackupKey_backup_key_help">Yedekleme anahtarı yardımı</string>
     <!-- Text field error text when the backup key provided has been confirmed invalid -->
-    <string name="EnterBackupKey_incorrect_backup_key_error">Incorrect backup key</string>
+    <string name="EnterBackupKey_incorrect_backup_key_error">Hatalı yedekleme anahtarı</string>
     <!-- Text field error text when the backup key is too long -->
-    <string name="EnterBackupKey_too_long_error">Too long (%1$d/%2$d)</string>
+    <string name="EnterBackupKey_too_long_error">Çok uzun (%1$d/%2$d)</string>
     <!-- Text field error when the backup key is invalid -->
-    <string name="EnterBackupKey_invalid_backup_key_error">Invalid backup key</string>
+    <string name="EnterBackupKey_invalid_backup_key_error">Geçersiz yedekleme anahtarı</string>
+    <!-- Dialog title shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_not_found">Yedek bulunamadı</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">Girdiğin yedekleme anahtarı doğru ancak bununla ilişkili bir yedekleme yok. Hala eski telefonun varsa, yedeklemelerin etkinleştirildiğinden ve bir yedeklemenin tamamlandığından emin ol ve tekrar dene.</string>
+    <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
+    <string name="EnterBackupKey_skip_restore">Geri yüklemeyi atla</string>
 
     <!-- Title for restore via qr screen -->
     <string name="RestoreViaQr_title">Bu kodu eski telefonunla tara</string>

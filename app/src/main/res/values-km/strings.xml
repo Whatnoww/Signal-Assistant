@@ -578,7 +578,7 @@
     <string name="ConversationFragment__save_to_phone">រក្សាទុកក្នុងទូរសព្ទឬ?</string>
     <!-- Dialog message explaining that media will be saved to your phone and can potentially be accessed by other phones. -->
     <plurals name="ConversationFragment__this_media_will_be_saved">
-        <item quantity="other">This media will be saved to your phone\'s storage. Other apps may be able to access it depending on your phone\'s permissions.</item>
+        <item quantity="other">មេឌៀនេះនឹងត្រូវបានរក្សាទុកទៅក្នុងទំហំផ្ទុកទូរសព្ទរបស់អ្នក។ កម្មវិធីផ្សេងៗទៀតអាចនឹងចូលប្រើវាបាន អាស្រ័យលើការអនុញ្ញាតរបស់ទូរសព្ទអ្នក។</item>
     </plurals>
     <!-- Checkbox shown in dialog to not show the dialog again in future cases -->
     <string name="ConversationFragment_dont_show_again">កុំបង្ហាញទៀត</string>
@@ -910,11 +910,11 @@
     <string name="DateUtils_tonight">យប់នេះ</string>
     <!-- Used when showing the time a device was linked. %1$s is replaced with the date while %2$s is replaced with the time. e.g. on Jan 15 at 9:00pm -->
     <plurals name="DateUtils_date_time_at">
-        <item quantity="other">on %1$s at %2$s</item>
+        <item quantity="other">នៅ %1$s ម៉ោង %2$s</item>
     </plurals>
     <!-- Used when showing the time a device was linked. e.g. at 9:00pm -->
     <plurals name="DateUtils_time_at">
-        <item quantity="other">at %1$s</item>
+        <item quantity="other">នៅម៉ោង %1$s</item>
     </plurals>
 
     <!-- Scheduled Messages -->
@@ -962,7 +962,7 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">ប្រើ Signal នៅលើ Desktop ឬ iPad។ សាររបស់អ្នកនឹងធ្វើសមកាលកម្មទៅឧបករណ៍ដែលបានភ្ជាប់របស់អ្នក។</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">ប្រើគណនី Signal នេះនៅលើកុំព្យូទ័រលើតុ ឬ iPad។</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">ភ្ជាប់ឧបករណ៍ថ្មី</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
@@ -1002,6 +1002,21 @@
     <string name="LinkDeviceFragment__tap_continue_and_enter_phone">ចុចបន្ត ហើយបញ្ចូលសោទូរសព្ទរបស់អ្នកដើម្បីបញ្ជាក់។ សូមកុំបញ្ចូលលេខកូដសម្ងាត់ Signal របស់អ្នក។</string>
     <!-- Button that dismisses the bottom sheet -->
     <string name="LinkDeviceFragment__continue">បន្ត</string>
+    <!-- Option on button to contact support -->
+    <string name="LinkDeviceFragment__contact_support">ទាក់ទងផ្នែកជំនួយ</string>
+    <!-- Title of dialog asking users if they want to submit debug logs when contacting support -->
+    <string name="LinkDeviceFragment__submit_debug_log">ដាក់បញ្ជូនកំណត់ត្រាបញ្ហា?</string>
+    <!-- Body of dialog explaining what debug logs are and that they are optional to submit -->
+    <string name="LinkDeviceFragment__your_debug_logs">កំណត់ត្រាបញ្ហារបស់អ្នកនឹងជួយយើងដោះស្រាយបញ្ហារបស់អ្នកឱ្យបានកាន់តែលឿន។ អ្នកមានជម្រើសដាក់ឬមិនដាក់បញ្ជូនកំណត់ត្រារបស់អ្នក។</string>
+    <!-- Button option to submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_with_debug">ដាក់បញ្ជូនជាមួយកំណត់ត្រាបញ្ហា</string>
+    <!-- Button option to not submit debug log when contacting support -->
+    <string name="LinkDeviceFragment__submit_without_debug">ដាក់បញ្ជូនដោយគ្មានកំណត់ត្រាបញ្ហា</string>
+    <!-- Button option to dismiss dialog -->
+    <string name="LinkDeviceFragment__cancel">បោះបង់</string>
+    <!-- Email subject when contacting support on a linked device syncing issue -->
+    <string name="LinkDeviceFragment__link_sync_failure_support_email">ការនាំចេញ Android (Link&amp;Sync) មិនបានជោគជ័យ</string>
+  <!-- Removed by excludeNonTranslatables <string name="LinkDeviceFragment__link_sync_failure_support_email_filter" translatable="false">Android Link&amp;Sync Export Failed</string> -->
     <!-- Title of a dialog letting the user know that syncing messages to their linked device failed -->
     <string name="LinkDeviceFragment__sync_failure_title">ការធ្វើសមកាលកម្មសារមិនបានជោគជ័យ</string>
     <!-- Body of a dialog letting the user know that syncing messages to their linked device failed -->
@@ -1024,7 +1039,7 @@
     <!-- Dialog title shown when a device is unlinked -->
     <string name="LinkDeviceFragment__device_unlinked">ឧបករណ៍ត្រូវបានផ្ដាច់</string>
     <!-- Dialog body shown when a device is unlinked where %1$s is the date and time the device was originally linked (eg Jan 15 at 9:00pm) -->
-    <string name="LinkDeviceFragment__the_device_that_was">The device that was linked %1$s is no longer linked.</string>
+    <string name="LinkDeviceFragment__the_device_that_was">ឧបករណ៍ដែលត្រូវបានភ្ជាប់ %1$s មិនត្រូវបានភ្ជាប់ទៀតទេ។</string>
     <!-- Button to dismiss dialog -->
     <string name="LinkDeviceFragment__ok">យល់ព្រម</string>
 
@@ -1075,7 +1090,7 @@
     <!-- Title of notification telling users that a device was linked to their account -->
     <string name="NewLinkedDeviceNotification__you_linked_new_device">អ្នកបានភ្ជាប់ឧបករណ៍ថ្មី</string>
     <!-- Message body of notification telling users that a device was linked to their account. %1$s is the time it was linked -->
-    <string name="NewLinkedDeviceNotification__a_new_device_was_linked">A new device was linked to your account %1$s. Tap to view.</string>
+    <string name="NewLinkedDeviceNotification__a_new_device_was_linked">ឧបករណ៍ថ្មីត្រូវបានភ្ជាប់ជាមួយគណនីរបស់អ្នក %1$s។ ចុចដើម្បីមើល។</string>
 
     <!-- DeviceListActivity -->
     <string name="DeviceListActivity_unlink_s">ផ្តាច់ \"%1$s\" ឬ?</string>
@@ -1301,7 +1316,7 @@
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">បុគ្គលនេះ មិនអាចបន្ថែមចូលក្រុមមុនបានទេ។</string>
     <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="other">បន្ថែមសមាជិក %3$d នាក់ទៅ \"%2$s\"?</item>
+        <item quantity="other">បញ្ចូលសមាជិក %3$d នាក់ទៅ \"%2$s\"?</item>
     </plurals>
     <string name="AddMembersActivity__add">បន្ថែម</string>
     <string name="AddMembersActivity__add_members">បន្ថែមសមាជិក</string>
@@ -1643,7 +1658,7 @@
     <string name="Megaphones_add_a_profile_photo">រូបថតប្រូហ្វាល់</string>
 
     <!-- Message body of megaphone telling users that a device was linked to their account. %1$s is the time it was linked -->
-    <string name="NewLinkedDeviceMegaphone__a_new_device_was_linked">A new device was linked to your account %1$s.</string>
+    <string name="NewLinkedDeviceMegaphone__a_new_device_was_linked">ឧបករណ៍ថ្មីត្រូវបានភ្ជាប់ជាមួយគណនីរបស់អ្នក %1$s។</string>
     <!-- Button shown on megaphone that will redirect to the linked devices screen -->
     <string name="NewLinkedDeviceMegaphone__view_device">មើលឧបករណ៍</string>
     <!-- Button shown on megaphone to acknowledge and dismiss the megaphone -->
@@ -1870,6 +1885,7 @@
 
     <!-- GV2 group link deny -->
     <string name="MessageRecord_your_request_to_join_the_group_has_been_denied_by_an_admin">សំណើចូលរួមក្រុមរបស់អ្នក ត្រូវបានបដិសេធដោយអ្នកគ្រប់គ្រង។</string>
+    <string name="MessageRecord_you_denied_a_request_to_join_the_group_from_s">អ្នកបានបដិសេធការស្នើសុំចូលរួមក្រុមពី %1$s។</string>
     <string name="MessageRecord_s_denied_a_request_to_join_the_group_from_s">%1$s បានបដិសេធសំណើចូលរួមក្រុមពី%2$s។</string>
     <string name="MessageRecord_a_request_to_join_the_group_from_s_has_been_denied">សំណើចួលរួមក្រុមពី %1$s ត្រូវបានបដិសេធ។</string>
     <string name="MessageRecord_you_canceled_your_request_to_join_the_group">អ្នកបានបោះបង់សំណើចូលរួមក្រុមរបស់អ្នក។</string>
@@ -1915,7 +1931,7 @@
     <!-- Chat log text for an ongoing group call only the local user has joined with a placeholder for formatted time -->
     <string name="MessageRecord_you_are_in_the_call_s1">អ្នកកំពុងនៅក្នុងការហៅ · %1$s</string>
     <!-- Chat log text for an ongoing group call with you and another participant where %1$s is the short display name of the other user and %2$s is the formatted time -->
-    <string name="MessageRecord_s_and_you_are_in_the_call_s1">%1$s and you are in the call · %2$s</string>
+    <string name="MessageRecord_s_and_you_are_in_the_call_s1">%1$s និងអ្នកកំពុងនៅក្នុងការហៅនេះ · %2$s</string>
     <!-- Chat log text for an ongoing group call with two participants with two placeholders for the short display name of the users that joined and a placeholder for formatted time -->
     <string name="MessageRecord_s_and_s_are_in_the_call_s1">%1$s និង %2$s កំពុងនៅក្នុងការហៅ · %3$s</string>
     <!-- Chat log text for an ongoing group call that has one participant -->
@@ -1923,7 +1939,7 @@
     <!-- Chat log text for an ongoing group call only the local user has joined -->
     <string name="MessageRecord_you_are_in_the_call">អ្នកកំពុងនៅក្នុងការហៅ</string>
     <!-- Chat log text for an ongoing group call with you and another participant where %1$s is the short display name of the other user -->
-    <string name="MessageRecord_s_and_you_are_in_the_call">%1$s and you are in the call</string>
+    <string name="MessageRecord_s_and_you_are_in_the_call">%1$s និងអ្នកកំពុងនៅក្នុងការហៅនេះ</string>
     <!-- Chat log text for an ongoing group call with two participants with two placeholders, each for the short display name of the users that joined -->
     <string name="MessageRecord_s_and_s_are_in_the_call">%1$s និង %2$s កំពុងនៅក្នុងការហៅនេះ</string>
     <!-- Chat log text for a group call that ended within the last 5 minutes -->
@@ -2046,7 +2062,7 @@
     <string name="DeviceProvisioningActivity_sorry_you_have_too_many_devices_linked_already">សុំទោស អ្នកបានភ្ជាប់ចំនួនឧបករណ៍ច្រើនពេក សូមលុបចោលខ្លះ</string>
     <string name="DeviceActivity_sorry_this_is_not_a_valid_device_link_qr_code">សុំទោស តំណកូដQR ភ្ជាប់ទៅកាន់ឧបករណ៍ មិនត្រឹមត្រូវ។</string>
     <string name="DeviceProvisioningActivity_link_a_signal_device">ភ្ជាប់ឧបករណ៍ Signal ១?</string>
-    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">To link a desktop or iPad to this Signal account, go to Linked Devices and tap \"Link a New Device\"and scan the QR code again. Make sure you only scan QR codes that come directly from Signal.</string>
+    <string name="DeviceProvisioningActivity_to_link_a_desktop_or_ipad_to_this_signal_account">ដើម្បីភ្ជាប់កុំព្យូទ័រលើតុ ឬ iPad ជាមួយគណនី Signal នេះ សូមចូលទៅកាន់ឧបករណ៍ដែលបានភ្ជាប់ ហើយចុច \"ភ្ជាប់ឧបករណ៍ថ្មី\" រួចហើយស្គែនកូដ QR ម្តងទៀត។ ត្រូវប្រាកដថាអ្នកស្គែនតែកូដ QR ដែលមកពី Signal ដោយផ្ទាល់ប៉ុណ្ណោះ។</string>
 
     <string name="DeviceActivity_signal_needs_the_camera_permission_in_order_to_scan_a_qr_code">Signalត្រូវការសិទ្ធិប្រើប្រាស់កាមេរ៉ាដើម្បីស្កេនកូដ QR ប៉ុន្តែវាត្រូវបានបដិសេធរហូត។ សូមបន្តទៅកាន់ ការកំណត់ជ្រើសរើស \"ការអនុញ្ញាត\" និងបើក \"កាមេរ៉ា\"។</string>
     <string name="DeviceActivity_unable_to_scan_a_qr_code_without_the_camera_permission">មិនអាចស្កេនកូដ QR ដោយគ្មានការអនុញ្ញាតសិទ្ធិប្រើប្រាស់កាមេរ៉ា</string>
@@ -2376,11 +2392,11 @@
     <string name="CallOverflowPopupWindow__expand_snackbar_accessibility_label">ពង្រីកមើលអ្នកលើកដៃ</string>
 
     <!-- Toolbar title of country picker selection page -->
-    <string name="CountryCodeFragment__your_country">Your country</string>
+    <string name="CountryCodeFragment__your_country">ប្រទេសរបស់អ្នក</string>
     <!-- Hint text in search bar to either enter in a country name or number -->
-    <string name="CountryCodeFragment__search_by">Search by name or number</string>
+    <string name="CountryCodeFragment__search_by">ស្វែងរកតាមឈ្មោះ ឬលេខកូដប្រទេស</string>
     <!-- Text shown when displaying a list of countries that indicates an unknown country    -->
-    <string name="CountryCodeFragment__unknown_country">Unknown country</string>
+    <string name="CountryCodeFragment__unknown_country">ប្រទេសមិនស្គាល់</string>
 
     <!-- AboutSheet -->
     <!-- Displayed in a sheet row and allows user to open signal connection explanation on tap -->
@@ -2462,9 +2478,9 @@
     <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
     <string name="RegistrationActivity_you_will_receive_a_verification_code">អ្នកនឹងទទួលបានកូដផ្ទៀងផ្ទាត់។ អត្រាគិតប្រាក់ក្រុមហ៊ុនអាចនឹងត្រូវបានអនុវត្ត។</string>
     <!-- Hint text to select a country -->
-    <string name="RegistrationActivity_select_a_country">Select a country</string>
+    <string name="RegistrationActivity_select_a_country">ជ្រើសរើសប្រទេសមួយ</string>
     <!-- Hint text explaining that this is where the country code should go -->
-    <string name="RegistrationActivity_default_country_code">+0</string>
+    <string name="RegistrationActivity_default_country_code">0</string>
     <string name="RegistrationActivity_you_will_receive_a_call_to_verify_this_number">អ្នកនឹងទទួលបានការហៅមួយដើម្បីផ្ទៀងផ្ទាត់លេខនេះ។</string>
     <string name="RegistrationActivity_edit_number">កែប្រែលេខ</string>
     <string name="RegistrationActivity_missing_google_play_services">រកមិនឃើញ Google Play Services</string>
@@ -3642,6 +3658,8 @@
     <string name="preferences__language">ភាសា</string>
     <string name="preferences__signal_messages_and_calls">ការផ្ញើសារ និងការហៅSignal</string>
     <string name="preferences__advanced_pin_settings">ការកំណត់លេខកូដ PIN ជាន់ខ្ពស់</string>
+    <!-- Title of toolbar for the advanced pin settings screen -->
+    <string name="preferences__advanced_pin_settings_title">ការកំណត់លេខកូដ PIN ជាន់ខ្ពស់</string>
     <string name="preferences__free_private_messages_and_calls">ការផ្ញើសារ និងការហៅចេញជាឯកជនភាព​ ដោយមិនគិតថ្លៃ​ ទៅកាន់អ្នកប្រើប្រាស់Signal</string>
     <string name="preferences__submit_debug_log">បញ្ជូនកំណត់ហេតុបញ្ហា</string>
     <string name="preferences__delete_account">លុបគណនី</string>
@@ -3744,6 +3762,7 @@
     <string name="preferences_connection_failed">ការតភ្ជាប់បរាជ័យ</string>
     <string name="preferences_couldnt_connect_to_the_proxy">មិនអាចតភ្ជាប់ទៅប្រូកស៊ី។ ពិនិត្យអាសយដ្ឋានប្រូកស៊ី និងសាកល្បងម្តងទៀត។</string>
     <string name="preferences_you_are_connected_to_the_proxy">អ្នកបានតភ្ជាប់ទៅប្រូកស៊ី។ អ្នកអាចបិទប្រូកស៊ីពេលណាក៏បាន នៅក្នុង ការកំណត់។</string>
+    <!-- Title of alert dialog after a successful connection to the proxy -->
     <string name="preferences_success">ជោគជ័យ</string>
     <string name="preferences_failed_to_connect">បរាជ័យក្នុងការតភ្ជាប់</string>
     <string name="preferences_enter_proxy_address">បញ្ចូលអាសយដ្ឋានប្រូកស៊ី</string>
@@ -4338,6 +4357,7 @@
     <string name="BackupDialog_copied_to_clipboard">បានចម្លងទៅ clipboard</string>
     <string name="BackupDialog_no_file_picker_available">មិនមានអ្នករើសឯកសារទេ។</string>
     <string name="BackupDialog_enter_backup_passphrase_to_verify">បញ្ចូលឃ្លាសម្ងាត់បម្រុងទុករបស់អ្នកដើម្បីផ្ទៀងផ្ទាត់</string>
+    <!-- Confirmation button text on an alert dialog to verify whether the entered backup phrase was correct -->
     <string name="BackupDialog_verify">ផ្ទៀងផ្ទាត់</string>
     <string name="BackupDialog_you_successfully_entered_your_backup_passphrase">អ្នកបានបញ្ចូលឃ្លាសម្ងាត់បម្រុងទុករបស់អ្នកដោយជោគជ័យ</string>
     <string name="BackupDialog_passphrase_was_not_correct">ឃ្លាសម្ងាត់មិនត្រឹមត្រូវ</string>
@@ -4362,6 +4382,7 @@
     <string name="RegistrationActivity_code_support_subject">ការចុះឈ្មោះ Signal - ការផ្ទៀងផ្ទាត់កូដសម្រាប់ Android</string>
     <string name="RegistrationActivity_incorrect_code">លេខកូដមិនត្រឹមត្រូវ</string>
     <string name="BackupUtil_never">មិនធ្លាប់</string>
+    <!-- Subtext below last backup time when we do not know when the last backup was -->
     <string name="BackupUtil_unknown">មិនស្គាល់</string>
     <!-- Phone number heading displayed as a screen title -->
     <string name="preferences_app_protection__phone_number">លេខទូរសព្ទ</string>
@@ -4546,6 +4567,7 @@
     <string name="DeviceTransferSetup__try_turning_wifi_off_and_on_on_both_devices">សូមព្យាយាមបិទ បើកវ៉ាយហ្វាយនៅលើឧបករណ៍ទាំងពីរ</string>
     <string name="DeviceTransferSetup__make_sure_both_devices_are_in_transfer_mode">អ្នកត្រូវប្រាកដថាឧបករណ៍ទាំងពីរស្ថិតនៅក្នុងការផ្ទេរ</string>
     <string name="DeviceTransferSetup__go_to_support_page">ចូលទៅកាន់ទំព័រសេវាជំនួយ</string>
+    <!-- Button text when a device transfer could not occur and to try again -->
     <string name="DeviceTransferSetup__try_again">ព្យាយាមម្តងទៀត</string>
     <string name="DeviceTransferSetup__waiting_for_other_device">កំពុងរង់ចាំឧបករណ៍ផ្សេងទៀត</string>
     <string name="DeviceTransferSetup__tap_continue_on_your_other_device_to_start_the_transfer">ចុចពាក្យ បន្ត លើឧបករណ៍មួយទៀតរបស់អ្នកដើម្បីចាប់ផ្ដើមការផ្ទេរ</string>
@@ -5043,6 +5065,7 @@
 
     <!-- ChangeNumberVerifyFragment -->
     <string name="ChangeNumberVerifyFragment__change_number">ប្ដូរលេខទូរស័ព្ទ</string>
+    <!-- Text shown when verifying a new phone number where %1$s is the number being changed -->
     <string name="ChangeNumberVerifyFragment__verifying_s">កំពុងបញ្ជាក់ %1$s</string>
     <string name="ChangeNumberVerifyFragment__captcha_required">តម្រូវអោយផ្ទៀងផ្ទាត់តាម Captcha</string>
 
@@ -5411,6 +5434,7 @@
     <string name="ConversationSettingsFragment__permissions">ការអនុញ្ញាត</string>
     <string name="ConversationSettingsFragment__requests_and_invites">ស្នើរ &amp; អញ្ជើញ</string>
     <string name="ConversationSettingsFragment__group_link">តំណភ្ជាប់របស់ក្រុម</string>
+    <!-- Option in conversation settings to add a user as a contact -->
     <string name="ConversationSettingsFragment__add_as_a_contact">បញ្ចូលជាលេខទំនាក់ទំនង</string>
     <string name="ConversationSettingsFragment__unmute">បើកសំឡេង</string>
     <!-- The subtitle for a settings item that describes how long the user\'s chat is muted. If a chat is muted, you will not receive notifications unless @mentioned. The placeholder represents a time (e.g. 10pm, March 4, etc). -->
@@ -5523,6 +5547,7 @@
     <string name="ShareInterstitialActivity__share">ចែករំលែក</string>
 
     <!-- DSLSettingsToolbar -->
+    <!-- Content description describing the back arrow on toolbars -->
     <string name="DSLSettingsToolbar__navigate_up">រុករក</string>
     <string name="MultiselectForwardFragment__forward_to">បញ្ជូនបន្តទៅកាន់</string>
     <!-- Displayed when sharing content to people via the fragment -->
@@ -5533,6 +5558,7 @@
     <string name="MultiselectForwardFragment__videos_will_be_trimmed">វីដេអូនឹងត្រូវបានតម្រឹមជាឃ្លីបដែលមានរយៈពេល 30 វិនាទី ហើយផ្ញើជារឿងរ៉ាវជាច្រើន។</string>
     <!-- Displayed when user selects a video that cannot be sent as a story -->
     <string name="MultiselectForwardFragment__videos_sent_to_stories_cant">វីដេអូដែលបានផ្ញើទៅរឿងរ៉ាវមិនអាចវែងជាង 30 វិនាទីទេ។</string>
+    <!-- Body in alert dialog telling users that messages are now sent immediately -->
     <string name="MultiselectForwardFragment__forwarded_messages_are_now">ការបញ្ជូនសារបន្តនឹងផ្ញើចេញទៅភ្លាមៗ</string>
     <plurals name="MultiselectForwardFragment_send_d_messages">
         <item quantity="other">ផ្ញើ %1$d សារ</item>
@@ -5618,7 +5644,7 @@
     <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
     <string name="MediaCaptureFragment_device_link_dialog_title">ភ្ជាប់ឧបករណ៍មែនទេ?</string>
     <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">It looks like you\'re trying to link a Signal device. Tap continue and then tap \"Link a New Device\" and scan the QR code again.</string>
+    <string name="MediaCaptureFragment_it_looks_like_youre_trying">អ្នកហាក់ដូចជាកំពុងព្យាយាមភ្ជាប់ឧបករណ៍ Signal។ ចុចបន្ត ហើយបន្ទាប់មកចុច \"ភ្ជាប់ឧបករណ៍ថ្មី\" ហើយស្គែនកូដ QR ម្តងទៀត។</string>
     <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
     <string name="MediaCaptureFragment_device_link_dialog_continue">បន្ត</string>
 
@@ -5713,6 +5739,7 @@
 
     <string name="MySupportPreference__s_per_month">%1$s/ខែ</string>
     <string name="MySupportPreference__renews_s">បន្ត %1$s</string>
+    <!-- Subtitle shown when processing a donation transaction -->
     <string name="MySupportPreference__processing_transaction">កំពុងដំណើការទូទាត់ប្រាក់</string>
     <!-- Displayed on "My Support" screen when user badge failed to be added to their account -->
     <string name="MySupportPreference__couldnt_add_badge_s">មិនអាចដាក់ស្លាកបានទេ។ %1$s</string>
@@ -6125,7 +6152,7 @@
     <string name="StoriesLandingItem__info">ព័ត៌មាន</string>
     <!-- Label when a story is pending sending -->
     <string name="StoriesLandingItem__sending">កំពុងផ្ញើ…</string>
-    <!-- Label when multiple stories are pending sending -->
+    <!-- Label when multiple stories are pending sending where %1$d is the number of stories being sent -->
     <string name="StoriesLandingItem__sending_d">កំពុងផ្ញើ %1$d …</string>
     <!-- Label when a story fails to send due to networking -->
     <string name="StoriesLandingItem__send_failed">ផ្ញើបរាជ័យ</string>
@@ -7908,19 +7935,25 @@
     <!-- Backup key not known bottom sheet button to skip backup key entry and resume normal reregistration -->
     <string name="EnterBackupKey_skip_and_dont_restore">រំលង ហើយកុំស្តារ</string>
     <!-- Dialog title shown when entered AEP doesn\'t work to register with provided e164 -->
-    <string name="EnterBackupKey_incorrect_backup_key_title">Incorrect backup key</string>
+    <string name="EnterBackupKey_incorrect_backup_key_title">សោបម្រុងទុកមិនត្រឹមត្រូវ</string>
     <!-- Dialog message shown when entered AEP doesn\'t work to register with provided e164 -->
-    <string name="EnterBackupKey_incorrect_backup_key_message">Make sure you\'re registering with the same phone number and 64-character backup key you saved when enabling Signal backups. Backups can not be recovered without this key.</string>
+    <string name="EnterBackupKey_incorrect_backup_key_message">ត្រូវប្រាកដថាអ្នកកំពុងចុះឈ្មោះជាមួយលេខទូរសព្ទដូចគ្នា និងសោបម្រុងទុក 64 តួអក្សរដែលអ្នកបានរក្សាទុកនៅពេលបើកការបម្រុងទុក Signal។ ការបម្រុងទុកមិនអាចស្តារបានទេបើគ្មានសោនេះ។</string>
     <!-- Dialog positive button text to try entering their backup key again -->
     <string name="EnterBackupKey_try_again">ព្យាយាមម្តងទៀត</string>
     <!-- Dialog negative button text to get help with backup key -->
-    <string name="EnterBackupKey_backup_key_help">Backup key help</string>
+    <string name="EnterBackupKey_backup_key_help">ជំនួយសោបម្រុងទុក</string>
     <!-- Text field error text when the backup key provided has been confirmed invalid -->
-    <string name="EnterBackupKey_incorrect_backup_key_error">Incorrect backup key</string>
+    <string name="EnterBackupKey_incorrect_backup_key_error">សោបម្រុងទុកមិនត្រឹមត្រូវ</string>
     <!-- Text field error text when the backup key is too long -->
-    <string name="EnterBackupKey_too_long_error">Too long (%1$d/%2$d)</string>
+    <string name="EnterBackupKey_too_long_error">វែងពេក (%1$d/%2$d)</string>
     <!-- Text field error when the backup key is invalid -->
-    <string name="EnterBackupKey_invalid_backup_key_error">Invalid backup key</string>
+    <string name="EnterBackupKey_invalid_backup_key_error">សោបម្រុងទុកមិនត្រឹមត្រូវ</string>
+    <!-- Dialog title shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_not_found">រកមិនឃើញការបម្រុងទុកទេ</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">សោបម្រុងទុកដែលអ្នកបានបញ្ចូលត្រឹមត្រូវហើយ ប៉ុន្តែមិនមានការបម្រុងទុកដែលពាក់ព័ន្ធនឹងវាទេ។ ប្រសិនបើអ្នកនៅតែមានទូរសព្ទចាស់របស់អ្នក សូមប្រាកដថាការបម្រុងទុកត្រូវបានបើក ហើយថាការបម្រុងទុកត្រូវបានបញ្ចប់ រួចព្យាយាមម្តងទៀត។</string>
+    <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
+    <string name="EnterBackupKey_skip_restore">រំលងការស្តារឡើងវិញ</string>
 
     <!-- Title for restore via qr screen -->
     <string name="RestoreViaQr_title">ស្គែនកូដនេះដោយប្រើទូរសព្ទចាស់របស់អ្នក</string>
