@@ -462,7 +462,7 @@
 
     <string name="ConversationActivity_invalid_recipient">Ugyldig mottaker.</string>
     <string name="ConversationActivity_added_to_home_screen">Lagt til startskjermen</string>
-    <string name="ConversationActivity_calls_not_supported">Samtaler støttes ikke</string>
+    <string name="ConversationActivity_calls_not_supported">Anrop støttes ikke</string>
     <string name="ConversationActivity_this_device_does_not_appear_to_support_dial_actions">Denne enheten ser ikke ut til å støtte oppringing.</string>
     <string name="ConversationActivity_transport_insecure_sms">Usikker SMS</string>
     <!-- A title for the option to send an SMS with a placeholder to put the name of their SIM card -->
@@ -572,11 +572,6 @@
         <item quantity="one">Hvis du lagrer disse mediene på enheten din, kan andre programmer få tilgang til dem.\n\nVil du fortsette?</item>
         <item quantity="other">Hvis du lagrer disse %1$d mediene på enheten din, kan andre programmer få tilgang til dem.\n\nVil du fortsette?</item>
     </plurals>
-    <plurals name="ConversationFragment_error_while_saving_attachments_to_sd_card">
-        <item quantity="one">Det oppstod en feil under lagring av vedlegg som vanlig fil.</item>
-        <item quantity="other">Det oppstod en feil under lagring av vedlegg som vanlige filer.</item>
-    </plurals>
-    <string name="ConversationFragment_unable_to_write_to_sd_card_exclamation">Klarte ikke å skrive til enhetslager.</string>
     <plurals name="ConversationFragment_saving_n_attachments">
         <item quantity="one">Lagrer vedlegget</item>
         <item quantity="other">Lagrer %1$d vedlegg</item>
@@ -669,6 +664,18 @@
     <string name="ConversationFragment_reported_as_spam_and_blocked">Rapportert som søppelpost og blokkert</string>
     <!-- Dialog message shown after accepting a message request and tapping on options from the conversation event -->
     <string name="ConversationFragment_you_accepted_a_message_request_from_s">Du godtok meldingsforespørselen fra %1$s. Dersom dette skjedde ved en feil, kan du velge en av handlingene nedenfor.</string>
+    <!-- Text shown in conversation header when in a message request state and to carefully review the user -->
+    <string name="ConversationFragment_review_carefully">Se nøye gjennom</string>
+    <!-- Text shown in conversation header when in a message request state that profile names are not verified. Placeholder will be \'Profile names\' -->
+    <string name="ConversationFragment_profile_names_not_verified">%1$s bekreftes ikke</string>
+    <!-- Text shown in conversation header when in a message request state that group names are not verified. Placeholder will be \'Group names\' -->
+    <string name="ConversationFragment_group_names_not_verified">%1$s bekreftes ikke</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about profile names -->
+    <string name="ConversationFragment_profile_names">Profilnavn</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about group names -->
+    <string name="ConversationFragment_group_names">Gruppenavn</string>
+    <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
+    <string name="ConversationFragment_photo_failed">Bildet kunne ikke lastes ned. Prøv på nytt.</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Sikkerhetstips</string>
@@ -680,6 +687,10 @@
     <string name="SafetyTips_previous_tip">Forrige tips</string>
     <!-- Button text to move to the next tip -->
     <string name="SafetyTips_next_tip">Neste tips</string>
+    <!-- Title of tip 0 -->
+    <string name="SafetyTips_tip0_title">Falske navn og kontoer</string>
+    <!-- Message of tip 0 -->
+    <string name="SafetyTips_tip0_message">Signal kommer aldri til å be deg om å sende registreringskoden eller PIN-koden din. Vær på vakt mot forespørsler fra svindlere som utgir seg for å være andre. Profilnavn velges av kontoinnehavere og bekreftes ikke.</string>
     <!-- Title of tip 1 -->
     <string name="SafetyTips_tip1_title">Krypto- og pengesvindel</string>
     <!-- Message of tip 1 -->
@@ -696,6 +707,21 @@
     <string name="SafetyTips_tip4_title">Falske virksomheter og organisasjoner</string>
     <!-- Message of tip 4 -->
     <string name="SafetyTips_tip4_message">Vær forsiktig hvis du blir kontaktet av virksomheter eller offentlige etater. Meldinger som omhandler skattebetalinger, forsendelser og lignende er ofte søppelpost.</string>
+
+    <!-- Bottom sheet text explaining that profile names are chosen by the account holder. Placeholder will be \'Profile names\' -->
+    <string name="ProfileNameBottomSheet__profile_names_on_signal">%1$s på Signal velges av kontoinnehaveren.</string>
+    <!-- Bottom sheet text explaining that profile names are not verified. -->
+    <string name="ProfileNameBottomSheet__profile_names_arent_verified">Profilnavn kan ikke bekreftes</string>
+    <!-- Bottom sheet text explaining that accounts can impersonate other people and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_accounts">Vær på vakt mot svindlere som utgir seg for å være andre</string>
+    <!-- Bottom sheet text explaining that personal information should not be shared with strangers -->
+    <string name="ProfileNameBottomSheet__dont_share_personal">Ikke send personlige opplysninger til folk du ikke kjenner</string>
+    <!-- Bottom sheet text explaining that group names are chosen by the group members. Placeholder will be \'Group names\' -->
+    <string name="ProfileNameBottomSheet__group_names_on_signal">%1$s velges av gruppemedlemmene.</string>
+    <!-- Bottom sheet text explaining that groups can impersonate organizations and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_groups">Vær på vakt mot grupper som utgir seg for å være organisasjoner og bedrifter</string>
+    <!-- Bottom sheet text explaining that profile names of group members are not verified -->
+    <string name="ProfileNameBottomSheet__profile_names_in_groups">Profilnavnene til gruppemedlemmer bekreftes ikke</string>
 
     <!-- Label for a button displayed in conversation list to clear the chat filter -->
     <string name="ConversationListFragment__clear_filter">Tøm filter</string>
@@ -759,8 +785,11 @@
     <string name="AddToFolderBottomSheet_choose_a_folder">Velg en mappe</string>
     <!-- Toast shown when a chat has been added to a folder, where %s is the name of the folder -->
     <string name="AddToFolderBottomSheet_added_to_s">Lagt til i «%1$s»</string>
-    <!-- Toast shown when a user tries to add a chat to a folder, but the folder already has that chat. %s is the name of the folder -->
-    <string name="AddToFolderBottomSheet_this_chat_is_already">Denne samtalen er allerede lagt i mappen «%1$s»</string>
+    <!-- Toast shown when a user tries to add chats to a folder, but the folder already has those chats. %s is the name of the folder -->
+    <plurals name="AddToFolderBottomSheet_these_chat_are_already_in_s">
+        <item quantity="one">Denne samtalen ligger allerede i %1$s</item>
+        <item quantity="other">Disse samtalene ligger allerede i %1$s</item>
+    </plurals>
 
     <!-- Show in conversation list overflow menu to open selection bottom sheet -->
     <string name="ConversationListFragment__notification_profile">Varslingsprofil</string>
@@ -1151,7 +1180,7 @@
 
     <!-- GcmRefreshJob -->
     <string name="GcmRefreshJob_Permanent_Signal_communication_failure">Permanent Signal kommunikasjonssvikt!</string>
-    <string name="GcmRefreshJob_Signal_was_unable_to_register_with_Google_Play_Services">Signal klarte ikke å registrere seg i Google Play-tjenesten. Signal-meldinger og -samtaler er derfor slått av. Prøv å registrere programmet på nytt under Innstillinger &gt; Avansert.</string>
+    <string name="GcmRefreshJob_Signal_was_unable_to_register_with_Google_Play_Services">Signal kunne ikke registreres i Google Play-tjenesten. Signal-meldinger og Signal-anrop er derfor slått av. Prøv å registrere programmet på nytt under Innstillinger &gt; Avansert.</string>
 
 
     <!-- GiphyActivity -->
@@ -2052,6 +2081,14 @@
     <string name="MessageRecord_reported_as_spam">Rapportert som søppelpost</string>
     <!-- Update message shown in chat after accept a message request -->
     <string name="MessageRecord_you_accepted_the_message_request">Du godtok meldingsforespørselen</string>
+    <!-- Update message shown in chat after you block a person -->
+    <string name="MessageRecord_you_blocked_this_person">Du blokkerte denne personen</string>
+    <!-- Update message shown in chat after you unblock a person -->
+    <string name="MessageRecord_you_unblocked_this_person">Du fjernet blokkeringen av denne personen</string>
+    <!-- Update message shown in chat after you block a group -->
+    <string name="MessageRecord_you_blocked_this_group">Du blokkerte denne gruppen</string>
+    <!-- Update message shown in chat after you unblock a group -->
+    <string name="MessageRecord_you_unblocked_this_group">Du fjernet blokkeringen av denne gruppen</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Godta</string>
@@ -2103,6 +2140,16 @@
     </plurals>
     <!-- Button label to report spam for a conversation when in a message request state -->
     <string name="MessageRequestBottomView_report">Rapporter</string>
+    <!-- Alert dialog title to accept a message request -->
+    <string name="MessageRequestBottomView_accept_request">Vil du godta forespørselen?</string>
+    <!-- Alert dialog body to review the message request carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully">Se nøye gjennom forespørsler. Profilnavn velges av kontoinnehavere og bekreftes ikke.</string>
+    <!-- Alert dialog title to accept a message request to join a group -->
+    <string name="MessageRequestBottomView_join_group">Vil du bli med i gruppen?</string>
+    <!-- Alert dialog body to review the message request for a group carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully_groups">Se nøye gjennom forespørsler. Gruppenavn velges av kontoinnehavere og bekreftes ikke.</string>
+    <!-- Button text to join a group -->
+    <string name="MessageRequestBottomView_join">Bli med</string>
 
     <!-- PassphraseChangeActivity -->
     <string name="PassphraseChangeActivity_passphrases_dont_match_exclamation">Passordene stemmer ikke overens!</string>
@@ -2485,12 +2532,16 @@
     <string name="AboutSheet__signal_connection">Signal-kontakter</string>
     <!-- Displayed in a sheet row describing that the user has marked this contact as \'verified\' from within the app -->
     <string name="AboutSheet__verified">Bekreftet</string>
+    <!-- Displayed in a sheet row that tells users that profile names are not verified -->
+    <string name="AboutSheet__profile_names_are_not_verified">Profilnavn kan ikke bekreftes</string>
+    <!-- Displayed in a sheet row describing that the user is in a message request state with the person -->
+    <string name="AboutSheet__pending_message_request">Ventende meldingsforespørsel</string>
     <!-- Displayed in bottom sheet describing that the user has no direct messages with this person. The placeholder is a person\'s name. -->
     <string name="AboutSheet__no_direct_message">Ingen direktemeldinger med %1$s</string>
     <!-- Explains that the given user (placeholder is short name) is in the users system contact -->
     <string name="AboutSheet__s_is_in_your_system_contacts">%1$s står i kontaktlisten på telefonen din</string>
     <!-- Notice in a row when user has no groups in common -->
-    <string name="AboutSheet__you_have_no_groups_in_common">Dere har ingen grupper til felles</string>
+    <string name="AboutSheet__you_have_no_groups_in_common">Ingen grupper til felles</string>
     <!-- Notice when a user is not a connection to review requests carefully -->
     <string name="AboutSheet__review_requests_carefully">Gjennomgå forespørsler nøye</string>
     <!-- Text used when user has groups in common. Placeholder is the count -->
@@ -2802,6 +2853,8 @@
     <string name="ThreadRecord_message_history_has_been_merged">Meldingsloggene har blitt slått sammen</string>
     <!--  Displayed in the conversation list when identities have been merged. The first placeholder is a phone number, and the second is a person\'s name -->
     <string name="ThreadRecord_s_belongs_to_s">%1$s tilhører %2$s</string>
+    <!-- Displayed in the conversation list when a person has been blocked -->
+    <string name="ThreadRecord_blocked">Blokkert</string>
 
     <!-- ApkUpdateNotifications -->
     <string name="ApkUpdateNotifications_prompt_install_title">Signal oppdatering</string>
@@ -3001,7 +3054,7 @@
 
     <!-- Notification Channels -->
     <string name="NotificationChannel_channel_messages">Meldinger</string>
-    <string name="NotificationChannel_calls">Samtaler</string>
+    <string name="NotificationChannel_calls">Anrop</string>
     <!-- Notification channel name for notifications involving failures of some sort (eg donations, message sends, etc.) -->
     <string name="NotificationChannel_failures">Feil</string>
     <string name="NotificationChannel_backups">Sikkerhetskopiering</string>
@@ -3031,8 +3084,27 @@
     <string name="QuickResponseService_quick_response_unavailable_when_Signal_is_locked">Hurtigsvar er utilgjengelig når Signal er låst.</string>
     <string name="QuickResponseService_problem_sending_message">Det oppstod et problem under sending av melding.</string>
 
-    <!-- A small toast notification to let the user know their image/video/audio was downloaded and saved to their device, accessible in other apps. -->
-    <string name="SaveAttachmentTask_saved">Mediet er lagret</string>
+    <!-- A toast notification that is shown when the app does not have sufficient permissions to save media files to the device storage. -->
+    <string name="SaveAttachment_unable_to_write_to_sd_card_exclamation">Klarte ikke å skrive til enhetslager.</string>
+
+    <!-- A toast notification that is shown after image/video/audio media was successfully downloaded and saved to the device storage, accessible in other apps. -->
+    <plurals name="SaveAttachment_saved_success">
+        <item quantity="one">Mediefilen ble lagret</item>
+        <item quantity="other">Mediefilene ble lagret</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after some image/video/audio media was successfully downloaded and saved to the device storage, but some failed to save
+         %1$s is the number of items that failed to save and %2$s is the total number of items that the user requested to save. -->
+    <plurals name="SaveAttachment_saved_success_n_failures">
+        <item quantity="one">Mediefilen ble lagret (%1$s av %2$s kunne ikke lagres)</item>
+        <item quantity="other">Mediefilene ble lagret (%1$s av %2$s kunne ikke lagres)</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after all of the requested image/video/audio media failed to save to the device storage. -->
+    <plurals name="SaveAttachment_error_while_saving_attachments_to_sd_card">
+        <item quantity="one">Det oppstod en feil under lagring av vedlegg som vanlig fil.</item>
+        <item quantity="other">Det oppstod en feil under lagring av vedlegg som vanlige filer.</item>
+    </plurals>
 
     <!-- SearchToolbar -->
     <string name="SearchToolbar_search">Søk</string>
@@ -3108,7 +3180,7 @@
     <string name="WebRtcCallActivity_to_answer_the_call_give_signal_access_to_your_microphone">Gi Signal tilgang til mikrofonen for å svare på anropet.</string>
     <!-- Message shown in permission dialog when attempting to answer a video call without camera or microphone permissions already granted. -->
     <string name="WebRtcCallActivity_to_answer_the_call_give_signal_access_to_your_microphone_and_camera">Gi Signal tilgang til mikrofonen og kameraet for å svare på videoanropet.</string>
-    <string name="WebRtcCallActivity_signal_requires_microphone_and_camera_permissions_in_order_to_make_or_receive_calls">Signal krever tillatelser fra systemet for å kunne ringe eller motta samtaler, men du har valgt å avslå minst én av disse permanent. Gå til «Apper»-menyen på systemet og slå på tillatelser for «Mikrofon» og «Kamera».</string>
+    <string name="WebRtcCallActivity_signal_requires_microphone_and_camera_permissions_in_order_to_make_or_receive_calls">Signal krever tillatelser fra systemet for å kunne ringe og motta telefonsamtaler, men du har valgt å avslå minst én av disse permanent. Gå til «Apper»-menyen på systemet og slå på tillatelser for «Mikrofon» og «Kamera».</string>
     <string name="WebRtcCallActivity__answered_on_a_linked_device">Besvart på en koblet enhet.</string>
     <string name="WebRtcCallActivity__declined_on_a_linked_device">Avslått på en koblet enhet.</string>
     <string name="WebRtcCallActivity__busy_on_a_linked_device">Opptatt på en koblet enhet.</string>
@@ -3269,7 +3341,8 @@
     <string name="ConversationUpdateItem_update_contact">Oppdater kontakt</string>
     <!-- Update item button text to show to block a recipient from requesting to join via group link -->
     <string name="ConversationUpdateItem_block_request">Blokker forespørselen</string>
-    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Ingen felles grupper. Gjennomgå forespørsler nøye.</string>
+    <!-- Text shown in conversation header that the account messaging the user does not have any groups in common with them -->
+    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Ingen grupper til felles</string>
     <string name="ConversationUpdateItem_no_contacts_in_this_group_review_requests_carefully">Ingen kontakter i denne gruppen. Gjennomgå forespørsler nøye.</string>
     <string name="ConversationUpdateItem_view">Vis</string>
     <string name="ConversationUpdateItem_the_disappearing_message_time_will_be_set_to_s_when_you_message_them">Utløpstiden for meldinger blir satt til %1$s når du melder dem.</string>
@@ -3759,11 +3832,11 @@
     <string name="preferences__pins_keep_information_stored_with_signal_encrypted_so_only_you_can_access_it">PIN-koder holder informasjon lagret i Signal kryptert slik at bare du kan få tilgang til den. Profilen, innstillingene og kontaktene dine vil gjenopprettes når du installerer Signal på nytt. Du vil ikke trenge PIN-koden for å åpne appen.</string>
     <string name="preferences__system_default">System standard</string>
     <string name="preferences__language">Språk</string>
-    <string name="preferences__signal_messages_and_calls">Signal-meldinger og -samtaler</string>
+    <string name="preferences__signal_messages_and_calls">Meldinger og anrop i Signal</string>
     <string name="preferences__advanced_pin_settings">Avanserte PIN-kode instillinger</string>
     <!-- Title of toolbar for the advanced pin settings screen -->
     <string name="preferences__advanced_pin_settings_title">Avanserte innstillinger for PIN-kode</string>
-    <string name="preferences__free_private_messages_and_calls">Gratis private meldinger og samtaler til Signal-brukere</string>
+    <string name="preferences__free_private_messages_and_calls">Gratis private meldinger og anrop til Signal-brukere</string>
     <string name="preferences__submit_debug_log">Send inn feilsøkingslogg</string>
     <string name="preferences__delete_account">Slett kontoen</string>
     <string name="preferences__support_wifi_calling">«Wi-Fi-anrop»-tilbakefallsmodus</string>
@@ -3818,8 +3891,8 @@
 
     <string name="preferences_storage__custom">Selvvalgt</string>
     <string name="preferences_advanced__use_system_emoji">Bruk systemets emoji</string>
-    <string name="preferences_advanced__relay_all_calls_through_the_signal_server_to_avoid_revealing_your_ip_address">Omdiriger alle samtaler gjennom Signal-tjenesten for å unngå å avsløre IP-adressen din til kontakten din. Aktivering vil redusere samtalekvaliteten.</string>
-    <string name="preferences_advanced__always_relay_calls">Omdiriger alle samtaler</string>
+    <string name="preferences_advanced__relay_all_calls_through_the_signal_server_to_avoid_revealing_your_ip_address">Omdiriger alle anrop gjennom Signal-tjenesten for å unngå å avsløre IP-adressen din til kontakten din. Aktivering vil redusere samtalekvaliteten.</string>
+    <string name="preferences_advanced__always_relay_calls">Omdiriger alle telefonsamtaler</string>
     <!-- Privacy settings payments section title -->
     <string name="preferences_app_protection__payments">Betalinger</string>
     <string name="preferences_chats__chats">Samtaler</string>
@@ -3829,7 +3902,7 @@
     <string name="preferences_data_and_storage__never">Aldri</string>
     <string name="preferences_data_and_storage__wifi_and_mobile_data">WiFi og mobildata</string>
     <string name="preferences_data_and_storage__mobile_data_only">Kun mobildata</string>
-    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">Lavere dataforbruk kan forbedre samtaler på dårlige nettverk</string>
+    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">Lavere dataforbruk kan forbedre telefonsamtaler på dårlige nettverk</string>
     <string name="preferences_notifications__in_chat_sounds">Samtalelyder</string>
     <string name="preferences_notifications__show">Vis</string>
     <string name="preferences_notifications__ringtone">Ringetone</string>
@@ -4408,6 +4481,13 @@
     <string name="KbsMegaphone__create_a_pin">Lag en PIN</string>
     <string name="KbsMegaphone__pins_keep_information_thats_stored_with_signal_encrytped">PIN-koden holder informasjonen som er lagret i Signal kryptert.</string>
     <string name="KbsMegaphone__create_pin">Lag PIN</string>
+
+    <!-- Title for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_signal_pin">Velg Signal-PIN</string>
+    <!-- Message for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__message">Velg en PIN-kode for å fullføre kontoregistreringen.</string>
+    <!-- Button text for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_pin">Velg PIN-kode</string>
 
     <!-- CallNotificationBuilder -->
     <!-- Displayed in a notification when a Signal voice call is ringing -->
@@ -5736,6 +5816,24 @@
     <string name="MediaReviewFragment__photo_set_to_high_quality">Bildet vises i høy oppløsning</string>
     <!-- Small notification presented to the user when they set their still image to be sent in standard (lower than high) visual quality. -->
     <string name="MediaReviewFragment__photo_set_to_standard_quality">Bildet vises i standard oppløsning</string>
+    <!-- Accessibility label describing the add media button on the Media review screen -->
+    <string name="MediaReviewFragment__add_media_accessibility_label">Legg til en mediefil</string>
+    <!-- Accessibility label describing the brush and pen button on the Media review screen -->
+    <string name="MediaReviewFragment__brush_pen_accessibility_label">Pensel og blyant</string>
+    <!-- Accessibility label describing the crop and rotate button on the Media review screen -->
+    <string name="MediaReviewFragment__crop_rotate_accessibility_label">Beskjær og roter</string>
+    <!-- Accessibility label describing the change media quality button on the Media review screen -->
+    <string name="MediaReviewFragment__change_media_quality_accessibility_label">Endre kvaliteten på mediefilen</string>
+    <!-- Accessibility label describing the save media button on the Media review screen -->
+    <string name="MediaReviewFragment__save_media_accessibility_label">Lagre mediefilen</string>
+    <!-- Accessibility label describing the toggle emoji keyboard button on the Media review screen -->
+    <string name="MediaReviewFragment__emoji_toggle_accessibility_label">Slå av/på emoji-tastatur</string>
+    <!-- Accessibility label describing the toggle view once button on the Media review screen -->
+    <string name="MediaReviewFragment__view_once_toggle_accessibility_label">Slå av/på flyktig mediefil</string>
+    <!-- Accessibility label describing the send media button on the Media review screen -->
+    <string name="MediaReviewFragment__send_media_accessibility_label">Send mediefilen</string>
+    <!-- Accessibility label describing the finish adding a message button on the Media review screen dialog -->
+    <string name="MediaReviewFragment__finish_adding_a_message_accessibility_label">Lagre meldingen</string>
     <!-- Small notification presented to the user when they set multiple media items to be sent in high visual quality. -->
     <plurals name="MediaReviewFragment__items_set_to_high_quality">
         <item quantity="one">%1$d element vises i høy oppløsning</item>
@@ -5986,7 +6084,7 @@
     <string name="DonationsErrors__your_payment_is_still">Betalingen av pengegaven er fremdeles under behandling. Dette kan ta et par minutter, avhengig av internettilkoblingen.</string>
     <string name="DonationsErrors__failed_to_cancel_subscription">Kunne ikke avslutte abonnementet</string>
     <string name="DonationsErrors__subscription_cancellation_requires_an_internet_connection">Du må være koblet til internett for å kunne avslutte abonnementet.</string>
-    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support_google_pay_so_you_can_t_subscribe_to_earn_a_badge_you_can_still_support_signal_by_making_a_donation_on_our_website">Enheten din støtter ikke Google Pay, så du kan ikke abonnere for å få et merke. Du kan fremdeles støtte Signal ved å gi et pengebeløp via nettsiden vår.</string>
+    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support">Enheten din har ikke støtte for donasjoner i appen, så det er ikke mulig å abonnere og få et merke. Men du kan støtte Signal ved å gi oss en pengegave på nettstedet vårt.</string>
     <string name="NetworkFailure__network_error_check_your_connection_and_try_again">Nettverksfeil. Sjekk internettilkoblingen din og prøv igjen.</string>
     <string name="NetworkFailure__retry">Prøv på nytt</string>
     <!-- Displayed as a dialog title when the selected recipient for a gift doesn\'t support gifting -->
@@ -6226,6 +6324,16 @@
 
     <!-- Description shown for the Signal Release Notes channel -->
     <string name="ReleaseNotes__signal_release_notes_and_news">Merknader og nyheter fra Signal</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat_period">Dette er den offisielle og eneste samtalen du har med Signal.</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date_period">Hold deg oppdatert på nyheter og utgavemerknader.</string>
+    <!-- Text description in Signal Release channel details explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat">Dette er den offisielle og eneste samtalen du har med Signal</string>
+    <!-- Text description in Signal Release channel details explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date">Hold deg oppdatert på nyheter og utgavemerknader</string>
+    <!-- Subtitle for the Signal Release channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__official_only_chat">Den offisielle og eneste samtalen med Signal</string>
 
     <!-- Donation receipts activity title -->
     <string name="DonationReceiptListFragment__all_activity">All aktivitet</string>
@@ -7257,6 +7365,8 @@
     <string name="CameraControls_capture_button_accessibility_label">Ta bilde-knapp</string>
     <!-- Accessibility label describing the continue button on the camera screen -->
     <string name="CameraControls_continue_button_accessibility_label">Fortsett-knapp</string>
+    <!-- Accessibility label describing the flash Mode toggle button on the camera screen -->
+    <string name="CameraControls_toggle_flash_mode_accessibility_label">Slå av/på blits</string>
 
     <!-- CallPreference -->
     <!-- Generic group call in call info -->
@@ -7956,6 +8066,10 @@
     <string name="SubscriptionNotFoundBottomSheet__got_it">Skjønner</string>
     <!-- Action button label to contact support -->
     <string name="SubscriptionNotFoundBottomSheet__contact_support">Kontakt brukerstøtte</string>
+
+    <!-- MessageBackupsFlowFragment -->
+    <!-- Body for network failure dialog in message backups checkout flow -->
+    <string name="MessageBackupsFlowFragment__a_network_failure_occurred">Det oppsto en nettverksfeil. Prøv igjen senere.</string>
 
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->

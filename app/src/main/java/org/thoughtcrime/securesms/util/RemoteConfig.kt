@@ -1031,20 +1031,6 @@ object RemoteConfig {
     BuildConfig.MESSAGE_BACKUP_RESTORE_ENABLED || value.asBoolean(false)
   }
 
-  /**
-   * Percentage [0, 100] of web socket requests that will be "shadowed" by sending
-   * an unauthenticated keep-alive via libsignal-net. Default: 0
-   */
-  @JvmStatic
-  @get:JvmName("libSignalWebSocketShadowingPercentage")
-  val libSignalWebSocketShadowingPercentage: Int by remoteValue(
-    key = "android.libsignalWebSocketShadowingPercentage",
-    hotSwappable = false
-  ) { value ->
-    val remote = value.asInteger(0)
-    remote.coerceIn(0, 100)
-  }
-
   @JvmStatic
   val backgroundMessageProcessInterval: Long by remoteValue(
     key = "android.messageProcessor.alarmIntervalMins",
@@ -1110,11 +1096,17 @@ object RemoteConfig {
     hotSwappable = false
   )
 
-  /** Whether or not this device supports syncing data to newly-linked device. */
-  @JvmStatic
-  val linkAndSync: Boolean by remoteBoolean(
-    key = "android.linkAndSync.3",
+  /** Whether or not this device respect attachment backfill requests.  */
+  val attachmentBackfillSync: Boolean by remoteBoolean(
+    key = "android.attachmentBackfillSync",
     defaultValue = false,
+    hotSwappable = true
+  )
+
+  /** Whether or not libsignal-net's CDSI lookups use the new route-based internals or the old ones */
+  val libsignalRouteBasedCDSILookup: Boolean by remoteBoolean(
+    key = "android.libsignal.libsignalRouteBasedCDSILookup",
+    defaultValue = true,
     hotSwappable = true
   )
 

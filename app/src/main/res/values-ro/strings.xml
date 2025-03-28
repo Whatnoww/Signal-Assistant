@@ -580,12 +580,6 @@
         <item quantity="few">Salvarea tuturor celor %1$d fișiere pe spațiul de stocare va permite altor aplicații de pe dispozitivul tău să le acceseze.\n\nContinui?</item>
         <item quantity="other">Salvarea tuturor celor %1$d de fișiere pe spațiul de stocare va permite altor aplicații de pe dispozitivul tău să le acceseze.\n\nContinui?</item>
     </plurals>
-    <plurals name="ConversationFragment_error_while_saving_attachments_to_sd_card">
-        <item quantity="one">A apărut o eroare în timpul salvării atașamentului pe spațiul de stocare!</item>
-        <item quantity="few">A apărut o eroare în timpul salvării atașamentelor pe spațiul de stocare!</item>
-        <item quantity="other">A apărut o eroare în timpul salvării atașamentelor pe spațiul de stocare!</item>
-    </plurals>
-    <string name="ConversationFragment_unable_to_write_to_sd_card_exclamation">Nu se poate scrie pe spațiul de stocare!</string>
     <plurals name="ConversationFragment_saving_n_attachments">
         <item quantity="one">Se salvează atașamentul</item>
         <item quantity="few">Se salvează %1$d atașamente</item>
@@ -681,6 +675,18 @@
     <string name="ConversationFragment_reported_as_spam_and_blocked">Raportat ca spam și blocat</string>
     <!-- Dialog message shown after accepting a message request and tapping on options from the conversation event -->
     <string name="ConversationFragment_you_accepted_a_message_request_from_s">Ai acceptat o solicitare de mesaj de la %1$s. Dacă a fost o greșeală, poți alege o acțiune mai jos.</string>
+    <!-- Text shown in conversation header when in a message request state and to carefully review the user -->
+    <string name="ConversationFragment_review_carefully">Examinează cu atenție</string>
+    <!-- Text shown in conversation header when in a message request state that profile names are not verified. Placeholder will be \'Profile names\' -->
+    <string name="ConversationFragment_profile_names_not_verified">%1$s nu sunt verificate</string>
+    <!-- Text shown in conversation header when in a message request state that group names are not verified. Placeholder will be \'Group names\' -->
+    <string name="ConversationFragment_group_names_not_verified">%1$s nu sunt verificate</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about profile names -->
+    <string name="ConversationFragment_profile_names">Numele de profil</string>
+    <!-- Placeholder text shown in conversation header that when clicked will open a dialog about group names -->
+    <string name="ConversationFragment_group_names">Numele de grup</string>
+    <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
+    <string name="ConversationFragment_photo_failed">Fotografia nu a putut fi descărcată. Încearcă din nou.</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Sfaturi de siguranță</string>
@@ -692,6 +698,10 @@
     <string name="SafetyTips_previous_tip">Sfat anterior</string>
     <!-- Button text to move to the next tip -->
     <string name="SafetyTips_next_tip">Următorul sfat</string>
+    <!-- Title of tip 0 -->
+    <string name="SafetyTips_tip0_title">Nume și conturi false</string>
+    <!-- Message of tip 0 -->
+    <string name="SafetyTips_tip0_message">Signal nu te va contacta niciodată pentru codul de înregistrare sau PIN. Ai grijă la cererile care uzurpă identitatea altora. Numele profilurilor sunt alese de titularul contului și nu sunt verificate.</string>
     <!-- Title of tip 1 -->
     <string name="SafetyTips_tip1_title">Escrocherii cu cripto sau bani</string>
     <!-- Message of tip 1 -->
@@ -708,6 +718,21 @@
     <string name="SafetyTips_tip4_title">Companii și instituții false</string>
     <!-- Message of tip 4 -->
     <string name="SafetyTips_tip4_message">Ai grijă la companiile sau agențiile guvernamentale care te contactează. Mesajele care implică agențiile fiscale, curierii și multe altele pot fi spam.</string>
+
+    <!-- Bottom sheet text explaining that profile names are chosen by the account holder. Placeholder will be \'Profile names\' -->
+    <string name="ProfileNameBottomSheet__profile_names_on_signal">%1$s de pe Signal sunt alese de titularul contului lor.</string>
+    <!-- Bottom sheet text explaining that profile names are not verified. -->
+    <string name="ProfileNameBottomSheet__profile_names_arent_verified">Numele de profil nu sunt verificate</string>
+    <!-- Bottom sheet text explaining that accounts can impersonate other people and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_accounts">Ai grijă la conturile care uzurpă identitatea altora</string>
+    <!-- Bottom sheet text explaining that personal information should not be shared with strangers -->
+    <string name="ProfileNameBottomSheet__dont_share_personal">Nu împărtăși informații personale cu persoane pe care nu le cunoști</string>
+    <!-- Bottom sheet text explaining that group names are chosen by the group members. Placeholder will be \'Group names\' -->
+    <string name="ProfileNameBottomSheet__group_names_on_signal">%1$s sunt alese de membrii grupului.</string>
+    <!-- Bottom sheet text explaining that groups can impersonate organizations and to be cautious -->
+    <string name="ProfileNameBottomSheet__be_cautious_of_groups">Ai grijă la grupurile care uzurpă identitatea organizațiilor și companiilor</string>
+    <!-- Bottom sheet text explaining that profile names of group members are not verified -->
+    <string name="ProfileNameBottomSheet__profile_names_in_groups">Numele de profil membrilor din grupuri nu sunt verificate</string>
 
     <!-- Label for a button displayed in conversation list to clear the chat filter -->
     <string name="ConversationListFragment__clear_filter">Șterge filtru</string>
@@ -780,8 +805,12 @@
     <string name="AddToFolderBottomSheet_choose_a_folder">Alege dosarul</string>
     <!-- Toast shown when a chat has been added to a folder, where %s is the name of the folder -->
     <string name="AddToFolderBottomSheet_added_to_s">Adăugat/ă la „ %1$s ”</string>
-    <!-- Toast shown when a user tries to add a chat to a folder, but the folder already has that chat. %s is the name of the folder -->
-    <string name="AddToFolderBottomSheet_this_chat_is_already">Această conversație este deja în dosarul „%1$s“</string>
+    <!-- Toast shown when a user tries to add chats to a folder, but the folder already has those chats. %s is the name of the folder -->
+    <plurals name="AddToFolderBottomSheet_these_chat_are_already_in_s">
+        <item quantity="one">Această conversație este deja în „%1$s”</item>
+        <item quantity="few">Aceste conversații sunt deja în „%1$s”</item>
+        <item quantity="other">Aceste conversații sunt deja în „%1$s”</item>
+    </plurals>
 
     <!-- Show in conversation list overflow menu to open selection bottom sheet -->
     <string name="ConversationListFragment__notification_profile">Profil notificări</string>
@@ -2113,6 +2142,14 @@
     <string name="MessageRecord_reported_as_spam">Raportat ca spam</string>
     <!-- Update message shown in chat after accept a message request -->
     <string name="MessageRecord_you_accepted_the_message_request">Ai acceptat o solicitare de mesaj</string>
+    <!-- Update message shown in chat after you block a person -->
+    <string name="MessageRecord_you_blocked_this_person">Ai blocat această persoană</string>
+    <!-- Update message shown in chat after you unblock a person -->
+    <string name="MessageRecord_you_unblocked_this_person">Ai deblocat această persoană</string>
+    <!-- Update message shown in chat after you block a group -->
+    <string name="MessageRecord_you_blocked_this_group">Ai blocat acest grup</string>
+    <!-- Update message shown in chat after you unblock a group -->
+    <string name="MessageRecord_you_unblocked_this_group">Ai deblocat acest grup</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Acceptă</string>
@@ -2168,6 +2205,16 @@
     </plurals>
     <!-- Button label to report spam for a conversation when in a message request state -->
     <string name="MessageRequestBottomView_report">Raportează…</string>
+    <!-- Alert dialog title to accept a message request -->
+    <string name="MessageRequestBottomView_accept_request">Accepți cererea?</string>
+    <!-- Alert dialog body to review the message request carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully">Examinează cu atenție solicitările. Numele de profil sunt alese de proprietarul contului și nu sunt verificate.</string>
+    <!-- Alert dialog title to accept a message request to join a group -->
+    <string name="MessageRequestBottomView_join_group">Te alături grupului?</string>
+    <!-- Alert dialog body to review the message request for a group carefully -->
+    <string name="MessageRequestBottomView_review_requests_carefully_groups">Examinează cu atenție solicitările. Numele grupurilor sunt alese de membrii grupului și nu sunt verificate.</string>
+    <!-- Button text to join a group -->
+    <string name="MessageRequestBottomView_join">Alătură-te</string>
 
     <!-- PassphraseChangeActivity -->
     <string name="PassphraseChangeActivity_passphrases_dont_match_exclamation">Parolele nu se potrivesc!</string>
@@ -2558,7 +2605,7 @@
     <!-- Toolbar title of country picker selection page -->
     <string name="CountryCodeFragment__your_country">Țara ta</string>
     <!-- Hint text in search bar to either enter in a country name or number -->
-    <string name="CountryCodeFragment__search_by">Caută dupa nume sau număr</string>
+    <string name="CountryCodeFragment__search_by">Caută după numele sau codul țării</string>
     <!-- Text shown when displaying a list of countries that indicates an unknown country    -->
     <string name="CountryCodeFragment__unknown_country">Țară necunoscută</string>
 
@@ -2567,12 +2614,16 @@
     <string name="AboutSheet__signal_connection">Conexiunea Signal</string>
     <!-- Displayed in a sheet row describing that the user has marked this contact as \'verified\' from within the app -->
     <string name="AboutSheet__verified">Verificat</string>
+    <!-- Displayed in a sheet row that tells users that profile names are not verified -->
+    <string name="AboutSheet__profile_names_are_not_verified">Numele de profil nu sunt verificate</string>
+    <!-- Displayed in a sheet row describing that the user is in a message request state with the person -->
+    <string name="AboutSheet__pending_message_request">Solicitare mesaj în așteptare</string>
     <!-- Displayed in bottom sheet describing that the user has no direct messages with this person. The placeholder is a person\'s name. -->
     <string name="AboutSheet__no_direct_message">Fără mesaje directe cu %1$s</string>
     <!-- Explains that the given user (placeholder is short name) is in the users system contact -->
     <string name="AboutSheet__s_is_in_your_system_contacts">%1$s se află în contactele tale din telefon</string>
     <!-- Notice in a row when user has no groups in common -->
-    <string name="AboutSheet__you_have_no_groups_in_common">Nu aveți grupuri în comun</string>
+    <string name="AboutSheet__you_have_no_groups_in_common">Nu există grupuri în comun</string>
     <!-- Notice when a user is not a connection to review requests carefully -->
     <string name="AboutSheet__review_requests_carefully">Examinează cu atenție solicitările</string>
     <!-- Text used when user has groups in common. Placeholder is the count -->
@@ -2890,6 +2941,8 @@
     <string name="ThreadRecord_message_history_has_been_merged">Istoricul mesajelor tale a fost cumulat</string>
     <!--  Displayed in the conversation list when identities have been merged. The first placeholder is a phone number, and the second is a person\'s name -->
     <string name="ThreadRecord_s_belongs_to_s">%1$s aparține persoanei %2$s</string>
+    <!-- Displayed in the conversation list when a person has been blocked -->
+    <string name="ThreadRecord_blocked">Blocat</string>
 
     <!-- ApkUpdateNotifications -->
     <string name="ApkUpdateNotifications_prompt_install_title">Actualizare Signal</string>
@@ -3122,8 +3175,30 @@
     <string name="QuickResponseService_quick_response_unavailable_when_Signal_is_locked">Răspunsul rapid nu este disponibil cât timp Signal este blocat!</string>
     <string name="QuickResponseService_problem_sending_message">Problemă la trimiterea mesajului!</string>
 
-    <!-- A small toast notification to let the user know their image/video/audio was downloaded and saved to their device, accessible in other apps. -->
-    <string name="SaveAttachmentTask_saved">Fișier salvat</string>
+    <!-- A toast notification that is shown when the app does not have sufficient permissions to save media files to the device storage. -->
+    <string name="SaveAttachment_unable_to_write_to_sd_card_exclamation">Nu se poate scrie pe spațiul de stocare!</string>
+
+    <!-- A toast notification that is shown after image/video/audio media was successfully downloaded and saved to the device storage, accessible in other apps. -->
+    <plurals name="SaveAttachment_saved_success">
+        <item quantity="one">Fișier salvat</item>
+        <item quantity="few">Fișiere salvate</item>
+        <item quantity="other">Fișiere salvate</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after some image/video/audio media was successfully downloaded and saved to the device storage, but some failed to save
+         %1$s is the number of items that failed to save and %2$s is the total number of items that the user requested to save. -->
+    <plurals name="SaveAttachment_saved_success_n_failures">
+        <item quantity="one">Fișier media salvat (%1$s din %2$s eșuate)</item>
+        <item quantity="few">Fișiere media salvate (%1$s din %2$s eșuate)</item>
+        <item quantity="other">Fișiere media salvate (%1$s din %2$s eșuate)</item>
+    </plurals>
+
+    <!-- A toast notification that is shown after all of the requested image/video/audio media failed to save to the device storage. -->
+    <plurals name="SaveAttachment_error_while_saving_attachments_to_sd_card">
+        <item quantity="one">A apărut o eroare în timpul salvării atașamentului pe spațiul de stocare!</item>
+        <item quantity="few">A apărut o eroare în timpul salvării atașamentelor pe spațiul de stocare!</item>
+        <item quantity="other">A apărut o eroare în timpul salvării atașamentelor pe spațiul de stocare!</item>
+    </plurals>
 
     <!-- SearchToolbar -->
     <string name="SearchToolbar_search">Caută</string>
@@ -3364,7 +3439,8 @@
     <string name="ConversationUpdateItem_update_contact">Actualizează contactul</string>
     <!-- Update item button text to show to block a recipient from requesting to join via group link -->
     <string name="ConversationUpdateItem_block_request">Blochează cererea</string>
-    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Niciun grup în comun. Examinează cu atenție solicitările.</string>
+    <!-- Text shown in conversation header that the account messaging the user does not have any groups in common with them -->
+    <string name="ConversationUpdateItem_no_groups_in_common_review_requests_carefully">Nu există grupuri în comun</string>
     <string name="ConversationUpdateItem_no_contacts_in_this_group_review_requests_carefully">Nu există contacte în acest grup. Examinează cu atenție solicitările.</string>
     <string name="ConversationUpdateItem_view">Vizualizare</string>
     <string name="ConversationUpdateItem_the_disappearing_message_time_will_be_set_to_s_when_you_message_them">Timpul de dispariție a mesajului va fi setat la %1$s în momentul în care trimiți un mesaj.</string>
@@ -4522,6 +4598,13 @@
     <string name="KbsMegaphone__create_a_pin">Creează un PIN</string>
     <string name="KbsMegaphone__pins_keep_information_thats_stored_with_signal_encrytped">PIN-urile păstrează informațiile stocate în Signal criptate.</string>
     <string name="KbsMegaphone__create_pin">Creează PIN</string>
+
+    <!-- Title for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_signal_pin">Actualizează PIN-ul Signal</string>
+    <!-- Message for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__message">Actualizează-ți codul PIN Signal ca să finalizezi înregistrarea contului.</string>
+    <!-- Button text for megaphone shown after registration without a pin but with aep to prompt the user to enter their pin -->
+    <string name="UpdatePinMegaphone__update_pin">Actualizează PIN-ul</string>
 
     <!-- CallNotificationBuilder -->
     <!-- Displayed in a notification when a Signal voice call is ringing -->
@@ -5870,6 +5953,24 @@
     <string name="MediaReviewFragment__photo_set_to_high_quality">Fotografie setată la calitate înaltă</string>
     <!-- Small notification presented to the user when they set their still image to be sent in standard (lower than high) visual quality. -->
     <string name="MediaReviewFragment__photo_set_to_standard_quality">Fotografie setată la calitate standard</string>
+    <!-- Accessibility label describing the add media button on the Media review screen -->
+    <string name="MediaReviewFragment__add_media_accessibility_label">Adaugă un fișier media</string>
+    <!-- Accessibility label describing the brush and pen button on the Media review screen -->
+    <string name="MediaReviewFragment__brush_pen_accessibility_label">Stilou și pensulă</string>
+    <!-- Accessibility label describing the crop and rotate button on the Media review screen -->
+    <string name="MediaReviewFragment__crop_rotate_accessibility_label">Decupare și rotire</string>
+    <!-- Accessibility label describing the change media quality button on the Media review screen -->
+    <string name="MediaReviewFragment__change_media_quality_accessibility_label">Schimbă calitatea media</string>
+    <!-- Accessibility label describing the save media button on the Media review screen -->
+    <string name="MediaReviewFragment__save_media_accessibility_label">Salvează fișierul media</string>
+    <!-- Accessibility label describing the toggle emoji keyboard button on the Media review screen -->
+    <string name="MediaReviewFragment__emoji_toggle_accessibility_label">Comutare tastatură emoji</string>
+    <!-- Accessibility label describing the toggle view once button on the Media review screen -->
+    <string name="MediaReviewFragment__view_once_toggle_accessibility_label">Comută la Media vizibilă o singură dată</string>
+    <!-- Accessibility label describing the send media button on the Media review screen -->
+    <string name="MediaReviewFragment__send_media_accessibility_label">Trimite fișier media</string>
+    <!-- Accessibility label describing the finish adding a message button on the Media review screen dialog -->
+    <string name="MediaReviewFragment__finish_adding_a_message_accessibility_label">Finalizează adăugarea unui mesaj</string>
     <!-- Small notification presented to the user when they set multiple media items to be sent in high visual quality. -->
     <plurals name="MediaReviewFragment__items_set_to_high_quality">
         <item quantity="one">%1$d element setat la calitate înaltă</item>
@@ -6122,7 +6223,7 @@
     <string name="DonationsErrors__your_payment_is_still">Donația ta este încă în procesare. Ceea ce poate dura câteva minute, în funcție de conexiunea ta.</string>
     <string name="DonationsErrors__failed_to_cancel_subscription">Anularea abonamentul a eșuat</string>
     <string name="DonationsErrors__subscription_cancellation_requires_an_internet_connection">Anularea abonamentului necesită o conexiune la internet.</string>
-    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support_google_pay_so_you_can_t_subscribe_to_earn_a_badge_you_can_still_support_signal_by_making_a_donation_on_our_website">Dispozitivul tău nu acceptă Google Pay, așa că nu te poți abona pentru a obține o insignă. Poți totuși să sprijini Signal făcând o donație pe site-ul nostru.</string>
+    <string name="ViewBadgeBottomSheetDialogFragment__your_device_doesn_t_support">Dispozitivul tău nu acceptă donațiile în aplicație, așa că nu te poți abona pentru a obține o insignă. Poți, totuși, să sprijini Signal făcând o donație pe site-ul nostru.</string>
     <string name="NetworkFailure__network_error_check_your_connection_and_try_again">Eroare de rețea. Verifică-ți conexiunea și încearcă din nou.</string>
     <string name="NetworkFailure__retry">Încearcă din nou</string>
     <!-- Displayed as a dialog title when the selected recipient for a gift doesn\'t support gifting -->
@@ -6362,6 +6463,16 @@
 
     <!-- Description shown for the Signal Release Notes channel -->
     <string name="ReleaseNotes__signal_release_notes_and_news">Informații despre versiune &amp; știri Signal</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat_period">Acesta este singurul chat oficial de la Signal.</string>
+    <!-- Text description shown for the Signal Release Notes channel explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date_period">Fii la curent cu știrile și notele de lansare.</string>
+    <!-- Text description in Signal Release channel details explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__this_is_official_chat">Acesta este singurul chat oficial de la Signal</string>
+    <!-- Text description in Signal Release channel details explaining what the channel is for -->
+    <string name="ReleaseNotes__keep_up_to_date">Fii la curent cu știrile și notele de lansare</string>
+    <!-- Subtitle for the Signal Release channel explaining that it is the only chat from Signal -->
+    <string name="ReleaseNotes__official_only_chat">Singurul chat oficial Signal</string>
 
     <!-- Donation receipts activity title -->
     <string name="DonationReceiptListFragment__all_activity">Toată activitatea</string>
@@ -7417,6 +7528,8 @@
     <string name="CameraControls_capture_button_accessibility_label">Buton realizează fotografie</string>
     <!-- Accessibility label describing the continue button on the camera screen -->
     <string name="CameraControls_continue_button_accessibility_label">Butonul continuă</string>
+    <!-- Accessibility label describing the flash Mode toggle button on the camera screen -->
+    <string name="CameraControls_toggle_flash_mode_accessibility_label">Comută modul bliț</string>
 
     <!-- CallPreference -->
     <!-- Generic group call in call info -->
@@ -8126,6 +8239,10 @@
     <string name="SubscriptionNotFoundBottomSheet__got_it">Am înțeles</string>
     <!-- Action button label to contact support -->
     <string name="SubscriptionNotFoundBottomSheet__contact_support">Contactează Asistența</string>
+
+    <!-- MessageBackupsFlowFragment -->
+    <!-- Body for network failure dialog in message backups checkout flow -->
+    <string name="MessageBackupsFlowFragment__a_network_failure_occurred">A apărut o eroare în rețea. Încearcă mai târziu.</string>
 
     <!-- MessageBackupsEducationScreen -->
     <!-- Screen subtitle underneath large headline title -->

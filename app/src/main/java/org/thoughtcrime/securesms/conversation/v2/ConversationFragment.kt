@@ -67,6 +67,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.ConversationLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -88,6 +89,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx3.rxSingle
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -202,6 +204,7 @@ import org.thoughtcrime.securesms.conversation.ui.inlinequery.InlineQueryReplace
 import org.thoughtcrime.securesms.conversation.ui.inlinequery.InlineQueryResultsControllerV2
 import org.thoughtcrime.securesms.conversation.ui.inlinequery.InlineQueryViewModelV2
 import org.thoughtcrime.securesms.conversation.v2.computed.ConversationMessageComputeWorkers
+import org.thoughtcrime.securesms.conversation.v2.data.AvatarDownloadStateCache
 import org.thoughtcrime.securesms.conversation.v2.data.ConversationMessageElement
 import org.thoughtcrime.securesms.conversation.v2.groups.ConversationGroupCallViewModel
 import org.thoughtcrime.securesms.conversation.v2.groups.ConversationGroupViewModel
@@ -330,6 +333,7 @@ import org.thoughtcrime.securesms.util.atUTC
 import org.thoughtcrime.securesms.util.createActivityViewModel
 import org.thoughtcrime.securesms.util.doAfterNextLayout
 import org.thoughtcrime.securesms.util.fragments.requireListener
+import org.thoughtcrime.securesms.util.getQuote
 import org.thoughtcrime.securesms.util.getRecordQuoteType
 import org.thoughtcrime.securesms.util.hasAudio
 import org.thoughtcrime.securesms.util.hasGiftBadge
@@ -1055,6 +1059,28 @@ class ConversationFragment :
         }
     }
 
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        val recipient = viewModel.recipientSnapshot
+        if (recipient != null) {
+          AvatarDownloadStateCache.forRecipient(recipient.id).collect {
+            when (it) {
+              AvatarDownloadStateCache.DownloadState.NONE,
+              AvatarDownloadStateCache.DownloadState.IN_PROGRESS,
+              AvatarDownloadStateCache.DownloadState.FINISHED -> {
+                viewModel.updateThreadHeader()
+              }
+              AvatarDownloadStateCache.DownloadState.FAILED -> {
+                Snackbar.make(requireView(), R.string.ConversationFragment_photo_failed, Snackbar.LENGTH_LONG).show()
+                presentConversationTitle(recipient)
+                viewModel.onAvatarDownloadFailed()
+              }
+            }
+          }
+        }
+      }
+    }
+
     if (TextSecurePreferences.getServiceOutage(context)) {
       AppDependencies.jobManager.add(ServiceOutageDetectionJob())
     }
@@ -1238,9 +1264,7 @@ class ConversationFragment :
   }
 
   private fun presentIdentityRecordsState(identityRecordsState: IdentityRecordsState) {
-    if (!identityRecordsState.isGroup) {
-      binding.conversationTitleView.root.setVerified(identityRecordsState.isVerified)
-    }
+    binding.conversationTitleView.root.setVerified(identityRecordsState.isVerified)
 
     if (identityRecordsState.isUnverified) {
       binding.conversationBanner.showUnverifiedBanner(identityRecordsState.identityRecords)
@@ -1596,6 +1620,15 @@ class ConversationFragment :
       return
     }
 
+    if (editMessage.body == composeText.editableText.toString() &&
+      editMessage.getQuote()?.displayText?.toString() == inputPanel.quote.map { it.text }.orNull() &&
+      editMessage.messageRanges == composeText.styling
+    ) {
+      Log.d(TAG, "Updated message matches original, exiting edit mode")
+      inputPanel.exitEditMessageMode()
+      return
+    }
+
     sendMessage()
   }
 
@@ -1832,7 +1865,8 @@ class ConversationFragment :
     slide: Slide? = null,
     contacts: List<Contact> = emptyList(),
     quote: QuoteModel? = null,
-    clearCompose: Boolean = true
+    clearCompose: Boolean = true,
+    scheduledDate: Long = -1
   ) {
     sendMessage(
       slideDeck = slide?.let { SlideDeck().apply { addSlide(slide) } },
@@ -1844,7 +1878,8 @@ class ConversationFragment :
       messageToEdit = null,
       quote = quote,
       linkPreviews = emptyList(),
-      bypassPreSendSafetyNumberCheck = true
+      bypassPreSendSafetyNumberCheck = true,
+      scheduledDate = scheduledDate
     )
   }
 
@@ -1884,19 +1919,24 @@ class ConversationFragment :
     }
 
     if (inputPanel.isRecordingInLockedMode) {
-      inputPanel.releaseRecordingLock()
+      inputPanel.releaseRecordingLockAndSend()
       return
     }
 
     if (slideDeck == null) {
       val voiceNote: DraftTable.Draft? = draftViewModel.voiceNoteDraft
       if (voiceNote != null) {
-        sendMessageWithoutComposeInput(slide = AudioSlide.createFromVoiceNoteDraft(voiceNote), clearCompose = true)
+        sendMessageWithoutComposeInput(
+          slide = AudioSlide.createFromVoiceNoteDraft(voiceNote),
+          quote = quote,
+          clearCompose = true,
+          scheduledDate = scheduledDate
+        )
         return
       }
     }
 
-    if (body.isNullOrBlank() && slideDeck?.containsMediaSlide() != true && preUploadResults.isEmpty() && contacts.isEmpty()) {
+    if (body.isBlank() && slideDeck?.containsMediaSlide() != true && preUploadResults.isEmpty() && contacts.isEmpty()) {
       Log.i(TAG, "Unable to send due to empty message")
       toast(R.string.ConversationActivity_message_is_empty_exclamation)
       return
@@ -2404,12 +2444,12 @@ class ConversationFragment :
       resources.getQuantityString(R.plurals.ConversationFragment_saving_n_attachments_to_sd_card, attachments.size, attachments.size)
     ).build().toBundle()
 
-    SaveAttachmentUtil.saveAttachments(attachments)
+    rxSingle { SaveAttachmentUtil.saveAttachments(attachments) }
       .subscribeOn(Schedulers.io())
       .observeOn(AndroidSchedulers.mainThread())
       .doOnSubscribe { progressDialog.show(parentFragmentManager, null) }
       .doOnTerminate { progressDialog.dismissAllowingStateLoss() }
-      .subscribeBy { it.toast(requireContext()) }
+      .subscribeBy { result -> Toast.makeText(context, result.getMessage(requireContext()), Toast.LENGTH_LONG).show() }
       .addTo(disposables)
   }
 
@@ -2926,6 +2966,10 @@ class ConversationFragment :
       getVoiceNoteMediaController().startConsecutivePlayback(uri, messageId, position)
     }
 
+    override fun onSingleVoiceNotePlay(uri: Uri, messageId: Long, position: Double) {
+      getVoiceNoteMediaController().startSinglePlayback(uri, messageId, position)
+    }
+
     override fun onVoiceNoteSeekTo(uri: Uri, position: Double) {
       getVoiceNoteMediaController().seekToPosition(uri, position)
     }
@@ -2950,6 +2994,10 @@ class ConversationFragment :
 
     override fun onSafetyNumberLearnMoreClicked(recipient: Recipient) {
       ConversationDialogs.displaySafetyNumberLearnMoreDialog(this@ConversationFragment, recipient)
+    }
+
+    override fun onShowUnverifiedProfileSheet(forGroup: Boolean) {
+      UnverifiedProfileNameBottomSheet.show(parentFragmentManager, forGroup)
     }
 
     override fun onJoinGroupCallClicked() {
@@ -3958,6 +4006,10 @@ class ConversationFragment :
     }
 
     override fun onSendScheduled() {
+      if (inputPanel.isRecordingInLockedMode) {
+        inputPanel.onSaveRecordDraft()
+      }
+
       ScheduleMessageContextMenu.show(sendButton, (requireView() as ViewGroup)) { time ->
         if (time == -1L) {
           showSchedule(childFragmentManager)
@@ -3965,10 +4017,6 @@ class ConversationFragment :
           sendMessage(scheduledDate = time)
         }
       }
-    }
-
-    override fun canSchedule(): Boolean {
-      return !(inputPanel.isRecordingInLockedMode || draftViewModel.voiceNoteDraft != null)
     }
   }
 
@@ -4112,6 +4160,11 @@ class ConversationFragment :
         updateToggleButtonState()
       }
       voiceMessageRecordingDelegate.onRecorderCanceled(byUser)
+    }
+
+    override fun onRecorderSaveDraft() {
+      voiceMessageRecordingDelegate.onRecordSaveDraft()
+      inputPanel.voiceNoteDraft = draftViewModel.voiceNoteDraft
     }
 
     override fun onRecorderPermissionRequired() {

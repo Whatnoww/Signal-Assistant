@@ -8,6 +8,7 @@ import io.mockk.verify
 import io.reactivex.rxjava3.observers.TestObserver
 import okio.ByteString.Companion.toByteString
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -19,6 +20,7 @@ import org.signal.libsignal.net.Network
 import org.signal.libsignal.net.UnauthenticatedChatConnection
 import org.whispersystems.signalservice.api.websocket.HealthMonitor
 import org.whispersystems.signalservice.api.websocket.WebSocketConnectionState
+import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -307,6 +309,34 @@ class LibSignalChatConnectionTest {
     }
   }
 
+  // If readRequest() does not throw when the underlying connection disconnects, this
+  //   causes the app to get stuck in a "fetching new messages" state.
+  @Test
+  fun regressionTestReadRequestThrowsOnDisconnect() {
+    setupConnectedConnection()
+
+    executor.submit {
+      Thread.sleep(100)
+      chatConnection.disconnect()
+    }
+
+    assertThrows(IOException::class.java) {
+      connection.readRequest(1000)
+    }
+  }
+
+  @Test(timeout = 20)
+  fun readRequestDoesTimeOut() {
+    setupConnectedConnection()
+
+    val observer = TestObserver<WebSocketConnectionState>()
+    connection.state.subscribe(observer)
+
+    assertThrows(TimeoutException::class.java) {
+      connection.readRequest(10)
+    }
+  }
+
   // Test reading incoming requests from the queue.
   // We'll simulate onIncomingMessage() from the ChatConnectionListener, then read them from the LibSignalChatConnection.
   @Test
@@ -315,15 +345,6 @@ class LibSignalChatConnectionTest {
 
     val observer = TestObserver<WebSocketConnectionState>()
     connection.state.subscribe(observer)
-
-    // Confirm that readRequest times out if there's no message.
-    var timedOut = false
-    try {
-      connection.readRequest(10)
-    } catch (e: TimeoutException) {
-      timedOut = true
-    }
-    assertTrue(timedOut)
 
     // We'll now simulate incoming messages
     val envelopeA = "msgA".toByteArray()
@@ -396,15 +417,54 @@ class LibSignalChatConnectionTest {
 
   @Test
   fun regressionTestSendWhileConnecting() {
+    var connectionCompletionFuture: CompletableFuture<UnauthenticatedChatConnection>? = null
     every { network.connectUnauthChat(any()) } answers {
       chatListener = firstArg()
       delay {
         // We do not complete the future, so we stay in the CONNECTING state forever.
+        connectionCompletionFuture = it
       }
     }
+    sendLatch = CountDownLatch(1)
 
     connection.connect()
-    connection.sendRequest(WebSocketRequestMessage("GET", "/fake-path"))
+
+    val sendSingle = connection.sendRequest(WebSocketRequestMessage("GET", "/fake-path"))
+    val sendObserver = sendSingle.test()
+
+    assertEquals(1, sendLatch!!.count)
+    sendObserver.assertNotComplete()
+
+    connectionCompletionFuture!!.complete(chatConnection)
+
+    sendLatch!!.await(100, TimeUnit.MILLISECONDS)
+    sendObserver.awaitDone(100, TimeUnit.MILLISECONDS)
+    sendObserver.assertValues(RESPONSE_SUCCESS.toWebsocketResponse(true))
+  }
+
+  @Test
+  fun testSendFailsWhenConnectionFails() {
+    var connectionCompletionFuture: CompletableFuture<UnauthenticatedChatConnection>? = null
+    every { network.connectUnauthChat(any()) } answers {
+      chatListener = firstArg()
+      delay {
+        connectionCompletionFuture = it
+      }
+    }
+    sendLatch = CountDownLatch(1)
+
+    connection.connect()
+    val sendSingle = connection.sendRequest(WebSocketRequestMessage("GET", "/fake-path"))
+    val sendObserver = sendSingle.test()
+
+    assertEquals(1, sendLatch!!.count)
+    sendObserver.assertNotComplete()
+
+    connectionCompletionFuture!!.completeExceptionally(ChatServiceException(""))
+
+    sendObserver.awaitDone(100, TimeUnit.MILLISECONDS)
+    assertEquals(1, sendLatch!!.count)
+    sendObserver.assertFailure(IOException().javaClass)
   }
 
   private fun <T> delay(action: ((CompletableFuture<T>) -> Unit)): CompletableFuture<T> {

@@ -143,6 +143,16 @@ object BackupRepository {
   }
 
   /**
+   * Triggers backup id reservation. As documented, this is safe to perform multiple times.
+   */
+  @WorkerThread
+  fun triggerBackupIdReservation(): NetworkResult<Unit> {
+    val messageBackupKey = SignalStore.backup.messageBackupKey
+    val mediaRootBackupKey = SignalStore.backup.mediaRootBackupKey
+    return SignalNetwork.archive.triggerBackupIdReservation(messageBackupKey, mediaRootBackupKey, SignalStore.account.requireAci())
+  }
+
+  /**
    * Refreshes backup via server
    */
   fun refreshBackup(): NetworkResult<Unit> {
@@ -1215,6 +1225,13 @@ object BackupRepository {
       .also { Log.i(TAG, "deleteAbandonedMediaObjectsResult: $it") }
   }
 
+  fun deleteBackup(): NetworkResult<Unit> {
+    return initBackupAndFetchAuth()
+      .then { credential ->
+        SignalNetwork.archive.deleteBackup(SignalStore.account.requireAci(), credential.messageBackupAccess)
+      }
+  }
+
   fun debugDeleteAllArchivedMedia(): NetworkResult<Unit> {
     return debugGetArchivedMediaState()
       .then { archivedMedia ->
@@ -1306,7 +1323,7 @@ object BackupRepository {
       val timestampResult = getBackupFileLastModified()
       when {
         timestampResult is NetworkResult.Success -> {
-          timestampResult.result?.let { SignalStore.backup.lastBackupTime = it.toMillis() }
+          SignalStore.backup.lastBackupTime = timestampResult.result?.toMillis() ?: 0L
         }
 
         timestampResult is NetworkResult.StatusCodeError && timestampResult.code == 404 -> {
@@ -1448,7 +1465,9 @@ object BackupRepository {
    * prevents early initialization with incorrect keys before we have restored them.
    */
   private fun initBackupAndFetchAuth(): NetworkResult<ArchiveServiceAccessPair> {
-    return if (SignalStore.backup.backupsInitialized) {
+    return if (!RemoteConfig.messageBackups) {
+      NetworkResult.StatusCodeError(555, null, null, emptyMap(), NonSuccessfulResponseCodeException(555, "Backups disabled!"))
+    } else if (SignalStore.backup.backupsInitialized) {
       getArchiveServiceAccessPair().runOnStatusCodeError(resetInitializedStateErrorAction)
     } else if (isPreRestoreDuringRegistration()) {
       Log.w(TAG, "Requesting/using auth credentials in pre-restore state", Throwable())
