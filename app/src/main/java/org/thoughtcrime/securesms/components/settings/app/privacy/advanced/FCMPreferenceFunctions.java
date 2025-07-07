@@ -1,5 +1,8 @@
 package org.thoughtcrime.securesms.components.settings.app.privacy.advanced;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.pm.PackageManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,30 +14,23 @@ import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
-import org.whispersystems.signalservice.api.SignalServiceAccountManager;
-
-import java.io.IOException;
-import java.util.Optional;
-
-//-----------------------------------------------------------------------------
-// JW: added
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.pm.PackageManager;
+import org.whispersystems.signalservice.api.NetworkResultUtil;
 import org.thoughtcrime.securesms.ExitActivity;
+import org.thoughtcrime.securesms.net.SignalNetwork;
 import org.thoughtcrime.securesms.jobs.FcmRefreshJob;
 import org.thoughtcrime.securesms.jobs.RefreshAttributesJob;
 import org.thoughtcrime.securesms.messages.IncomingMessageObserver;
 import org.thoughtcrime.securesms.util.PlayServicesUtil;
-//-----------------------------------------------------------------------------
+
+import java.io.IOException;
+
 
 public class FCMPreferenceFunctions {
   private static final String TAG = Log.tag(FCMPreferenceFunctions.class);
 
   public static void cleanGcmId(Context context) {
     try {
-      SignalServiceAccountManager accountManager = AppDependencies.getSignalServiceAccountManager();
-      accountManager.setGcmId(Optional.<String>empty());
+      NetworkResultUtil.toBasicLegacy(SignalNetwork.account().clearFcmToken());
     } catch (IOException e) {
       Log.w(TAG, e.getMessage());
       Toast.makeText(context, R.string.ApplicationPreferencesActivity_error_connecting_to_server, Toast.LENGTH_LONG).show();
@@ -123,5 +119,4 @@ public class FCMPreferenceFunctions {
       exitAndRestart(context);
     }
   }
-
 }

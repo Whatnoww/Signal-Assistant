@@ -304,6 +304,7 @@ android {
     getByName("release") {
       isMinifyEnabled = true
       proguardFiles(*buildTypes["debug"].proguardFiles.toTypedArray())
+      manifestPlaceholders["mapsKey"] = getMapsKey() // JW
       buildConfigField("String", "BUILD_VARIANT_TYPE", "\"Release\"")
     }
 
@@ -450,24 +451,17 @@ android {
     outputs
       .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
       .forEach { output ->
-        if (output.baseName.contains("nightly")) {
-          var tag = getCurrentGitTag()
-          if (!tag.isNullOrEmpty()) {
-            if (tag.startsWith("v")) {
-              tag = tag.substring(1)
-            }
-            output.versionNameOverride = tag
-            output.outputFileName = output.outputFileName.replace(".apk", "-${output.versionNameOverride}.apk")
-          } else {
-            output.outputFileName = output.outputFileName.replace(".apk", "-$versionName.apk")
-          }
-        } else {
-          output.outputFileName = output.outputFileName.replace(".apk", "-$versionName.apk")
+        // JW: rewrote section
+        output.outputFileName = output.outputFileName.replace(".apk", "-$versionName.apk")
 
-          if (currentHotfixVersion >= maxHotfixVersions) {
-            throw AssertionError("Hotfix version is too large!")
-          }
+        val abiName: String = output.getFilter("ABI") ?: "universal"
+        val postFix: Int = abiPostFix[abiName]!!
+
+        if (postFix >= maxHotfixVersions) {
+          throw AssertionError("maxHotfixVersions is too large")
         }
+
+        output.versionCodeOverride = canonicalVersionCode * maxHotfixVersions + postFix
       }
   }
 
@@ -513,7 +507,7 @@ dependencies {
   implementation(project(":photoview"))
   implementation(project(":core-ui"))
 
-  implementation("net.lingala.zip4j:zip4j:2.11.5") // JW: added															   
+  implementation("net.lingala.zip4j:zip4j:2.11.5") // JW: added
   implementation(libs.androidx.fragment.ktx)
   implementation(libs.androidx.fragment.compose)
   implementation(libs.androidx.appcompat) {

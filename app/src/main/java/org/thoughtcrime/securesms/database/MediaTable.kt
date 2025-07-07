@@ -134,6 +134,7 @@ class MediaTable internal constructor(context: Context?, databaseHelper: SignalD
         (${AttachmentTable.CONTENT_TYPE} LIKE 'image/%' OR ${AttachmentTable.CONTENT_TYPE} LIKE 'video/%')
       """
     )
+
     private val AUDIO_MEDIA_QUERY = String.format(
       BASE_MEDIA_QUERY,
       """

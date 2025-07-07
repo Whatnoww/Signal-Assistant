@@ -5,16 +5,51 @@
   <!-- preferences.xml -->
   <string name="preferences__oled_theme">OLED Dunkel</string>
   <string name="preferences__green_theme">Grün Hell</string>
+  <string name="preferences_chats__google_map_type">Standort</string>
+  <string name="preferences__map_type">Kartentyp</string>
+  <string name="preferences__map_normal">Normal</string>
+  <string name="preferences__map_hybrid">Hybrid</string>
+  <string name="preferences__map_satellite">Satellit</string>
+  <string name="preferences__map_terrain">Terrain</string>
+  <string name="preferences__map_none">Keiner</string>
+  <string name="preferences__group_anyone">Irgendjemand</string>
+  <string name="preferences__group_non_blocked">Alle nicht gesperrten Personen</string>
+  <string name="preferences__group_only_contats">Nur Kontakte</string>
+  <string name="preferences__group_only_systemcontats">Nur nicht blockierte Systemkontakte</string>
+  <string name="preferences__group_nobody">Niemand</string>  
   <!--app protection-->
   <string name="preferences_app_protection__method_passphrase">Passphrase verwenden</string>
   <string name="preferences_app_protection__method_passphrase_summary">Passphrase zum Schutz von Signal verwenden anstatt Androids Bildschirmsperre oder Fingerabdruck</string>
+  <string name="preferences_app_protection__screenlock_requires_lollipop">Für die Verwendung der System-Bildschirmsperre ist Android 5.0 (Lollipop) oder höher erforderlich.</string>
+  <string name="preferences_app_protection__android_version_too_low">Android-Version zu niedrig</string>
+  <!-- FCM switch -->
+  <string name="preferences_advanced__push_notifications_fcm">Push-Benachrichtigungen über FCM</string>
+  <string name="preferences_advanced__push_notifications_fcm_summary">Empfangen Sie Push-Benachrichtigungen über Google Play Services. Wenn Sie die Funktion deaktivieren, wird ein WebSocket verwendet, was zu einem höheren Akkuverbrauch führen kann.</string>
+  <string name="preferences_advanced__play_services_not_found">Google Play-Dienste nicht gefunden</string>
+  <string name="preferences_advanced__need_to_restart">Signal muss neu gestartet werden, damit die Änderungen wirksam werden</string>
+  <!-- Keep messages -->
+  <string name="preferences_chats__control_message_deletion">Nachrichtenlöschung steuern</string>
+  <string name="preferences_chats__chat_keep_view_once_messages">Einmal ansehbare Medien behalten</string>
+  <string name="preferences_chats__keep_view_once_messages_summary">Bei aktivierter Option werden eingehende Medien, die einmal angesehen werden, als normale Medien behandelt, die immer angesehen werden können und nach der Ansicht nicht gelöscht werden.</string>
+  <string name="preferences_chats__chat_ignore_remote_delete">Remote-Löschen ignorieren</string>
+  <string name="preferences_chats__chat_ignore_remote_delete_summary">Wenn diese Option aktiviert ist, verhindert sie das Löschen von Nachrichten durch den Absender.</string>
+  <string name="preferences_chats__delete_media_only">Nur Medien löschen</string>
+  <string name="preferences_chats__delete_media_only_summary">Löschen Sie nur Medien, nicht die Nachricht selbst, wenn Medien im Bildschirm Alle Medien gelöscht werden</string>
   <!--backup location-->
   <string name="preferences_chats__chat_backups_removable">Speicherort für Datensicherungen</string>
+  <string name="preferences_chats__chat_backups_location_tap_to_change">Sicherungsspeicherort (zum Ändern tippen)</string>
   <string name="preferences_chats__backup_chats_to_removable_storage">Unterhaltungen auf SD-Karte sichern (falls vorhanden)</string>
+  <!--backup zipfile or not-->
+  <string name="preferences_chats__chat_backups_zipfile">Speichern Sie verschlüsselte Backups in einer ZIP-Datei</string>
+  <string name="preferences_chats__backup_chats_to_encrypted_zipfile">Die Zip-Datei wird mit dem gleichen Passwort wie die regulären Backups verschlüsselt, oder ohne Passwort, wenn kein reguläres Backup eingerichtet ist</string>
+  <string name="preferences_chats__chat_backups_zipfile_plain">Klartext-Backups in einer ZIP-Datei speichern</string>
+  <string name="preferences_chats__backup_chats_to_encrypted_zipfile_plain">Die Zip-Datei wird mit dem gleichen Passwort wie die regulären Backups verschlüsselt, oder ohne Passwort, wenn kein reguläres Backup eingerichtet ist</string>
+  <!-- ImportExportActivity -->
+  <string name="ImportExportActivity_import">Import</string>
+  <string name="ImportExportActivity_export">Export</string>
   <!--ImportFragment-->
   <string name="ImportFragment_restore_encrypted_backup">Verschlüsselte Sicherung wiederherstellen?</string>
-  <string name="ImportFragment_restoring_an_encrypted_backup_will_completely_replace_your_existing_keys">
-Das Wiederherstellen einer verschlüsselten Datensicherung ersetzt deine bestehenden Schlüssel, Einstellungen und Nachrichten. Du wirst jegliche Informationen deiner jetzigen Signal-Installation verlieren, die nicht in dieser Datensicherung enthalten sind.</string>
+  <string name="ImportFragment_restoring_an_encrypted_backup_will_completely_replace_your_existing_keys">Das Wiederherstellen einer verschlüsselten Datensicherung ersetzt deine bestehenden Schlüssel, Einstellungen und Nachrichten. Du wirst jegliche Informationen deiner jetzigen Signal-Installation verlieren, die nicht in dieser Datensicherung enthalten sind.</string>
   <string name="ImportFragment_restore">Wiederherstellen</string>
   <string name="ImportFragment_restoring">Wiederherstellen</string>
   <string name="ImportFragment_restoring_encrypted_backup">Verschlüsselte Datensicherung wird wiederhergestellt …</string>

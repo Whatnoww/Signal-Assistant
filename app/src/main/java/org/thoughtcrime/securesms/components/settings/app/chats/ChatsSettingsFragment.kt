@@ -1,32 +1,36 @@
 package org.thoughtcrime.securesms.components.settings.app.chats
 
-import android.app.Activity // JW: added
-import android.content.Intent // JW: added
-import android.os.Build // JW: added
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import org.thoughtcrime.securesms.R
-import org.thoughtcrime.securesms.backup.BackupDialog // JW: added
 import org.thoughtcrime.securesms.components.settings.DSLConfiguration
 import org.thoughtcrime.securesms.components.settings.DSLSettingsFragment
 import org.thoughtcrime.securesms.components.settings.DSLSettingsText
 import org.thoughtcrime.securesms.components.settings.configure
-import org.thoughtcrime.securesms.service.LocalBackupListener // JW: added
-import org.thoughtcrime.securesms.util.TextSecurePreferences // JW: added
-import org.thoughtcrime.securesms.keyvalue.SignalStore // JW: added
 import org.thoughtcrime.securesms.util.RemoteConfig
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingAdapter
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
-import org.thoughtcrime.securesms.util.UriUtils // JW: added
+// JW: Added
+import android.app.Activity
+import android.content.Intent
+import android.os.Build
+import org.thoughtcrime.securesms.backup.BackupDialog
+import org.thoughtcrime.securesms.service.LocalBackupListener
+import org.thoughtcrime.securesms.util.TextSecurePreferences
+import org.thoughtcrime.securesms.keyvalue.SignalStore
+import org.thoughtcrime.securesms.util.UriUtils
+//----------
 
 class ChatsSettingsFragment : DSLSettingsFragment(R.string.preferences_chats__chats) {
 
   private lateinit var viewModel: ChatsSettingsViewModel
-  private val mapLabels by lazy { resources.getStringArray(R.array.pref_map_type_entries) } // JW: added
-  private val mapValues by lazy { resources.getStringArray(R.array.pref_map_type_values) }  // JW: added
-  private val groupAddLabels by lazy { resources.getStringArray(R.array.pref_group_add_entries) } // JW: added
-  private val groupAddValues by lazy { resources.getStringArray(R.array.pref_group_add_values) }  // JW: added
-  val CHOOSE_BACKUPS_LOCATION_REQUEST_CODE = 1201 // JW: added
+  // JW: added
+  private val mapLabels by lazy { resources.getStringArray(R.array.pref_map_type_entries) }
+  private val mapValues by lazy { resources.getStringArray(R.array.pref_map_type_values) }
+  private val groupAddLabels by lazy { resources.getStringArray(R.array.pref_group_add_entries) }
+  private val groupAddValues by lazy { resources.getStringArray(R.array.pref_group_add_values) }
+  val CHOOSE_BACKUPS_LOCATION_REQUEST_CODE = 1201
+  // ----------
 
   override fun onResume() {
     super.onResume()
@@ -95,7 +99,7 @@ class ChatsSettingsFragment : DSLSettingsFragment(R.string.preferences_chats__ch
 
       dividerPref()
 
-     sectionHeaderPref(R.string.ChatsSettingsFragment__chat_folders)
+      sectionHeaderPref(R.string.ChatsSettingsFragment__chat_folders)
 
       if (state.folderCount == 1) {
         clickPref(

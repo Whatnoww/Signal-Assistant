@@ -155,7 +155,7 @@ public class WhatsappBackupImporter {
         if (item.getAddress() == null) {
             recipient = Recipient.self();
         } else {
-            recipient = Recipient.external(context, item.getAddress());
+            recipient = Recipient.external(item.getAddress());
         }
         return recipient;
     }

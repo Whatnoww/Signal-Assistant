@@ -55,7 +55,7 @@ public class PlaintextBackupImporter {
       // TODO: we might have to split this up in chunks of about 5000 messages to prevent these errors:
       // java.util.concurrent.TimeoutException: net.sqlcipher.database.SQLiteCompiledSql.finalize() timed out after 10 seconds
       while ((item = backup.getNext()) != null) {
-        Recipient       recipient  = Recipient.external(context, item.getAddress());
+        Recipient       recipient  = Recipient.external(item.getAddress());
         long            threadId   = threadTable.getOrCreateThreadIdFor(recipient);
         SQLiteStatement statement  = createMessageInsertStatement(transaction);
 

@@ -913,7 +913,7 @@ object DataMessageProcessor {
     notifyTypingStoppedFromIncomingMessage(context, senderRecipient, threadRecipient.id, metadata.sourceDeviceId)
 
     val insertResult: InsertResult?
-    val viewOnce: Boolean = if (TextSecurePreferences.isKeepViewOnceMessages(context)) false else (message.isViewOnce == true) // J
+    val viewOnce: Boolean = if (TextSecurePreferences.isKeepViewOnceMessages(context)) false else (message.isViewOnce == true) // JW
 
     SignalDatabase.messages.beginTransaction()
     try {
