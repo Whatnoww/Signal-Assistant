@@ -160,7 +160,7 @@ object E164Util {
       val withAreaCodeRules: String = applyAreaCodeRules(localNumber, localAreaCode, correctedInput)
       val parsedNumber: PhoneNumber = PhoneNumberUtil.getInstance().parse(withAreaCodeRules, regionCode)
 
-      val isShortCode = ShortNumberInfo.getInstance().isValidShortNumberForRegion(parsedNumber, regionCode) || withAreaCodeRules.length <= 5
+      val isShortCode = ShortNumberInfo.getInstance().isValidShortNumberForRegion(parsedNumber, regionCode) || withAreaCodeRules.trimStart('+').length <= 6
       if (isShortCode) {
         return correctedInput.numbersOnly().stripLeadingZerosFromE164()
       }
@@ -253,12 +253,18 @@ object E164Util {
      * a phone number.
      */
     fun formatAsE164(input: String): String? {
-      return formatAsE164WithRegionCode(
+      val formatted = formatAsE164WithRegionCode(
         localNumber = localNumber,
         localAreaCode = localAreaCode,
         regionCode = localRegionCode,
         input = input
       )
+
+      return if (formatted == null && input.startsWith("+")) {
+        formatAsE164(input.substring(1))
+      } else {
+        formatted
+      }
     }
 
     /**

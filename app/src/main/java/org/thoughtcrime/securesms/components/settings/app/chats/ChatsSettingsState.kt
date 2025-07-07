@@ -7,6 +7,14 @@ data class ChatsSettingsState(
   val useSystemEmoji: Boolean,
   val enterKeySends: Boolean,
   val localBackupsEnabled: Boolean,
+  val folderCount: Int,
+  val userUnregistered: Boolean,
+  val clientDeprecated: Boolean
+) {
+  fun isRegisteredAndUpToDate(): Boolean {
+    return !userUnregistered && !clientDeprecated
+  }
+}
   val folderCount: Int
   // JW: added extra preferences
   ,

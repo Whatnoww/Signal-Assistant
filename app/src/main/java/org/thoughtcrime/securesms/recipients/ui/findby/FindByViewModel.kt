@@ -59,13 +59,13 @@ class FindByViewModel(
 
   @WorkerThread
   private fun performUsernameLookup(): FindByResult {
-    val username = state.value.userEntry
+    val username = state.value.userEntry.trim()
 
     if (!UsernameUtil.isValidUsernameForSearch(username)) {
       return FindByResult.InvalidEntry
     }
 
-    return when (val result = UsernameRepository.fetchAciForUsername(usernameString = username)) {
+    return when (val result = UsernameRepository.fetchAciForUsername(usernameString = username.removePrefix("@"))) {
       UsernameRepository.UsernameAciFetchResult.NetworkError -> FindByResult.NotFound()
       UsernameRepository.UsernameAciFetchResult.NotFound -> FindByResult.NotFound()
       is UsernameRepository.UsernameAciFetchResult.Success -> FindByResult.Success(Recipient.externalUsername(result.aci, username).id)
@@ -99,7 +99,7 @@ class FindByViewModel(
         query = filterBy,
         filteredCountries = state.value.supportedCountries.filter { country: Country ->
           country.name.contains(filterBy, ignoreCase = true) ||
-            country.countryCode.toString().contains(filterBy) ||
+            country.countryCode.toString().contains(filterBy.removePrefix("+")) ||
             (filterBy.equals("usa", ignoreCase = true) && country.name.equals("United States", ignoreCase = true))
         }
       )

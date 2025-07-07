@@ -42,10 +42,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -59,15 +61,15 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import kotlinx.coroutines.launch
-import org.signal.core.ui.Animations.navHostSlideInTransition
-import org.signal.core.ui.Animations.navHostSlideOutTransition
-import org.signal.core.ui.Buttons
-import org.signal.core.ui.Dialogs
-import org.signal.core.ui.Dividers
-import org.signal.core.ui.Previews
-import org.signal.core.ui.Scaffolds
-import org.signal.core.ui.TextFields
-import org.signal.core.ui.theme.SignalTheme
+import org.signal.core.ui.compose.Animations.navHostSlideInTransition
+import org.signal.core.ui.compose.Animations.navHostSlideOutTransition
+import org.signal.core.ui.compose.Buttons
+import org.signal.core.ui.compose.Dialogs
+import org.signal.core.ui.compose.Dividers
+import org.signal.core.ui.compose.Previews
+import org.signal.core.ui.compose.Scaffolds
+import org.signal.core.ui.compose.TextFields
+import org.signal.core.ui.compose.theme.SignalTheme
 import org.signal.core.util.E164Util
 import org.signal.core.util.getParcelableExtraCompat
 import org.thoughtcrime.securesms.PassphraseRequiredActivity
@@ -132,7 +134,7 @@ class FindByActivity : PassphraseRequiredActivity() {
             Scaffolds.Settings(
               title = stringResource(id = title),
               onNavigationClick = { finishAfterTransition() },
-              navigationIconPainter = painterResource(id = R.drawable.symbol_arrow_left_24)
+              navigationIcon = ImageVector.vectorResource(id = R.drawable.symbol_arrow_start_24)
             ) {
               val context = LocalContext.current
 

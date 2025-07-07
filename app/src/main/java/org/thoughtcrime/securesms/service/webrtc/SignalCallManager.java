@@ -417,7 +417,7 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
                                                                                                    CallLinkSecretParams.deriveFromRootKey(callLinkRootKey.getKeyBytes())
                                                                                                );
 
-        callManager.peekCallLinkCall(SignalStore.internal().getGroupCallingServer(), callLinkAuthCredentialPresentation.serialize(), callLinkRootKey, peekInfo -> {
+        callManager.peekCallLinkCall(SignalStore.internal().getGroupCallingServer(), callLinkAuthCredentialPresentation.serialize(), callLinkRootKey, null, peekInfo -> {
           PeekInfo info = peekInfo.getValue();
           if (info == null) {
             Log.w(TAG, "Failed to get peek info: " + peekInfo.getStatus());
@@ -971,18 +971,37 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
   }
 
   @Override
-  public void onSpeakingNotification(@NonNull GroupCall groupCall, @NonNull GroupCall.SpeechEvent speechEvent) {
+  public void onRemoteMuteRequest(@NonNull GroupCall groupCall, long sourceDemuxId) {
+    process((s, p) -> p.handleRemoteMuteRequest(s, sourceDemuxId));
 
   }
 
   @Override
-  public void onFullyInitialized() {
-    process((s, p) -> p.handleOrientationChanged(s, s.getLocalDeviceState().isLandscapeEnabled(), s.getLocalDeviceState().getDeviceOrientation().getDegrees()));
+  public void onObservedRemoteMute(@NonNull GroupCall groupCall, long sourceDemuxId, long targetDemuxId) {
+    process((s, p) -> p.handleObservedRemoteMute(s, sourceDemuxId, targetDemuxId));
+  }
+
+  @Override
+  public void onSpeakingNotification(@NonNull GroupCall groupCall, @NonNull GroupCall.SpeechEvent speechEvent) {
+    process((s, p) -> p.handleGroupCallSpeechEvent(s, speechEvent));
+  }
+
+  @Override
+  public void onFullyInitialized(@NonNull final CameraState newCameraState) {
+    process((s, p) -> {
+      WebRtcServiceState s1 = p.handleSetCameraDirection(s, newCameraState);
+      return p.handleOrientationChanged(s1, s.getLocalDeviceState().isLandscapeEnabled(), s.getLocalDeviceState().getDeviceOrientation().getDegrees());
+    });
   }
 
   @Override
   public void onCameraSwitchCompleted(@NonNull final CameraState newCameraState) {
     process((s, p) -> p.handleCameraSwitchCompleted(s, newCameraState));
+  }
+
+  @Override
+  public void onCameraSwitchFailure(@NonNull final CameraState newCameraState) {
+    process((s, p) -> p.handleCameraSwitchFailure(s, newCameraState));
   }
 
   @Override
@@ -1033,21 +1052,42 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
   public void retrieveTurnServers(@NonNull RemotePeer remotePeer) {
     networkExecutor.execute(() -> {
       try {
-        List<TurnServerInfo> turnServerInfos = NetworkResultUtil.toBasicLegacy(SignalNetwork.calling().getTurnServerInfo());
-        List<PeerConnection.IceServer> iceServers = mapToIceServers(turnServerInfos);
-        process((s, p) -> {
-          RemotePeer activePeer = s.getCallInfoState().getActivePeer();
-          if (activePeer != null && activePeer.getCallId().equals(remotePeer.getCallId())) {
-            return p.handleTurnServerUpdate(s, iceServers, TextSecurePreferences.isTurnOnly(context));
-          }
+        List<PeerConnection.IceServer> cachedServers = TurnServerCache.getCachedServers();
+        if (cachedServers != null) {
+          processTurnServers(remotePeer, cachedServers);
+          return;
+        }
 
-          Log.w(TAG, "Ignoring received turn servers for incorrect call id. requesting_call_id: " + remotePeer.getCallId() + " current_call_id: " + (activePeer != null ? activePeer.getCallId() : "null"));
-          return s;
-        });
+        List<TurnServerInfo> turnServerInfos = NetworkResultUtil.toBasicLegacy(SignalNetwork.calling().getTurnServerInfo());
+
+        // Find *any* provided ttl values as long as they are valid.
+        long minTtl = turnServerInfos.stream()
+                                     .map(TurnServerInfo::getTtl)
+                                     .filter(ttl -> ttl != null && ttl > 0)
+                                     .min(Long::compare)
+                                     .orElse(0L);
+
+        List<PeerConnection.IceServer> iceServers = mapToIceServers(turnServerInfos);
+
+        TurnServerCache.updateCache(iceServers, minTtl);
+
+        processTurnServers(remotePeer, iceServers);
       } catch (IOException e) {
         Log.w(TAG, "Unable to retrieve turn servers: ", e);
         process((s, p) -> p.handleSetupFailure(s, remotePeer.getCallId()));
       }
+    });
+  }
+
+  private void processTurnServers(RemotePeer remotePeer, List<PeerConnection.IceServer> servers) {
+    process((s, p) -> {
+      RemotePeer activePeer = s.getCallInfoState().getActivePeer();
+      if (activePeer != null && activePeer.getCallId().equals(remotePeer.getCallId())) {
+        return p.handleTurnServerUpdate(s, servers, TextSecurePreferences.isTurnOnly(context));
+      }
+
+      Log.w(TAG, "Ignoring received turn servers for incorrect call id. requesting_call_id: " + remotePeer.getCallId() + " current_call_id: " + (activePeer != null ? activePeer.getCallId() : "null"));
+      return s;
     });
   }
 

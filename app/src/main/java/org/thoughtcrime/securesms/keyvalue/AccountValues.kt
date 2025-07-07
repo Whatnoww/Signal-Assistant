@@ -9,7 +9,7 @@ import org.signal.core.util.logging.Log
 import org.signal.core.util.nullIfBlank
 import org.signal.libsignal.protocol.IdentityKey
 import org.signal.libsignal.protocol.IdentityKeyPair
-import org.signal.libsignal.protocol.ecc.Curve
+import org.signal.libsignal.protocol.ecc.ECPrivateKey
 import org.signal.libsignal.protocol.util.Medium
 import org.thoughtcrime.securesms.crypto.IdentityKeyUtil
 import org.thoughtcrime.securesms.crypto.MasterCipher
@@ -161,6 +161,7 @@ class AccountValues internal constructor(store: KeyValueStore, context: Context)
     }
   }
 
+  @get:JvmName("restoredAccountEntropyPool")
   @get:Synchronized
   val restoredAccountEntropyPool by booleanValue(KEY_RESTORED_ACCOUNT_ENTROPY_KEY, false)
 
@@ -227,7 +228,7 @@ class AccountValues internal constructor(store: KeyValueStore, context: Context)
       require(store.containsKey(KEY_ACI_IDENTITY_PUBLIC_KEY)) { "Not yet set!" }
       return IdentityKeyPair(
         IdentityKey(getBlob(KEY_ACI_IDENTITY_PUBLIC_KEY, null)),
-        Curve.decodePrivatePoint(getBlob(KEY_ACI_IDENTITY_PRIVATE_KEY, null))
+        ECPrivateKey(getBlob(KEY_ACI_IDENTITY_PRIVATE_KEY, null))
       )
     }
 
@@ -237,7 +238,7 @@ class AccountValues internal constructor(store: KeyValueStore, context: Context)
       require(store.containsKey(KEY_PNI_IDENTITY_PUBLIC_KEY)) { "Not yet set!" }
       return IdentityKeyPair(
         IdentityKey(getBlob(KEY_PNI_IDENTITY_PUBLIC_KEY, null)),
-        Curve.decodePrivatePoint(getBlob(KEY_PNI_IDENTITY_PRIVATE_KEY, null))
+        ECPrivateKey(getBlob(KEY_PNI_IDENTITY_PRIVATE_KEY, null))
       )
     }
 
@@ -332,6 +333,22 @@ class AccountValues internal constructor(store: KeyValueStore, context: Context)
         .beginWrite()
         .putBlob(KEY_ACI_IDENTITY_PUBLIC_KEY, publicKey)
         .putBlob(KEY_ACI_IDENTITY_PRIVATE_KEY, privateKey)
+        .commit()
+    }
+  }
+
+  /**
+   * Only to be used as part of Quick Restore, DO NOT USE OTHERWISE.
+   */
+  fun resetAciAndPniIdentityKeysAfterFailedRestore() {
+    synchronized(this) {
+      Log.i(TAG, "Resetting ACI and PNI identity keys after failed quick registration and restore")
+
+      store.beginWrite()
+        .remove(KEY_ACI_IDENTITY_PUBLIC_KEY)
+        .remove(KEY_ACI_IDENTITY_PRIVATE_KEY)
+        .remove(KEY_PNI_IDENTITY_PUBLIC_KEY)
+        .remove(KEY_PNI_IDENTITY_PRIVATE_KEY)
         .commit()
     }
   }
