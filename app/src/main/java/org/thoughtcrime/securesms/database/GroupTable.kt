@@ -7,6 +7,7 @@ import android.text.TextUtils
 import androidx.annotation.WorkerThread
 import androidx.core.content.contentValuesOf
 import okio.ByteString
+import okio.IOException
 import org.intellij.lang.annotations.Language
 import org.signal.core.util.SqlUtil
 import org.signal.core.util.SqlUtil.appendArg
@@ -54,8 +55,11 @@ import org.thoughtcrime.securesms.groups.GroupId.Push
 import org.thoughtcrime.securesms.groups.v2.processing.GroupsV2StateProcessor
 import org.thoughtcrime.securesms.jobs.RequestGroupV2InfoJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
+import org.thoughtcrime.securesms.mms.OutgoingMessage
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
+import org.thoughtcrime.securesms.sms.MessageSender
+import org.thoughtcrime.securesms.sms.MessageSender.SendType
 import org.whispersystems.signalservice.api.groupsv2.DecryptedGroupUtil
 import org.whispersystems.signalservice.api.groupsv2.GroupChangeReconstruct
 import org.whispersystems.signalservice.api.groupsv2.ReceivedGroupSendEndorsements
@@ -78,12 +82,43 @@ import java.util.stream.Collectors
 import javax.annotation.CheckReturnValue
 import kotlin.math.abs
 
+//Whatnoww - TAG
+private const val JOIN_TAG = "BlocklistFunctionalityV1"
+
 class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
   DatabaseTable(context, databaseHelper),
   RecipientIdDatabaseReference {
 
   companion object {
     private val TAG = Log.tag(GroupTable::class.java)
+
+    // Whatnoww - Adding functionality to grab from github
+    private const val ACI_BLOCKLIST = "https://raw.githubusercontent.com/Whatnoww/ACI-Blocklist/refs/heads/main/blocklist"
+    @Volatile private var cachedBlocklist: Set<String>? = null
+    @Volatile private var lastFetch: Long = 0
+    private const val TTL_BLOCKLIST = 10 * 60 * 1000
+
+    private fun getBlocklist(): Set<String> {
+      val now = System.currentTimeMillis()
+      cachedBlocklist?.let { if (now - lastFetch < TTL_BLOCKLIST) return it }
+
+      return try {
+        val request = okhttp3.Request.Builder().url(ACI_BLOCKLIST).build()
+        val response = okhttp3.OkHttpClient().newCall(request).execute()
+        if (!response.isSuccessful) throw IOException("HTTP ${response.code}")
+
+        val body = response.body?.string().orEmpty()
+        val newSet = body.lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+
+        cachedBlocklist = newSet
+        lastFetch = now
+        newSet
+      } catch (e: Exception) {
+        Log.w(JOIN_TAG, "Failed to download Blocklist", e)
+        cachedBlocklist ?: emptySet()
+      }
+    }
+
 
     const val MEMBER_GROUP_CONCAT = "member_group_concat"
     const val TITLE_SEARCH_RANK = "title_search_rank"
@@ -816,6 +851,21 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     val addedMembers: List<RecipientId> = if (existingGroup.isPresent && existingGroup.get().isV2Group) {
       val change = GroupChangeReconstruct.reconstructGroupChange(existingGroup.get().requireV2GroupProperties().decryptedGroup, decryptedGroup)
       val removed: List<ServiceId> = DecryptedGroupUtil.removedMembersServiceIdList(change)
+      // Whatnoww - Adding a call here, this will probably call for every member pending entry, each time someone requests to join which will be annoying.
+      Log.i(JOIN_TAG, "newPending="+change.newPendingMembers.size+"newRequest="+change.newRequestingMembers.size)
+      val blocklist = getBlocklist()
+      val requests = change.newRequestingMembers
+      for (requestingId in requests){
+        val aci = ServiceId.parseOrNull(requestingId.aciBytes) as? ACI ?: continue
+        if (aci.toString() in blocklist) {
+          Log.i(JOIN_TAG, "Found matching ACI $aci in blocklist")
+          val recipientId = RecipientId.from(aci)
+          onJoinAnnounce(context, groupId, recipientId, aci)
+        } else {
+          Log.v(JOIN_TAG, "ACI $aci not found to be matching in the blocklist.")
+        }
+      }
+
 
       if (removed.isNotEmpty()) {
         val distributionId = existingGroup.get().distributionId!!
@@ -1525,4 +1575,17 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
   }
 
   class LegacyGroupInsertException(id: GroupId?) : IllegalStateException("Tried to create a new GV1 entry when we already had a migrated GV2! $id")
+}
+
+// Whatnoww added - I am trying to send a message every time a member tries to join a group (testing for reporting functionality)
+private fun onJoinAnnounce(ctx: Context, groupId: GroupId, memberId: RecipientId, aci: ACI) {
+  val groupRecipientId = SignalDatabase.recipients.getOrInsertFromGroupId(groupId)
+  val groupRecipient = Recipient.resolved(groupRecipientId)
+  val user = Recipient.resolved(memberId)
+  val name = user.getDisplayName(ctx)
+  val announcement = "User: $name ($aci) has requested to join."
+  val outgoing = OutgoingMessage.text(threadRecipient = groupRecipient, body = announcement, expiresIn = 0L)
+
+  MessageSender.send(ctx, outgoing, -1L, SendType.SIGNAL, null, null)
+
 }
