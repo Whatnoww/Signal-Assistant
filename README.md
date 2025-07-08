@@ -5,6 +5,7 @@ Just my changes for Signal-Assistant. It doesn't need much. I will probably eith
 ## Current features
 
 - Basically all from Signal-JW
+- Spam reporting based off of a blocklist.
 
 ## Contributing Bug reports
 We use GitHub for bug tracking. Only report issues that happen here if they also happen on the stock client.
