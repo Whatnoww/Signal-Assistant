@@ -1,6 +1,6 @@
-# Signal Android 
+# Signal Assistant 
 
-Just my changes for Signal-Assistant. It doesn't need much. I will probably either extend or reduce custom functionality in the future depending on different needs, but this is essentially a fork that is focused on making auto-reply bots that work through notifications work with some additional group controls.
+Signal Assistant is a fork of Signal Android with some quality of life enhancements from Signal-JW that benefit auto-reply bots, besides a spam reporting feature.
 
 ## Current features
 
