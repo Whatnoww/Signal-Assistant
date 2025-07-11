@@ -96,7 +96,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     private const val ACI_BLOCKLIST = "https://raw.githubusercontent.com/Whatnoww/ACI-Blocklist/refs/heads/main/blocklist"
     @Volatile private var cachedBlocklist: Set<String>? = null
     @Volatile private var lastFetch: Long = 0
-    private const val TTL_BLOCKLIST = 10 * 60 * 1000
+    private const val TTL_BLOCKLIST = 10 * 60 * 500
 
     private fun getBlocklist(): Set<String> {
       val now = System.currentTimeMillis()
