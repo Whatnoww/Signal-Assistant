@@ -1493,7 +1493,7 @@
     <!-- Text label button to dismiss the dialog -->
     <string name="RemoteRestoreActivity__not_now">आता नाही</string>
     <!-- Text shown on restore screen as information on what will happen if you skip -->
-    <string name="RemoteRestoreActivity__if_you_choose_not_to_restore">If you choose not to restore now, you won\'t be able to restore later. Your media will restore in the background.</string>
+    <string name="RemoteRestoreActivity__if_you_choose_not_to_restore">तुम्ही आत्ता पूर्ववत न करण्याचा निर्णय घेतलात, तर तुम्हाला नंतर ते पूर्ववत करता येणार नाहीत. तुमचा मीडिया पाठीमागे पूर्ववत होईल.</string>
 
     <!-- GroupMentionSettingDialog -->
     <string name="GroupMentionSettingDialog_notify_me_for_mentions">उल्लेखा साठी मला सूचित करा</string>
@@ -4568,6 +4568,8 @@
     <string name="ConfirmKbsPinFragment__pin_created">PIN तयार केले</string>
     <string name="ConfirmKbsPinFragment__re_enter_your_pin">आपला PIN पुन्हा प्रविष्ट करा</string>
     <string name="ConfirmKbsPinFragment__creating_pin">PIN तयार करत आहे…</string>
+    <!-- ID used when saving the PIN to the device password manager. -->
+    <string name="ConfirmKbsPinFragment__pin_password_manager_id">Signal PIN</string>
 
     <!-- KbsSplashFragment -->
     <string name="KbsSplashFragment__introducing_pins">PIN ची ओळख करून देत आहे</string>
@@ -8099,6 +8101,8 @@
     <string name="BackupsSettingsFragment_subscription_not_found_on_this_device">"या डिव्हाईसवर सदस्यत्व सापडले नाही."</string>
     <!-- Action button label to set up backups -->
     <string name="BackupsSettingsFragment_set_up">सेट अप</string>
+    <!-- Action button label to open remote backup settings -->
+    <string name="BackupsSettingsFragment_view_settings">View settings</string>
 
     <!-- RemoteBackupsSettingsFragment -->
     <!-- Content description for canceling backup upload -->
@@ -8356,16 +8360,18 @@
     <string name="MessageBackupsKeyRecordScreen__confirm_save_to_password_manager_title">पासवर्ड व्यवस्थापकामध्ये जतन करायची?</string>
     <!-- Dialog message confirming that the user wants to save a backup key to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__confirm_save_to_password_manager_body">तुमची बॅकअप की अशाच पासवर्ड व्यवस्थापकामध्ये जतन करा ज्याच्या सुरक्षिततेवर तुमचा विश्वास आहे. तुमच्यासाठी कोणता पासवर्ड व्यवस्थापक योग्य आहे याबाबत Signal कोणतीही शिफारस करत नाही.</string>
+    <!-- ID used when saving the backup key to the device password manager. -->
+    <string name="MessageBackupsKeyRecordScreen__backup_key_password_manager_id">Signal Backups</string>
     <!-- Message shown after the backup key is successfully saved to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__save_to_password_manager_success">तुमच्या पासवर्ड व्यवस्थापकामध्ये जतन झाली</string>
     <!-- Dialog title shown when there is an error saving the backup key to the device password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__cant_save_to_password_manager_title">Can\'t save to password manager</string>
+    <string name="MessageBackupsKeyRecordScreen__cant_save_to_password_manager_title">पासवर्ड व्यवस्थापकामध्ये जतन करता येत नाही</string>
     <!-- Dialog message shown when there is an error saving the backup key because no compatible password manager was detected. -->
     <string name="MessageBackupsKeyRecordScreen__missing_password_manager_message">तुम्ही पासवर्ड व्यवस्थापक अजून सेट केलेला नाही, किंवा तुम्ही वापरत असलेला पासवर्ड व्यवस्थापक समर्थित नाही.</string>
     <!-- Dialog message shown when there is an error saving the backup key because the user previously chose not to save Signal passwords to their password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">You previously chose not to save passwords for Signal to Google Password Manager. In your Google Password Manager settings, remove Signal from \"Declined sites and apps\" and try again.</string>
+    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">तुम्ही याआधी गूगल पासवर्ड मॅनेजरमध्ये Signalचे पासवर्ड जतन न करण्याचा निर्णय घेतला होतात. तुमच्या गूगल पासवर्ड मॅनेजर सेटिंग्जमध्ये, \"नाकारलेल्या साईट्स आणि ॲप्स\" मधून Signal हटवा आणि पुन्हा प्रयत्न करा.</string>
     <!-- Label for a button that navigates to the device settings -->
-    <string name="MessageBackupsKeyRecordScreen__go_to_settings">Go to settings</string>
+    <string name="MessageBackupsKeyRecordScreen__go_to_settings">सेटिंग्ज वर जा</string>
     <!-- Action button label -->
     <string name="MessageBackupsKeyRecordScreen__next">पुढे</string>
     <!-- Bottom sheet title -->

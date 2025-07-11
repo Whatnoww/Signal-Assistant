@@ -1453,7 +1453,7 @@
     <!-- Text label button to dismiss the dialog -->
     <string name="RemoteRestoreActivity__not_now">ယခု မလုပ်သေးပါ</string>
     <!-- Text shown on restore screen as information on what will happen if you skip -->
-    <string name="RemoteRestoreActivity__if_you_choose_not_to_restore">If you choose not to restore now, you won\'t be able to restore later. Your media will restore in the background.</string>
+    <string name="RemoteRestoreActivity__if_you_choose_not_to_restore">ယခု ပြန်လည်ရယူရန် မရွေးချယ်ပါက နောက်မှပြန်လည်မရယူနိုင်တော့ပါ။ သင့်မီဒီယာ ပြန်လည်ရယူခြင်းကို နောက်ခံတွင် လုပ်ဆောင်ပါမည်။</string>
 
     <!-- GroupMentionSettingDialog -->
     <string name="GroupMentionSettingDialog_notify_me_for_mentions">မန်းရှင်းများရှိလျှင် ကျွန်ုပ်ကိုအသိပေးပါ</string>
@@ -4450,6 +4450,8 @@
     <string name="ConfirmKbsPinFragment__pin_created">ပင်နံပါတ်ဖန်တီးပြီး</string>
     <string name="ConfirmKbsPinFragment__re_enter_your_pin">ပင်နံပါတ်ကို ပြန်ရိုက်ထည့်ပေးပါ</string>
     <string name="ConfirmKbsPinFragment__creating_pin">ပင်နံပါတ် ဖန်တီးနေသည်…</string>
+    <!-- ID used when saving the PIN to the device password manager. -->
+    <string name="ConfirmKbsPinFragment__pin_password_manager_id">Signal PIN</string>
 
     <!-- KbsSplashFragment -->
     <string name="KbsSplashFragment__introducing_pins">ပင်နံပါတ်များကို မိတ်ဆက်ပေးသည်</string>
@@ -7922,6 +7924,8 @@
     <string name="BackupsSettingsFragment_subscription_not_found_on_this_device">"ပုံမှန်လှူဒါန်းမှုကို ဤစက်တွင်ရှာမတွေ့ပါ။"</string>
     <!-- Action button label to set up backups -->
     <string name="BackupsSettingsFragment_set_up">သတ်မှတ်ရန်</string>
+    <!-- Action button label to open remote backup settings -->
+    <string name="BackupsSettingsFragment_view_settings">View settings</string>
 
     <!-- RemoteBackupsSettingsFragment -->
     <!-- Content description for canceling backup upload -->
@@ -8176,16 +8180,18 @@
     <string name="MessageBackupsKeyRecordScreen__confirm_save_to_password_manager_title">စကားဝှက်စီမံရေးတွင် သိမ်းဆည်းပါမည်လား။</string>
     <!-- Dialog message confirming that the user wants to save a backup key to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__confirm_save_to_password_manager_body">ဘက်ခ်အပ်ကီးကို သင်ယုံကြည်စိတ်ချရသော စကားဝှက်စီမံရေးတွင်သာ သိမ်းဆည်းပါ။ Signal သည် သင့်အတွက် သင့်လျော်သော စကားဝှက်စီမံရေးကို အကြံပြုချက်မပေးပါ။</string>
+    <!-- ID used when saving the backup key to the device password manager. -->
+    <string name="MessageBackupsKeyRecordScreen__backup_key_password_manager_id">Signal Backups</string>
     <!-- Message shown after the backup key is successfully saved to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__save_to_password_manager_success">သင့်စကားဝှက်စီမံရေးတွင် သိမ်းဆည်းထားသည်</string>
     <!-- Dialog title shown when there is an error saving the backup key to the device password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__cant_save_to_password_manager_title">Can\'t save to password manager</string>
+    <string name="MessageBackupsKeyRecordScreen__cant_save_to_password_manager_title">စကားဝှက်စီမံရေးတွင် သိမ်းဆည်း၍မရပါ</string>
     <!-- Dialog message shown when there is an error saving the backup key because no compatible password manager was detected. -->
     <string name="MessageBackupsKeyRecordScreen__missing_password_manager_message">သင့်တွင် စကားဝှက်စီမံရေးစနစ် ထည့်သွင်းထားခြင်း မရှိပါ သို့မဟုတ် သင်အသုံးပြုနေသည့် စကားဝှက်စီမံရေးကို ပံ့ပိုးမထားပါ။</string>
     <!-- Dialog message shown when there is an error saving the backup key because the user previously chose not to save Signal passwords to their password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">You previously chose not to save passwords for Signal to Google Password Manager. In your Google Password Manager settings, remove Signal from \"Declined sites and apps\" and try again.</string>
+    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">Google Password Manager တွင် Signal အတွက် စကားဝှက်များကို မသိမ်းဆည်းရန် ယခင်က သင်ရွေးချယ်ခဲ့သည်။ Google Password Manager ဆက်တင်တွင် Signal ကို \"ငြင်းပယ်ထားသောဆိုက်များနှင့် အက်ပ်များ\" မှ ဖယ်ရှားပြီး ထပ်စမ်းကြည့်ပါ။</string>
     <!-- Label for a button that navigates to the device settings -->
-    <string name="MessageBackupsKeyRecordScreen__go_to_settings">Go to settings</string>
+    <string name="MessageBackupsKeyRecordScreen__go_to_settings">ဆက်တင်သို့ သွားရန်</string>
     <!-- Action button label -->
     <string name="MessageBackupsKeyRecordScreen__next">ဆက်သွားမည်</string>
     <!-- Bottom sheet title -->

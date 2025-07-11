@@ -1453,7 +1453,7 @@
     <!-- Text label button to dismiss the dialog -->
     <string name="RemoteRestoreActivity__not_now">ไว้ทีหลัง</string>
     <!-- Text shown on restore screen as information on what will happen if you skip -->
-    <string name="RemoteRestoreActivity__if_you_choose_not_to_restore">If you choose not to restore now, you won\'t be able to restore later. Your media will restore in the background.</string>
+    <string name="RemoteRestoreActivity__if_you_choose_not_to_restore">หากเลือกไม่กู้คืนตอนนี้ คุณจะไม่สามารถกู้คืนได้อีกในภายหลัง โดยการกู้คืนไฟล์สื่อจะดำเนินการในพื้นหลัง</string>
 
     <!-- GroupMentionSettingDialog -->
     <string name="GroupMentionSettingDialog_notify_me_for_mentions">แจ้งให้ฉันรู้สำหรับการกล่าวถึง</string>
@@ -4450,6 +4450,8 @@
     <string name="ConfirmKbsPinFragment__pin_created">สร้างรหัส PIN แล้ว</string>
     <string name="ConfirmKbsPinFragment__re_enter_your_pin">ใส่รหัส PIN ของคุณอีกครั้ง</string>
     <string name="ConfirmKbsPinFragment__creating_pin">สร้างรหัส PIN…</string>
+    <!-- ID used when saving the PIN to the device password manager. -->
+    <string name="ConfirmKbsPinFragment__pin_password_manager_id">Signal PIN</string>
 
     <!-- KbsSplashFragment -->
     <string name="KbsSplashFragment__introducing_pins">แนะนำรหัส PINs</string>
@@ -7922,6 +7924,8 @@
     <string name="BackupsSettingsFragment_subscription_not_found_on_this_device">"ไม่พบการสมัครแพ็กเกจบนอุปกรณ์เครื่องนี้"</string>
     <!-- Action button label to set up backups -->
     <string name="BackupsSettingsFragment_set_up">ตั้งชื่อผู้ใช้</string>
+    <!-- Action button label to open remote backup settings -->
+    <string name="BackupsSettingsFragment_view_settings">View settings</string>
 
     <!-- RemoteBackupsSettingsFragment -->
     <!-- Content description for canceling backup upload -->
@@ -8176,16 +8180,18 @@
     <string name="MessageBackupsKeyRecordScreen__confirm_save_to_password_manager_title">บันทึกไปยังตัวจัดการรหัสผ่านใช่หรือไม่</string>
     <!-- Dialog message confirming that the user wants to save a backup key to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__confirm_save_to_password_manager_body">โปรดเก็บกุญแจสำรองของคุณไว้กับตัวจัดการรหัสผ่านที่คุณมั่นใจว่าปลอดภัยเท่านั้น โดย Signal จะไม่แนะนำตัวจัดการรหัสผ่านที่เหมาะกับคุณตัวใดตัวหนึ่งเป็นพิเศษ</string>
+    <!-- ID used when saving the backup key to the device password manager. -->
+    <string name="MessageBackupsKeyRecordScreen__backup_key_password_manager_id">Signal Backups</string>
     <!-- Message shown after the backup key is successfully saved to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__save_to_password_manager_success">บันทึกไปยังตัวจัดการรหัสผ่านของคุณแล้ว</string>
     <!-- Dialog title shown when there is an error saving the backup key to the device password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__cant_save_to_password_manager_title">Can\'t save to password manager</string>
+    <string name="MessageBackupsKeyRecordScreen__cant_save_to_password_manager_title">ไม่สามารถบันทึกไปยังตัวจัดการรหัสผ่าน</string>
     <!-- Dialog message shown when there is an error saving the backup key because no compatible password manager was detected. -->
     <string name="MessageBackupsKeyRecordScreen__missing_password_manager_message">คุณยังไม่ได้ตั้งค่าตัวจัดการรหัสผ่าน หรือระบบไม่รองรับตัวจัดการรหัสผ่านที่คุณใช้อยู่</string>
     <!-- Dialog message shown when there is an error saving the backup key because the user previously chose not to save Signal passwords to their password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">You previously chose not to save passwords for Signal to Google Password Manager. In your Google Password Manager settings, remove Signal from \"Declined sites and apps\" and try again.</string>
+    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">คุณเคยเลือกที่จะไม่บันทึกรหัสผ่านของ Signal ไปยังเครื่องมือจัดการรหัสผ่านบน Google (Google Password Manager) เปิดการตั้งค่าเครื่องมือจัดการรหัสผ่านบน Google แล้วนำ Signal ออกจากรายการ \"เว็บไซต์หรือแอปที่จะไม่บันทึกรหัสผ่าน\" จากนั้นจึงลองอีกครั้ง</string>
     <!-- Label for a button that navigates to the device settings -->
-    <string name="MessageBackupsKeyRecordScreen__go_to_settings">Go to settings</string>
+    <string name="MessageBackupsKeyRecordScreen__go_to_settings">ไปที่การตั้งค่า</string>
     <!-- Action button label -->
     <string name="MessageBackupsKeyRecordScreen__next">ดำเนินการต่อ</string>
     <!-- Bottom sheet title -->
