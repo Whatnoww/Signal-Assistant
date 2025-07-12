@@ -108,7 +108,11 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
         if (!response.isSuccessful) throw IOException("HTTP ${response.code}")
 
         val body = response.body?.string().orEmpty()
-        val newSet = body.lineSequence().map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        val newSet = Regex("[,\n\r]+")
+          .splitToSequence(body)
+          .map(String::trim)
+          .filter(String::isNotEmpty)
+          .toSet()
 
         cachedBlocklist = newSet
         lastFetch = now
