@@ -852,7 +852,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
       val change = GroupChangeReconstruct.reconstructGroupChange(existingGroup.get().requireV2GroupProperties().decryptedGroup, decryptedGroup)
       val removed: List<ServiceId> = DecryptedGroupUtil.removedMembersServiceIdList(change)
       // Whatnoww - Adding a call here, this will probably call for every member pending entry, each time someone requests to join which will be annoying.
-      Log.i(JOIN_TAG, "newPending="+change.newPendingMembers.size+"newRequest="+change.newRequestingMembers.size)
+      Log.i(JOIN_TAG, decryptedGroup.title+" newPending="+change.newPendingMembers.size+"newRequest="+change.newRequestingMembers.size)
       val blocklist = getBlocklist()
       val requests = change.newRequestingMembers
       for (requestingId in requests){
