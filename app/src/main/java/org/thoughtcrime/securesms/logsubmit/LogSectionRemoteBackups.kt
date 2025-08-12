@@ -24,6 +24,7 @@ class LogSectionRemoteBackups : LogSection {
     output.append("Enabled:                              ${SignalStore.backup.areBackupsEnabled}\n")
     output.append("Current tier:                         ${SignalStore.backup.backupTier}\n")
     output.append("Latest tier:                          ${SignalStore.backup.latestBackupTier}\n")
+    output.append("Backup override tier:                 ${SignalStore.backup.backupTierInternalOverride}\n")
     output.append("Last backup time:                     ${SignalStore.backup.lastBackupTime}\n")
     output.append("Last check-in:                        ${SignalStore.backup.lastCheckInMillis}\n")
     output.append("Last media sync:                      ${SignalStore.backup.lastAttachmentReconciliationTime}\n")
@@ -35,6 +36,7 @@ class LogSectionRemoteBackups : LogSection {
     output.append("Backup frequency:                     ${SignalStore.backup.backupFrequency.name}\n")
     output.append("Optimize storage:                     ${SignalStore.backup.optimizeStorage}\n")
     output.append("Detected subscription state mismatch: ${SignalStore.backup.subscriptionStateMismatchDetected}\n")
+    output.append("Last verified key time:               ${SignalStore.backup.lastVerifyKeyTime}\n")
     output.append("\n -- Subscription State\n")
 
     val backupSubscriptionId = InAppPaymentsRepository.getSubscriber(InAppPaymentSubscriberRecord.Type.BACKUP)

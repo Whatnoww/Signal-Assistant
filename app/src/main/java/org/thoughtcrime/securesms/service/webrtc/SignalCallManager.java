@@ -69,6 +69,7 @@ import org.thoughtcrime.securesms.service.webrtc.state.WebRtcEphemeralState;
 import org.thoughtcrime.securesms.service.webrtc.state.WebRtcServiceState;
 import org.thoughtcrime.securesms.util.AppForegroundObserver;
 import org.thoughtcrime.securesms.util.RecipientAccessList;
+import org.thoughtcrime.securesms.util.RemoteConfig;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 import org.thoughtcrime.securesms.util.Util;
 import org.thoughtcrime.securesms.util.rx.RxStore;
@@ -802,7 +803,7 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
                                         callMessage);
       } catch (UntrustedIdentityException e) {
         Log.i(TAG, "onSendCallMessage onFailure: ", e);
-        RetrieveProfileJob.enqueue(recipient.getId());
+        RetrieveProfileJob.enqueue(recipient.getId(), true);
         process((s, p) -> p.handleGroupMessageSentError(s, Collections.singletonList(recipient.getId()), UNTRUSTED_IDENTITY));
       } catch (ProofRequiredException e) {
         Log.i(TAG, "onSendCallMessage onFailure: ", e);
@@ -855,7 +856,7 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
         if (Util.hasItems(identifyFailureRecipientIds)) {
           process((s, p) -> p.handleGroupMessageSentError(s, identifyFailureRecipientIds, UNTRUSTED_IDENTITY));
 
-          RetrieveProfileJob.enqueue(identifyFailureRecipientIds);
+          RetrieveProfileJob.enqueue(identifyFailureRecipientIds, true);
         }
       } catch (UntrustedIdentityException | IOException | InvalidInputException e) {
         Log.w(TAG, "onSendCallMessageToGroup failed", e);
@@ -989,21 +990,13 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
   }
 
   @Override
-  public void onFullyInitialized(@NonNull final CameraState newCameraState) {
-    process((s, p) -> {
-      WebRtcServiceState s1 = p.handleSetCameraDirection(s, newCameraState);
-      return p.handleOrientationChanged(s1, s.getLocalDeviceState().isLandscapeEnabled(), s.getLocalDeviceState().getDeviceOrientation().getDegrees());
-    });
+  public void onFullyInitialized() {
+    process((s, p) -> p.handleOrientationChanged(s, s.getLocalDeviceState().isLandscapeEnabled(), s.getLocalDeviceState().getDeviceOrientation().getDegrees()));
   }
 
   @Override
   public void onCameraSwitchCompleted(@NonNull final CameraState newCameraState) {
     process((s, p) -> p.handleCameraSwitchCompleted(s, newCameraState));
-  }
-
-  @Override
-  public void onCameraSwitchFailure(@NonNull final CameraState newCameraState) {
-    process((s, p) -> p.handleCameraSwitchFailure(s, newCameraState));
   }
 
   @Override
@@ -1214,7 +1207,7 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
                                         callMessage);
         process((s, p) -> p.handleMessageSentSuccess(s, remotePeer.getCallId()));
       } catch (UntrustedIdentityException e) {
-        RetrieveProfileJob.enqueue(remotePeer.getId());
+        RetrieveProfileJob.enqueue(remotePeer.getId(), true);
         processSendMessageFailureWithChangeDetection(remotePeer,
                                                      (s, p) -> p.handleMessageSentError(s,
                                                                                         remotePeer.getCallId(),
@@ -1240,7 +1233,7 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
         .calls()
         .updateOneToOneCall(remotePeer.getCallId().longValue(), CallTable.Event.ACCEPTED);
 
-    if (SignalStore.account().hasLinkedDevices()) {
+    if (SignalStore.account().isMultiDevice()) {
       networkExecutor.execute(() -> {
         try {
           SyncMessage.CallEvent callEvent = CallEventSyncMessageUtil.createAcceptedSyncMessage(remotePeer, System.currentTimeMillis(), isOutgoing, isVideoCall);
@@ -1257,7 +1250,7 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
         .calls()
         .updateOneToOneCall(remotePeer.getCallId().longValue(), CallTable.Event.NOT_ACCEPTED);
 
-    if (SignalStore.account().hasLinkedDevices()) {
+    if (SignalStore.account().isMultiDevice()) {
       networkExecutor.execute(() -> {
         try {
           SyncMessage.CallEvent callEvent = CallEventSyncMessageUtil.createNotAcceptedSyncMessage(remotePeer, System.currentTimeMillis(), isOutgoing, isVideoCall);
@@ -1270,7 +1263,7 @@ public final class SignalCallManager implements CallManager.Observer, GroupCall.
   }
 
   public void sendGroupCallNotAcceptedCallEventSyncMessage(@NonNull RemotePeer remotePeer, boolean isOutgoing) {
-    if (SignalStore.account().hasLinkedDevices()) {
+    if (SignalStore.account().isMultiDevice()) {
       networkExecutor.execute(() -> {
         try {
           SyncMessage.CallEvent callEvent = CallEventSyncMessageUtil.createNotAcceptedSyncMessage(remotePeer, System.currentTimeMillis(), isOutgoing, true);

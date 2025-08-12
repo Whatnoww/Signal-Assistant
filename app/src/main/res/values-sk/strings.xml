@@ -1562,6 +1562,12 @@
     <string name="RemoteRestoreActivity__skip_restore">Preskočiť obnovenie</string>
     <!-- Dialog title displayed when remote restore failed -->
     <string name="RemoteRestoreActivity__couldnt_transfer">Prenos sa nepodarilo dokončiť</string>
+    <!-- Dialog title displayed when remote restore failed and we want them to contact support -->
+    <string name="RemoteRestoreActivity__failure_with_log_prompt_title">Nepodarilo sa obnoviť zálohu</string>
+    <!-- Dialog body displayed when remote restore failed and we want them to contact support -->
+    <string name="RemoteRestoreActivity__failure_with_log_prompt_body">Pri obnove zálohy sa vyskytla chyba. Vaša záloha nie je obnoviteľná. Kontaktujte náš tím podpory.</string>
+    <!-- Dialog action button that will link users to a flow to contact support, displayed when remote restore failed -->
+    <string name="RemoteRestoreActivity__failure_with_log_prompt_contact_button">Kontaktovať podporu</string>
     <!-- Dialog message displayed when remote restore failed -->
     <string name="RemoteRestoreActivity__error_occurred">Vyskytla sa chyba a váš účet sa nepodarilo preniesť. Zvoľte spôsob prenosu a skúste to znova.</string>
     <!-- Dialog title displayed when remote restore failed because of an outdated backup version. -->
@@ -4805,7 +4811,7 @@
     <string name="ConfirmKbsPinFragment__re_enter_your_pin">Zadajte váš PIN znovu</string>
     <string name="ConfirmKbsPinFragment__creating_pin">Vytvára sa PIN kód…</string>
     <!-- ID used when saving the PIN to the device password manager. -->
-    <string name="ConfirmKbsPinFragment__pin_password_manager_id">Signal PIN</string>
+    <string name="ConfirmKbsPinFragment__pin_password_manager_id">Signal PIN kód</string>
 
     <!-- KbsSplashFragment -->
     <string name="KbsSplashFragment__introducing_pins">Predstavujeme PINy</string>
@@ -5114,7 +5120,6 @@
     <string name="TransferOrRestoreFragment__restore_your_messages_from_a_local_backup">Obnovte vaše správy z lokálnej zálohy. Keď nevykonáte obnovu teraz, neskôr nebude možná.</string>
     <string name="TransferOrRestoreFragment__restore_from_local_backup">Obnoviť lokálnu zálohu</string>
     <string name="TransferOrRestoreFragment__restore_from_signal_backup">Obnoviť zálohu Signal</string>
-    <string name="TransferOrRestoreFragment__restore_your_messages_from_a_signal_backup">Obnovte všetky svoje textové správy a médiá za posledných 30 dní</string>
     <!-- Button label for more options -->
     <string name="TransferOrRestoreFragment__more_options">Viac možností</string>
 
@@ -8076,6 +8081,19 @@
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will simply dismiss the megaphone -->
     <string name="TurnOnSignalBackups__not_now">Teraz nie</string>
 
+    <!-- Title of a megaphone shown to prompt the user to verify their backup key -->
+    <string name="VerifyBackupKey__title">Overte svoj záložný kľúč</string>
+    <!-- Body of a megaphone shown to prompt the user to verify their backup key -->
+    <string name="VerifyBackupKey__body">Aby sme vám pomohli zapamätať si kľúč, budeme ho od vás pravidelne vyžadovať.</string>
+    <!-- Button of a megaphone that will take users to the verify backup key screen -->
+    <string name="VerifyBackupKey__verify">Overiť</string>
+    <!-- Button of a megaphone that will snooze the reminder to verify their backup key -->
+    <string name="VerifyBackupKey__not_now">Teraz nie</string>
+    <!-- Snackbar text shown when the backup key entered is correct. -->
+    <string name="VerifyBackupKey__backup_key_correct">Záložný kľúč je správny. Uchovajte ho v bezpečí.</string>
+    <!-- Snackbar text shown when the user chooses to snooze the backup key reminder. -->
+    <string name="VerifyBackupKey__we_will_ask_again">Opýtame sa vás znova o týždeň.</string>
+
     <!-- Title of a megaphone shown at the bottom of the chat list when a user has disable the system setting for showing full screen notifications used showing incoming calls -->
     <string name="GrantFullScreenIntentPermission_megaphone_title">Chcete zapnúť upozornenia na celú obrazovku?</string>
     <!-- Body of a megaphone shown at the bottom of the chat list when a user has disable the system setting for showing full screen notifications used showing incoming calls -->
@@ -8213,7 +8231,7 @@
     <!-- Sheet body part 1 when user does not have enough space to download their backup. Placeholder is the amount of space needed. -->
     <string name="BackupAlertBottomSheet__to_finish_downloading_your_signal_backup">Na dokončenie sťahovania Zálohy Signal potrebuje vaše zariadenie %1$s úložného priestoru.</string>
     <!-- Sheet body part 2 when user does not have enough space to download their backup. -->
-    <string name="BackupAlertBottomSheet__to_free_up_space_offload">Ak chcete uvoľniť miesto, odstráňte nepoužívané aplikácie alebo obsiahle súbory.</string>
+    <string name="BackupAlertBottomSheet__to_free_up_space_offload">Ak chcete uvoľniť miesto, presuňte alebo odstráňte nepoužívané aplikácie alebo obsiahle súbory.</string>
     <!-- Sheet title when user payment failed to process -->
     <string name="BackupAlertBottomSheet__your_backups_subscription_failed_to_renew">Vaše predplatné záloh sa nepodarilo obnoviť</string>
     <!-- Sheet body when user payment failed to process -->
@@ -8277,6 +8295,8 @@
     <string name="BackupAlertBottomSheet__couldnt_redeem_your_backups_subscription">Vaše predplatné záloh sa nepodarilo uplatniť</string>
     <!-- Dialog text for when a backup fails to be created and ways to fix it -->
     <string name="BackupAlertBottomSheet__an_error_occurred">Vyskytla sa chyba a zálohovanie nebolo možné dokončiť. Uistite sa, že používate najnovšiu verziu Signalu a skúste to znova. Ak problém pretrváva, kontaktujte podporu.</string>
+    <!-- Dialog text for when a backup fails to be created and ways to fix it. Used for out of remote storage space error. -->
+    <string name="BackupAlertBottomSheet__an_error_occurred_and">Vyskytla sa chyba a zálohovanie nebolo možné dokončiť. Ak problém pretrváva, kontaktujte podporu.</string>
     <!-- Dialog action button that will allow you to check for any Signal version updates -->
     <string name="BackupAlertBottomSheet__check_for_update">Overiť dostupnosť aktualizácie</string>
     <!-- Backup redemption error sheet text line 1 -->
@@ -8456,7 +8476,7 @@
     <!-- Action button label to set up backups -->
     <string name="BackupsSettingsFragment_set_up">Nastaviť</string>
     <!-- Action button label to open remote backup settings -->
-    <string name="BackupsSettingsFragment_view_settings">View settings</string>
+    <string name="BackupsSettingsFragment_view_settings">Zobraziť nastavenia</string>
 
     <!-- RemoteBackupsSettingsFragment -->
     <!-- Content description for canceling backup upload -->
@@ -8481,6 +8501,8 @@
     <string name="RemoteBackupsSettingsFragment__view_backup_key">Zobraziť záložný kľúč</string>
     <!-- Prompt title for unlocking device to view backup key -->
     <string name="RemoteBackupsSettingsFragment__unlock_to_view_backup_key">Ak chcete zobraziť záložný kľúč, odomknite</string>
+    <!-- Title of bottom sheet explaining that authentication is required to view your key -->
+    <string name="RemoteBackupsSettingsFragment__to_view_your_key">Ak chcete zobraziť svoj kľúč, potvrďte, že ste to vy</string>
     <!-- Row label for cancelling and deleting backup -->
     <string name="RemoteBackupsSettingsFragment__turn_off_and_delete_backup">Vypnúť a vymazať zálohu</string>
     <!-- Snackbar text displayed when backup has been deleted and turned off -->
@@ -8493,6 +8515,8 @@
     <string name="RemoteBackupsSettingsFragment__download_complete">Sťahovanie dokončené</string>
     <!-- Snackbar text displayed when backup will be created overnight -->
     <string name="RemoteBackupsSettingsFragment__backup_will_be_created_overnight">Zálohovanie prebehne počas noci.</string>
+    <!-- Snackbar text displayed when user rotates AEP -->
+    <string name="RemoteBackupsSettingsFragment__new_backup_key_created">Bol vytvorený nový záložný kľúč</string>
     <!-- Text displayed in card when subscription is inactive -->
     <string name="RemoteBackupsSettingsFragment__subscription_inactive">Predplatné je neaktívne</string>
     <!-- Text displayed in card when free tier is inactive -->
@@ -8588,6 +8612,10 @@
     <string name="RemoteBackupsSettingsFragment__processing_backup">Spracováva sa záloha…</string>
     <!-- Linear progress dialog text shown when preparing a backup -->
     <string name="RemoteBackupsSettingsFragment__preparing_backup">Pripravuje sa záloha…</string>
+    <!-- Linear progress dialog text shown when backup is paused because unmetered connectivity, such as WiFi, is unavailable. -->
+    <string name="RemoteBackupsSettingsFragment__Waiting_for_Wifi">Čaká sa na pripojenie k Wi-Fi…</string>
+    <!-- Linear progress dialog text shown when backup is paused because internet is unavailable. -->
+    <string name="RemoteBackupsSettingsFragment__Waiting_for_internet_connection">Čaká sa na internetové pripojenie…</string>
     <!-- Linear progress dialog text shown when processing messages for backup. First placeholder is completed count, second is approximate total count, third is percent completed. -->
     <plurals name="RemoteBackupsSettingsFragment__processing_messages_progress_text">
         <item quantity="one">Spracováva sa %1$s z %2$s správ (%3$d %%)</item>
@@ -8721,7 +8749,7 @@
     <!-- Dialog message confirming that the user wants to save a backup key to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__confirm_save_to_password_manager_body">Záložný kľúč ukladajte iba do takého správcu hesiel, ktorému dôverujete, že je bezpečný. Signal neposkytuje odporúčania, ktorý správca hesiel je pre vás ten správny.</string>
     <!-- ID used when saving the backup key to the device password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__backup_key_password_manager_id">Signal Backups</string>
+    <string name="MessageBackupsKeyRecordScreen__backup_key_password_manager_id">Zálohy Signal</string>
     <!-- Message shown after the backup key is successfully saved to the device password manager. -->
     <string name="MessageBackupsKeyRecordScreen__save_to_password_manager_success">Uložené do správcu hesiel</string>
     <!-- Dialog title shown when there is an error saving the backup key to the device password manager. -->
@@ -8744,6 +8772,28 @@
     <string name="MessageBackupsKeyRecordScreen__continue">Pokračovať</string>
     <!-- Sheet secondary action button label -->
     <string name="MessageBackupsKeyRecordScreen__see_key_again">Pozrieť si kľúč znova</string>
+    <!-- Action label to rotate AEP key -->
+    <string name="MessageBackupsKeyRecordScreen__create_new_key">Vytvoriť nový kľúč</string>
+    <!-- Dialog title for confirming you need to disable optimized storage and download media to rotate AEP key -->
+    <string name="MessageBackupsKeyRecordScreen__download_media">Stiahnutie médií</string>
+    <!-- Dialog body for confirming you need to disable optimized storage and download media to rotate AEP key -->
+    <string name="MessageBackupsKeyRecordScreen__to_create_a_new_backup_key">Ak chcete vytvoriť nový záložný kľúč, musíte vypnúť možnosť „Optimalizovať úložisko“ a počkať, kým sa médiá stiahnu. Po dokončení sťahovania si môžete vytvoriť nový kľúč.</string>
+    <!-- Action label to turn off optimized storage and download media -->
+    <string name="MessageBackupsKeyRecordScreen__turn_off_and_download">Vypnúť a stiahnuť</string>
+    <!-- Bottom Sheet title for creating a new AEP key -->
+    <string name="MessageBackupsKeyRecordScreen__create_a_new_backup_key">Vytvorenie nového záložného kľúča</string>
+    <!-- Bottom Sheet body for creating a new AEP key -->
+    <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Nový kľúč je potrebné vytvoriť iba v prípade, že ho pozná niekto iný. Budete musieť znova nahrať zálohu vrátane médií. Ak používate funkciu „Optimalizovať úložisko“, budete si musieť najprv stiahnuť presunuté médiá.</string>
+
+    <!-- BackupKeyDisplayFragment -->
+    <!-- Dialog title when exiting before confirming new key -->
+    <string name="BackupKeyDisplayFragment__cancel_key_creation_question">Zrušiť vytvorenie kľúča?</string>
+    <!-- Dialog body when exiting before confirming new key -->
+    <string name="BackupKeyDisplayFragment__your_new_backup_key">Váš nový záložný kľúč sa nevytvorí, pokiaľ ho nepotvrdíte.</string>
+    <!-- Dialog button to continue confirming new backup key-->
+    <string name="BackupKeyDisplayFragment__confirm_key">Potvrdiť kľúč</string>
+    <!-- Dialog button to cancel new key creation -->
+    <string name="BackupKeyDisplayFragment__cancel_key_creation">Zrušiť vytvorenie kľúča</string>
 
     <!-- Confirm key title -->
     <string name="MessageBackupsKeyVerifyScreen__confirm_your_backup_key">Potvrďte záložný kľúč</string>
@@ -8758,6 +8808,13 @@
     <!-- Confirm your key button text to move onto next screen in flow -->
     <string name="MessageBackupsKeyVerifyScreen__next">Ďalej</string>
 
+    <!-- Verify your key title -->
+    <string name="VerifyBackupPinScreen__enter_your_backup_key">Zadajte záložný kľúč</string>
+    <!-- Verify your key subtitle -->
+    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">Zadajte 64-miestny kód, ktorý ste si zaznamenali pri povolení záloh.</string>
+    <!-- Button text when you forget your backup key -->
+    <string name="VerifyBackupPinScreen__forgot_key">Zabudli ste kľúč?</string>
+
     <!-- MessagesBackupsTypeSelectionScreen -->
     <!-- Screen headline -->
     <string name="MessagesBackupsTypeSelectionScreen__choose_your_backup_plan">Vyberte si plán zálohovania</string>
@@ -8765,8 +8822,10 @@
     <string name="MessageBackupsTypeSelectionScreen__all_backups_are_end_to_end_encrypted">Všetky zálohy sú chránené end-to-end šifrovaním. Signal je nezisková organizácia – platbami za zálohovanie podporujete naše poslanie.</string>
     <!-- Screen subhead highlighted read-more button -->
     <string name="MessageBackupsTypeSelectionScreen__learn_more">Zistiť viac</string>
-    <!-- Primary action button label when selecting the free backup tier without a current selection -->
+    <!-- Primary action button label without a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__subscribe">Predplatiť</string>
+    <!-- Primary action button label when selecting the free backup tier without a current selection -->
+    <string name="MessageBackupsTypeSelectionScreen__choose_free_plan">Vybrať bezplatný plán</string>
     <!-- Primary action button label when selecting the paid backup tier without a current selection -->
     <string name="MessageBackupsTypeSelectionScreen__subscribe_for_x_month">Predplatiť za %1$s mesačne</string>
     <!-- Primary action button label when selecting a backup tier with a current selection -->
@@ -8899,6 +8958,9 @@
     <!-- Email subject when contacting support on a restore backup network issue -->
     <string name="EnterBackupKey_network_failure_support_email">Chyba siete pri obnovovaní zálohy Signal Android</string>
   <!-- Removed by excludeNonTranslatables <string name="EnterBackupKey_network_failure_support_email_filter" translatable="false">Android SignalBackups Import Failed</string> -->
+    <!-- Email subject when contacting support on a permanent backup import failure -->
+    <string name="EnterBackupKey_permanent_failure_support_email">Trvalé zlyhanie pri obnovovaní zálohy Signal Android</string>
+  <!-- Removed by excludeNonTranslatables <string name="EnterBackupKey_permanent_failure_support_email_filter" translatable="false">Android SignalBackups Import Permanent Failure</string> -->
 
     <!-- Email subject when contacting support on a create backup failure -->
     <string name="BackupAlertBottomSheet_network_failure_support_email">Chyba siete pri exportovaní zálohy Signal Android</string>
