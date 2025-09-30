@@ -76,7 +76,6 @@ import org.signal.donations.StripeApi
 import org.thoughtcrime.securesms.ImportExportActivity // JW
 import org.thoughtcrime.securesms.backup.v2.ArchiveRestoreProgress
 import org.thoughtcrime.securesms.backup.v2.ui.verify.VerifyBackupKeyActivity
-import org.thoughtcrime.securesms.ImportExportActivity // JW
 import org.thoughtcrime.securesms.calls.YouAreAlreadyInACallSnackbar.show
 import org.thoughtcrime.securesms.calls.links.details.CallLinkDetailsActivity
 import org.thoughtcrime.securesms.calls.log.CallLogFilter
