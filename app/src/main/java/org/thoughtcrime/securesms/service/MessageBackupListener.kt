@@ -6,13 +6,13 @@
 package org.thoughtcrime.securesms.service
 
 import android.content.Context
-import org.thoughtcrime.securesms.backup.v2.BackupFrequency
+import androidx.annotation.VisibleForTesting
 import org.thoughtcrime.securesms.jobs.BackupMessagesJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
-import org.thoughtcrime.securesms.util.RemoteConfig
 import org.thoughtcrime.securesms.util.toMillis
 import java.time.LocalDateTime
 import java.util.Random
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 
 class MessageBackupListener : PersistentAlarmManagerListener() {
@@ -20,8 +20,14 @@ class MessageBackupListener : PersistentAlarmManagerListener() {
     return true
   }
 
-  override fun getNextScheduledExecutionTime(context: Context): Long {
-    return SignalStore.backup.nextBackupTime
+  @VisibleForTesting
+  public override fun getNextScheduledExecutionTime(context: Context): Long {
+    val nextTime = SignalStore.backup.nextBackupTime
+    return if (nextTime < 0 || nextTime > (System.currentTimeMillis() + 2.days.inWholeMilliseconds)) {
+      setNextBackupTimeToIntervalFromNow()
+    } else {
+      nextTime
+    }
   }
 
   override fun onAlarm(context: Context, scheduledTime: Long): Long {
@@ -36,11 +42,12 @@ class MessageBackupListener : PersistentAlarmManagerListener() {
 
     @JvmStatic
     fun schedule(context: Context?) {
-      if (RemoteConfig.messageBackups && SignalStore.backup.areBackupsEnabled) {
+      if (SignalStore.backup.areBackupsEnabled) {
         MessageBackupListener().onReceive(context, getScheduleIntent())
       }
     }
 
+    @VisibleForTesting
     @JvmStatic
     fun getNextDailyBackupTimeFromNowWithJitter(now: LocalDateTime, hour: Int, minute: Int, maxJitterSeconds: Int, randomSource: Random = Random()): LocalDateTime {
       var next = now.withHour(hour).withMinute(minute).withSecond(0)
@@ -54,17 +61,11 @@ class MessageBackupListener : PersistentAlarmManagerListener() {
       return next.plusSeconds(jitter.toLong())
     }
 
-    fun setNextBackupTimeToIntervalFromNow(maxJitterSeconds: Int = BACKUP_JITTER_WINDOW_SECONDS): Long {
-      val now = LocalDateTime.now()
-      val hour = SignalStore.settings.backupHour
-      val minute = SignalStore.settings.backupMinute
-      var next = getNextDailyBackupTimeFromNowWithJitter(now, hour, minute, maxJitterSeconds)
-      next = when (SignalStore.backup.backupFrequency) {
-        BackupFrequency.MANUAL -> next.plusDays(364)
-        BackupFrequency.MONTHLY -> next.plusDays(29)
-        BackupFrequency.WEEKLY -> next.plusDays(6)
-        else -> next
-      }
+    @VisibleForTesting
+    fun setNextBackupTimeToIntervalFromNow(now: LocalDateTime = LocalDateTime.now(), maxJitterSeconds: Int = BACKUP_JITTER_WINDOW_SECONDS, randomSource: Random = Random()): Long {
+      val hour = SignalStore.settings.signalBackupHour
+      val minute = SignalStore.settings.signalBackupMinute
+      val next = getNextDailyBackupTimeFromNowWithJitter(now, hour, minute, maxJitterSeconds, randomSource)
       val nextTime = next.toMillis()
       SignalStore.backup.nextBackupTime = nextTime
       return nextTime

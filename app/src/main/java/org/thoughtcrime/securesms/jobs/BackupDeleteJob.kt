@@ -52,6 +52,21 @@ class BackupDeleteJob private constructor(
   override fun getFactoryKey(): String = KEY
 
   override fun run(): Result {
+    if (!SignalStore.account.isRegistered) {
+      Log.w(TAG, "User not registered. Exiting without local cleanup.")
+      return Result.failure()
+    }
+
+    if (SignalStore.account.isLinkedDevice) {
+      Log.w(TAG, "User is on a linked device. Exiting without local cleanup.")
+      return Result.failure()
+    }
+
+    if (SignalStore.backup.deletionState.isIdle()) {
+      Log.w(TAG, "Invalid state ${SignalStore.backup.deletionState}. Exiting without local cleanup.")
+      return Result.failure()
+    }
+
     val result = doRun()
 
     if (result.isFailure) {
@@ -63,11 +78,6 @@ class BackupDeleteJob private constructor(
   }
 
   private fun doRun(): Result {
-    if (SignalStore.backup.deletionState.isIdle()) {
-      Log.w(TAG, "Invalid state ${SignalStore.backup.deletionState}. Exiting.")
-      return Result.failure()
-    }
-
     if (SignalStore.backup.deletionState == DeletionState.AWAITING_MEDIA_DOWNLOAD) {
       Log.i(TAG, "Awaiting media download. Scheduling retry.")
       return Result.retry(5.seconds.inWholeMilliseconds)
@@ -119,7 +129,9 @@ class BackupDeleteJob private constructor(
   }
 
   override fun onFailure() {
-    if (SignalStore.backup.deletionState == DeletionState.AWAITING_MEDIA_DOWNLOAD) {
+    if (SignalStore.backup.deletionState.isIdle()) {
+      Log.w(TAG, "Backup is idle. Not marking a deletion.")
+    } else if (SignalStore.backup.deletionState == DeletionState.AWAITING_MEDIA_DOWNLOAD) {
       Log.w(TAG, "BackupDeleteFailure occurred while awaiting media download, ignoring.")
     } else {
       SignalStore.backup.deletionState = DeletionState.FAILED
@@ -147,6 +159,11 @@ class BackupDeleteJob private constructor(
   }
 
   private fun isMediaRestoreRequired(): Boolean {
+    if (backupDeleteJobData.tier != BackupDeleteJobData.Tier.PAID) {
+      Log.i(TAG, "User is not on the PAID tier so there's nothing we can download.")
+      return false
+    }
+
     val requiresMediaRestore = SignalDatabase.attachments.getRemainingRestorableAttachmentSize() > 0L
     val hasOffloadedMedia = SignalDatabase.attachments.getOptimizedMediaAttachmentSize() > 0L
 
