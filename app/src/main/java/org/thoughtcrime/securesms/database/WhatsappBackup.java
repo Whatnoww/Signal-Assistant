@@ -64,15 +64,15 @@ public class WhatsappBackup {
                         String name = filePath;
                         if (type.equals("image/jpeg")) {
                             Attachment attachment = new UriAttachment(uri, MediaUtil.IMAGE_JPEG, AttachmentTable.TRANSFER_PROGRESS_DONE,
-                                    size, name, false, false, false, false, item.getMediaCaption(), null, null, null, null);
+                                    size, name, false, false, false, false, null, item.getMediaCaption(), null, null, null, null);
                             attachments.add(attachment);
                         } else if (type.equals("video/mp4")) {
                             Attachment attachment = new UriAttachment(uri, MediaUtil.VIDEO_MP4, AttachmentTable.TRANSFER_PROGRESS_DONE,
-                                    size, name, false, false, false, false, item.getMediaCaption(), null, null, null, null);
+                                    size, name, false, false, false, false, null, item.getMediaCaption(), null, null, null, null);
                             attachments.add(attachment);
                         } else if (type.equals("audio/ogg; codecs=opus")) {
                         Attachment attachment = new UriAttachment(uri, MediaUtil.AUDIO_UNSPECIFIED, AttachmentTable.TRANSFER_PROGRESS_DONE,
-                                size, name, true, false, false, false, null, null, null, null, null);
+                                    size, name, true, false, false, false, null, null, null, null, null, null);
                         attachments.add(attachment);
                         } else {
                             return attachments; // Ignore everything that is not an image or a video for the moment

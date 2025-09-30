@@ -26,3 +26,4 @@ data class ChatsSettingsState(
     return !userUnregistered && !clientDeprecated
   }
 }
+
