@@ -64,6 +64,7 @@ import org.thoughtcrime.securesms.mediasend.Media;
 import org.thoughtcrime.securesms.mms.MmsException;
 import org.thoughtcrime.securesms.mms.OutgoingMessage;
 import org.thoughtcrime.securesms.mms.QuoteModel;
+import org.thoughtcrime.securesms.notifications.MarkReadReceiver;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.recipients.RecipientUtil;
@@ -244,6 +245,10 @@ public class MessageSender {
       sendMessageInternal(context, recipient, sendType, messageId, insertResult.getQuoteAttachmentId(), Collections.emptyList());
       onMessageSent();
       threadTable.update(allocatedThreadId, true, true);
+      //Whatnoww added - Mark everything as read after sending which hopefully bypasses safety number changes that currently block Signal Assistant from responding quite often.
+      var messageIds = SignalDatabase.threads().setAllThreadsRead();
+      AppDependencies.getMessageNotifier().updateNotification(AppDependencies.getApplication());
+      MarkReadReceiver.process(messageIds);
 
       return allocatedThreadId;
     } catch (MmsException e) {

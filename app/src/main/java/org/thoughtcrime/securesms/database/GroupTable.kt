@@ -1593,5 +1593,4 @@ private fun onJoinAnnounce(ctx: Context, groupId: GroupId, memberId: RecipientId
   val outgoing = OutgoingMessage.text(threadRecipient = groupRecipient, body = announcement, expiresIn = 0L)
 
   MessageSender.send(ctx, outgoing, -1L, SendType.SIGNAL, null, null)
-
 }
