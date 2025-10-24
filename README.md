@@ -6,6 +6,7 @@ Signal Assistant is a fork of Signal Android with some quality of life enhanceme
 
 - Basically all from Signal-JW
 - Spam reporting based off of a blocklist: https://github.com/Whatnoww/ACI-Blocklist
+- Will now not notify for messages that don't contain ! so there's less overhead.
 
 
 ## Contributing Code
