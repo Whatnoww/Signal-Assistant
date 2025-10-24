@@ -1,12 +1,14 @@
 # Signal Assistant 
 
 Signal Assistant is a fork of Signal Android with some quality of life enhancements from Signal-JW that benefit auto-reply bots, besides a spam reporting feature. 0 guarantee's.
+DO NOT USE THIS AS YOUR PERSONAL CLIENT YOUR SECURITY IS EXPLICITLY REDUCED.
 
 ## Current features
 
 - Basically all from Signal-JW
 - Spam reporting based off of a blocklist: https://github.com/Whatnoww/ACI-Blocklist
 - Will now not notify for messages that don't contain ! so there's less overhead.
+- Will try to mark as read more often to clear safety number changes.
 
 
 ## Contributing Code
