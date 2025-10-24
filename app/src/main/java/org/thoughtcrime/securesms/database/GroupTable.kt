@@ -934,6 +934,8 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
 
     val groupRecipient = recipients.getOrInsertFromGroupId(groupId)
     Recipient.live(groupRecipient).refresh()
+
+    notifyConversationListListeners()
   }
 
   fun remove(groupId: GroupId, source: RecipientId) {

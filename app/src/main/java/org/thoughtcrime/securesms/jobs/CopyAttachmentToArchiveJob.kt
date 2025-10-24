@@ -173,7 +173,7 @@ class CopyAttachmentToArchiveJob private constructor(private val attachmentId: A
 
             Log.i(TAG, "[$attachmentId] Remote storage is full, but our local state indicates that once we reconcile our storage, we should have enough. Enqueuing the reconciliation job and retrying.")
             SignalStore.backup.remoteStorageGarbageCollectionPending = true
-            AppDependencies.jobManager.add(ArchiveAttachmentReconciliationJob(forced = true))
+            ArchiveAttachmentReconciliationJob.enqueueIfRetryAllowed(forced = true)
 
             Result.retry(defaultBackoff())
           }
@@ -197,7 +197,7 @@ class CopyAttachmentToArchiveJob private constructor(private val attachmentId: A
 
     if (result.isSuccess) {
       Log.d(TAG, "[$attachmentId] Updating archive transfer state to ${AttachmentTable.ArchiveTransferState.FINISHED}")
-      SignalDatabase.attachments.setArchiveTransferState(attachmentId, AttachmentTable.ArchiveTransferState.FINISHED)
+      SignalDatabase.attachments.setArchiveTransferState(attachmentId, attachment.remoteKey!!, attachment.dataHash!!, AttachmentTable.ArchiveTransferState.FINISHED)
 
       if (!isCanceled && !attachment.quote) {
         ArchiveThumbnailUploadJob.enqueueIfNecessary(attachmentId)
@@ -206,6 +206,7 @@ class CopyAttachmentToArchiveJob private constructor(private val attachmentId: A
       }
 
       ArchiveUploadProgress.onAttachmentFinished(attachmentId)
+      SignalStore.backup.archiveAttachmentReconciliationAttempts = 0
     }
 
     return result
@@ -213,7 +214,7 @@ class CopyAttachmentToArchiveJob private constructor(private val attachmentId: A
 
   private fun getServerQuota(): ByteSize? {
     return runBlocking {
-      BackupRepository.getPaidType().successOrThrow()?.storageAllowanceBytes?.bytes
+      BackupRepository.getPaidType().successOrThrow().storageAllowanceBytes?.bytes
     }
   }
 

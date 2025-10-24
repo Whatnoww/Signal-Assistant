@@ -88,6 +88,8 @@
     <string name="AttachmentKeyboard_file">Tệp</string>
     <string name="AttachmentKeyboard_contact">Liên hệ</string>
     <string name="AttachmentKeyboard_location">Vị trí</string>
+    <!-- Text for a button that will allow users to create a poll -->
+    <string name="AttachmentKeyboard_poll">Hỏi ý kiến</string>
     <string name="AttachmentKeyboard_Signal_needs_permission_to_show_your_photos_and_videos">Signal cần quyền để hiển thị ảnh và video của bạn</string>
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Cho phép Truy cập</string>
@@ -1451,6 +1453,10 @@
     <string name="RemoteRestoreActivity__not_now">Để sau</string>
     <!-- Text shown on restore screen as information on what will happen if you skip -->
     <string name="RemoteRestoreActivity__your_media_will_restore_in_the_background">Tập tin đa phương tiện sẽ khôi phục ở chế độ nền. Nếu bạn chọn không khôi phục bây giờ, bạn sẽ không khôi phục được sau này.</string>
+    <!-- Dialog title -->
+    <string name="RestoreActivity__no_longer_registered_title">Thiết bị này không còn được đăng ký</string>
+    <!-- Dialog message -->
+    <string name="RestoreActivity__no_longer_registered_message">Nguyên nhân có thể là do bạn đăng ký tài khoản Signal của mình trên một thiết bị khác.</string>
 
     <!-- GroupMentionSettingDialog -->
     <string name="GroupMentionSettingDialog_notify_me_for_mentions">Thông báo khi tôi được nhắc tên</string>
@@ -2047,6 +2053,8 @@
     <string name="MessageRecord_you_unblocked_this_group">Bạn đã bỏ chặn nhóm này</string>
     <!-- Update message shown when you receive a message that cannot be processed because your Signal version is too old. %1$s is the sender\'s name -->
     <string name="MessageRecord_unsupported_feature">%1$s đã gửi cho bạn một tin nhắn nhưng không thể xử lý hoặc hiển thị vì sử dụng tính năng Signal mới.</string>
+    <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
+    <string name="MessageRecord_ended_the_poll">%1$s đã kết thúc hỏi ý kiến: \"%2$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Chấp nhận</string>
@@ -2821,6 +2829,8 @@
     <string name="SubmitDebugLogActivity_success">Thành công!</string>
     <string name="SubmitDebugLogActivity_copy_this_url_and_add_it_to_your_issue">Sao chép URL này và thêm nó vào báo cáo lỗi hoặc email hỗ trợ:\n\n<b>%1$s</b></string>
     <string name="SubmitDebugLogActivity_share">Chia sẻ</string>
+    <!-- Displayed when entering activity in view-only mode -->
+    <string name="SubmitDebugLogActivity_close">Close</string>
     <string name="SubmitDebugLogActivity_this_log_will_be_posted_publicly_online_for_contributors">Nhật kí này sẽ được đăng trực tuyến công khai cho những người đóng góp theo dõi. Bạn có thể kiểm tra nó trước khi gửi đi.</string>
     <!-- Banner message shown while submitting debug log -->
     <string name="SubmitDebugLogActivity_your_log_will_be_posted_online">Khi bạn bấm Gửi, nhật ký của bạn sẽ được đăng online trong 30 ngày tại một URL độc nhất, chưa được xuất bản. Bạn có thể Lưu trên thiết bị trước.</string>
@@ -3076,6 +3086,8 @@
     <string name="MessageNotifier_reacted_s_to_your_payment">Đã bày tỏ cảm xúc %1$s với khoản thanh toán của bạn.</string>
     <string name="MessageNotifier_reacted_s_to_your_sticker">Đã bày tỏ cảm xúc %1$s với nhãn dán của bạn.</string>
     <string name="MessageNotifier_this_message_was_deleted">Tin nhắn này đã bị xóa.</string>
+    <!-- Body of a notification when someone votes in a poll. First placeholder is the poll emoji, second placeholder is the name of the voter and third is the poll question -->
+    <string name="MessageNotifier_s_voted_in_poll">%1$s %2$s đã bình chọn trong cuộc hỏi ý kiến \"%3$s\"</string>
 
     <string name="TurnOffContactJoinedNotificationsActivity__turn_off_contact_joined_signal">Tắt thông báo khi liên hệ bắt đầu sử dụng Signal? Bạn có thể bật lại ở Signal &gt; Cài đặt &gt; Thông báo.</string>
 
@@ -4302,6 +4314,8 @@
     <string name="conversation_selection__menu_multi_select">Chọn</string>
     <!-- Button to view a in-chat payment message\'s full payment details; Action item with hyphenation. Translation can use soft hyphen - Unicode U+00AD  -->
     <string name="conversation_selection__menu_payment_details">Chi tiết Thanh toán</string>
+    <!-- Button to end a poll -->
+    <string name="conversation_selection__menu_end_poll">Kết thúc</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5040,9 +5054,17 @@
 
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Bỏ qua</string>
+
     <plurals name="CreateGroupActivity__d_members">
         <item quantity="other">%1$d thành viên</item>
     </plurals>
+
+    <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
+    <plurals name="CreateGroupActivity__s_members">
+        <item quantity="other">%1$s members</item>
+    </plurals>
+    <!-- Accessibility label for navigating to the next screen in the create group flow. -->
+    <string name="CreateGroupActivity__accessibility_next">Next</string>
 
     <!-- ShareActivity -->
     <string name="ShareActivity__share">Chia sẻ</string>
@@ -5756,23 +5778,17 @@
     <string name="NewConversationActivity__s_has_been_blocked">%1$s đã bị chặn</string>
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">Chặn không thành công</string>
-    <!-- Dialog title when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__unable_to_remove_s">Không thể xóa %1$s</string>
-    <!-- Dialog message when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__this_person_is_saved_to_your">Người này được lưu trong Danh bạ trên thiết bị của bạn. Xóa liên hệ của người này trên Danh bạ và thử lại.</string>
-    <!-- Dialog action to view contact when they can\'t be removed otherwise -->
-    <string name="NewConversationActivity__view_contact">Xem liên hệ</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
     <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s không phải là người dùng Signal</string>
-    <!-- Error message shown when we could not get a user from the username link -->
-    <string name="NewConversationActivity__">%1$s không phải là người dùng Signal</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="NewConversationActivity__accessibility_open_top_bar_menu">Open menu</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
     <plurals name="CreateGroupActivity_not_signal_users">
         <item quantity="other">%1$s không phải là người dùng Signal</item>
     </plurals>
 
-    <!-- ContactFilterView -->
-    <string name="ContactFilterView__search_name_or_number">Tìm kiếm tên hoặc số điện thoại</string>
+    <!-- Hint text that shows in the recipient search box when no text is entered yet. -->
+    <string name="ContactFilterView__search_name_or_number">Tên, tên người dùng hoặc số điện thoại</string>
 
     <!-- VoiceNotePlayerView -->
     <string name="VoiceNotePlayerView__dot_s">. %1$s</string>
@@ -8232,13 +8248,15 @@
 
     <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Mã khóa khôi phục</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Recovery key</string>
     <!-- Screen body part 1 -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Mã khóa khôi phục của bạn là mã có 64 ký tự có tác dụng giúp bạn khôi phục bản sao lưu khi cài lại Signal.</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your recovery key is a 64-character code that you will need to restore your backup.</string>
     <!-- Screen body part 2 -->
-    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">Nếu quên mã khóa, bạn sẽ không thể khôi phục bản sao lưu. Signal không thể giúp bạn khôi phục bản sao lưu.</string>
+    <string name="MessageBackupsKeyEducationScreen__store_your_recovery">Store your recovery key somewhere safe like a secure password manager, and don’t share it with anyone.</string>
+    <!-- Screen body part 3 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_lose_it">If you lose it, you won’t be able to recover your messages.</string>
     <!-- Action button label -->
-    <string name="MessageBackupsKeyEducationScreen__next">Tiếp</string>
+    <string name="MessageBackupsKeyEducationScreen__view_recovery_key">View recovery key</string>
 
     <!-- MessageBackupsKeyRecordScreen -->
     <!-- Screen headline -->
@@ -8413,6 +8431,12 @@
     <string name="SelectRestoreMethodFragment__from_your_old_phone">Từ điện thoại cũ của bạn</string>
     <!-- Option subtitle for restoring via device transfer -->
     <string name="SelectRestoreMethodFragment__transfer_directly_from_old">Chuyển trực tiếp từ điện thoại Android cũ của bạn</string>
+    <!-- Dialog title shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_title">Bỏ qua khôi phục?</string>
+    <!-- Dialog message shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_warning">Nếu bạn bỏ qua việc khôi phục bây giờ, bạn sẽ không thể khôi phục sau này. Nếu bạn bật lại tính năng sao lưu sau khi bỏ qua việc khôi phục, bản sao lưu hiện tại sẽ được thay thế bởi lịch sử tin nhắn mới.</string>
+    <!-- Dialog confirm text shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore">Bỏ qua</string>
 
     <!-- Screen title for restore via local backup -->
     <string name="RestoreLocalBackup_title">Khôi phục bản sao lưu cục bộ</string>
@@ -8453,6 +8477,10 @@
     <string name="EnterBackupKey_backup_not_found">Không tìm thấy bản sao lưu</string>
     <!-- Dialog message shown during registration and trying to restore a remote backup -->
     <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">Mã khóa khôi phục bạn nhập đúng nhưng không có bản sao lưu đi kèm. Nếu bạn còn giữ điện thoại cũ, đảm bảo đã bật sao lưu và đã hoàn tất sao lưu rồi thử lại.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_incorrect_or_backups_not_enabled">Có thể bạn đã nhập sai mã khóa khôi phục hoặc chưa hoàn tất ít nhất một lần sao lưu trên thiết bị cũ.\n\nHãy đảm bảo rằng bạn đang đăng ký bằng cùng số điện thoại và mã khóa khôi phục bạn đã lưu khi bật Sao lưu bảo mật Signal và xác nhận rằng thiết bị cũ của bạn đã hoàn tất quá trình sao lưu.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_check_rate_limited">Bạn đã hết số lượt thử mã khóa khôi phục. Vì lý do bảo mật, bạn chỉ có thể nhập mã khóa với số lượt nhất định. Hãy chờ một tiếng và thử lại.</string>
     <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
     <string name="EnterBackupKey_skip_restore">Bỏ qua</string>
     <!-- Dialog title text when encountering backup restore network error -->
@@ -8578,6 +8606,142 @@
     <plurals name="Notification_you_have_not_completed_a_backup">
         <item quantity="other">Bạn chưa hoàn tất sao lưu trong %1$d ngày. Tạo bản sao lưu ngay.</item>
     </plurals>
+
+    <!-- Polls -->
+    <!-- Caption in poll message to select an option  -->
+    <string name="Poll__select_one">Hỏi ý kiến · Chọn một</string>
+    <!-- Caption in poll message to select one or more options  -->
+    <string name="Poll__select_multiple">Hỏi ý kiến · Chọn một hoặc hơn</string>
+    <!-- Caption in poll message once a poll has ended  -->
+    <string name="Poll__final_results">Hỏi ý kiến · Kết quả</string>
+    <!-- Caption in poll message that no votes have been cast  -->
+    <string name="Poll__no_votes">Không có bình chọn</string>
+    <!-- Button in poll message to view current votes for a poll -->
+    <string name="Poll__view_votes">Xem các bình chọn</string>
+    <!-- Button in poll message to view the poll after it has ended -->
+    <string name="Poll__view_poll">Xem câu hỏi</string>
+    <!-- Toast message shown if we cannot find the poll -->
+    <string name="Poll__unable_poll">Không tìm thấy câu hỏi</string>
+    <!-- Button in poll message to view results for a poll after it ends -->
+    <string name="Poll__view_results">Xem kết quả</string>
+    <!-- Quote preview when replying to a poll. %1$s is the question of the poll -->
+    <string name="Poll__poll_question">Hỏi ý kiến: %1$s</string>
+    <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
+    <string name="Poll__poll_end">%1$s đã kết thúc hỏi ý kiến: \"%2$s\"</string>
+    <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
+    <string name="Poll__poll_voted">%1$s đã bình chọn trong cuộc hỏi ý kiến: \"%2$s\"</string>
+    <!-- Option in settings to configure notifications for polls -->
+    <string name="Poll__poll">Hỏi ý kiến</string>
+    <!-- Title of screen that shows the poll results of a poll after it has ended-->
+    <string name="Poll__poll_results">Kết quả hỏi ý kiến</string>
+    <!-- Title of screen that shows the poll details of a poll -->
+    <string name="Poll__poll_details">Poll details</string>
+    <!-- Header text displaying the question of the poll -->
+    <string name="Poll__question">Câu hỏi</string>
+    <!-- Text displaying how many votes, %1$d, an option has gotten -->
+    <plurals name="Poll__num_votes">
+        <item quantity="other">%1$d bình chọn</item>
+    </plurals>
+    <!-- Content description to describe the icon that is shown next to the winning option when the poll ends -->
+    <string name="Poll__poll_winner">Winner</string>
+    <!-- Text that when pressed will end the poll   -->
+    <string name="Poll__end_poll">Kết thúc</string>
+    <!-- Button that once pressed will show all of the voters for a poll -->
+    <string name="Poll__see_all">Xem tất cả</string>
+    <!-- Dialog title when a poll fails to end -->
+    <string name="Poll__couldnt_end_poll">Couldn\'t end poll</string>
+    <!-- Dialog body when a poll fails to end and to try again -->
+    <string name="Poll__check_connection">Check your connection and try again.</string>
+    <!-- Header when creating a new poll -->
+    <string name="CreatePollFragment__new_poll">Câu hỏi mới</string>
+    <!-- Section text to enter in a question for a poll  -->
+    <string name="CreatePollFragment__question">Câu hỏi</string>
+    <!-- Hint text for question field when creating a poll  -->
+    <string name="CreatePollFragment__ask_a_question">Hỏi một câu hỏi</string>
+    <!-- Section text to enter in options for a poll -->
+    <string name="CreatePollFragment__options">Tùy chọn</string>
+    <!-- Hint text for the option field, where %1$d is the option number (max 10) -->
+    <string name="CreatePollFragment__option_n">Lựa chọn %1$d</string>
+    <!-- Accessibility label for the polls drag and drop handle used to reorder the list. -->
+    <string name="CreatePollFragment__drag_handle">Thanh kéo và thả</string>
+    <!-- Text next to button to allow the poll to allow for multiple votes -->
+    <string name="CreatePollFragment__allow_multiple_votes">Nhiều bình chọn</string>
+    <!-- Snackbar text to add a question and two options before creating a poll -->
+    <string name="CreatePollFragment__add_question_option">Thêm một câu hỏi và ít nhất 2 lựa chọn</string>
+    <!-- Snackbar text to add two options before creating a poll -->
+    <string name="CreatePollFragment__add_option">Thêm ít nhất 2 lựa chọn</string>
+    <!-- Snackbar text to add a question before creating a poll -->
+    <string name="CreatePollFragment__add_question">Thêm câu hỏi</string>
+
+    <!-- CallQualityIssue -->
+    <!-- Label for general audio issue category -->
+    <string name="CallQualityIssue__audio_issue">Audio issue</string>
+    <!-- Label for general video issue category -->
+    <string name="CallQualityIssue__video_issue">Video issue</string>
+    <!-- Label for call dropped issue -->
+    <string name="CallQualityIssue__call_droppped">Call dropped</string>
+    <!-- Label for other/custom issues not covered by predefined categories -->
+    <string name="CallQualityIssue__something_else">Something else</string>
+    <!-- Label for audio stuttering/choppy audio issue -->
+    <string name="CallQualityIssue__audio_stuttering">Audio stuttering</string>
+    <!-- Label for audio cutting out/dropping issue -->
+    <string name="CallQualityIssue__audio_cut_out">Audio cut out</string>
+    <!-- Label for echo heard by the user -->
+    <string name="CallQualityIssue__i_heard_echo">I heard echo</string>
+    <!-- Label for echo heard by other call participants -->
+    <string name="CallQualityIssue__others_heard_echo">Others heard echo</string>
+    <!-- Label for poor video quality issue -->
+    <string name="CallQualityIssue__poor_video_quality">Poor video quality</string>
+    <!-- Label for low video resolution issue -->
+    <string name="CallQualityIssue__low_resolution">Low resolution</string>
+    <!-- Label for camera malfunction issue -->
+    <string name="CallQualityIssue__camera_did_not_work">Camera didn\'t work</string>
+
+    <!-- CallQualitySomethingElseScreen -->
+    <!-- Title for the "Something else" call quality issue screen -->
+    <string name="CallQualitySomethingElseScreen__title">Something else</string>
+    <!-- Label for text field where user describes their call quality issue -->
+    <string name="CallQualitySomethingElseScreen__describe_your_issue">Describe your issue</string>
+    <!-- Privacy notice explaining that issue details will be kept private and used to improve Signal calls -->
+    <string name="CallQualitySomethingElseScreen__privacy_notice">Please include any details relevant to the issue. Anything you share here will be kept private and will only be used to help improve calls in Signal.</string>
+    <!-- Button to save the call quality issue description -->
+    <string name="CallQualitySomethingElseScreen__save">Save</string>
+    <!-- Content description for the back navigation button -->
+    <string name="CallQualitySomethingElseScreen__back">Back</string>
+
+    <!-- CallQualitySheet -->
+    <!-- Title asking user how their call was -->
+    <string name="CallQualitySheet__how_was_your_call">How was your call?</string>
+    <!-- Subtitle explaining that feedback helps improve Signal and no PII is stored -->
+    <string name="CallQualitySheet__how_was_your_call_subtitle">This helps us improve calls in Signal. No personally identifiable information will be stored.</string>
+    <!-- Button label indicating the call had issues -->
+    <string name="CallQualitySheet__had_issues">Had issues</string>
+    <!-- Button label indicating the call was great -->
+    <string name="CallQualitySheet__great">Great</string>
+    <!-- Title asking what issues the user experienced -->
+    <string name="CallQualitySheet__what_issues_did_you_have">What issues did you have?</string>
+    <!-- Instruction to select all applicable issues -->
+    <string name="CallQualitySheet__select_all_that_apply">Select all that apply</string>
+    <!-- Placeholder text for describing a custom issue -->
+    <string name="CallQualitySheet__describe_your_issue">Describe your issue</string>
+    <!-- Button to continue to the next step -->
+    <string name="CallQualitySheet__continue">Continue</string>
+    <!-- Title asking user to help improve Signal -->
+    <string name="CallQualitySheet__help_us_improve">Help us improve</string>
+    <!-- First part of description explaining diagnostics help improve call quality -->
+    <string name="CallQualitySheet__help_us_improve_description_prefix">Sending us your diagnostics info helps us improve call quality. You can </string>
+    <!-- Link text to view debug log -->
+    <string name="CallQualitySheet__view_your_debug_log">view your debug log</string>
+    <!-- Last part of description about viewing debug log before submitting -->
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> before submitting</string>
+    <!-- Toggle label for sharing debug log -->
+    <string name="CallQualitySheet__share_debug_log">Share debug log</string>
+    <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
+    <string name="CallQualitySheet__debug_log_privacy_notice">Debug logs contain low level app information and do not reveal any of your message contents.</string>
+    <!-- Button to submit the call quality feedback -->
+    <string name="CallQualitySheet__submit">Submit</string>
+    <!-- Displayed as a snackbar after submitting feedback -->
+    <string name="CallQualitySheet__thanks_for_your_feedback">Thanks for your feedback!</string>
 
     <!-- EOF -->
 </resources>

@@ -88,6 +88,8 @@
     <string name="AttachmentKeyboard_file">Dosya</string>
     <string name="AttachmentKeyboard_contact">Kişi</string>
     <string name="AttachmentKeyboard_location">Konum</string>
+    <!-- Text for a button that will allow users to create a poll -->
+    <string name="AttachmentKeyboard_poll">Anket</string>
     <string name="AttachmentKeyboard_Signal_needs_permission_to_show_your_photos_and_videos">Signal\'in fotoğraflarını ve videolarını göstermek için izne ihtiyacı var</string>
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Erişimine İzin Ver</string>
@@ -1491,6 +1493,10 @@
     <string name="RemoteRestoreActivity__not_now">Şimdi değil</string>
     <!-- Text shown on restore screen as information on what will happen if you skip -->
     <string name="RemoteRestoreActivity__your_media_will_restore_in_the_background">Medyan arka planda geri yüklenecektir. Şimdi geri yüklememeyi seçersen, daha sonra geri yükleyemezsin.</string>
+    <!-- Dialog title -->
+    <string name="RestoreActivity__no_longer_registered_title">Bu cihaz artık kayıtlı değil</string>
+    <!-- Dialog message -->
+    <string name="RestoreActivity__no_longer_registered_message">Bunun nedeni büyük olasılıkla Signal hesabının farklı bir cihazda kaydedilmiş olmasıdır.</string>
 
     <!-- GroupMentionSettingDialog -->
     <string name="GroupMentionSettingDialog_notify_me_for_mentions">Bahsedilmeleri bana bildir</string>
@@ -2107,6 +2113,8 @@
     <string name="MessageRecord_you_unblocked_this_group">Bu grubun engelini kaldırdın</string>
     <!-- Update message shown when you receive a message that cannot be processed because your Signal version is too old. %1$s is the sender\'s name -->
     <string name="MessageRecord_unsupported_feature">%1$s size Signal\'in yeni özelliğini kullanan bir ileti gönderdiği için işlenemiyor veya görüntülenemiyor.</string>
+    <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
+    <string name="MessageRecord_ended_the_poll">%1$s şu anketi sonlandırdı: \"%2$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Kabul et</string>
@@ -2914,6 +2922,8 @@
     <string name="SubmitDebugLogActivity_success">Başarılı!</string>
     <string name="SubmitDebugLogActivity_copy_this_url_and_add_it_to_your_issue">Bu adresi kopyalayın ve sorun bildirinize veya destek epostasına ekleyin:\n\n<b>%1$s</b></string>
     <string name="SubmitDebugLogActivity_share">Paylaş</string>
+    <!-- Displayed when entering activity in view-only mode -->
+    <string name="SubmitDebugLogActivity_close">Close</string>
     <string name="SubmitDebugLogActivity_this_log_will_be_posted_publicly_online_for_contributors">Bu günlük katkıda bulunanların görmesi için herkese açık bir şekilde paylaşılacaktır. Yüklemeden önce inceleyebilirsiniz.</string>
     <!-- Banner message shown while submitting debug log -->
     <string name="SubmitDebugLogActivity_your_log_will_be_posted_online">Gönder\'i tıkladığınızda, günlüğünüz benzersiz, yayınlanmamış bir URL\'de 30 gün boyunca çevrimiçi olarak yayınlanacaktır. Önce yerel olarak kaydedebilirsiniz.</string>
@@ -3172,6 +3182,8 @@
     <string name="MessageNotifier_reacted_s_to_your_payment">Ödemene %1$s tepkisi verdi.</string>
     <string name="MessageNotifier_reacted_s_to_your_sticker">Çıkartmana %1$s tepkisi verdi.</string>
     <string name="MessageNotifier_this_message_was_deleted">Bu ileti silindi.</string>
+    <!-- Body of a notification when someone votes in a poll. First placeholder is the poll emoji, second placeholder is the name of the voter and third is the poll question -->
+    <string name="MessageNotifier_s_voted_in_poll">%1$s %2$s \"%3$s\" anketini oyladı</string>
 
     <string name="TurnOffContactJoinedNotificationsActivity__turn_off_contact_joined_signal">Kişi katıldı Signal bildirimlerini kapatmak mı istiyorsunuz? Signal &gt; Ayarlar &gt; Bildirimler kısmında tekrar açabilirsiniz.</string>
 
@@ -4417,6 +4429,8 @@
     <string name="conversation_selection__menu_multi_select">Seç</string>
     <!-- Button to view a in-chat payment message\'s full payment details; Action item with hyphenation. Translation can use soft hyphen - Unicode U+00AD  -->
     <string name="conversation_selection__menu_payment_details">Ödeme detayları</string>
+    <!-- Button to end a poll -->
+    <string name="conversation_selection__menu_end_poll">Anketi sonlandır</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5169,10 +5183,19 @@
 
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Atla</string>
+
     <plurals name="CreateGroupActivity__d_members">
         <item quantity="one">%1$d üye</item>
         <item quantity="other">%1$d üye</item>
     </plurals>
+
+    <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
+    <plurals name="CreateGroupActivity__s_members">
+        <item quantity="one">%1$s member</item>
+        <item quantity="other">%1$s members</item>
+    </plurals>
+    <!-- Accessibility label for navigating to the next screen in the create group flow. -->
+    <string name="CreateGroupActivity__accessibility_next">Next</string>
 
     <!-- ShareActivity -->
     <string name="ShareActivity__share">Paylaş</string>
@@ -5894,24 +5917,18 @@
     <string name="NewConversationActivity__s_has_been_blocked">%1$s engellendi</string>
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">Engelleme başarısız oldu</string>
-    <!-- Dialog title when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__unable_to_remove_s">%1$s kaldırılamıyor</string>
-    <!-- Dialog message when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__this_person_is_saved_to_your">Bu kişi cihazında Kişiler\'e kaydedildi. Kişiler\'den sil ve tekrar dene.</string>
-    <!-- Dialog action to view contact when they can\'t be removed otherwise -->
-    <string name="NewConversationActivity__view_contact">Kişiyi görüntüle</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
     <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s bir Signal kullanıcısı değil</string>
-    <!-- Error message shown when we could not get a user from the username link -->
-    <string name="NewConversationActivity__">%1$s bir Signal kullanıcısı değil</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="NewConversationActivity__accessibility_open_top_bar_menu">Open menu</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
     <plurals name="CreateGroupActivity_not_signal_users">
         <item quantity="one">%1$s bir Signal kullanıcısı değil</item>
         <item quantity="other">%1$s Signal kullanıcıları değil</item>
     </plurals>
 
-    <!-- ContactFilterView -->
-    <string name="ContactFilterView__search_name_or_number">İsim veya numara bul</string>
+    <!-- Hint text that shows in the recipient search box when no text is entered yet. -->
+    <string name="ContactFilterView__search_name_or_number">İsim, kullanıcı adı veya numara</string>
 
     <!-- VoiceNotePlayerView -->
     <string name="VoiceNotePlayerView__dot_s">· %1$s</string>
@@ -8413,13 +8430,15 @@
 
     <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Kurtarma anahtarın</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Recovery key</string>
     <!-- Screen body part 1 -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Kurtarma anahtarın, Signal\'ı yeniden kurduğunda yedeklemeni geri yüklemeni sağlayan 64 karakterli bir koddur.</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your recovery key is a 64-character code that you will need to restore your backup.</string>
     <!-- Screen body part 2 -->
-    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">Anahtarını unutursan yedeklemeni geri yükleyemezsin. Signal, yedeklemeni kurtarmana yardımcı olamaz.</string>
+    <string name="MessageBackupsKeyEducationScreen__store_your_recovery">Store your recovery key somewhere safe like a secure password manager, and don’t share it with anyone.</string>
+    <!-- Screen body part 3 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_lose_it">If you lose it, you won’t be able to recover your messages.</string>
     <!-- Action button label -->
-    <string name="MessageBackupsKeyEducationScreen__next">İleri</string>
+    <string name="MessageBackupsKeyEducationScreen__view_recovery_key">View recovery key</string>
 
     <!-- MessageBackupsKeyRecordScreen -->
     <!-- Screen headline -->
@@ -8596,6 +8615,12 @@
     <string name="SelectRestoreMethodFragment__from_your_old_phone">Eski telefonundan</string>
     <!-- Option subtitle for restoring via device transfer -->
     <string name="SelectRestoreMethodFragment__transfer_directly_from_old">Doğrudan eski Android\'inden aktar</string>
+    <!-- Dialog title shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_title">Geri yükleme atlansın mı?</string>
+    <!-- Dialog message shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_warning">Şimdi geri yüklemeyi atlarsan, daha sonra geri yükleme yapamazsın. Geri yüklemeyi atladıktan sonra yedeklemeleri yeniden etkinleştirirsen, mevcut yedeğin yeni mesaj geçmişinle değiştirilir.</string>
+    <!-- Dialog confirm text shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore">Geri yüklemeyi atla</string>
 
     <!-- Screen title for restore via local backup -->
     <string name="RestoreLocalBackup_title">Yerel yedeklemeni geri yükle</string>
@@ -8636,6 +8661,10 @@
     <string name="EnterBackupKey_backup_not_found">Yedek bulunamadı</string>
     <!-- Dialog message shown during registration and trying to restore a remote backup -->
     <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">Girdiğin kurtarma anahtarı doğru, ancak bununla ilişkili bir yedekleme yok. Hala eski telefonun varsa, yedeklemelerin etkinleştirildiğinden ve bir yedeklemenin tamamlandığından emin ol ve tekrar dene.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_incorrect_or_backups_not_enabled">Kurtarma anahtarını yanlış girmiş veya eski cihazında en az bir yedeklemeyi tamamlamamış olabilirsin.\n\nSignal Güvenli Yedeklemeleri etkinleştirirken kaydettiğin aynı telefon numarası ve kurtarma anahtarıyla kaydolduğundan emin ol ve eski cihazının bir yedeklemeyi tamamladığını onayla.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_check_rate_limited">Kurtarma anahtarı denemelerin tükendi. Güvenliğin için yapabileceğin deneme sayısı sınırlıdır. Bir saat bekleyip tekrar dene.</string>
     <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
     <string name="EnterBackupKey_skip_restore">Geri yüklemeyi atla</string>
     <!-- Dialog title text when encountering backup restore network error -->
@@ -8763,6 +8792,143 @@
         <item quantity="one">%1$d günlük yedeklemeyi tamamlamadın. Hemen bir yedekleme oluştur.</item>
         <item quantity="other">%1$d günlük yedeklemeyi tamamlamadın. Hemen bir yedekleme oluştur.</item>
     </plurals>
+
+    <!-- Polls -->
+    <!-- Caption in poll message to select an option  -->
+    <string name="Poll__select_one">Anket · Birini Seç</string>
+    <!-- Caption in poll message to select one or more options  -->
+    <string name="Poll__select_multiple">Anket · Bir veya daha fazlasını seç</string>
+    <!-- Caption in poll message once a poll has ended  -->
+    <string name="Poll__final_results">Anket · Nihai sonuçlar</string>
+    <!-- Caption in poll message that no votes have been cast  -->
+    <string name="Poll__no_votes">Oy yok</string>
+    <!-- Button in poll message to view current votes for a poll -->
+    <string name="Poll__view_votes">Oyları görüntüle</string>
+    <!-- Button in poll message to view the poll after it has ended -->
+    <string name="Poll__view_poll">Anketi görüntüle</string>
+    <!-- Toast message shown if we cannot find the poll -->
+    <string name="Poll__unable_poll">Anket bulunamadı</string>
+    <!-- Button in poll message to view results for a poll after it ends -->
+    <string name="Poll__view_results">Sonuçları görüntüle</string>
+    <!-- Quote preview when replying to a poll. %1$s is the question of the poll -->
+    <string name="Poll__poll_question">Anket: %1$s</string>
+    <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
+    <string name="Poll__poll_end">%1$s şu anketi sonlandırdı: \"%2$s\"</string>
+    <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
+    <string name="Poll__poll_voted">%1$s şu anketi oyladı: \"%2$s\"</string>
+    <!-- Option in settings to configure notifications for polls -->
+    <string name="Poll__poll">Anketler</string>
+    <!-- Title of screen that shows the poll results of a poll after it has ended-->
+    <string name="Poll__poll_results">Anket sonuçları</string>
+    <!-- Title of screen that shows the poll details of a poll -->
+    <string name="Poll__poll_details">Poll details</string>
+    <!-- Header text displaying the question of the poll -->
+    <string name="Poll__question">Soru</string>
+    <!-- Text displaying how many votes, %1$d, an option has gotten -->
+    <plurals name="Poll__num_votes">
+        <item quantity="one">%1$d oy</item>
+        <item quantity="other">%1$d oy</item>
+    </plurals>
+    <!-- Content description to describe the icon that is shown next to the winning option when the poll ends -->
+    <string name="Poll__poll_winner">Winner</string>
+    <!-- Text that when pressed will end the poll   -->
+    <string name="Poll__end_poll">Anketi sonlandır</string>
+    <!-- Button that once pressed will show all of the voters for a poll -->
+    <string name="Poll__see_all">Tümünü gör</string>
+    <!-- Dialog title when a poll fails to end -->
+    <string name="Poll__couldnt_end_poll">Couldn\'t end poll</string>
+    <!-- Dialog body when a poll fails to end and to try again -->
+    <string name="Poll__check_connection">Check your connection and try again.</string>
+    <!-- Header when creating a new poll -->
+    <string name="CreatePollFragment__new_poll">Yeni anket</string>
+    <!-- Section text to enter in a question for a poll  -->
+    <string name="CreatePollFragment__question">Soru</string>
+    <!-- Hint text for question field when creating a poll  -->
+    <string name="CreatePollFragment__ask_a_question">Bir soru sor</string>
+    <!-- Section text to enter in options for a poll -->
+    <string name="CreatePollFragment__options">Seçenekler</string>
+    <!-- Hint text for the option field, where %1$d is the option number (max 10) -->
+    <string name="CreatePollFragment__option_n">Seçenek %1$d</string>
+    <!-- Accessibility label for the polls drag and drop handle used to reorder the list. -->
+    <string name="CreatePollFragment__drag_handle">Sürükle ve bırak tutamacı</string>
+    <!-- Text next to button to allow the poll to allow for multiple votes -->
+    <string name="CreatePollFragment__allow_multiple_votes">Birden çok oya izin ver</string>
+    <!-- Snackbar text to add a question and two options before creating a poll -->
+    <string name="CreatePollFragment__add_question_option">Bir soru ve en az 2 seçenek ekle</string>
+    <!-- Snackbar text to add two options before creating a poll -->
+    <string name="CreatePollFragment__add_option">En az 2 seçenek ekle</string>
+    <!-- Snackbar text to add a question before creating a poll -->
+    <string name="CreatePollFragment__add_question">Bir soru ekle</string>
+
+    <!-- CallQualityIssue -->
+    <!-- Label for general audio issue category -->
+    <string name="CallQualityIssue__audio_issue">Audio issue</string>
+    <!-- Label for general video issue category -->
+    <string name="CallQualityIssue__video_issue">Video issue</string>
+    <!-- Label for call dropped issue -->
+    <string name="CallQualityIssue__call_droppped">Call dropped</string>
+    <!-- Label for other/custom issues not covered by predefined categories -->
+    <string name="CallQualityIssue__something_else">Something else</string>
+    <!-- Label for audio stuttering/choppy audio issue -->
+    <string name="CallQualityIssue__audio_stuttering">Audio stuttering</string>
+    <!-- Label for audio cutting out/dropping issue -->
+    <string name="CallQualityIssue__audio_cut_out">Audio cut out</string>
+    <!-- Label for echo heard by the user -->
+    <string name="CallQualityIssue__i_heard_echo">I heard echo</string>
+    <!-- Label for echo heard by other call participants -->
+    <string name="CallQualityIssue__others_heard_echo">Others heard echo</string>
+    <!-- Label for poor video quality issue -->
+    <string name="CallQualityIssue__poor_video_quality">Poor video quality</string>
+    <!-- Label for low video resolution issue -->
+    <string name="CallQualityIssue__low_resolution">Low resolution</string>
+    <!-- Label for camera malfunction issue -->
+    <string name="CallQualityIssue__camera_did_not_work">Camera didn\'t work</string>
+
+    <!-- CallQualitySomethingElseScreen -->
+    <!-- Title for the "Something else" call quality issue screen -->
+    <string name="CallQualitySomethingElseScreen__title">Something else</string>
+    <!-- Label for text field where user describes their call quality issue -->
+    <string name="CallQualitySomethingElseScreen__describe_your_issue">Describe your issue</string>
+    <!-- Privacy notice explaining that issue details will be kept private and used to improve Signal calls -->
+    <string name="CallQualitySomethingElseScreen__privacy_notice">Please include any details relevant to the issue. Anything you share here will be kept private and will only be used to help improve calls in Signal.</string>
+    <!-- Button to save the call quality issue description -->
+    <string name="CallQualitySomethingElseScreen__save">Save</string>
+    <!-- Content description for the back navigation button -->
+    <string name="CallQualitySomethingElseScreen__back">Back</string>
+
+    <!-- CallQualitySheet -->
+    <!-- Title asking user how their call was -->
+    <string name="CallQualitySheet__how_was_your_call">How was your call?</string>
+    <!-- Subtitle explaining that feedback helps improve Signal and no PII is stored -->
+    <string name="CallQualitySheet__how_was_your_call_subtitle">This helps us improve calls in Signal. No personally identifiable information will be stored.</string>
+    <!-- Button label indicating the call had issues -->
+    <string name="CallQualitySheet__had_issues">Had issues</string>
+    <!-- Button label indicating the call was great -->
+    <string name="CallQualitySheet__great">Great</string>
+    <!-- Title asking what issues the user experienced -->
+    <string name="CallQualitySheet__what_issues_did_you_have">What issues did you have?</string>
+    <!-- Instruction to select all applicable issues -->
+    <string name="CallQualitySheet__select_all_that_apply">Select all that apply</string>
+    <!-- Placeholder text for describing a custom issue -->
+    <string name="CallQualitySheet__describe_your_issue">Describe your issue</string>
+    <!-- Button to continue to the next step -->
+    <string name="CallQualitySheet__continue">Continue</string>
+    <!-- Title asking user to help improve Signal -->
+    <string name="CallQualitySheet__help_us_improve">Help us improve</string>
+    <!-- First part of description explaining diagnostics help improve call quality -->
+    <string name="CallQualitySheet__help_us_improve_description_prefix">Sending us your diagnostics info helps us improve call quality. You can </string>
+    <!-- Link text to view debug log -->
+    <string name="CallQualitySheet__view_your_debug_log">view your debug log</string>
+    <!-- Last part of description about viewing debug log before submitting -->
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> before submitting</string>
+    <!-- Toggle label for sharing debug log -->
+    <string name="CallQualitySheet__share_debug_log">Share debug log</string>
+    <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
+    <string name="CallQualitySheet__debug_log_privacy_notice">Debug logs contain low level app information and do not reveal any of your message contents.</string>
+    <!-- Button to submit the call quality feedback -->
+    <string name="CallQualitySheet__submit">Submit</string>
+    <!-- Displayed as a snackbar after submitting feedback -->
+    <string name="CallQualitySheet__thanks_for_your_feedback">Thanks for your feedback!</string>
 
     <!-- EOF -->
 </resources>

@@ -22,8 +22,8 @@ plugins {
 
 apply(from = "static-ips.gradle.kts")
 
-val canonicalVersionCode = 1593
-val canonicalVersionName = "7.58.1"
+val canonicalVersionCode = 1604
+val canonicalVersionName = "7.62.0"
 val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 
@@ -301,6 +301,7 @@ android {
       manifestPlaceholders["mapsKey"] = getMapsKey()
 
       buildConfigField("String", "BUILD_VARIANT_TYPE", "\"Debug\"")
+      buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true")
     }
 
     getByName("release") {
@@ -327,7 +328,6 @@ android {
       isMinifyEnabled = false
       matchingFallbacks += "debug"
       buildConfigField("String", "BUILD_VARIANT_TYPE", "\"Spinner\"")
-      buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true")
     }
 
     create("perf") {
@@ -387,6 +387,7 @@ android {
       buildConfigField("boolean", "MANAGES_APP_UPDATES", "true")
       buildConfigField("String", "APK_UPDATE_MANIFEST_URL", "\"${apkUpdateManifestUrl}\"")
       buildConfigField("String", "BUILD_DISTRIBUTION_TYPE", "\"nightly\"")
+      buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true")
     }
 
     create("prod") {
@@ -511,7 +512,6 @@ dependencies {
 
   implementation("net.lingala.zip4j:zip4j:2.11.5") // JW: added
   implementation(libs.androidx.fragment.ktx)
-  implementation(libs.androidx.fragment.compose)
   implementation(libs.androidx.appcompat) {
     version {
       strictly("1.6.1")

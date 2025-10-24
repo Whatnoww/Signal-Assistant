@@ -36,8 +36,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import org.signal.core.ui.compose.DayNightPreviews
 import org.signal.core.ui.compose.Previews
-import org.signal.core.ui.compose.SignalPreview
 import org.signal.core.ui.compose.theme.SignalTheme
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.window.Navigation
@@ -137,7 +137,7 @@ private fun BoxScope.SecondaryActionButton(
   }
 
   AnimatedVisibility(
-    visible = destination == MainNavigationListLocation.CHATS,
+    visible = destination == MainNavigationListLocation.CHATS || destination == MainNavigationListLocation.ARCHIVE,
     modifier = Modifier.align(secondaryButtonAlignment),
     enter = slideInVertically(initialOffsetY = offsetYProvider),
     exit = slideOutVertically(targetOffsetY = offsetYProvider)
@@ -170,7 +170,7 @@ private fun PrimaryActionButton(
 ) {
   val onClick = remember(destination) {
     when (destination) {
-      MainNavigationListLocation.ARCHIVE -> error("Not supported")
+      MainNavigationListLocation.ARCHIVE -> onNewChatClick
       MainNavigationListLocation.CHATS -> onNewChatClick
       MainNavigationListLocation.CALLS -> onNewCallClick
       MainNavigationListLocation.STORIES -> {
@@ -185,7 +185,7 @@ private fun PrimaryActionButton(
     icon = {
       AnimatedContent(destination) { targetState ->
         val (icon, contentDescriptionId) = when (targetState) {
-          MainNavigationListLocation.ARCHIVE -> error("Not supported")
+          MainNavigationListLocation.ARCHIVE -> R.drawable.symbol_edit_24 to R.string.conversation_list_fragment__fab_content_description
           MainNavigationListLocation.CHATS -> R.drawable.symbol_edit_24 to R.string.conversation_list_fragment__fab_content_description
           MainNavigationListLocation.CALLS -> R.drawable.symbol_phone_plus_24 to R.string.CallLogFragment__start_a_new_call
           MainNavigationListLocation.STORIES -> R.drawable.symbol_camera_24 to R.string.conversation_list_fragment__open_camera_description
@@ -242,7 +242,7 @@ private fun MainFloatingActionButton(
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun MainFloatingActionButtonsNavigationRailPreview() {
   var currentDestination by remember { mutableStateOf(MainNavigationListLocation.CHATS) }
@@ -271,7 +271,7 @@ private fun MainFloatingActionButtonsNavigationRailPreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun MainFloatingActionButtonsNavigationBarPreview() {
   var currentDestination by remember { mutableStateOf(MainNavigationListLocation.CHATS) }

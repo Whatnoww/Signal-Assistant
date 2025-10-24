@@ -202,21 +202,24 @@ object Dialogs {
   fun IndeterminateProgressDialog(
     onDismissRequest: () -> Unit = {}
   ) {
-    BaseAlertDialog(
-      onDismissRequest = onDismissRequest,
-      confirmButton = {},
-      dismissButton = {},
-      text = {
+    Dialog(
+      onDismissRequest = onDismissRequest
+    ) {
+      Surface(
+        modifier = Modifier.size(100.dp),
+        shape = Defaults.shape,
+        color = Defaults.containerColor,
+        tonalElevation = Defaults.TonalElevation
+      ) {
         CircularProgressIndicator(
           modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .padding(24.dp)
             .testTag("dialog-circular-progress-indicator")
         )
-      },
-      modifier = Modifier
-        .size(100.dp)
-    )
+      }
+    }
   }
 
   /**
@@ -513,7 +516,9 @@ object Dialogs {
 
           FlowRow(
             horizontalArrangement = Arrangement.End,
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(bottom = 16.dp)
           ) {
             TextButton(onClick = onDismissRequest) {
               Text(text = stringResource(R.string.cancel))
@@ -599,7 +604,7 @@ object Dialogs {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun PermissionRationaleDialogPreview() {
   Previews.Preview {
@@ -614,7 +619,7 @@ private fun PermissionRationaleDialogPreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun AlertDialogPreview() {
   Previews.Preview {
@@ -629,7 +634,7 @@ private fun AlertDialogPreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun AdvancedAlertDialogPreview() {
   Previews.Preview {
@@ -646,7 +651,7 @@ private fun AdvancedAlertDialogPreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun MessageDialogPreview() {
   Previews.Preview {
@@ -658,7 +663,7 @@ private fun MessageDialogPreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun IndeterminateProgressDialogPreview() {
   Previews.Preview {
@@ -666,7 +671,7 @@ private fun IndeterminateProgressDialogPreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun IndeterminateProgressDialogMessagePreview() {
   Previews.Preview {
@@ -674,7 +679,7 @@ private fun IndeterminateProgressDialogMessagePreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun IndeterminateProgressDialogCancellablePreview() {
   Previews.Preview {
@@ -682,7 +687,7 @@ private fun IndeterminateProgressDialogCancellablePreview() {
   }
 }
 
-@SignalPreview
+@DayNightPreviews
 @Composable
 private fun RadioListDialogPreview() {
   Previews.Preview {

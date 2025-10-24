@@ -88,6 +88,8 @@
     <string name="AttachmentKeyboard_file">ملف</string>
     <string name="AttachmentKeyboard_contact">جهة الاتصال</string>
     <string name="AttachmentKeyboard_location">الموقع</string>
+    <!-- Text for a button that will allow users to create a poll -->
+    <string name="AttachmentKeyboard_poll">استطلاع</string>
     <string name="AttachmentKeyboard_Signal_needs_permission_to_show_your_photos_and_videos">يحتاج سيجنال إلى إذن لإظهار الصور ومقاطع الفيديو الخاصة بك.</string>
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">إعطاء الصلاحية</string>
@@ -944,7 +946,7 @@
     <!-- Bottom sheet paid message -->
     <string name="CreateBackupBottomSheet__depending_on_the_size">قد يستغرق هذا وقتًا طويلًا حسب حجم النسخة الاحتياطية الخاصة بك. يُمكنك استخدام هاتفك بشكل اعتيادي أثناء إجراء عملية النسخ الاحتياطي.</string>
     <!-- Bottom sheet free message -->
-    <string name="CreateBackupBottomSheet__free_tier">Media is added to your backup as you send and receive messages.</string>
+    <string name="CreateBackupBottomSheet__free_tier">تتمُّ إضافة ملفات الوسائط إلى نسختك الاحتياطية كلما أرسلتَ أو استلمتَ رسائل.</string>
 
     <!-- Headline text for a bottom sheet dialog shown when the restoration of the media backup fails. -->
     <string name="RestoreMediaFailedBottomSheet__Cant_restore_media">تعذَّر استرجاع الوسائط.</string>
@@ -1651,6 +1653,10 @@
     <string name="RemoteRestoreActivity__not_now">ليس الآن</string>
     <!-- Text shown on restore screen as information on what will happen if you skip -->
     <string name="RemoteRestoreActivity__your_media_will_restore_in_the_background">سَتتم استعادة ملفات وسائطك في الخلفية. إذا اخترتَ عدم الاستعادة الآن، فلن تتمكَّن من الاستعادة لاحقًا.</string>
+    <!-- Dialog title -->
+    <string name="RestoreActivity__no_longer_registered_title">هذا الجهاز لم يَعُد مُسجلًا.</string>
+    <!-- Dialog message -->
+    <string name="RestoreActivity__no_longer_registered_message">على الأغلب هذا بسبب قيامك بتسجيل حساب سيجنال الخاص بك على جهاز آخر.</string>
 
     <!-- GroupMentionSettingDialog -->
     <string name="GroupMentionSettingDialog_notify_me_for_mentions">نبّهني عندما يذكر أحدهم اسمي</string>
@@ -2347,6 +2353,8 @@
     <string name="MessageRecord_you_unblocked_this_group">رفعتَ الحظر عن هذه المجموعة</string>
     <!-- Update message shown when you receive a message that cannot be processed because your Signal version is too old. %1$s is the sender\'s name -->
     <string name="MessageRecord_unsupported_feature">أرسَلَ %1$s لك رسالة لا يمكن معالجتها ولا عرضها لأنها تستخدم ميزة سيجنال جديدة.</string>
+    <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
+    <string name="MessageRecord_ended_the_poll">%1$s أنهى الاستطلاع: \"%2$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">موافقة</string>
@@ -3286,6 +3294,8 @@
     <string name="SubmitDebugLogActivity_success">تمَّ بنجاح!</string>
     <string name="SubmitDebugLogActivity_copy_this_url_and_add_it_to_your_issue">يُرجى نسخ هذا العنوان وإضافته إلى بلاغك عن مشكلة أو إلى بريد الدعم:\n\n<b>%1$s</b></string>
     <string name="SubmitDebugLogActivity_share">مشاركة</string>
+    <!-- Displayed when entering activity in view-only mode -->
+    <string name="SubmitDebugLogActivity_close">Close</string>
     <string name="SubmitDebugLogActivity_this_log_will_be_posted_publicly_online_for_contributors">سيتمُّ نشر هذا السّجل علنًا على الانترنت حتى يتمكن المساهمون من الاطِّلاع عليه. يمكنك فحصه أو تعديله قبل تحميله.</string>
     <!-- Banner message shown while submitting debug log -->
     <string name="SubmitDebugLogActivity_your_log_will_be_posted_online">‫عند النقرعلى زر \"إرسال\"، سوف يُنشَر السجلّ على الإنترنت لمدة 30 يومًا في عنوان URL فريد غير منشور. يمكنك حفظه محليًا أولًا.</string>
@@ -3556,6 +3566,8 @@
     <string name="MessageNotifier_reacted_s_to_your_payment">تفاعل %1$s مع عملية الدفع الخاصة بك.</string>
     <string name="MessageNotifier_reacted_s_to_your_sticker">تفاعل %1$s مع الملصق الخاص بك.</string>
     <string name="MessageNotifier_this_message_was_deleted">تمَّ حذف هذه الرسالة.</string>
+    <!-- Body of a notification when someone votes in a poll. First placeholder is the poll emoji, second placeholder is the name of the voter and third is the poll question -->
+    <string name="MessageNotifier_s_voted_in_poll">%1$s %2$s صوّتَ في الاستطلاع بخصوص \"%3$s\"</string>
 
     <string name="TurnOffContactJoinedNotificationsActivity__turn_off_contact_joined_signal">هل ترغبُ بإيقاف إشعارات انضمام شخص إلى سيجنال؟ يمكنك تفعيل الميزة مُجدَّدًا في سيجنال &gt; الإعدادات &gt; الإشعارات.</string>
 
@@ -4877,6 +4889,8 @@
     <string name="conversation_selection__menu_multi_select">تحديد</string>
     <!-- Button to view a in-chat payment message\'s full payment details; Action item with hyphenation. Translation can use soft hyphen - Unicode U+00AD  -->
     <string name="conversation_selection__menu_payment_details">تفاصيل عملية الدفع</string>
+    <!-- Button to end a poll -->
+    <string name="conversation_selection__menu_end_poll">إنهاء الاستطلاع</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5685,6 +5699,7 @@
 
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">تخطّي</string>
+
     <plurals name="CreateGroupActivity__d_members">
         <item quantity="zero">بدون أعضاء %1$d</item>
         <item quantity="one">عضو واحد %1$d</item>
@@ -5693,6 +5708,18 @@
         <item quantity="many">%1$d عضوًا</item>
         <item quantity="other">%1$d عضو</item>
     </plurals>
+
+    <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
+    <plurals name="CreateGroupActivity__s_members">
+        <item quantity="zero">%1$s members</item>
+        <item quantity="one">%1$s member</item>
+        <item quantity="two">%1$s members</item>
+        <item quantity="few">%1$s members</item>
+        <item quantity="many">%1$s members</item>
+        <item quantity="other">%1$s members</item>
+    </plurals>
+    <!-- Accessibility label for navigating to the next screen in the create group flow. -->
+    <string name="CreateGroupActivity__accessibility_next">Next</string>
 
     <!-- ShareActivity -->
     <string name="ShareActivity__share">مشاركة</string>
@@ -6446,16 +6473,10 @@
     <string name="NewConversationActivity__s_has_been_blocked">تمَّ حظر %1$s</string>
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">تعذّر الحظر</string>
-    <!-- Dialog title when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__unable_to_remove_s">لا يمكن إزالة %1$s</string>
-    <!-- Dialog message when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__this_person_is_saved_to_your">هذا الشخص محفوظ في جهات اتصالك. اِحذفه من جهات اتصالك وحاوِل مرّة أخرى.</string>
-    <!-- Dialog action to view contact when they can\'t be removed otherwise -->
-    <string name="NewConversationActivity__view_contact">عرض جهة الاتصال</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
     <string name="NewConversationActivity__s_is_not_a_signal_user">ليس %1$s من مُستخدِمي سيجنال</string>
-    <!-- Error message shown when we could not get a user from the username link -->
-    <string name="NewConversationActivity__">ليس %1$s من مُستخدِمي سيجنال.</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="NewConversationActivity__accessibility_open_top_bar_menu">Open menu</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
     <plurals name="CreateGroupActivity_not_signal_users">
         <item quantity="zero">%1$s ليسوا من مُستخدِمي سيجنال</item>
@@ -6466,8 +6487,8 @@
         <item quantity="other">%1$s ليسوا من مُستخدِمي سيجنال</item>
     </plurals>
 
-    <!-- ContactFilterView -->
-    <string name="ContactFilterView__search_name_or_number">البحث باستخدام الاسم أو الرقم</string>
+    <!-- Hint text that shows in the recipient search box when no text is entered yet. -->
+    <string name="ContactFilterView__search_name_or_number">الاسم، أو اسم المُستخدِم، أو الرقم</string>
 
     <!-- VoiceNotePlayerView -->
     <string name="VoiceNotePlayerView__dot_s">· %1$s</string>
@@ -8900,12 +8921,12 @@
     <string name="RemoteBackupsSettingsFragment__free_tier_storage_title">حجم النسخة الاحتياطية</string>
     <!-- Dialog message for explainer text to on how backup size works for free tier -->
     <plurals name="RemoteBackupsSettingsFragment__backup_frequency_dialog_body">
-        <item quantity="zero">Your backup includes all of your text messages and your last %1$d days of media. The size will change as new media is received and old media expires.</item>
-        <item quantity="one">Your backup includes all of your text messages and your last %1$d day of media. The size will change as new media is received and old media expires.</item>
-        <item quantity="two">Your backup includes all of your text messages and your last %1$d days of media. The size will change as new media is received and old media expires.</item>
-        <item quantity="few">Your backup includes all of your text messages and your last %1$d days of media. The size will change as new media is received and old media expires.</item>
-        <item quantity="many">Your backup includes all of your text messages and your last %1$d days of media. The size will change as new media is received and old media expires.</item>
-        <item quantity="other">Your backup includes all of your text messages and your last %1$d days of media. The size will change as new media is received and old media expires.</item>
+        <item quantity="zero">تتضمّن النسخة الاحتياطية الخاصة بك كل رسائلك النصية وملفات الوسائط الخاصة بك للأيام الـ %1$d الأخيرة. سيتغير الحجم كلما تمَّ استلام ملفات وسائط جديدة وعند انتهاء صلاحية الوسائط القديمة.</item>
+        <item quantity="one">تتضمن النسخة الاحتياطية الخاصة بك كل رسائلك النصية وملفات الوسائط الخاصة بك لليوم الـ %1$d الأخير. سيتغير الحجم كلما تمَّ استلام ملفات وسائط جديدة وعند انتهاء صلاحية الوسائط القديمة.</item>
+        <item quantity="two">تتضمن النسخة الاحتياطية الخاصة بك كل رسائلك النصية وملفات الوسائط الخاصة بك لليومين %1$d الأخيرين. سيتغير الحجم كلما تمَّ استلام ملفات وسائط جديدة وعند انتهاء صلاحية الوسائط القديمة.</item>
+        <item quantity="few">تتضمن النسخة الاحتياطية الخاصة بك كل رسائلك النصية وملفات الوسائط الخاصة بك للأيام الـ %1$d الأخيرة. سيتغير الحجم كلما تمَّ استلام ملفات وسائط جديدة وعند انتهاء صلاحية الوسائط القديمة.</item>
+        <item quantity="many">تتضمن النسخة الاحتياطية الخاصة بك كل رسائلك النصية وملفات الوسائط الخاصة بك للأيام الـ %1$d الأخيرة. سيتغير الحجم كلما تمَّ استلام ملفات وسائط جديدة وعند انتهاء صلاحية الوسائط القديمة.</item>
+        <item quantity="other">تتضمن النسخة الاحتياطية الخاصة بك كل رسائلك النصية وملفات الوسائط الخاصة بك للأيام الـ %1$d الأخيرة. سيتغير الحجم كلما تمَّ استلام ملفات وسائط جديدة وعند انتهاء صلاحية الوسائط القديمة.</item>
     </plurals>
     <!-- Snackbar text displayed when backup has been deleted and turned off -->
     <string name="RemoteBackupsSettingsFragment__backup_deleted_and_turned_off">تمَّ حذف النُسخ الاحتياطية وإيقافها.</string>
@@ -9063,7 +9084,7 @@
     <!-- Progress message when backup file is being uploaded. First placeholder and second placeholder are formatted byte sizes (2 MB) and third is percent completion. -->
     <string name="RemoteBackupsSettingsFragment__uploading_s_of_s_d">جارٍ تحميل: %1$s من أصل %2$s (%3$d%%)</string>
     <!-- Progress message when backup file is being uploaded. Placeholder is percent completion. -->
-    <string name="RemoteBackupsSettingsFragment__uploading_d">Uploading: %1$d%%</string>
+    <string name="RemoteBackupsSettingsFragment__uploading_d">جارٍ التحميل: %1$d%%</string>
     <!-- Button label to see more details about redemption error -->
     <string name="RemoteBackupsSettingsFragment__details">التفاصيل</string>
     <!-- Text displayed when there was an error deleting backup -->
@@ -9137,13 +9158,15 @@
 
     <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key">مفتاح الاستعادة الخاص بك</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Recovery key</string>
     <!-- Screen body part 1 -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">مفتاح الاستعادة الخاص بك هو كود مُكوَّن من 64 رقمًا يَسمح لك باستعادة نسختك الاحتياطية عندما تُعيد تثبيت سيجنال.</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your recovery key is a 64-character code that you will need to restore your backup.</string>
     <!-- Screen body part 2 -->
-    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">إذا نسيتَ مفتاحك، لن تتمكَّن من استرجاع نسختك الاحتياطية. لا يُمكن لسيجنال مُساعدتك على استرجاع نسختك الاحتياطية.</string>
+    <string name="MessageBackupsKeyEducationScreen__store_your_recovery">Store your recovery key somewhere safe like a secure password manager, and don’t share it with anyone.</string>
+    <!-- Screen body part 3 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_lose_it">If you lose it, you won’t be able to recover your messages.</string>
     <!-- Action button label -->
-    <string name="MessageBackupsKeyEducationScreen__next">التالي</string>
+    <string name="MessageBackupsKeyEducationScreen__view_recovery_key">View recovery key</string>
 
     <!-- MessageBackupsKeyRecordScreen -->
     <!-- Screen headline -->
@@ -9167,7 +9190,7 @@
     <!-- Dialog message shown when there is an error saving the recovery key because no compatible password manager was detected. -->
     <string name="MessageBackupsKeyRecordScreen__missing_password_manager_message">لم تقم بإعداد مدير كلمات المرور، أو مدير كلمات المرور الذي تستخدمه غير مدعوم.</string>
     <!-- Dialog message shown when there is an error saving the recovery key because the user previously chose not to save Signal passwords to their password manager. -->
-    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">You previously chose not to save passwords for Signal to Google Password Manager. In your Google Password Manager settings, remove Signal from \"Declined sites and apps\" and try again.</string>
+    <string name="MessageBackupsKeyRecordScreen__password_save_prompt_disabled_message">لقد اخترت مسبقًا عدم حفظ كلمات المرور الخاصة بسيجنال في Google Password Manager. أزِل سيجنال من \"المواقع والتطبيقات المرفوضة\" في إعدادات Google Password Manager ثم حاول من جديد.</string>
     <!-- Label for a button that navigates to the device settings -->
     <string name="MessageBackupsKeyRecordScreen__go_to_settings">انتقِل إلى الإعدادات</string>
     <!-- Action button label -->
@@ -9328,6 +9351,12 @@
     <string name="SelectRestoreMethodFragment__from_your_old_phone">من جهازك القديم</string>
     <!-- Option subtitle for restoring via device transfer -->
     <string name="SelectRestoreMethodFragment__transfer_directly_from_old">النقل مباشرةً من جهاز أندرويد القديم الخاص بك</string>
+    <!-- Dialog title shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_title">هل ترغبُ بتخطِّي الاستعادة؟</string>
+    <!-- Dialog message shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_warning">إذا قُمتَ بتخطي الاستعادة الآن، فلن تتمكّن من الاستعادة لاحقًا. إذا فعّلتَ النسخ الاحتياطية من جديد لاحقًا بعد تخطي الاستعادة، فسيتم استبدال نسختك الاحتياطية الحالية بسجل الرسائل الخاص بك الجديد.</string>
+    <!-- Dialog confirm text shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore">تخطِّي الاستعادة</string>
 
     <!-- Screen title for restore via local backup -->
     <string name="RestoreLocalBackup_title">استعادة نسخة احتياطية محلية</string>
@@ -9368,6 +9397,10 @@
     <string name="EnterBackupKey_backup_not_found">لا توجد نسخة احتياطية</string>
     <!-- Dialog message shown during registration and trying to restore a remote backup -->
     <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">مفتاح الاستعادة الذي أدخلته صحيح، لكن لا توجد أي نسخة احتياطية مرتبطة به. إذا كُنتَ لا تزال تحتفظ بهاتفك القديم، تأكَّد من أن النسخ الاحتياطية مُفعَّلة وأن عملية نسخ احتياطي قد اكتملت بالفعل، وحاوِل مرّة أخرى.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_incorrect_or_backups_not_enabled">قد تكون أدخلتَ مفتاح الاستعادة الخاص بك بشكل خاطئ، أو لم تكمل نسخة احتياطية واحدة على الأقل على جهازك القديم.\n\nتأكَّد من تسجيل الدخول باستخدام رقم الهاتف ومفتاح الاستعادة نفسيهما اللذين حفظتهما عند تفعيل النسخ الاحتياطية الآمنة في سيجنال، وتحقَّق من أن جهازك القديم قد أكملَ النسخ الاحتياطي.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_check_rate_limited">نفدَت محاولات إدخال مفتاح الاستعادة. من أجل أمانك، فإن عدد المحاولات التي يمكنك القيام بها محدود. حاوِل مُجدَّدًا بعد ساعة.</string>
     <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
     <string name="EnterBackupKey_skip_restore">تخطِّي الاستعادة</string>
     <!-- Dialog title text when encountering backup restore network error -->
@@ -9503,6 +9536,147 @@
         <item quantity="many">لم تُكمِل نسخة احتياطية منذ %1$d يومًا. أنشِئ نسخة احتياطية الآن.</item>
         <item quantity="other">لم تُكمِل نسخة احتياطية منذ %1$d يوم. أنشِئ نسخة احتياطية الآن.</item>
     </plurals>
+
+    <!-- Polls -->
+    <!-- Caption in poll message to select an option  -->
+    <string name="Poll__select_one">استطلاع · اختر خيارًا واحدًا</string>
+    <!-- Caption in poll message to select one or more options  -->
+    <string name="Poll__select_multiple">استطلاع · اختر واحدًا أو أكثر</string>
+    <!-- Caption in poll message once a poll has ended  -->
+    <string name="Poll__final_results">استطلاع · النتائج النهائية</string>
+    <!-- Caption in poll message that no votes have been cast  -->
+    <string name="Poll__no_votes">لا أصوات</string>
+    <!-- Button in poll message to view current votes for a poll -->
+    <string name="Poll__view_votes">عرض الأصوات</string>
+    <!-- Button in poll message to view the poll after it has ended -->
+    <string name="Poll__view_poll">عرض الاستطلاع</string>
+    <!-- Toast message shown if we cannot find the poll -->
+    <string name="Poll__unable_poll">لم يتم العثور على الاستطلاع</string>
+    <!-- Button in poll message to view results for a poll after it ends -->
+    <string name="Poll__view_results">عرض النتائج</string>
+    <!-- Quote preview when replying to a poll. %1$s is the question of the poll -->
+    <string name="Poll__poll_question">استطلاع: %1$s</string>
+    <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
+    <string name="Poll__poll_end">%1$s أنهى الاستطلاع: \"%2$s\"</string>
+    <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
+    <string name="Poll__poll_voted">%1$s صوت في الاستطلاع: \"%2$s\"</string>
+    <!-- Option in settings to configure notifications for polls -->
+    <string name="Poll__poll">الاستطلاعات</string>
+    <!-- Title of screen that shows the poll results of a poll after it has ended-->
+    <string name="Poll__poll_results">نتائج الاستطلاع</string>
+    <!-- Title of screen that shows the poll details of a poll -->
+    <string name="Poll__poll_details">Poll details</string>
+    <!-- Header text displaying the question of the poll -->
+    <string name="Poll__question">سؤال</string>
+    <!-- Text displaying how many votes, %1$d, an option has gotten -->
+    <plurals name="Poll__num_votes">
+        <item quantity="zero">%1$d أصوات</item>
+        <item quantity="one">%1$d صوت</item>
+        <item quantity="two">%1$d صوتين</item>
+        <item quantity="few">%1$d أصوات</item>
+        <item quantity="many">%1$d صوت</item>
+        <item quantity="other">%1$d صوت</item>
+    </plurals>
+    <!-- Content description to describe the icon that is shown next to the winning option when the poll ends -->
+    <string name="Poll__poll_winner">Winner</string>
+    <!-- Text that when pressed will end the poll   -->
+    <string name="Poll__end_poll">إنهاء الاستطلاع</string>
+    <!-- Button that once pressed will show all of the voters for a poll -->
+    <string name="Poll__see_all">مشاهدة الكل</string>
+    <!-- Dialog title when a poll fails to end -->
+    <string name="Poll__couldnt_end_poll">Couldn\'t end poll</string>
+    <!-- Dialog body when a poll fails to end and to try again -->
+    <string name="Poll__check_connection">Check your connection and try again.</string>
+    <!-- Header when creating a new poll -->
+    <string name="CreatePollFragment__new_poll">استطلاع جديد</string>
+    <!-- Section text to enter in a question for a poll  -->
+    <string name="CreatePollFragment__question">سؤال</string>
+    <!-- Hint text for question field when creating a poll  -->
+    <string name="CreatePollFragment__ask_a_question">اطرَح سؤالًا</string>
+    <!-- Section text to enter in options for a poll -->
+    <string name="CreatePollFragment__options">الخيارات</string>
+    <!-- Hint text for the option field, where %1$d is the option number (max 10) -->
+    <string name="CreatePollFragment__option_n">خيار %1$d</string>
+    <!-- Accessibility label for the polls drag and drop handle used to reorder the list. -->
+    <string name="CreatePollFragment__drag_handle">أداة التحكُّم بالسحب والإفلات</string>
+    <!-- Text next to button to allow the poll to allow for multiple votes -->
+    <string name="CreatePollFragment__allow_multiple_votes">السماح بالتصويت عدة مرّات</string>
+    <!-- Snackbar text to add a question and two options before creating a poll -->
+    <string name="CreatePollFragment__add_question_option">أضِف سؤالًا وخيارين على الأقل</string>
+    <!-- Snackbar text to add two options before creating a poll -->
+    <string name="CreatePollFragment__add_option">أضِف خيارين على الأقل</string>
+    <!-- Snackbar text to add a question before creating a poll -->
+    <string name="CreatePollFragment__add_question">أضِف سؤالًا</string>
+
+    <!-- CallQualityIssue -->
+    <!-- Label for general audio issue category -->
+    <string name="CallQualityIssue__audio_issue">Audio issue</string>
+    <!-- Label for general video issue category -->
+    <string name="CallQualityIssue__video_issue">Video issue</string>
+    <!-- Label for call dropped issue -->
+    <string name="CallQualityIssue__call_droppped">Call dropped</string>
+    <!-- Label for other/custom issues not covered by predefined categories -->
+    <string name="CallQualityIssue__something_else">Something else</string>
+    <!-- Label for audio stuttering/choppy audio issue -->
+    <string name="CallQualityIssue__audio_stuttering">Audio stuttering</string>
+    <!-- Label for audio cutting out/dropping issue -->
+    <string name="CallQualityIssue__audio_cut_out">Audio cut out</string>
+    <!-- Label for echo heard by the user -->
+    <string name="CallQualityIssue__i_heard_echo">I heard echo</string>
+    <!-- Label for echo heard by other call participants -->
+    <string name="CallQualityIssue__others_heard_echo">Others heard echo</string>
+    <!-- Label for poor video quality issue -->
+    <string name="CallQualityIssue__poor_video_quality">Poor video quality</string>
+    <!-- Label for low video resolution issue -->
+    <string name="CallQualityIssue__low_resolution">Low resolution</string>
+    <!-- Label for camera malfunction issue -->
+    <string name="CallQualityIssue__camera_did_not_work">Camera didn\'t work</string>
+
+    <!-- CallQualitySomethingElseScreen -->
+    <!-- Title for the "Something else" call quality issue screen -->
+    <string name="CallQualitySomethingElseScreen__title">Something else</string>
+    <!-- Label for text field where user describes their call quality issue -->
+    <string name="CallQualitySomethingElseScreen__describe_your_issue">Describe your issue</string>
+    <!-- Privacy notice explaining that issue details will be kept private and used to improve Signal calls -->
+    <string name="CallQualitySomethingElseScreen__privacy_notice">Please include any details relevant to the issue. Anything you share here will be kept private and will only be used to help improve calls in Signal.</string>
+    <!-- Button to save the call quality issue description -->
+    <string name="CallQualitySomethingElseScreen__save">Save</string>
+    <!-- Content description for the back navigation button -->
+    <string name="CallQualitySomethingElseScreen__back">Back</string>
+
+    <!-- CallQualitySheet -->
+    <!-- Title asking user how their call was -->
+    <string name="CallQualitySheet__how_was_your_call">How was your call?</string>
+    <!-- Subtitle explaining that feedback helps improve Signal and no PII is stored -->
+    <string name="CallQualitySheet__how_was_your_call_subtitle">This helps us improve calls in Signal. No personally identifiable information will be stored.</string>
+    <!-- Button label indicating the call had issues -->
+    <string name="CallQualitySheet__had_issues">Had issues</string>
+    <!-- Button label indicating the call was great -->
+    <string name="CallQualitySheet__great">Great</string>
+    <!-- Title asking what issues the user experienced -->
+    <string name="CallQualitySheet__what_issues_did_you_have">What issues did you have?</string>
+    <!-- Instruction to select all applicable issues -->
+    <string name="CallQualitySheet__select_all_that_apply">Select all that apply</string>
+    <!-- Placeholder text for describing a custom issue -->
+    <string name="CallQualitySheet__describe_your_issue">Describe your issue</string>
+    <!-- Button to continue to the next step -->
+    <string name="CallQualitySheet__continue">Continue</string>
+    <!-- Title asking user to help improve Signal -->
+    <string name="CallQualitySheet__help_us_improve">Help us improve</string>
+    <!-- First part of description explaining diagnostics help improve call quality -->
+    <string name="CallQualitySheet__help_us_improve_description_prefix">Sending us your diagnostics info helps us improve call quality. You can </string>
+    <!-- Link text to view debug log -->
+    <string name="CallQualitySheet__view_your_debug_log">view your debug log</string>
+    <!-- Last part of description about viewing debug log before submitting -->
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> before submitting</string>
+    <!-- Toggle label for sharing debug log -->
+    <string name="CallQualitySheet__share_debug_log">Share debug log</string>
+    <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
+    <string name="CallQualitySheet__debug_log_privacy_notice">Debug logs contain low level app information and do not reveal any of your message contents.</string>
+    <!-- Button to submit the call quality feedback -->
+    <string name="CallQualitySheet__submit">Submit</string>
+    <!-- Displayed as a snackbar after submitting feedback -->
+    <string name="CallQualitySheet__thanks_for_your_feedback">Thanks for your feedback!</string>
 
     <!-- EOF -->
 </resources>

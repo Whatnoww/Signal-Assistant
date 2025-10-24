@@ -109,11 +109,14 @@ import org.thoughtcrime.securesms.jobs.BackupRestoreMediaJob
 import org.thoughtcrime.securesms.jobs.CancelRestoreMediaJob
 import org.thoughtcrime.securesms.jobs.CreateReleaseChannelJob
 import org.thoughtcrime.securesms.jobs.LocalBackupJob
+import org.thoughtcrime.securesms.jobs.MultiDeviceKeysUpdateJob
 import org.thoughtcrime.securesms.jobs.RequestGroupV2InfoJob
 import org.thoughtcrime.securesms.jobs.ResetSvrGuessCountJob
 import org.thoughtcrime.securesms.jobs.RestoreOptimizedMediaJob
 import org.thoughtcrime.securesms.jobs.RetrieveProfileJob
 import org.thoughtcrime.securesms.jobs.StickerPackDownloadJob
+import org.thoughtcrime.securesms.jobs.StorageForcePushJob
+import org.thoughtcrime.securesms.jobs.Svr2MirrorJob
 import org.thoughtcrime.securesms.jobs.UploadAttachmentToArchiveJob
 import org.thoughtcrime.securesms.keyvalue.BackupValues.ArchiveServiceCredentials
 import org.thoughtcrime.securesms.keyvalue.KeyValueStore
@@ -174,6 +177,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.jvm.optionals.getOrNull
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -241,7 +245,20 @@ object BackupRepository {
     resetInitializedStateAndAuthCredentials()
     SignalStore.account.rotateAccountEntropyPool(stagedKeyRotations.aep)
     SignalStore.backup.mediaRootBackupKey = stagedKeyRotations.mediaRootBackupKey
+    refreshMasterKeyDependents()
     BackupMessagesJob.enqueue()
+  }
+
+  private fun refreshMasterKeyDependents() {
+    val jobs = buildList {
+      add(Svr2MirrorJob())
+      if (SignalStore.account.isMultiDevice) {
+        add(MultiDeviceKeysUpdateJob())
+      }
+      add(StorageForcePushJob())
+    }
+
+    AppDependencies.jobManager.addAll(jobs)
   }
 
   fun resetInitializedStateAndAuthCredentials() {
@@ -269,6 +286,19 @@ object BackupRepository {
     val messageBackupKey = SignalStore.backup.messageBackupKey
     val mediaRootBackupKey = SignalStore.backup.mediaRootBackupKey
     return SignalNetwork.archive.triggerBackupIdReservation(messageBackupKey, mediaRootBackupKey, SignalStore.account.requireAci())
+      .runIfSuccessful {
+        SignalStore.backup.messageCredentials.clearAll()
+        SignalStore.backup.mediaCredentials.clearAll()
+      }
+  }
+
+  @WorkerThread
+  fun triggerBackupIdReservationForRestore(): NetworkResult<Unit> {
+    val messageBackupKey = SignalStore.backup.messageBackupKey
+    return SignalNetwork.archive.triggerBackupIdReservation(messageBackupKey, null, SignalStore.account.requireAci())
+      .runIfSuccessful {
+        SignalStore.backup.messageCredentials.clearAll()
+      }
   }
 
   /**
@@ -534,7 +564,7 @@ object BackupRepository {
       return false
     }
 
-    return !SignalStore.backup.hasBackupBeenUploaded && SignalStore.backup.hasBackupFailure && System.currentTimeMillis().milliseconds > SignalStore.backup.nextBackupFailureSheetSnoozeTime
+    return (!SignalStore.backup.hasBackupBeenUploaded || SignalStore.backup.hasValidationError) && SignalStore.backup.hasBackupFailure && System.currentTimeMillis().milliseconds > SignalStore.backup.nextBackupFailureSheetSnoozeTime
   }
 
   /**
@@ -547,8 +577,38 @@ object BackupRepository {
     }
 
     val isRegistered = SignalStore.account.isRegistered && !TextSecurePreferences.isUnauthorizedReceived(AppDependencies.application)
+    if (!isRegistered) {
+      Log.d(TAG, "[shouldDisplayCouldNotCompleteBackupSheet] Not displaying sheet for unregistered user.")
+      return false
+    }
 
-    return SignalStore.backup.hasBackupBeenUploaded && System.currentTimeMillis().milliseconds > SignalStore.backup.nextBackupFailureSheetSnoozeTime && isRegistered
+    if (SignalStore.backup.lastBackupTime <= 0) {
+      Log.d(TAG, "[shouldDisplayCouldNotCompleteBackupSheet] Not displaying sheet as the last backup time is unset.")
+      return false
+    }
+
+    if (!SignalStore.backup.hasBackupBeenUploaded) {
+      Log.d(TAG, "[shouldDisplayCouldNotCompleteBackupSheet] Not displaying sheet as a backup has never been uploaded.")
+      return false
+    }
+
+    val now = System.currentTimeMillis().milliseconds
+    val lastBackupTime = SignalStore.backup.lastBackupTime.milliseconds
+    val nextSnoozeTime = SignalStore.backup.nextBackupFailureSnoozeTime
+
+    val isLastBackupTimeAtLeastAWeekAgo = now - 7.days > lastBackupTime
+    if (!isLastBackupTimeAtLeastAWeekAgo) {
+      Log.d(TAG, "[shouldDisplayCouldNotCompleteBackupSheet] Not displaying sheet as the last backup time is less than a week ago.")
+      return false
+    }
+
+    val isNextSnoozeTimeBeforeNow = nextSnoozeTime < now
+    if (!isNextSnoozeTimeBeforeNow) {
+      Log.d(TAG, "[shouldDisplayCouldNotCompleteBackupSheet] Not displaying sheet as the next snooze time is in the future.")
+      return false
+    }
+
+    return true
   }
 
   fun snoozeDownloadYourBackupData() {
@@ -1321,6 +1381,9 @@ object BackupRepository {
 
       stopwatch.split("frames")
 
+      Log.d(TAG, "[import] Remove duplicate messages...")
+      SignalDatabase.messages.removeDuplicatesPostBackupRestore()
+
       Log.d(TAG, "[import] Rebuilding FTS index...")
       SignalDatabase.messageSearch.rebuildIndex()
 
@@ -1772,11 +1835,23 @@ object BackupRepository {
         return RestoreTimestampResult.Success(SignalStore.backup.lastBackupTime)
       }
 
-      timestampResult is NetworkResult.StatusCodeError && (timestampResult.code == 401 || timestampResult.code == 404) -> {
+      timestampResult is NetworkResult.StatusCodeError && timestampResult.code == 404 -> {
         Log.i(TAG, "No backup file exists")
         SignalStore.backup.lastBackupTime = 0L
         SignalStore.backup.isBackupTimestampRestored = true
         return RestoreTimestampResult.NotFound
+      }
+
+      timestampResult is NetworkResult.StatusCodeError && timestampResult.code == 401 -> {
+        Log.i(TAG, "Backups not enabled")
+        SignalStore.backup.lastBackupTime = 0L
+        SignalStore.backup.isBackupTimestampRestored = true
+        return RestoreTimestampResult.BackupsNotEnabled
+      }
+
+      timestampResult is NetworkResult.ApplicationError && timestampResult.getCause() is VerificationFailedException -> {
+        Log.w(TAG, "Entered AEP fails zk verification", timestampResult.getCause())
+        return RestoreTimestampResult.VerificationFailure
       }
 
       else -> {
@@ -1786,11 +1861,40 @@ object BackupRepository {
     }
   }
 
-  fun verifyBackupKeyAssociatedWithAccount(aci: ACI, aep: AccountEntropyPool): MessageBackupTier? {
+  fun verifyBackupKeyAssociatedWithAccount(aci: ACI, aep: AccountEntropyPool): RestoreTimestampResult {
+    Log.i(TAG, "Verifying enter aep is associated with account")
+    var result: RestoreTimestampResult = getBackupTimestampToVerifyAepAssociatedWithAccountAndHasBackup(aci, aep)
+
+    if (result is RestoreTimestampResult.VerificationFailure) {
+      Log.w(TAG, "Resetting backup id reservation due to zk verification failure")
+      val triggerResult = SignalNetwork.archive.triggerBackupIdReservation(aep.deriveMessageBackupKey(), null, aci)
+      result = when {
+        triggerResult is NetworkResult.Success -> {
+          Log.i(TAG, "Reset successful, retrying aep verification")
+          SignalStore.backup.messageCredentials.clearAll()
+          getBackupTimestampToVerifyAepAssociatedWithAccountAndHasBackup(aci, aep)
+        }
+
+        triggerResult is NetworkResult.StatusCodeError && triggerResult.code == 429 -> {
+          Log.w(TAG, "Rate limited when resetting backup id, failing operation $triggerResult")
+          RestoreTimestampResult.RateLimited(triggerResult.retryAfter())
+        }
+
+        else -> {
+          Log.w(TAG, "Reset backup id failed, failing operation", triggerResult.getCause())
+          result
+        }
+      }
+    }
+
+    return result
+  }
+
+  private fun getBackupTimestampToVerifyAepAssociatedWithAccountAndHasBackup(aci: ACI, aep: AccountEntropyPool): RestoreTimestampResult {
     val currentTime = System.currentTimeMillis()
     val messageBackupKey = aep.deriveMessageBackupKey()
 
-    val result: NetworkResult<MessageBackupTier> = SignalNetwork.archive.getServiceCredentials(currentTime)
+    val result: NetworkResult<ZonedDateTime> = SignalNetwork.archive.getServiceCredentials(currentTime)
       .then { result ->
         val credential: ArchiveServiceCredential? = ArchiveServiceCredentials(result.messageCredentials.associateBy { it.redemptionTime }).getForCurrentTime(currentTime.milliseconds)
 
@@ -1805,20 +1909,41 @@ object BackupRepository {
           )
         }
       }
-      .map { messageAccess ->
-        val zkCredential = SignalNetwork.archive.getZkCredential(aci, messageAccess)
-        if (zkCredential.backupLevel == BackupLevel.PAID) {
-          MessageBackupTier.PAID
-        } else {
-          MessageBackupTier.FREE
-        }
+      .then { messageAccess ->
+        SignalNetwork.archive.getBackupInfo(SignalStore.account.requireAci(), messageAccess)
+          .then { info -> SignalNetwork.archive.getCdnReadCredentials(info.cdn ?: RemoteConfig.backupFallbackArchiveCdn, aci, messageAccess).map { it.headers to info } }
+          .then { pair ->
+            val (cdnCredentials, info) = pair
+            NetworkResult.fromFetch {
+              AppDependencies.signalServiceMessageReceiver.getCdnLastModifiedTime(info.cdn!!, cdnCredentials, "backups/${info.backupDir}/${info.backupName}")
+            }
+          }
       }
 
-    return if (result is NetworkResult.Success) {
-      result.result
-    } else {
-      Log.i(TAG, "Unable to verify backup key", result.getCause())
-      null
+    return when {
+      result is NetworkResult.Success -> {
+        RestoreTimestampResult.Success(result.result.toMillis())
+      }
+
+      result is NetworkResult.StatusCodeError && result.code == 404 -> {
+        Log.i(TAG, "No backup file exists")
+        RestoreTimestampResult.NotFound
+      }
+
+      result is NetworkResult.StatusCodeError && result.code == 401 -> {
+        Log.i(TAG, "Backups not enabled")
+        RestoreTimestampResult.BackupsNotEnabled
+      }
+
+      result is NetworkResult.ApplicationError && result.getCause() is VerificationFailedException -> {
+        Log.w(TAG, "Entered AEP fails zk verification", result.getCause())
+        RestoreTimestampResult.VerificationFailure
+      }
+
+      else -> {
+        Log.w(TAG, "Could not check for backup file.", result.getCause())
+        RestoreTimestampResult.Failure
+      }
     }
   }
 
@@ -1892,7 +2017,7 @@ object BackupRepository {
   suspend fun getPaidType(): NetworkResult<MessageBackupsType.Paid> {
     val productPrice: FiatMoney? = if (SignalStore.backup.backupTierInternalOverride == MessageBackupTier.PAID) {
       Log.d(TAG, "Accessing price via mock subscription.")
-      RecurringInAppPaymentRepository.getActiveSubscriptionSync(InAppPaymentSubscriberRecord.Type.BACKUP).getOrNull()?.activeSubscription?.let {
+      RecurringInAppPaymentRepository.getActiveSubscriptionSync(InAppPaymentSubscriberRecord.Type.BACKUP).successOrNull()?.activeSubscription?.let {
         FiatMoney.fromSignalNetworkAmount(it.amount, Currency.getInstance(it.currency))
       }
     } else if (AppDependencies.billingApi.getApiAvailability().isSuccess) {
@@ -1947,7 +2072,11 @@ object BackupRepository {
 
       return SignalNetwork.archive
         .triggerBackupIdReservation(messageBackupKey, mediaRootBackupKey, SignalStore.account.requireAci())
-        .then { getArchiveServiceAccessPair() }
+        .then {
+          SignalStore.backup.messageCredentials.clearAll()
+          SignalStore.backup.mediaCredentials.clearAll()
+          getArchiveServiceAccessPair()
+        }
         .then { credential -> SignalNetwork.archive.setPublicKey(SignalStore.account.requireAci(), credential.messageBackupAccess).map { credential } }
         .then { credential -> SignalNetwork.archive.setPublicKey(SignalStore.account.requireAci(), credential.mediaBackupAccess).map { credential } }
         .runIfSuccessful { SignalStore.backup.backupsInitialized = true }
@@ -2099,20 +2228,24 @@ object BackupRepository {
         SignalStore.backup.nextBackupSecretData = result.data.nextBackupSecretData
         result.data.forwardSecrecyToken
       }
+
       is SvrBApi.RestoreResult.NetworkError -> {
         Log.w(TAG, "[remoteRestore] Network error during SVRB.", result.exception)
         return RemoteRestoreResult.NetworkError
       }
+
       is SvrBApi.RestoreResult.RestoreFailedError,
       SvrBApi.RestoreResult.InvalidDataError -> {
         Log.w(TAG, "[remoteRestore] Permanent SVRB error! $result")
         return RemoteRestoreResult.PermanentSvrBFailure
       }
+
       SvrBApi.RestoreResult.DataMissingError,
       is SvrBApi.RestoreResult.SvrError -> {
         Log.w(TAG, "[remoteRestore] Failed to fetch SVRB data: $result")
         return RemoteRestoreResult.Failure
       }
+
       is SvrBApi.RestoreResult.UnknownError -> {
         Log.e(TAG, "[remoteRestore] Unknown SVRB result! Crashing.", result.throwable)
         throw result.throwable
@@ -2337,6 +2470,9 @@ sealed interface RemoteRestoreResult {
 sealed interface RestoreTimestampResult {
   data class Success(val timestamp: Long) : RestoreTimestampResult
   data object NotFound : RestoreTimestampResult
+  data object BackupsNotEnabled : RestoreTimestampResult
+  data object VerificationFailure : RestoreTimestampResult
+  data class RateLimited(val retryAfter: Duration?) : RestoreTimestampResult
   data object Failure : RestoreTimestampResult
 }
 

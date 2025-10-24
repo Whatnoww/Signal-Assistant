@@ -88,6 +88,8 @@
     <string name="AttachmentKeyboard_file">Archivo</string>
     <string name="AttachmentKeyboard_contact">Contacto</string>
     <string name="AttachmentKeyboard_location">Ubicación</string>
+    <!-- Text for a button that will allow users to create a poll -->
+    <string name="AttachmentKeyboard_poll">Encuesta</string>
     <string name="AttachmentKeyboard_Signal_needs_permission_to_show_your_photos_and_videos">Signal necesita permiso para mostrar tus fotos y vídeos</string>
     <!-- Text for a button prompting users to allow Signal access to their gallery storage -->
     <string name="AttachmentKeyboard_allow_access">Permitir acceso</string>
@@ -348,7 +350,7 @@
     <string name="CommunicationActions_cancel">Cancelar</string>
     <string name="CommunicationActions_call">Llamar</string>
     <string name="CommunicationActions_insecure_call">Llamada no segura</string>
-    <string name="CommunicationActions_carrier_charges_may_apply">Es posible que se apliquen cargos del operador móvil. El número al que llamas no está registrado en Signal. Esta llamada se realizará por la red de tu operador móvil, no por Internet.</string>
+    <string name="CommunicationActions_carrier_charges_may_apply">Es posible que se apliquen cargos del operador móvil. El número al que llamas no está registrado en Signal. Esta llamada se hará por la red de tu operador móvil, no por Internet.</string>
     <string name="CommunicationActions_cant_join_call">No es posible unirse a la llamada</string>
     <string name="CommunicationActions_this_call_link_is_no_longer_valid">Este enlace de llamada ya no es válido.</string>
     <!-- Title on dialog when call link url cannot be parsed -->
@@ -468,7 +470,7 @@
     <string name="ConversationActivity_invalid_recipient">Destinatario no válido</string>
     <string name="ConversationActivity_added_to_home_screen">Se ha añadido a la pantalla de inicio</string>
     <string name="ConversationActivity_calls_not_supported">Llamadas no disponibles</string>
-    <string name="ConversationActivity_this_device_does_not_appear_to_support_dial_actions">Este dispositivo no es compatible con la función de realizar llamadas.</string>
+    <string name="ConversationActivity_this_device_does_not_appear_to_support_dial_actions">Este dispositivo no es compatible con la función de hacer llamadas.</string>
     <string name="ConversationActivity_transport_insecure_sms">SMS no seguro</string>
     <!-- A title for the option to send an SMS with a placeholder to put the name of their SIM card -->
     <string name="ConversationActivity_transport_insecure_sms_with_sim">SMS no seguro (%1$s)</string>
@@ -862,7 +864,7 @@
     <!-- Bottom sheet title -->
     <string name="CreateBackupBottomSheet__you_are_all_set">¡Todo listo! Ya puedes iniciar tu copia de seguridad.</string>
     <!-- Bottom sheet paid message -->
-    <string name="CreateBackupBottomSheet__depending_on_the_size">Dependiendo del tamaño de tu copia de seguridad, este proceso puede llevar bastante tiempo. Mientras se realiza la copia de seguridad, podrás seguir usando tu teléfono como de costumbre.</string>
+    <string name="CreateBackupBottomSheet__depending_on_the_size">Dependiendo del tamaño de tu copia de seguridad, este proceso puede llevar bastante tiempo. Mientras se genera la copia de seguridad, podrás seguir usando tu teléfono como de costumbre.</string>
     <!-- Bottom sheet free message -->
     <string name="CreateBackupBottomSheet__free_tier">Los archivos multimedia se guardan en tu copia de seguridad a medida que envías y recibes mensajes.</string>
 
@@ -1491,6 +1493,10 @@
     <string name="RemoteRestoreActivity__not_now">Ahora no</string>
     <!-- Text shown on restore screen as information on what will happen if you skip -->
     <string name="RemoteRestoreActivity__your_media_will_restore_in_the_background">Tus archivos multimedia se restaurarán en segundo plano. Si decides no restaurarlos ahora, no podrás hacerlo más tarde.</string>
+    <!-- Dialog title -->
+    <string name="RestoreActivity__no_longer_registered_title">Este dispositivo ya no está registrado</string>
+    <!-- Dialog message -->
+    <string name="RestoreActivity__no_longer_registered_message">Probablemente se deba a que has registrado tu cuenta de Signal en un dispositivo diferente.</string>
 
     <!-- GroupMentionSettingDialog -->
     <string name="GroupMentionSettingDialog_notify_me_for_mentions">Notificarme cuando alguien me mencione</string>
@@ -2107,6 +2113,8 @@
     <string name="MessageRecord_you_unblocked_this_group">Has desbloqueado este grupo</string>
     <!-- Update message shown when you receive a message that cannot be processed because your Signal version is too old. %1$s is the sender\'s name -->
     <string name="MessageRecord_unsupported_feature">%1$s te ha enviado un mensaje que no se puede procesar ni mostrar porque usa una función nueva de Signal.</string>
+    <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
+    <string name="MessageRecord_ended_the_poll">%1$s ha finalizado la encuesta \"%2$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Aceptar</string>
@@ -2914,6 +2922,8 @@
     <string name="SubmitDebugLogActivity_success">¡Todo listo!</string>
     <string name="SubmitDebugLogActivity_copy_this_url_and_add_it_to_your_issue">Copia esta URL y envíala junto con tu informe de incidencia o correo al equipo de asistencia:\n\n<b>%1$s</b></string>
     <string name="SubmitDebugLogActivity_share">Compartir</string>
+    <!-- Displayed when entering activity in view-only mode -->
+    <string name="SubmitDebugLogActivity_close">Close</string>
     <string name="SubmitDebugLogActivity_this_log_will_be_posted_publicly_online_for_contributors">Este registro se publicará online y las personas que colaboran con nosotros tendrán acceso. Lo puedes examinar antes de enviarlo.</string>
     <!-- Banner message shown while submitting debug log -->
     <string name="SubmitDebugLogActivity_your_log_will_be_posted_online">Si seleccionas Enviar, tu registro se publicará durante 30 días en una URL única y privada. Lo podrás guardar en tu dispositivo como primera opción.</string>
@@ -3172,6 +3182,8 @@
     <string name="MessageNotifier_reacted_s_to_your_payment">Ha reaccionado con %1$s a tu pago.</string>
     <string name="MessageNotifier_reacted_s_to_your_sticker">Ha reaccionado con %1$s a tu sticker.</string>
     <string name="MessageNotifier_this_message_was_deleted">Se ha eliminado este mensaje.</string>
+    <!-- Body of a notification when someone votes in a poll. First placeholder is the poll emoji, second placeholder is the name of the voter and third is the poll question -->
+    <string name="MessageNotifier_s_voted_in_poll">%1$s %2$s ha votado en la encuesta \"%3$s\"</string>
 
     <string name="TurnOffContactJoinedNotificationsActivity__turn_off_contact_joined_signal">¿Desactivar las notificaciones de cuando alguien comience a usar Signal? Puedes volver a activarlas en Signal &gt; Ajustes &gt; Notificaciones.</string>
 
@@ -3856,7 +3868,7 @@
     <string name="arrays__mute_for_one_hour">1 hora</string>
     <string name="arrays__mute_for_eight_hours">8 horas</string>
     <string name="arrays__mute_for_one_day">1 día</string>
-    <string name="arrays__mute_for_seven_days">7 días</string>
+    <string name="arrays__mute_for_seven_days">1 semana</string>
     <string name="arrays__always">Siempre</string>
 
     <string name="arrays__settings_default">Ajustes predeterminados</string>
@@ -4417,6 +4429,8 @@
     <string name="conversation_selection__menu_multi_select">Seleccionar</string>
     <!-- Button to view a in-chat payment message\'s full payment details; Action item with hyphenation. Translation can use soft hyphen - Unicode U+00AD  -->
     <string name="conversation_selection__menu_payment_details">Detalles de pago</string>
+    <!-- Button to end a poll -->
+    <string name="conversation_selection__menu_end_poll">Finalizar encuesta</string>
 
     <!-- conversation_expiring_on -->
 
@@ -4848,7 +4862,7 @@
     <string name="Recipient_deleted_account">Cuenta eliminada</string>
 
     <!-- Option in settings that will take use to re-register if they are no longer registered -->
-    <string name="preferences_account_reregister">Volver a registrar tu cuenta</string>
+    <string name="preferences_account_reregister">Volver a registrar cuenta</string>
     <!-- Option in settings that will take user to our website or playstore to update their expired build -->
     <string name="preferences_account_update_signal">Actualizar Signal</string>
     <!-- Option in settings shown when user is no longer registered or expired client that will WIPE ALL THEIR DATA -->
@@ -4958,8 +4972,8 @@
     <string name="DeviceTransfer__try_again">Reintentar</string>
     <string name="DeviceTransfer__stop_transfer">Detener transferencia</string>
     <string name="DeviceTransfer__all_transfer_progress_will_be_lost">Se perderá todo el progreso de la transferencia.</string>
-    <string name="DeviceTransfer__transfer_failed">No se ha podido realizar la transferencia</string>
-    <string name="DeviceTransfer__unable_to_transfer">No se puede realizar la transferencia</string>
+    <string name="DeviceTransfer__transfer_failed">No se ha podido completar la transferencia</string>
+    <string name="DeviceTransfer__unable_to_transfer">No se puede completar la transferencia</string>
 
     <!-- OldDeviceTransferInstructionsFragment -->
     <string name="OldDeviceTransferInstructions__transfer_account">Transferir cuenta</string>
@@ -4971,7 +4985,7 @@
     <string name="OldDeviceTransferInstructions__select_transfer_from_android_device_when_prompted_and_then_continue">"Selecciona \"Transferir desde dispositivo Android\" y luego \"Continuar\". Mantén ambos dispositivos cerca."</string>
     <string name="OldDeviceTransferInstructions__continue">Continuar</string>
     <!-- Title for exit device transfer confirmation dialog -->
-    <string name="OldDeviceTransferInstructions__confirm_exit_title">¿Detener la transferencia de dispositivos?</string>
+    <string name="OldDeviceTransferInstructions__confirm_exit_title">¿Detener la transferencia entre dispositivos?</string>
     <!-- Message for exit device transfer confirmation dialog -->
     <string name="OldDeviceTransferInstructions__confirm_exit_message">No se han transferido datos a tu nuevo dispositivo.</string>
     <!-- Confirm button for exit device transfer confirmation dialog -->
@@ -4985,7 +4999,7 @@
     <string name="OldDeviceTransferComplete__close">Cerrar</string>
 
     <!-- NewDeviceTransferComplete -->
-    <string name="NewDeviceTransferComplete__transfer_successful">Transferencia realizada correctamente</string>
+    <string name="NewDeviceTransferComplete__transfer_successful">Transferencia completada correctamente</string>
     <string name="NewDeviceTransferComplete__transfer_complete">Transferencia completada</string>
     <string name="NewDeviceTransferComplete__to_complete_the_transfer_process_you_must_continue_registration">Para completar la transferencia, debes continuar con el proceso de registro.</string>
     <string name="NewDeviceTransferComplete__continue_registration">Continuar con el registro</string>
@@ -5074,13 +5088,13 @@
     <string name="ReviewCardDialogFragment__review_request">Revisar solicitud</string>
     <!-- Message of a screen where the user will be prompted to review a message request matching the name of someone they already know -->
     <plurals name="ReviewCardDialogFragment__d_group_members_have_the_same_name">
-        <item quantity="one">%1$d participante del grupo tiene el mismo nombre. Revisa la siguiente lista de participantes y selecciona la opción que desees.</item>
-        <item quantity="other">%1$d participantes del grupo tienen el mismo nombre. Revisa la siguiente lista de participantes y selecciona la opción que desees.</item>
+        <item quantity="one">%1$d participante del grupo tiene el mismo nombre. Revisa la siguiente lista de participantes y selecciona la opción que quieras.</item>
+        <item quantity="other">%1$d participantes del grupo tienen el mismo nombre. Revisa la siguiente lista de participantes y selecciona la opción que quieras.</item>
     </plurals>
     <!-- Message of a screen where the user will be prompted to review a message request matching the name of someone they already know -->
     <plurals name="ReviewCardDialogFragment__if_youre_not_sure">
-        <item quantity="one">Si no sabes quién ha enviado esta solicitud, revisa el siguiente contacto y selecciona la opción que desees.</item>
-        <item quantity="other">Si no sabes quién ha enviado esta solicitud, revisa la siguiente lista de contactos y selecciona la opción que desees.</item>
+        <item quantity="one">Si no sabes quién ha enviado esta solicitud, revisa el siguiente contacto y selecciona la opción que quieras.</item>
+        <item quantity="other">Si no sabes quién ha enviado esta solicitud, revisa la siguiente lista de contactos y selecciona la opción que quieras.</item>
     </plurals>
     <string name="ReviewCardDialogFragment__no_other_groups_in_common">No tienes otros grupos en común.</string>
     <string name="ReviewCardDialogFragment__no_groups_in_common">No tienes grupos en común.</string>
@@ -5169,10 +5183,19 @@
 
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Omitir</string>
+
     <plurals name="CreateGroupActivity__d_members">
         <item quantity="one">%1$d participante</item>
         <item quantity="other">%1$d participantes</item>
     </plurals>
+
+    <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
+    <plurals name="CreateGroupActivity__s_members">
+        <item quantity="one">%1$s member</item>
+        <item quantity="other">%1$s members</item>
+    </plurals>
+    <!-- Accessibility label for navigating to the next screen in the create group flow. -->
+    <string name="CreateGroupActivity__accessibility_next">Next</string>
 
     <!-- ShareActivity -->
     <string name="ShareActivity__share">Compartir</string>
@@ -5544,7 +5567,7 @@
     <!-- Option in context menu to edit the folder -->
     <string name="ChatFoldersFragment__edit_folder">Editar carpeta</string>
     <!-- Option in context menu to mute all chats in the folder -->
-    <string name="ChatFoldersFragment__mute_all">Silenciar todos</string>
+    <string name="ChatFoldersFragment__mute_all">Silenciar notificaciones</string>
     <!-- Option in context menu to unmute all chats in the folder -->
     <string name="ChatFoldersFragment__unmute_all">Reactivar notificaciones</string>
     <!-- Option in context menu to mark all of the chats in a folder as read -->
@@ -5855,7 +5878,7 @@
     <string name="SoundsAndNotificationsSettingsFragment__mute_notifications">Silenciar notificaciones</string>
     <string name="SoundsAndNotificationsSettingsFragment__not_muted">No silenciado</string>
     <string name="SoundsAndNotificationsSettingsFragment__mentions">Menciones</string>
-    <string name="SoundsAndNotificationsSettingsFragment__always_notify">Notificar siempre</string>
+    <string name="SoundsAndNotificationsSettingsFragment__always_notify">Notificarme siempre</string>
     <!-- Dialog option to not send notifications if mentioned when the conversation is muted -->
     <string name="SoundsAndNotificationsSettingsFragment__do_not_notify">No notificar</string>
     <string name="SoundsAndNotificationsSettingsFragment__custom_notifications">Notificaciones personalizadas</string>
@@ -5894,24 +5917,18 @@
     <string name="NewConversationActivity__s_has_been_blocked">Se ha bloqueado a %1$s</string>
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">No se ha podido bloquear</string>
-    <!-- Dialog title when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__unable_to_remove_s">No se ha podido eliminar a %1$s</string>
-    <!-- Dialog message when remove target contact is in system contacts -->
-    <string name="NewConversationActivity__this_person_is_saved_to_your">Esta persona está guardada en los contactos de tu dispositivo. Elimínala de tus contactos y vuelve a intentarlo.</string>
-    <!-- Dialog action to view contact when they can\'t be removed otherwise -->
-    <string name="NewConversationActivity__view_contact">Ver contacto</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
     <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s no usa Signal</string>
-    <!-- Error message shown when we could not get a user from the username link -->
-    <string name="NewConversationActivity__">%1$s no usa Signal</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="NewConversationActivity__accessibility_open_top_bar_menu">Open menu</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
     <plurals name="CreateGroupActivity_not_signal_users">
         <item quantity="one">%1$s no usa Signal</item>
         <item quantity="other">%1$s no usan Signal</item>
     </plurals>
 
-    <!-- ContactFilterView -->
-    <string name="ContactFilterView__search_name_or_number">Buscar por nombre o número</string>
+    <!-- Hint text that shows in the recipient search box when no text is entered yet. -->
+    <string name="ContactFilterView__search_name_or_number">Nombre, alias o número</string>
 
     <!-- VoiceNotePlayerView -->
     <string name="VoiceNotePlayerView__dot_s">· %1$s</string>
@@ -6191,7 +6208,7 @@
     <!-- Message of dialog telling user they need to re-register signal as it is no longer registered -->
     <string name="ReregisterSignalDialog__message">Este dispositivo ya no está registrado. Vuelve a registrarte para seguir usando Signal en este dispositivo.</string>
     <!-- Button text of re-registration dialog to re-register the device.  -->
-    <string name="ReregisterSignalDialog__reregister_action">Volver a registrarme</string>
+    <string name="ReregisterSignalDialog__reregister_action">Volver a registrar</string>
     <!-- Button text of re-registration dialog to cancel the dialog.  -->
     <string name="ReregisterSignalDialog__cancel_action">Cancelar</string>
 
@@ -6267,7 +6284,7 @@
     <!-- Displayed when badge credential couldn\'t be verified -->
     <string name="DonationsErrors__could_not_validate">No se ha podido validar la respuesta del servidor. Contacta con el equipo de asistencia.</string>
     <!-- Displayed as title when some generic error happens during sending donation on behalf of another user -->
-    <string name="DonationsErrors__donation_failed">No se ha podido realizar la donación</string>
+    <string name="DonationsErrors__donation_failed">No se ha podido hacer la donación</string>
     <!-- Displayed as message when some generic error happens during sending donation on behalf of another user -->
     <string name="DonationsErrors__your_payment_was_processed_but">Tu donación se ha procesado, pero Signal no ha podido enviar tu mensaje de donación. Contacta con el equipo de asistencia.</string>
     <string name="DonationsErrors__your_badge_could_not">No se ha podido añadir la insignia a tu perfil, pero es posible que se haya realizado el cargo. Contacta con el equipo de asistencia.</string>
@@ -6382,11 +6399,11 @@
     <!-- Preset selectable name for a profile name, shown as list in edit/create screen -->
     <string name="EditNotificationProfileFragment__sleep">Durmiendo</string>
     <!-- Preset selectable name for a profile name, shown as list in edit/create screen -->
-    <string name="EditNotificationProfileFragment__driving">Conduciendo</string>
+    <string name="EditNotificationProfileFragment__driving">Al volante</string>
     <!-- Preset selectable name for a profile name, shown as list in edit/create screen -->
-    <string name="EditNotificationProfileFragment__downtime">Descansando</string>
+    <string name="EditNotificationProfileFragment__downtime">Desconexión</string>
     <!-- Preset selectable name for a profile name, shown as list in edit/create screen -->
-    <string name="EditNotificationProfileFragment__focus">Concentración</string>
+    <string name="EditNotificationProfileFragment__focus">No molestar</string>
     <!-- Error message shown when attempting to next/save without a profile name -->
     <string name="EditNotificationProfileFragment__profile_must_have_a_name">El nombre es obligatorio</string>
 
@@ -6413,7 +6430,7 @@
     <!-- Button that starts the create new notification profile flow -->
     <string name="NotificationProfilesFragment__new_profile">Nuevo perfil</string>
     <!-- Profile active status, indicating the current profile is on for an unknown amount of time -->
-    <string name="NotificationProfilesFragment__on">Activo</string>
+    <string name="NotificationProfilesFragment__on">Activado</string>
 
     <!-- Button use to permanently delete a notification profile -->
     <string name="NotificationProfileDetails__delete_profile">Eliminar perfil</string>
@@ -6430,9 +6447,9 @@
     <!-- Schedule description if all days are selected -->
     <string name="NotificationProfileDetails__everyday">Todos los días</string>
     <!-- Profile status on if it is the active profile -->
-    <string name="NotificationProfileDetails__on">Activo</string>
+    <string name="NotificationProfileDetails__on">Activado</string>
     <!-- Profile status on if it is not the active profile -->
-    <string name="NotificationProfileDetails__off">Inactivo</string>
+    <string name="NotificationProfileDetails__off">Desactivado</string>
     <!-- Description of hours for schedule (start to end) times -->
     <string name="NotificationProfileDetails__s_to_s">de %1$s a %2$s</string>
     <!-- Section header for exceptions to the notification profile -->
@@ -6503,7 +6520,7 @@
     <!-- Option to view profile details -->
     <string name="NotificationProfileSelection__view_settings">Ver ajustes</string>
     <!-- Descriptor text indicating how long a profile will be on when there is a time component associated with it -->
-    <string name="NotificationProfileSelection__on_until_s">Activo hasta %1$s</string>
+    <string name="NotificationProfileSelection__on_until_s">Activado hasta %1$s</string>
 
     <!-- Displayed in a toast when we fail to open the ringtone picker -->
     <string name="NotificationSettingsFragment__failed_to_open_picker">No se ha podido abrir el selector.</string>
@@ -7158,11 +7175,11 @@
     <!-- Dialog body when a user tries to donate while they already have a pending monthly donation. -->
     <string name="DonateToSignalFragment__bank_transfers_usually_take_1_business_day_to_process_monthly">Las transferencias bancarias pueden tardar entre 1 y 14 días hábiles en procesarse. Espera hasta que se complete este pago antes de actualizar tu suscripción.</string>
     <!-- Dialog body when a user tries to donate while they already have a pending one time donation. -->
-    <string name="DonateToSignalFragment__bank_transfers_usually_take_1_business_day_to_process_onetime">Las transferencias bancarias pueden tardar entre 1 y 14 días hábiles en procesarse. Espera hasta que se complete este pago antes de realizar otra donación.</string>
+    <string name="DonateToSignalFragment__bank_transfers_usually_take_1_business_day_to_process_onetime">Las transferencias bancarias pueden tardar entre 1 y 14 días hábiles en procesarse. Espera hasta que se complete este pago antes de hacer otra donación.</string>
     <!-- Dialog body when a user tries to donate while they already have a pending monthly donation. -->
     <string name="DonateToSignalFragment__your_payment_is_still_being_processed_monthly">Tu donación aún se está procesando. Puede llevar unos minutos dependiendo de tu conexión. Espera hasta que se complete este pago antes de actualizar tu suscripción.</string>
     <!-- Dialog body when a user tries to donate while they already have a pending one time donation. -->
-    <string name="DonateToSignalFragment__your_payment_is_still_being_processed_onetime">Tu donación aún se está procesando. Puede llevar unos minutos dependiendo de tu conexión. Espera hasta que se complete este pago antes de realizar otra donación.</string>
+    <string name="DonateToSignalFragment__your_payment_is_still_being_processed_onetime">Tu donación aún se está procesando. Puede llevar unos minutos dependiendo de tu conexión. Espera hasta que se complete este pago antes de hacer otra donación.</string>
     <!-- Dialog body when a user opens the manage donations main screen and they have a pending iDEAL donation -->
     <string name="DonateToSignalFragment__your_ideal_payment_is_still_processing">Tu donación a través de iDEAL aún se está procesando. Consulta la aplicación de tu banco para aprobar el pago antes de hacer otra donación.</string>
     <!-- Dialog title shown when a user tries to donate an amount higher than is allowed for a given payment method. -->
@@ -7374,7 +7391,7 @@
     <!-- Displayed as a description on a megaphone which prompts user to set up a username -->
     <string name="SetUpYourUsername__introducing_phone_number_privacy">Protege la privacidad de tu número de teléfono, elige un alias opcional y descubre los enlaces de Signal.</string>
     <!-- Displayed as an action on a megaphone which prompts user to set up a username -->
-    <string name="SetUpYourUsername__dismiss">Ignorar</string>
+    <string name="SetUpYourUsername__dismiss">Cerrar</string>
     <!-- Displayed as an action on a megaphone which prompts user to set up a username -->
     <string name="SetUpYourUsername__learn_more">Más información</string>
 
@@ -7383,7 +7400,7 @@
     <!-- Displayed as a description on a megaphone which prompts user to set up a username -->
     <string name="PnpLaunchMegaphone_body">Protege la privacidad de tu número de teléfono, elige un alias opcional y descubre los enlaces de Signal.</string>
     <!-- Displayed as an action on a megaphone which prompts user to set up a username. Clicking it will dismiss the megaphone. -->
-    <string name="PnpLaunchMegaphone_dismiss">Ignorar</string>
+    <string name="PnpLaunchMegaphone_dismiss">Cerrar</string>
     <!-- Displayed as an action on a megaphone which prompts user to set up a username. Clicking it will open a link. -->
     <string name="PnpLaunchMegaphone_learn_more">Más información</string>
 
@@ -8049,7 +8066,7 @@
     <!-- Dialog title when Google Play services are currently updating -->
     <string name="GooglePlayServicesAvailability__service_updating_title">Los servicios de Google Play se están actualizando</string>
     <!-- Dialog message asking user to wait while Google Play services finish updating -->
-    <string name="GooglePlayServicesAvailability__service_updating_message">Para suscribirte a las Copias Seguras de Signal, espera a que los servicios de Google Play terminen de actualizarse.</string>
+    <string name="GooglePlayServicesAvailability__service_updating_message">Para suscribirte a las Copias Seguras de Signal, espera a que se terminen de actualizar los servicios de Google Play.</string>
     <!-- Dialog title when Google Play services need to be updated -->
     <string name="GooglePlayServicesAvailability__service_update_required_title">Actualiza los servicios de Google Play</string>
     <!-- Dialog message explaining that Google Play services need to be updated for Signal Secure backups -->
@@ -8282,7 +8299,7 @@
     <!-- Dialog title for dialog which alerts user their optimized media will be downloaded -->
     <string name="RemoteBackupsSettingsFragment__downloading_your_backup">Descargando tu copia de seguridad</string>
     <!-- Dialog message for dialog which alerts user their optimized media will be downloaded -->
-    <string name="RemoteBackupsSettingsFragment__depending_on_the_size">Dependiendo del tamaño de tu copia de seguridad, este proceso puede llevar bastante tiempo. Mientras se realiza la descarga, podrás seguir usando tu teléfono como de costumbre.</string>
+    <string name="RemoteBackupsSettingsFragment__depending_on_the_size">Dependiendo del tamaño de tu copia de seguridad, este proceso puede llevar bastante tiempo. Mientras se completa la descarga, podrás seguir usando tu teléfono como de costumbre.</string>
     <!-- Displayed in card when user has backups enabled but there is otherwise no subscription available. This can happen for example after a device transfer. -->
     <string name="RemoteBackupsSettingsFragment__your_subscription_was_not_found">No se ha encontrado tu suscripción en este dispositivo. Renuévala para seguir usando Copias Seguras de Signal.</string>
     <!-- Displayed in card when user has a signal subscription but the device doesn\'t see a google play billing subscription. Placeholder is days until subscription expiration. -->
@@ -8413,13 +8430,15 @@
 
     <!-- MessageBackupsKeyEducationScreen -->
     <!-- Screen headline -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Tu clave de recuperación</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key">Recovery key</string>
     <!-- Screen body part 1 -->
-    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Tu clave de recuperación es un código de 64 caracteres que te permite restaurar tu copia de seguridad cuando vuelves a instalar Signal.</string>
+    <string name="MessageBackupsKeyEducationScreen__your_backup_key_is_a">Your recovery key is a 64-character code that you will need to restore your backup.</string>
     <!-- Screen body part 2 -->
-    <string name="MessageBackupsKeyEducationScreen__if_you_forget_your_key">Si olvidas tu clave, no podrás restaurar tu copia de seguridad. Signal no puede ayudarte a recuperar tu copia de seguridad.</string>
+    <string name="MessageBackupsKeyEducationScreen__store_your_recovery">Store your recovery key somewhere safe like a secure password manager, and don’t share it with anyone.</string>
+    <!-- Screen body part 3 -->
+    <string name="MessageBackupsKeyEducationScreen__if_you_lose_it">If you lose it, you won’t be able to recover your messages.</string>
     <!-- Action button label -->
-    <string name="MessageBackupsKeyEducationScreen__next">Siguiente</string>
+    <string name="MessageBackupsKeyEducationScreen__view_recovery_key">View recovery key</string>
 
     <!-- MessageBackupsKeyRecordScreen -->
     <!-- Screen headline -->
@@ -8534,9 +8553,9 @@
         <item quantity="other">Mensajes de texto + %1$d días de archivos multimedia</item>
     </plurals>
     <!-- Description text for text history feature -->
-    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">Copia de seguridad de todos los mensajes de texto</string>
+    <string name="MessageBackupsTypeSelectionScreen__full_text_message_backup">Copia de seguridad de todos tus mensajes de texto</string>
     <!-- Description text for paid tier media retention -->
-    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">Copia de seguridad de todos los archivos multimedia</string>
+    <string name="MessageBackupsTypeSelectionScreen__full_media_backup">Copia de seguridad de todos tus archivos multimedia</string>
     <!-- Description text for storage space for paid tier media. Placeholder 1 is for byte amount, placeholder 2 is for a photo count estimate -->
     <string name="MessageBackupsTypeSelectionScreen__s_of_storage_s_photos">%1$s de espacio de almacenamiento (%2$s fotos)</string>
     <!-- Description text for thanks -->
@@ -8551,7 +8570,7 @@
     <!-- Dialog title when user can\'t upgrade plan due to missing Google Services -->
     <string name="MessageBackupsTypeSelectionScreen__cant_upgrade_plan">No se puede actualizar el plan</string>
     <!-- Dialog body text explaining Google Services requirement for backup subscription -->
-    <string name="MessageBackupsTypeSelectionScreen__to_subscribe_to_signal_secure_backups">Para suscribirte a las Copias Seguras de Signal, debes tener habilitados los servicios de Google en tu teléfono e iniciar sesión en Google Play Store.</string>
+    <string name="MessageBackupsTypeSelectionScreen__to_subscribe_to_signal_secure_backups">Para suscribirte a las Copias Seguras de Signal, debes tener habilitados los servicios de Google Play en tu teléfono e iniciar sesión en Google Play Store.</string>
 
     <!-- ConfirmBackupCancellationDialog -->
     <!-- Dialog title -->
@@ -8596,6 +8615,12 @@
     <string name="SelectRestoreMethodFragment__from_your_old_phone">Desde tu teléfono anterior</string>
     <!-- Option subtitle for restoring via device transfer -->
     <string name="SelectRestoreMethodFragment__transfer_directly_from_old">Transfiere tu cuenta desde tu Android anterior</string>
+    <!-- Dialog title shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_title">¿Omitir restauración?</string>
+    <!-- Dialog message shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore_warning">Si omites la restauración ahora, no podrás hacerlo más tarde. Si vuelves a habilitar las copias de seguridad después de omitir la restauración, tu copia de seguridad actual se reemplazará por tu nuevo historial de mensajes.</string>
+    <!-- Dialog confirm text shown as a warning when skipping restore during registration -->
+    <string name="SelectRestoreMethodFragment__skip_restore">Omitir restauración</string>
 
     <!-- Screen title for restore via local backup -->
     <string name="RestoreLocalBackup_title">Restaurar copia de seguridad local</string>
@@ -8621,7 +8646,7 @@
     <!-- Dialog title shown when entered AEP doesn\'t work to register with provided e164 -->
     <string name="EnterBackupKey_incorrect_backup_key_title">Clave de recuperación incorrecta</string>
     <!-- Dialog message shown when entered AEP doesn\'t work to register with provided e164 -->
-    <string name="EnterBackupKey_incorrect_backup_key_message">Asegúrate de registrarte con el mismo número de teléfono y la misma clave de recuperación de 64 caracteres que guardaste al activar Copias Seguras de Signal. Sin esta clave, no se pueden recuperar las copias de seguridad.</string>
+    <string name="EnterBackupKey_incorrect_backup_key_message">Asegúrate de registrarte con el mismo número de teléfono y la misma clave de recuperación de 64 caracteres que guardaste al activar Copias Seguras de Signal. Sin esta clave, no es posible recuperar las copias de seguridad.</string>
     <!-- Dialog positive button text to try entering their recovery key again -->
     <string name="EnterBackupKey_try_again">Reintentar</string>
     <!-- Dialog negative button text to get help with recovery key -->
@@ -8636,6 +8661,10 @@
     <string name="EnterBackupKey_backup_not_found">Copia de seguridad no encontrada</string>
     <!-- Dialog message shown during registration and trying to restore a remote backup -->
     <string name="EnterBackupKey_backup_key_you_entered_is_correct_but_no_backup">La clave de recuperación que has introducido es correcta, pero no hay ninguna copia de seguridad asociada a ella. Si aún tienes tu teléfono anterior, comprueba que las copias de seguridad estén habilitadas y que se haya completado una copia de seguridad, e inténtalo de nuevo.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_incorrect_or_backups_not_enabled">Es posible que hayas introducido tu clave de recuperación de forma incorrecta o que no hayas completado al menos una copia de seguridad en tu dispositivo anterior.\n\nAsegúrate de registrarte con el mismo número de teléfono y clave de recuperación que guardaste al habilitar las Copias Seguras de Signal, y confirma que se haya completado una copia de seguridad en tu dispositivo anterior.</string>
+    <!-- Dialog message shown during registration and trying to restore a remote backup -->
+    <string name="EnterBackupKey_backup_key_check_rate_limited">Has agotado los intentos para confirmar tu clave de recuperación. Por tu seguridad, tienes un número limitado de intentos. Espera una hora y vuelve a intentarlo.</string>
     <!-- Dialog button shown during registration and trying to restore a remote backup to instead skip said backup process -->
     <string name="EnterBackupKey_skip_restore">Omitir restauración</string>
     <!-- Dialog title text when encountering backup restore network error -->
@@ -8763,6 +8792,143 @@
         <item quantity="one">Hace %1$d día que no se completa una copia de seguridad. Crea una copia de seguridad ahora.</item>
         <item quantity="other">Hace %1$d días que no se completa una copia de seguridad. Crea una copia de seguridad ahora.</item>
     </plurals>
+
+    <!-- Polls -->
+    <!-- Caption in poll message to select an option  -->
+    <string name="Poll__select_one">Encuesta · Elige una opción</string>
+    <!-- Caption in poll message to select one or more options  -->
+    <string name="Poll__select_multiple">Encuesta · Elige una o más opciones</string>
+    <!-- Caption in poll message once a poll has ended  -->
+    <string name="Poll__final_results">Encuesta · Resultados finales</string>
+    <!-- Caption in poll message that no votes have been cast  -->
+    <string name="Poll__no_votes">Sin votos</string>
+    <!-- Button in poll message to view current votes for a poll -->
+    <string name="Poll__view_votes">Ver votos</string>
+    <!-- Button in poll message to view the poll after it has ended -->
+    <string name="Poll__view_poll">Ver encuesta</string>
+    <!-- Toast message shown if we cannot find the poll -->
+    <string name="Poll__unable_poll">No se ha encontrado la encuesta</string>
+    <!-- Button in poll message to view results for a poll after it ends -->
+    <string name="Poll__view_results">Ver resultados</string>
+    <!-- Quote preview when replying to a poll. %1$s is the question of the poll -->
+    <string name="Poll__poll_question">Encuesta: %1$s</string>
+    <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
+    <string name="Poll__poll_end">%1$s ha finalizado la encuesta \"%2$s\"</string>
+    <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
+    <string name="Poll__poll_voted">%1$s ha votado en la encuesta \"%2$s\"</string>
+    <!-- Option in settings to configure notifications for polls -->
+    <string name="Poll__poll">Encuestas</string>
+    <!-- Title of screen that shows the poll results of a poll after it has ended-->
+    <string name="Poll__poll_results">Resultados de la encuesta</string>
+    <!-- Title of screen that shows the poll details of a poll -->
+    <string name="Poll__poll_details">Poll details</string>
+    <!-- Header text displaying the question of the poll -->
+    <string name="Poll__question">Pregunta</string>
+    <!-- Text displaying how many votes, %1$d, an option has gotten -->
+    <plurals name="Poll__num_votes">
+        <item quantity="one">%1$d voto</item>
+        <item quantity="other">%1$d votos</item>
+    </plurals>
+    <!-- Content description to describe the icon that is shown next to the winning option when the poll ends -->
+    <string name="Poll__poll_winner">Winner</string>
+    <!-- Text that when pressed will end the poll   -->
+    <string name="Poll__end_poll">Finalizar encuesta</string>
+    <!-- Button that once pressed will show all of the voters for a poll -->
+    <string name="Poll__see_all">Ver todos</string>
+    <!-- Dialog title when a poll fails to end -->
+    <string name="Poll__couldnt_end_poll">Couldn\'t end poll</string>
+    <!-- Dialog body when a poll fails to end and to try again -->
+    <string name="Poll__check_connection">Check your connection and try again.</string>
+    <!-- Header when creating a new poll -->
+    <string name="CreatePollFragment__new_poll">Nueva encuesta</string>
+    <!-- Section text to enter in a question for a poll  -->
+    <string name="CreatePollFragment__question">Pregunta</string>
+    <!-- Hint text for question field when creating a poll  -->
+    <string name="CreatePollFragment__ask_a_question">Escribe aquí tu pregunta</string>
+    <!-- Section text to enter in options for a poll -->
+    <string name="CreatePollFragment__options">Opciones</string>
+    <!-- Hint text for the option field, where %1$d is the option number (max 10) -->
+    <string name="CreatePollFragment__option_n">Opción %1$d</string>
+    <!-- Accessibility label for the polls drag and drop handle used to reorder the list. -->
+    <string name="CreatePollFragment__drag_handle">Control para arrastrar y soltar</string>
+    <!-- Text next to button to allow the poll to allow for multiple votes -->
+    <string name="CreatePollFragment__allow_multiple_votes">Permitir varios votos</string>
+    <!-- Snackbar text to add a question and two options before creating a poll -->
+    <string name="CreatePollFragment__add_question_option">Añade una pregunta y al menos dos opciones</string>
+    <!-- Snackbar text to add two options before creating a poll -->
+    <string name="CreatePollFragment__add_option">Añade al menos dos opciones</string>
+    <!-- Snackbar text to add a question before creating a poll -->
+    <string name="CreatePollFragment__add_question">Añade una pregunta</string>
+
+    <!-- CallQualityIssue -->
+    <!-- Label for general audio issue category -->
+    <string name="CallQualityIssue__audio_issue">Audio issue</string>
+    <!-- Label for general video issue category -->
+    <string name="CallQualityIssue__video_issue">Video issue</string>
+    <!-- Label for call dropped issue -->
+    <string name="CallQualityIssue__call_droppped">Call dropped</string>
+    <!-- Label for other/custom issues not covered by predefined categories -->
+    <string name="CallQualityIssue__something_else">Something else</string>
+    <!-- Label for audio stuttering/choppy audio issue -->
+    <string name="CallQualityIssue__audio_stuttering">Audio stuttering</string>
+    <!-- Label for audio cutting out/dropping issue -->
+    <string name="CallQualityIssue__audio_cut_out">Audio cut out</string>
+    <!-- Label for echo heard by the user -->
+    <string name="CallQualityIssue__i_heard_echo">I heard echo</string>
+    <!-- Label for echo heard by other call participants -->
+    <string name="CallQualityIssue__others_heard_echo">Others heard echo</string>
+    <!-- Label for poor video quality issue -->
+    <string name="CallQualityIssue__poor_video_quality">Poor video quality</string>
+    <!-- Label for low video resolution issue -->
+    <string name="CallQualityIssue__low_resolution">Low resolution</string>
+    <!-- Label for camera malfunction issue -->
+    <string name="CallQualityIssue__camera_did_not_work">Camera didn\'t work</string>
+
+    <!-- CallQualitySomethingElseScreen -->
+    <!-- Title for the "Something else" call quality issue screen -->
+    <string name="CallQualitySomethingElseScreen__title">Something else</string>
+    <!-- Label for text field where user describes their call quality issue -->
+    <string name="CallQualitySomethingElseScreen__describe_your_issue">Describe your issue</string>
+    <!-- Privacy notice explaining that issue details will be kept private and used to improve Signal calls -->
+    <string name="CallQualitySomethingElseScreen__privacy_notice">Please include any details relevant to the issue. Anything you share here will be kept private and will only be used to help improve calls in Signal.</string>
+    <!-- Button to save the call quality issue description -->
+    <string name="CallQualitySomethingElseScreen__save">Save</string>
+    <!-- Content description for the back navigation button -->
+    <string name="CallQualitySomethingElseScreen__back">Back</string>
+
+    <!-- CallQualitySheet -->
+    <!-- Title asking user how their call was -->
+    <string name="CallQualitySheet__how_was_your_call">How was your call?</string>
+    <!-- Subtitle explaining that feedback helps improve Signal and no PII is stored -->
+    <string name="CallQualitySheet__how_was_your_call_subtitle">This helps us improve calls in Signal. No personally identifiable information will be stored.</string>
+    <!-- Button label indicating the call had issues -->
+    <string name="CallQualitySheet__had_issues">Had issues</string>
+    <!-- Button label indicating the call was great -->
+    <string name="CallQualitySheet__great">Great</string>
+    <!-- Title asking what issues the user experienced -->
+    <string name="CallQualitySheet__what_issues_did_you_have">What issues did you have?</string>
+    <!-- Instruction to select all applicable issues -->
+    <string name="CallQualitySheet__select_all_that_apply">Select all that apply</string>
+    <!-- Placeholder text for describing a custom issue -->
+    <string name="CallQualitySheet__describe_your_issue">Describe your issue</string>
+    <!-- Button to continue to the next step -->
+    <string name="CallQualitySheet__continue">Continue</string>
+    <!-- Title asking user to help improve Signal -->
+    <string name="CallQualitySheet__help_us_improve">Help us improve</string>
+    <!-- First part of description explaining diagnostics help improve call quality -->
+    <string name="CallQualitySheet__help_us_improve_description_prefix">Sending us your diagnostics info helps us improve call quality. You can </string>
+    <!-- Link text to view debug log -->
+    <string name="CallQualitySheet__view_your_debug_log">view your debug log</string>
+    <!-- Last part of description about viewing debug log before submitting -->
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> before submitting</string>
+    <!-- Toggle label for sharing debug log -->
+    <string name="CallQualitySheet__share_debug_log">Share debug log</string>
+    <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
+    <string name="CallQualitySheet__debug_log_privacy_notice">Debug logs contain low level app information and do not reveal any of your message contents.</string>
+    <!-- Button to submit the call quality feedback -->
+    <string name="CallQualitySheet__submit">Submit</string>
+    <!-- Displayed as a snackbar after submitting feedback -->
+    <string name="CallQualitySheet__thanks_for_your_feedback">Thanks for your feedback!</string>
 
     <!-- EOF -->
 </resources>

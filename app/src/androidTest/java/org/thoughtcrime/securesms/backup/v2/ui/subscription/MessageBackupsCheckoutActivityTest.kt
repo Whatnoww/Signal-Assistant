@@ -31,6 +31,7 @@ import org.junit.runner.RunWith
 import org.signal.core.util.billing.BillingProduct
 import org.signal.core.util.billing.BillingPurchaseResult
 import org.signal.core.util.billing.BillingPurchaseState
+import org.signal.core.util.billing.BillingResponseCode
 import org.signal.core.util.money.FiatMoney
 import org.signal.donations.InAppPaymentType
 import org.thoughtcrime.securesms.R
@@ -63,6 +64,7 @@ class MessageBackupsCheckoutActivityTest {
   @Before
   fun setUp() {
     every { AppDependencies.billingApi.getBillingPurchaseResults() } returns purchaseResults
+    coEvery { AppDependencies.billingApi.getApiAvailability() } returns BillingResponseCode.OK
     coEvery { AppDependencies.billingApi.queryProduct() } returns BillingProduct(price = FiatMoney(BigDecimal.ONE, Currency.getInstance("USD")))
     coEvery { AppDependencies.billingApi.launchBillingFlow(any()) } returns Unit
   }
@@ -136,7 +138,7 @@ class MessageBackupsCheckoutActivityTest {
 
     // Key education screen
     composeTestRule.onNodeWithText(context.getString(R.string.MessageBackupsKeyEducationScreen__your_backup_key)).assertIsDisplayed()
-    composeTestRule.onNodeWithText(context.getString(R.string.MessageBackupsKeyRecordScreen__next)).performClick()
+    composeTestRule.onNodeWithText(context.getString(R.string.MessageBackupsKeyEducationScreen__view_recovery_key)).performClick()
 
     // Key record screen
     composeTestRule.onNodeWithText(context.getString(R.string.MessageBackupsKeyRecordScreen__record_your_backup_key)).assertIsDisplayed()

@@ -7,28 +7,31 @@ package org.thoughtcrime.securesms.window
 
 import android.content.res.Configuration
 import android.content.res.Resources
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.PaneExpansionState
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldScope
-import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.layout.defaultDragHandleSemantics
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
-import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
-import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,12 +42,13 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.window.core.ExperimentalWindowCoreApi
 import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
+import org.signal.core.ui.compose.AllDevicePreviews
 import org.signal.core.ui.compose.Previews
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.main.MainFloatingActionButtonsCallback
@@ -87,6 +91,12 @@ enum class WindowSizeClass(
   EXTENDED_PORTRAIT(Navigation.RAIL),
   EXTENDED_LANDSCAPE(Navigation.RAIL);
 
+  val listPaneDefaultPreferredWidth: Dp
+    get() = if (isExtended()) 416.dp else 316.dp
+
+  val detailPaneMaxContentWidth: Dp = 624.dp
+  val horizontalPartitionDefaultSpacerSize: Dp = 12.dp
+
   fun isCompact(): Boolean = this == COMPACT_PORTRAIT || this == COMPACT_LANDSCAPE
   fun isMedium(): Boolean = this == MEDIUM_PORTRAIT || this == MEDIUM_LANDSCAPE
   fun isExtended(): Boolean = this == EXTENDED_PORTRAIT || this == EXTENDED_LANDSCAPE
@@ -94,8 +104,11 @@ enum class WindowSizeClass(
   fun isLandscape(): Boolean = this == COMPACT_LANDSCAPE || this == MEDIUM_LANDSCAPE || this == EXTENDED_LANDSCAPE
   fun isPortrait(): Boolean = !isLandscape()
 
-  fun isSplitPane(): Boolean {
-    return if (isLargeScreenSupportEnabled() && SignalStore.internal.forceSplitPaneOnCompactLandscape) {
+  @JvmOverloads
+  fun isSplitPane(
+    forceSplitPaneOnCompactLandscape: Boolean = SignalStore.internal.forceSplitPaneOnCompactLandscape
+  ): Boolean {
+    return if (isLargeScreenSupportEnabled() && forceSplitPaneOnCompactLandscape) {
       this != COMPACT_PORTRAIT
     } else {
       this.navigation != Navigation.BAR
@@ -173,17 +186,10 @@ enum class WindowSizeClass(
         }
 
         Configuration.ORIENTATION_LANDSCAPE -> {
-          when (windowSizeClass.windowWidthSizeClass) {
-            WindowWidthSizeClass.COMPACT -> COMPACT_LANDSCAPE
-            WindowWidthSizeClass.MEDIUM -> {
-              if (windowSizeClass.windowHeightSizeClass == WindowHeightSizeClass.COMPACT) {
-                COMPACT_LANDSCAPE
-              } else {
-                MEDIUM_LANDSCAPE
-              }
-            }
-
-            WindowWidthSizeClass.EXPANDED -> EXTENDED_LANDSCAPE
+          when (windowSizeClass.windowHeightSizeClass) {
+            WindowHeightSizeClass.COMPACT -> COMPACT_LANDSCAPE
+            WindowHeightSizeClass.MEDIUM -> MEDIUM_LANDSCAPE
+            WindowHeightSizeClass.EXPANDED -> EXTENDED_LANDSCAPE
             else -> error("Unsupported.")
           }
         }
@@ -195,134 +201,195 @@ enum class WindowSizeClass(
 }
 
 /**
- * Composable who's precise layout will depend on the window size class of the device it is being utilized on.
- * This is built to be generic so that we can use it throughout the application to support different device classes.
+ * A top-level scaffold that automatically adapts its layout based on the device's window size class. It is a generic container designed to handle the
+ * arrangement of navigation rails, top/bottom bars, and list-detail pane management for both compact and large screens.
+ *
+ * @param topBarContent An optional top bar that spans across all panes.
+ *
+ * @param primaryContent The main content, which is typically the detail view in a split-pane layout.
+ * @param secondaryContent The secondary content, which is typically the list view in a split-pane layout.
+ *
+ * @param navRailContent The side navigation rail, shown on medium and larger screen sizes.
+ * @param bottomNavContent The bottom navigation bar, shown on compact screen sizes.
+ *
+ * @param paneExpansionState Manages the position and expansion of the panes in a list-detail layout.
+ * @param paneExpansionDragHandle An optional drag handle used to resize panes in the list-detail layout.
+ *
+ * @param animatorFactory Provides animations to control how panes enter and exit the screen during navigation.
  */
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun AppScaffold(
-  navigator: ThreePaneScaffoldNavigator<Any> = rememberListDetailPaneScaffoldNavigator<Any>(),
-  detailContent: @Composable () -> Unit = {},
+  navigator: AppScaffoldNavigator<Any>,
+  modifier: Modifier = Modifier,
+  topBarContent: @Composable () -> Unit = {},
+  primaryContent: @Composable () -> Unit = {},
+  secondaryContent: @Composable () -> Unit,
   navRailContent: @Composable () -> Unit = {},
   bottomNavContent: @Composable () -> Unit = {},
   paneExpansionState: PaneExpansionState = rememberPaneExpansionState(),
   paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? = null,
-  listContent: @Composable () -> Unit
+  snackbarHost: @Composable () -> Unit = {},
+  contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+  animatorFactory: AppScaffoldAnimationStateFactory = AppScaffoldAnimationStateFactory.Default
 ) {
   val isForcedCompact = WindowSizeClass.checkForcedCompact()
   val windowSizeClass = WindowSizeClass.rememberWindowSizeClass()
 
   if (isForcedCompact) {
     ListAndNavigation(
-      listContent = listContent,
+      topBarContent = topBarContent,
+      listContent = secondaryContent,
       navRailContent = navRailContent,
       bottomNavContent = bottomNavContent,
-      windowSizeClass = windowSizeClass
+      windowSizeClass = windowSizeClass,
+      contentWindowInsets = contentWindowInsets,
+      modifier = modifier
     )
 
     return
   }
 
   val minPaneWidth = navigator.scaffoldDirective.defaultPanePreferredWidth
+  val navigationState = navigator.state
 
-  NavigableListDetailPaneScaffold(
-    navigator = navigator,
-    listPane = {
-      AnimatedPane {
-        Box(
-          modifier = Modifier
-            .clipToBounds()
-            .layout { measurable, constraints ->
-              val width = max(minPaneWidth.roundToPx(), constraints.maxWidth)
-              val placeable = measurable.measure(
-                constraints.copy(
-                  minWidth = minPaneWidth.roundToPx(),
-                  maxWidth = width
-                )
-              )
-              layout(constraints.maxWidth, placeable.height) {
-                placeable.placeRelative(
-                  x = 0,
-                  y = 0
-                )
-              }
-            }
-        ) {
-          ListAndNavigation(
-            listContent = listContent,
-            navRailContent = navRailContent,
-            bottomNavContent = bottomNavContent,
-            windowSizeClass = windowSizeClass
-          )
+  Scaffold(
+    containerColor = Color.Transparent,
+    contentWindowInsets = contentWindowInsets,
+    topBar = topBarContent,
+    snackbarHost = snackbarHost,
+    modifier = modifier
+  ) { paddingValues ->
+    NavigableListDetailPaneScaffold(
+      navigator = navigator,
+      listPane = {
+        val animationState = with(animatorFactory) {
+          this@NavigableListDetailPaneScaffold.getListAnimationState(navigationState)
         }
-      }
-    },
-    detailPane = {
-      AnimatedPane {
-        Box(
+
+        AnimatedPane(
+          enterTransition = EnterTransition.None,
+          exitTransition = ExitTransition.None,
           modifier = Modifier
-            .clipToBounds()
-            .layout { measurable, constraints ->
-              val width = max(minPaneWidth.roundToPx(), constraints.maxWidth)
-              val placeable = measurable.measure(
-                constraints.copy(
-                  minWidth = minPaneWidth.roundToPx(),
-                  maxWidth = width
-                )
-              )
-              layout(constraints.maxWidth, placeable.height) {
-                placeable.placeRelative(
-                  x = constraints.maxWidth -
-                    max(constraints.maxWidth, placeable.width),
-                  y = 0
-                )
-              }
-            }
+            .zIndex(0f)
+            .then(animationState.parentModifier)
         ) {
-          detailContent()
+          Box(
+            modifier = Modifier
+              .then(animationState.toModifier())
+              .clipToBounds()
+              .layout { measurable, constraints ->
+                val width = max(minPaneWidth.roundToPx(), constraints.maxWidth)
+                val placeable = measurable.measure(
+                  constraints.copy(
+                    minWidth = minPaneWidth.roundToPx(),
+                    maxWidth = width
+                  )
+                )
+                layout(constraints.maxWidth, placeable.height) {
+                  placeable.placeRelative(
+                    x = 0,
+                    y = 0
+                  )
+                }
+              }
+          ) {
+            ListAndNavigation(
+              topBarContent = { },
+              listContent = secondaryContent,
+              navRailContent = navRailContent,
+              bottomNavContent = bottomNavContent,
+              windowSizeClass = windowSizeClass,
+              contentWindowInsets = contentWindowInsets
+            )
+          }
         }
-      }
-    },
-    paneExpansionDragHandle = paneExpansionDragHandle,
-    paneExpansionState = paneExpansionState
-  )
+      },
+      detailPane = {
+        val animationState = with(animatorFactory) {
+          this@NavigableListDetailPaneScaffold.getDetailAnimationState(navigationState)
+        }
+
+        AnimatedPane(
+          enterTransition = EnterTransition.None,
+          exitTransition = ExitTransition.None,
+          modifier = Modifier
+            .zIndex(1f)
+            .then(animationState.parentModifier)
+        ) {
+          Box(
+            modifier = Modifier
+              .then(animationState.toModifier())
+              .clipToBounds()
+              .layout { measurable, constraints ->
+                val width = max(minPaneWidth.roundToPx(), constraints.maxWidth)
+                val placeable = measurable.measure(
+                  constraints.copy(
+                    minWidth = minPaneWidth.roundToPx(),
+                    maxWidth = width
+                  )
+                )
+                layout(constraints.maxWidth, placeable.height) {
+                  placeable.placeRelative(
+                    x = 0,
+                    y = 0
+                  )
+                }
+              }
+          ) {
+            primaryContent()
+          }
+        }
+      },
+      paneExpansionDragHandle = paneExpansionDragHandle,
+      paneExpansionState = paneExpansionState,
+      modifier = Modifier.padding(paddingValues)
+    )
+  }
 }
 
 @Composable
 private fun ListAndNavigation(
+  topBarContent: @Composable () -> Unit,
   listContent: @Composable () -> Unit,
   navRailContent: @Composable () -> Unit,
   bottomNavContent: @Composable () -> Unit,
-  windowSizeClass: WindowSizeClass
+  snackbarHost: @Composable () -> Unit = {},
+  windowSizeClass: WindowSizeClass,
+  contentWindowInsets: WindowInsets,
+  modifier: Modifier = Modifier
 ) {
-  Row(
-    modifier = if (windowSizeClass.isLandscape()) {
-      Modifier.displayCutoutPadding()
-    } else Modifier
-  ) {
-    if (windowSizeClass.navigation == Navigation.RAIL) {
-      navRailContent()
-    }
-
-    Column {
-      Box(modifier = Modifier.weight(1f)) {
-        listContent()
+  Scaffold(
+    containerColor = Color.Transparent,
+    topBar = topBarContent,
+    contentWindowInsets = contentWindowInsets,
+    snackbarHost = snackbarHost,
+    modifier = modifier
+  ) { paddingValues ->
+    Row(
+      modifier = Modifier
+        .padding(paddingValues)
+        .then(if (windowSizeClass.isLandscape()) Modifier.displayCutoutPadding() else Modifier)
+    ) {
+      if (windowSizeClass.navigation == Navigation.RAIL) {
+        navRailContent()
       }
 
-      if (windowSizeClass.navigation == Navigation.BAR) {
-        bottomNavContent()
+      Column {
+        Box(modifier = Modifier.weight(1f)) {
+          listContent()
+        }
+
+        if (windowSizeClass.navigation == Navigation.BAR) {
+          bottomNavContent()
+        }
       }
     }
   }
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-@Preview(device = "spec:width=360dp,height=640dp,orientation=portrait")
-@Preview(device = "spec:width=640dp,height=360dp,orientation=landscape")
-@Preview(device = "spec:width=600dp,height=1024dp,orientation=portrait")
-@Preview(device = "spec:width=1024dp,height=600dp,orientation=landscape")
-@Preview(device = "spec:width=840dp,height=1280dp,orientation=portrait")
-@Preview(device = "spec:width=1280dp,height=840dp,orientation=landscape")
+@AllDevicePreviews
 @Composable
 private fun AppScaffoldPreview() {
   Previews.Preview {
@@ -334,7 +401,7 @@ private fun AppScaffoldPreview() {
         defaultPanePreferredWidth = 416.dp,
         horizontalPartitionSpacerSize = 16.dp
       ),
-      listContent = {
+      secondaryContent = {
         Box(
           contentAlignment = Alignment.Center,
           modifier = Modifier
@@ -347,7 +414,7 @@ private fun AppScaffoldPreview() {
           )
         }
       },
-      detailContent = {
+      primaryContent = {
         Box(
           contentAlignment = Alignment.Center,
           modifier = Modifier
@@ -406,22 +473,4 @@ fun ThreePaneScaffoldScope.AppPaneDragHandle(
         .background(color = Color(0xFF605F5D), RoundedCornerShape(percent = 50))
     )
   }
-}
-
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
-@Composable
-fun rememberAppScaffoldNavigator(
-  isSplitPane: Boolean,
-  horizontalPartitionSpacerSize: Dp,
-  defaultPanePreferredWidth: Dp
-): ThreePaneScaffoldNavigator<Any> {
-  return rememberListDetailPaneScaffoldNavigator<Any>(
-    scaffoldDirective = calculatePaneScaffoldDirective(
-      currentWindowAdaptiveInfo()
-    ).copy(
-      maxHorizontalPartitions = if (isSplitPane) 2 else 1,
-      horizontalPartitionSpacerSize = horizontalPartitionSpacerSize,
-      defaultPanePreferredWidth = defaultPanePreferredWidth
-    )
-  )
 }

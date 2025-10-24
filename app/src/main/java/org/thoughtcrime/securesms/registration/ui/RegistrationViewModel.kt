@@ -30,6 +30,7 @@ import org.signal.libsignal.protocol.IdentityKey
 import org.signal.libsignal.protocol.IdentityKeyPair
 import org.signal.libsignal.protocol.ecc.ECPrivateKey
 import org.signal.libsignal.zkgroup.profiles.ProfileKey
+import org.signal.registration.proto.RegistrationProvisionMessage
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.backup.v2.RestoreTimestampResult
 import org.thoughtcrime.securesms.database.model.databaseprotos.LinkedDeviceInfo
@@ -150,6 +151,8 @@ class RegistrationViewModel : ViewModel() {
       }
     }
 
+  var registrationProvisioningMessage: RegistrationProvisionMessage? = null
+
   @SuppressLint("MissingPermission")
   fun maybePrefillE164(context: Context) {
     Log.v(TAG, "maybePrefillE164()")
@@ -240,8 +243,8 @@ class RegistrationViewModel : ViewModel() {
   }
 
   fun togglePinKeyboardType() {
-    store.update { previousState ->
-      previousState.copy(pinKeyboardType = previousState.pinKeyboardType.other)
+    store.update {
+      it.copy(pinKeyboardType = it.pinKeyboardType.other)
     }
   }
 

@@ -12,6 +12,7 @@ import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
@@ -64,6 +65,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -85,9 +87,12 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -184,6 +189,7 @@ import org.thoughtcrime.securesms.conversation.ScheduledMessagesBottomSheet
 import org.thoughtcrime.securesms.conversation.ScheduledMessagesRepository
 import org.thoughtcrime.securesms.conversation.SelectedConversationModel
 import org.thoughtcrime.securesms.conversation.ShowAdminsBottomSheetDialog
+import org.thoughtcrime.securesms.conversation.clicklisteners.PollVotesFragment
 import org.thoughtcrime.securesms.conversation.colors.ChatColors
 import org.thoughtcrime.securesms.conversation.colors.Colorizer
 import org.thoughtcrime.securesms.conversation.colors.RecyclerViewColorizer
@@ -257,8 +263,9 @@ import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.linkpreview.LinkPreview
 import org.thoughtcrime.securesms.linkpreview.LinkPreviewViewModelV2
 import org.thoughtcrime.securesms.longmessage.LongMessageFragment
-import org.thoughtcrime.securesms.main.InsetsViewModel
 import org.thoughtcrime.securesms.main.MainNavigationListLocation
+import org.thoughtcrime.securesms.main.MainNavigationViewModel
+import org.thoughtcrime.securesms.main.VerticalInsets
 import org.thoughtcrime.securesms.mediaoverview.MediaOverviewActivity
 import org.thoughtcrime.securesms.mediapreview.MediaIntentFactory
 import org.thoughtcrime.securesms.mediapreview.MediaPreviewV2Activity
@@ -282,6 +289,9 @@ import org.thoughtcrime.securesms.nicknames.NicknameActivity
 import org.thoughtcrime.securesms.notifications.v2.ConversationId
 import org.thoughtcrime.securesms.payments.preferences.PaymentsActivity
 import org.thoughtcrime.securesms.permissions.Permissions
+import org.thoughtcrime.securesms.polls.Poll
+import org.thoughtcrime.securesms.polls.PollOption
+import org.thoughtcrime.securesms.polls.PollRecord
 import org.thoughtcrime.securesms.profiles.manage.EditProfileActivity
 import org.thoughtcrime.securesms.profiles.spoofing.ReviewCardDialogFragment
 import org.thoughtcrime.securesms.providers.BlobProvider
@@ -333,6 +343,7 @@ import org.thoughtcrime.securesms.util.atMidnight
 import org.thoughtcrime.securesms.util.atUTC
 import org.thoughtcrime.securesms.util.doAfterNextLayout
 import org.thoughtcrime.securesms.util.fragments.requireListener
+import org.thoughtcrime.securesms.util.getPoll
 import org.thoughtcrime.securesms.util.getQuote
 import org.thoughtcrime.securesms.util.getRecordQuoteType
 import org.thoughtcrime.securesms.util.hasAudio
@@ -341,7 +352,6 @@ import org.thoughtcrime.securesms.util.hasLinkPreview
 import org.thoughtcrime.securesms.util.hasNonTextSlide
 import org.thoughtcrime.securesms.util.isValidReactionTarget
 import org.thoughtcrime.securesms.util.padding
-import org.thoughtcrime.securesms.util.savedStateViewModel
 import org.thoughtcrime.securesms.util.setIncognitoKeyboardEnabled
 import org.thoughtcrime.securesms.util.toMillis
 import org.thoughtcrime.securesms.util.viewModel
@@ -447,8 +457,8 @@ class ConversationFragment :
     )
   }
 
-  private val linkPreviewViewModel: LinkPreviewViewModelV2 by savedStateViewModel {
-    LinkPreviewViewModelV2(it, enablePlaceholder = false)
+  private val linkPreviewViewModel: LinkPreviewViewModelV2 by viewModel {
+    LinkPreviewViewModelV2(it.createSavedStateHandle(), enablePlaceholder = false)
   }
 
   private val groupCallViewModel: ConversationGroupCallViewModel by viewModel {
@@ -485,7 +495,7 @@ class ConversationFragment :
 
   private val shareDataTimestampViewModel: ShareDataTimestampViewModel by activityViewModels()
 
-  private val insetsViewModel: InsetsViewModel by activityViewModels()
+  private val mainNavigationViewModel: MainNavigationViewModel by activityViewModels()
 
   private val inlineQueryController: InlineQueryResultsControllerV2 by lazy {
     InlineQueryResultsControllerV2(
@@ -589,6 +599,9 @@ class ConversationFragment :
 
   private lateinit var voiceMessageRecordingDelegate: VoiceMessageRecordingDelegate
 
+  private val internalDidFirstFrameRender = MutableStateFlow(false)
+  val didFirstFrameRender: StateFlow<Boolean> = internalDidFirstFrameRender
+
   //region Android Lifecycle
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -596,21 +609,12 @@ class ConversationFragment :
     SignalLocalMetrics.ConversationOpen.start()
   }
 
+  fun applyRootInsets(insets: VerticalInsets) {
+    binding.root.applyInsets(insets)
+  }
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     binding.toolbar.isBackInvokedCallbackEnabled = false
-
-    if (WindowSizeClass.isLargeScreenSupportEnabled()) {
-      viewLifecycleOwner.lifecycleScope.launch {
-        repeatOnLifecycle(Lifecycle.State.RESUMED) {
-          binding.root.clearVerticalInsetOverride()
-          if (!resources.getWindowSizeClass().isSplitPane()) {
-            insetsViewModel.insets.collect {
-              binding.root.applyInsets(it)
-            }
-          }
-        }
-      }
-    }
 
     binding.root.setApplyRootInsets(!WindowSizeClass.isLargeScreenSupportEnabled())
     binding.root.setUseWindowTypes(!WindowSizeClass.isLargeScreenSupportEnabled())
@@ -753,7 +757,7 @@ class ConversationFragment :
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     ToolbarDependentMarginListener(binding.toolbar)
-    inlineQueryController.onOrientationChange(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+    inlineQueryController.onWindowSizeClassChanged(resources.getWindowSizeClass())
   }
 
   override fun onDestroyView() {
@@ -982,6 +986,7 @@ class ConversationFragment :
     }
 
     activity?.supportStartPostponedEnterTransition()
+    internalDidFirstFrameRender.update { true }
 
     val backPressedDelegate = BackPressedDelegate()
     requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, backPressedDelegate)
@@ -1224,7 +1229,7 @@ class ConversationFragment :
   }
 
   private fun initializeInlineSearch() {
-    inlineQueryController.onOrientationChange(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+    inlineQueryController.onWindowSizeClassChanged(resources.getWindowSizeClass())
 
     composeText.apply {
       setInlineQueryChangedListener(object : InlineQueryChangedListener {
@@ -1406,16 +1411,37 @@ class ConversationFragment :
   }
 
   private fun presentNavigationIconForNormal() {
-    if (!resources.getWindowSizeClass().isSplitPane()) {
+    if (WindowSizeClass.isLargeScreenSupportEnabled()) {
+      lifecycleScope.launch {
+        repeatOnLifecycle(Lifecycle.State.RESUMED) {
+          mainNavigationViewModel.isFullScreenPane.collect { isFullScreenPane ->
+            updateNavigationIconForNormal(isFullScreenPane)
+          }
+        }
+      }
+    } else {
+      updateNavigationIconForNormal(true)
+    }
+  }
+
+  private fun updateNavigationIconForNormal(isFullScreenPane: Boolean) {
+    if (!resources.getWindowSizeClass().isSplitPane() || isFullScreenPane) {
       binding.toolbar.setNavigationIcon(R.drawable.symbol_arrow_start_24)
       binding.toolbar.setNavigationContentDescription(R.string.ConversationFragment__content_description_back_button)
       binding.toolbar.setNavigationOnClickListener {
         binding.root.hideKeyboard(composeText)
         requireActivity().onBackPressedDispatcher.onBackPressed()
       }
+      binding.toolbar.setContentInsetsRelative(
+        46.dp,
+        binding.toolbar.contentInsetEnd
+      )
     } else {
       binding.toolbar.navigationIcon = null
-      binding.toolbar.contentInsetStartWithNavigation = 0
+      binding.toolbar.setContentInsetsRelative(
+        24.dp,
+        binding.toolbar.contentInsetEnd
+      )
     }
   }
 
@@ -1949,6 +1975,16 @@ class ConversationFragment :
       bypassPreSendSafetyNumberCheck = true,
       scheduledDate = scheduledDate
     )
+  }
+
+  private fun sendPoll(recipient: Recipient, poll: Poll) {
+    val send = viewModel.sendPoll(recipient, poll)
+
+    disposables += send
+      .subscribeBy(
+        onComplete = { onSendComplete() },
+        onError = { Log.w(TAG, "Error received during poll send!", it) }
+      )
   }
 
   private fun sendMessage(
@@ -2554,6 +2590,27 @@ class ConversationFragment :
       }
   }
 
+  private fun handleEndPoll(pollId: Long?) {
+    if (pollId == null) {
+      Log.w(TAG, "Unable to find poll to end $pollId")
+      return
+    }
+
+    val endPoll = viewModel.endPoll(pollId)
+
+    disposables += endPoll
+      .subscribeBy(
+        onError = {
+          Log.w(TAG, "Error received during poll end!", it)
+          MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.Poll__couldnt_end_poll)
+            .setMessage(getString(R.string.Poll__check_connection))
+            .setPositiveButton(android.R.string.ok) { dialog: DialogInterface?, which: Int -> dialog!!.dismiss() }
+            .show()
+        }
+      )
+  }
+
   private inner class SwipeAvailabilityProvider : ConversationItemSwipeCallback.SwipeAvailabilityProvider {
     override fun isSwipeAvailable(conversationMessage: ConversationMessage): Boolean {
       val recipient = viewModel.recipientSnapshot ?: return false
@@ -3049,6 +3106,32 @@ class ConversationFragment :
 
     override fun onUpdateSignalClicked() {
       PlayStoreUtil.openPlayStoreOrOurApkDownloadPage(requireContext())
+    }
+
+    override fun onViewResultsClicked(pollId: Long) {
+      if (parentFragmentManager.findFragmentByTag(PollVotesFragment.POLL_VOTES_FRAGMENT_TAG) == null) {
+        PollVotesFragment.create(pollId, parentFragmentManager)
+
+        parentFragmentManager.setFragmentResultListener(PollVotesFragment.RESULT_KEY, requireActivity()) { _, bundle ->
+          val shouldEndPoll = bundle.getBoolean(PollVotesFragment.RESULT_KEY, false)
+          if (shouldEndPoll) {
+            handleEndPoll(pollId)
+          }
+        }
+      }
+    }
+
+    override fun onViewPollClicked(messageId: Long) {
+      disposables += viewModel
+        .moveToMessage(messageId)
+        .subscribeBy(
+          onSuccess = { moveToPosition(it) },
+          onError = { Toast.makeText(requireContext(), R.string.Poll__unable_poll, Toast.LENGTH_LONG).show() }
+        )
+    }
+
+    override fun onToggleVote(poll: PollRecord, pollOption: PollOption, isChecked: Boolean) {
+      viewModel.toggleVote(poll, pollOption, isChecked)
     }
 
     override fun onJoinGroupCallClicked() {
@@ -3743,6 +3826,7 @@ class ConversationFragment :
         ConversationReactionOverlay.Action.PAYMENT_DETAILS -> handleViewPaymentDetails(conversationMessage)
         ConversationReactionOverlay.Action.VIEW_INFO -> handleDisplayDetails(conversationMessage)
         ConversationReactionOverlay.Action.DELETE -> handleDeleteMessages(conversationMessage.multiselectCollection.toSet())
+        ConversationReactionOverlay.Action.END_POLL -> handleEndPoll(conversationMessage.messageRecord.getPoll()?.id)
       }
     }
   }
@@ -4383,6 +4467,12 @@ class ConversationFragment :
           AttachmentKeyboardButton.FILE -> {
             if (!conversationActivityResultContracts.launchSelectFile()) {
               toast(R.string.AttachmentManager_cant_open_media_selection, Toast.LENGTH_LONG)
+            }
+          }
+          AttachmentKeyboardButton.POLL -> {
+            CreatePollFragment.show(childFragmentManager)
+            childFragmentManager.setFragmentResultListener(CreatePollFragment.REQUEST_KEY, requireActivity()) { _, bundle ->
+              sendPoll(recipient, Poll.fromBundle(bundle))
             }
           }
         }

@@ -10,17 +10,27 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import org.signal.core.util.AppUtil
+import org.signal.core.util.ThreadUtil
 import org.signal.core.util.getParcelableExtraCompat
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.BaseActivity
+import org.thoughtcrime.securesms.MainActivity
 import org.thoughtcrime.securesms.PassphraseRequiredActivity
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.RestoreDirections
-import org.thoughtcrime.securesms.registration.ui.restore.RemoteRestoreActivity
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme
+import org.thoughtcrime.securesms.util.TextSecurePreferences
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
 
 /**
@@ -63,9 +73,20 @@ class RestoreActivity : BaseActivity() {
 
     when (navTarget) {
       NavTarget.NEW_LANDING -> {
-        if (!sharedViewModel.hasMultipleRestoreMethods()) {
-          startActivity(RemoteRestoreActivity.getIntent(this, isOnlyOption = true))
-          finish()
+        if (sharedViewModel.hasNoRestoreMethods()) {
+          Log.i(TAG, "No restore methods available, skipping")
+          sharedViewModel.skipRestore()
+
+          val nextIntent = sharedViewModel.getNextIntent()
+
+          if (nextIntent != null) {
+            Log.d(TAG, "Launching ${nextIntent.component}")
+            startActivity(nextIntent)
+          } else {
+            startActivity(MainActivity.clearTop(this))
+          }
+
+          supportFinishAfterTransition()
         }
       }
       NavTarget.LOCAL_RESTORE -> navController.safeNavigate(RestoreDirections.goDirectlyToChooseLocalBackup())
@@ -80,6 +101,18 @@ class RestoreActivity : BaseActivity() {
         }
       }
     )
+
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        while (isActive) {
+          if (TextSecurePreferences.isUnauthorizedReceived(this@RestoreActivity)) {
+            ThreadUtil.runOnMain { showUnregisteredDialog() }
+            break
+          }
+          delay(1000)
+        }
+      }
+    }
   }
 
   override fun onResume() {
@@ -98,12 +131,21 @@ class RestoreActivity : BaseActivity() {
 
   fun onBackupCompletedSuccessfully() {
     sharedViewModel.getNextIntent()?.let {
-      Log.d(TAG, "Launching ${it.component}", Throwable())
+      Log.d(TAG, "Launching ${it.component}")
       startActivity(it)
     }
 
     setResult(RESULT_OK)
     finish()
+  }
+
+  private fun showUnregisteredDialog() {
+    MaterialAlertDialogBuilder(this)
+      .setTitle(R.string.RestoreActivity__no_longer_registered_title)
+      .setMessage(R.string.RestoreActivity__no_longer_registered_message)
+      .setCancelable(false)
+      .setPositiveButton(android.R.string.ok) { _, _ -> AppUtil.clearData(this) }
+      .show()
   }
 
   companion object {
