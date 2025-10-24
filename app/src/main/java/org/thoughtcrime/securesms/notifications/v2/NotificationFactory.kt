@@ -11,6 +11,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.TransactionTooLargeException
+import android.text.SpannableStringBuilder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -219,7 +220,12 @@ object NotificationFactory {
     defaultBubbleState: BubbleUtil.BubbleState,
     shouldAlert: Boolean
   ) {
+    // Whatnoww added: Attempting to filter !-less notifications.
+    val stringBuilder= SpannableStringBuilder()
     if (conversation.notificationItems.isEmpty()) {
+      return
+    }
+    if (!stringBuilder.append(conversation.getContentText(context)).startsWith("!")) {
       return
     }
 
