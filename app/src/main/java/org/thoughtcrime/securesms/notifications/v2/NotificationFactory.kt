@@ -225,7 +225,7 @@ object NotificationFactory {
     if (conversation.notificationItems.isEmpty()) {
       return
     }
-    if (!stringBuilder.append(conversation.getContentText(context)).startsWith("!")) {
+    if (!stringBuilder.append(conversation.getContentText(context)).contains("!")) {
       return
     }
 
