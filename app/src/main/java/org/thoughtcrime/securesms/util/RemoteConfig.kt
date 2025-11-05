@@ -1123,7 +1123,7 @@ object RemoteConfig {
 
   /** Whether to allow different WindowSizeClasses to be used to determine screen layout */
   val largeScreenUi: Boolean by remoteBoolean(
-    key = "android.largeScreenUI",
+    key = "android.largeScreenUI.2",
     hotSwappable = false,
     defaultValue = false
   )
@@ -1166,18 +1166,19 @@ object RemoteConfig {
 
   @JvmStatic
   @get:JvmName("polls")
-  val polls: Boolean by remoteBoolean(
-    key = "android.polls",
+  val polls: Boolean = true // JW
+
+  /** Whether or not to send over binary service ids (alongside string service ids). */
+  @JvmStatic
+  @get:JvmName("useBinaryId")
+  val useBinaryId: Boolean by remoteBoolean(
+    key = "android.useBinaryServiceId",
     defaultValue = false,
-    hotSwappable = true
+    hotSwappable = false
   )
 
   @JvmStatic
   @get:JvmName("receivePolls")
-  val receivePolls: Boolean by remoteBoolean(
-    key = "android.receivePolls",
-    defaultValue = false,
-    hotSwappable = true
-  )
+  val receivePolls: Boolean = true // JW
   // endregion
 }

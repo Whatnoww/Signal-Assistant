@@ -11,6 +11,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -63,7 +65,8 @@ import org.thoughtcrime.securesms.recipients.ui.findby.FindByActivity
 import org.thoughtcrime.securesms.recipients.ui.findby.FindByMode
 import org.thoughtcrime.securesms.util.CommunicationActions
 import org.thoughtcrime.securesms.window.AppScaffold
-import org.thoughtcrime.securesms.window.WindowSizeClass
+import org.thoughtcrime.securesms.window.detailPaneMaxContentWidth
+import org.thoughtcrime.securesms.window.isSplitPane
 import org.thoughtcrime.securesms.window.rememberAppScaffoldNavigator
 
 /**
@@ -81,6 +84,7 @@ class NewConversationActivity : PassphraseRequiredActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?, ready: Boolean) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState, ready)
 
     val navigateBack = onBackPressedDispatcher::onBackPressed
@@ -126,7 +130,7 @@ private fun NewConversationScreen(
   val callbacks = remember {
     object : UiCallbacks {
       override fun onSearchQueryChanged(query: String) = viewModel.onSearchQueryChanged(query)
-      override fun onCreateNewGroup() = createGroupLauncher.launch(CreateGroupActivity.newIntent(context))
+      override fun onCreateNewGroup() = createGroupLauncher.launch(CreateGroupActivity.createIntent(context))
       override fun onFindByUsername() = findByLauncher.launch(FindByMode.USERNAME)
       override fun onFindByPhoneNumber() = findByLauncher.launch(FindByMode.PHONE_NUMBER)
       override suspend fun shouldAllowSelection(id: RecipientId?, phone: PhoneNumber?): Boolean = true
@@ -198,8 +202,8 @@ private fun NewConversationScreenUi(
   uiState: NewConversationUiState,
   callbacks: UiCallbacks
 ) {
-  val windowSizeClass = WindowSizeClass.rememberWindowSizeClass()
-  val isSplitPane = windowSizeClass.isSplitPane(forceSplitPaneOnCompactLandscape = uiState.forceSplitPaneOnCompactLandscape)
+  val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+  val isSplitPane = windowSizeClass.isSplitPane(forceSplitPane = uiState.forceSplitPaneOnCompactLandscape)
   val snackbarHostState = remember { SnackbarHostState() }
 
   AppScaffold(
@@ -362,9 +366,7 @@ private fun NewConversationRecipientPicker(
       findByUsername = callbacks,
       findByPhoneNumber = callbacks
     ),
-    modifier = modifier
-      .fillMaxSize()
-      .padding(vertical = 12.dp)
+    modifier = modifier.fillMaxSize()
   )
 }
 

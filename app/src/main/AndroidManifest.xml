@@ -713,8 +713,18 @@
 
     <activity android:name=".NewConversationActivity"
               android:theme="@style/Theme.Signal.DayNight.NoActionBar"
+              android:windowSoftInputMode="stateVisible"
               android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
               android:exported="false"/>
+
+    <!-- JW: Add activity used in plaintext backup import / export -->
+    <activity android:name=".ImportExportActivity"
+              android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"/>
+
+    <!-- JW: Add activity used in encrypted backup import -->
+    <activity android:name=".ExitActivity"
+              android:theme="@android:style/Theme.NoDisplay" />
+
     <activity
               android:name=".conversation.NewConversationActivity"
               android:exported="false"
@@ -1064,7 +1074,7 @@
     <activity android:name=".MainActivity"
               android:enableOnBackInvokedCallback="true"
               android:theme="@style/Theme.Signal.DayNight.NoActionBar"
-              android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout"
+              android:configChanges="touchscreen|keyboard|keyboardHidden"
               android:windowSoftInputMode="stateUnchanged"
               android:resizeableActivity="true"
               android:exported="false"/>
@@ -1079,7 +1089,7 @@
               android:exported="false"/>
 
     <activity
-        android:name=".groups.ui.creategroup.CreateGroupActivityV2"
+        android:name=".groups.ui.creategroup.CreateGroupActivity"
         android:exported="false"
         android:theme="@style/Signal.DayNight.NoActionBar" />
 

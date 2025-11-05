@@ -66,7 +66,7 @@ class ChatsSettingsFragment : ComposeFragment() {
       }
     }
   }
-  
+
   @Composable
   override fun FragmentContent() {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -114,12 +114,12 @@ class ChatsSettingsFragment : ComposeFragment() {
     override fun onChatBackupsClick() {
       findNavController().safeNavigate(R.id.action_chatsSettingsFragment_to_backupsPreferenceFragment)
     }
-    
+
     // JW: added --------------------------------------------------------------
     override fun onChatBackupLocationChanged(enabled: Boolean) {
       viewModel.setChatBackupLocation(enabled)
     }
-    
+
     override fun onChatBackupLocationChangedApi30() {
       val backupUri = SignalStore.settings.signalBackupDirectory
 
@@ -128,15 +128,15 @@ class ChatsSettingsFragment : ComposeFragment() {
         viewModel.setChatBackupLocationApi30(UriUtils.getFullPathFromTreeUri(context, backupUri))
       }
     }
-    
+
     override fun ontChatBackupZipfileChanged(enabled: Boolean) {
       viewModel.setChatBackupZipfile(enabled)
     }
-    
+
     override fun onChatBackupZipfilePlainChanged(enabled: Boolean) {
       viewModel.setChatBackupZipfilePlain(enabled)
     }
-    
+
     override fun onKeepViewOnceMessagesChanged(enabled: Boolean) {
       viewModel.keepViewOnceMessages(enabled)
     }
@@ -144,18 +144,18 @@ class ChatsSettingsFragment : ComposeFragment() {
     override fun onIgnoreRemoteDeleteChanged(enabled: Boolean) {
       viewModel.setIgnoreRemoteDelete(enabled)
     }
-    
+
     override fun onDeleteMediaOnlyChanged(enabled: Boolean) {
       viewModel.setDeleteMediaOnly(enabled)
     }
-    
+
     override fun onWhoCanAddYouToGroupsClicked(selection: String) {
       viewModel.setWhoCanAddYouToGroups(selection)
     }
 
     override fun onSetGoogleMapTypeClicked(selection: String) {
       viewModel.setGoogleMapType(selection)
-    }  
+    }
     //-------------------------------------------------------------------------
   }
 }
@@ -282,25 +282,24 @@ private fun ChatsSettingsScreen(
         )
       }
 
-      if (true) { // JW
-        item {
-          Dividers.Default()
-        }
-
-        item {
-          Texts.SectionHeader(stringResource(R.string.preferences_chats__backups))
-        }
-
-        item {
-          Rows.TextRow(
-            text = stringResource(R.string.preferences_chats__chat_backups),
-            label = stringResource(if (state.localBackupsEnabled) R.string.arrays__enabled else R.string.arrays__disabled),
-            enabled = state.localBackupsEnabled || state.isRegisteredAndUpToDate(),
-            onClick = callbacks::onChatBackupsClick
-          )
-        }
-      }
       // JW: added ------------------------------------------------------------
+      item {
+        Dividers.Default()
+      }
+
+      item {
+        Texts.SectionHeader(stringResource(R.string.preferences_chats__backups))
+      }
+
+      item {
+        Rows.TextRow(
+          text = stringResource(R.string.preferences_chats__chat_backups),
+          label = stringResource(if (state.localBackupsEnabled) R.string.arrays__enabled else R.string.arrays__disabled),
+          enabled = state.localBackupsEnabled || state.isRegisteredAndUpToDate(),
+          onClick = callbacks::onChatBackupsClick
+        )
+      }
+
       if (Build.VERSION.SDK_INT < 30) {
         item {
           Rows.ToggleRow(
@@ -341,7 +340,7 @@ private fun ChatsSettingsScreen(
       item {
         Dividers.Default()
       }
-      
+
       item {
         Texts.SectionHeader(stringResource(R.string.preferences_chats__control_message_deletion))
       }
@@ -376,7 +375,7 @@ private fun ChatsSettingsScreen(
       item {
         Dividers.Default()
       }
-      
+
       item {
         Texts.SectionHeader(stringResource(R.string.preferences_chats__group_control))
       }
@@ -394,7 +393,7 @@ private fun ChatsSettingsScreen(
       item {
         Dividers.Default()
       }
-      
+
       item {
         Texts.SectionHeader(stringResource(R.string.preferences_chats__google_map_type))
       }
@@ -402,7 +401,7 @@ private fun ChatsSettingsScreen(
       item {
         Rows.RadioListRow(
           text = stringResource(R.string.preferences__map_type),
-          
+
           labels = stringArrayResource(R.array.pref_map_type_entries),
           values = stringArrayResource(R.array.pref_map_type_values),
           selectedValue = state.googleMapType,

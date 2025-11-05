@@ -309,6 +309,7 @@ android {
       proguardFiles(*buildTypes["debug"].proguardFiles.toTypedArray())
       manifestPlaceholders["mapsKey"] = getMapsKey() // JW
       buildConfigField("String", "BUILD_VARIANT_TYPE", "\"Release\"")
+      buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true") // JW
     }
 
     create("instrumentation") {
@@ -328,6 +329,7 @@ android {
       isMinifyEnabled = false
       matchingFallbacks += "debug"
       buildConfigField("String", "BUILD_VARIANT_TYPE", "\"Spinner\"")
+      buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true")
     }
 
     create("perf") {
@@ -653,7 +655,6 @@ dependencies {
   androidTestImplementation(testLibs.androidx.test.ext.junit.ktx)
   androidTestImplementation(testLibs.assertk)
   androidTestImplementation(testLibs.mockk.android)
-  androidTestImplementation(testLibs.square.okhttp.mockserver)
   androidTestImplementation(testLibs.diff.utils)
 
   androidTestUtil(testLibs.androidx.test.orchestrator)
