@@ -869,6 +869,18 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
           Log.v(JOIN_TAG, "ACI $aci not found to be matching in the blocklist.")
         }
       }
+      //Return ACI for reported member.
+      val isAdminGroup = groupId
+      val aciGetUserAdded = change.newMembers
+      if (isAdminGroup.toString() in ("__signal_group__v2__!ad56ed63e15f7b71285b3e96efef739d3ca78797150b3e0f7141f9fe130bf2e4")){
+        for (member in aciGetUserAdded){
+          val aci = ServiceId.parseOrNull(requestingId.aciBytes) as? ACI ?: continue
+          val recipientId = RecipientId.from(aci)
+          Log.i(JOIN_TAG, "Returning ACI for added user")
+          onJoinAnnounceAciGrab(context, groupId, recipientId, aci)
+        }
+      }
+
 
 
       if (removed.isNotEmpty()) {
@@ -1589,7 +1601,19 @@ private fun onJoinAnnounce(ctx: Context, groupId: GroupId, memberId: RecipientId
   val groupRecipient = Recipient.resolved(groupRecipientId)
   val user = Recipient.resolved(memberId)
   val name = user.getDisplayName(ctx)
-  val announcement = "User: $name ($aci) has requested to join."
+  val announcement = "!!! User: $name ($aci) in blocklist has requested to join."
+  val outgoing = OutgoingMessage.text(threadRecipient = groupRecipient, body = announcement, expiresIn = 0L)
+
+  MessageSender.send(ctx, outgoing, -1L, SendType.SIGNAL, null, null)
+}
+
+//Whatnoww added - Same function but for spam reporting for admin groups.
+private fun onJoinAnnounceAciGrab(ctx: Context, groupId: GroupId, memberId: RecipientId, aci: ACI) {
+  val groupRecipientId = SignalDatabase.recipients.getOrInsertFromGroupId(groupId)
+  val groupRecipient = Recipient.resolved(groupRecipientId)
+  val user = Recipient.resolved(memberId)
+  val name = user.getDisplayName(ctx)
+  val announcement = "$name $aci"
   val outgoing = OutgoingMessage.text(threadRecipient = groupRecipient, body = announcement, expiresIn = 0L)
 
   MessageSender.send(ctx, outgoing, -1L, SendType.SIGNAL, null, null)
