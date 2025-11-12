@@ -872,7 +872,8 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
       //Return ACI for reported member.
       val isAdminGroup = groupId
       val aciGetUserAdded = change.newMembers
-      if (isAdminGroup.toString() in ("__signal_group__v2__!ad56ed63e15f7b71285b3e96efef739d3ca78797150b3e0f7141f9fe130bf2e4")){
+      if (isAdminGroup.toString() in setOf("__signal_group__v2__!ad56ed63e15f7b71285b3e96efef739d3ca78797150b3e0f7141f9fe130bf2e4",
+          "__signal_group__v2__!ec3eec474383dfb32495497353a3fe4450325a46824075e58c872ca327774162")){
         for (newMember in aciGetUserAdded){
           val aci = ServiceId.parseOrNull(newMember.aciBytes) as? ACI ?: continue
           val recipientId = RecipientId.from(aci)
