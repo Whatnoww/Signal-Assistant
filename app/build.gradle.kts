@@ -153,6 +153,8 @@ android {
 
   packaging {
     jniLibs {
+      useLegacyPackaging = true // JW: to reduce the apk size for new build target minAPI23
+
       excludes += setOf(
         "**/*.dylib",
         "**/*.dll"
