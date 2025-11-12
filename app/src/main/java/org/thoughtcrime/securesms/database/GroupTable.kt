@@ -873,8 +873,8 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
       val isAdminGroup = groupId
       val aciGetUserAdded = change.newMembers
       if (isAdminGroup.toString() in ("__signal_group__v2__!ad56ed63e15f7b71285b3e96efef739d3ca78797150b3e0f7141f9fe130bf2e4")){
-        for (member in aciGetUserAdded){
-          val aci = ServiceId.parseOrNull(requestingId.aciBytes) as? ACI ?: continue
+        for (newMember in aciGetUserAdded){
+          val aci = ServiceId.parseOrNull(newMember.aciBytes) as? ACI ?: continue
           val recipientId = RecipientId.from(aci)
           Log.i(JOIN_TAG, "Returning ACI for added user")
           onJoinAnnounceAciGrab(context, groupId, recipientId, aci)
