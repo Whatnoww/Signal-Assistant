@@ -60,6 +60,12 @@
     <string name="ApplicationPreferencesActivity_record_payments_recovery_phrase">Registrar frase de recuperación de pagos</string>
     <string name="ApplicationPreferencesActivity_record_phrase">Registrar frase</string>
     <string name="ApplicationPreferencesActivity_before_you_can_disable_your_pin">Antes de desactivar tu PIN, debes registrar la frase de recuperación de tu cartera de pagos para asegurarte de que puedas recuperar tu cuenta de pagos si lo necesitas.</string>
+    <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">Crea una nueva clave de recuperación</string>
+    <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -1128,7 +1134,7 @@
     <!-- Option in bottom sheet to transfer message history -->
     <string name="LinkDeviceSyncBottomSheet_transfer">Transferir historial de mensajes</string>
     <!-- Description in bottom sheet of what transferring message history will do -->
-    <string name="LinkDeviceSyncBottomSheet_transfer_your_text">Transfiere todos tus mensajes de texto, así como tus archivos multimedia de los últimos 45 días</string>
+    <string name="LinkDeviceSyncBottomSheet_transfer_your_text">Transfiere todos tus mensajes de texto y tus últimos 45 días de archivos multimedia</string>
     <!-- Description in bottom sheet of what transferring message history will do -->
     <string name="LinkDeviceSyncBottomSheet_transfer_your_text_and_all_media">Transfiere tus mensajes de texto y archivos multimedia</string>
     <!-- Option in bottom sheet to not transfer message history -->
@@ -1170,7 +1176,7 @@
     <string name="ExpiredBuildReminder_update_now">Actualizar ahora</string>
 
     <!-- A message in a banner shown at the top of the screen indicating that the user must upgrade their device to use signal. -->
-    <string name="DeprecatedSdkBanner_body">Signal ya no funciona en este dispositivo. Para volver a usar Signal, actualiza tu dispositivo a una versión más nueva de Android o cámbialo por un dispositivo más nuevo.</string>
+    <string name="DeprecatedSdkBanner_body">Signal ya no funciona en este dispositivo. Para volver a usar Signal, debes actualizar tu dispositivo a una versión más nueva de Android o cambiarlo por un dispositivo más nuevo.</string>
 
     <!-- Title of notification telling users to update Signal -->
     <string name="DeprecatedNotificationJob_update_signal">Actualizar Signal</string>
@@ -3363,6 +3369,9 @@
     <!-- Label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="WebRtcCallScreen__answer_without_video">Atender sin vídeo</string>
 
+    <!-- CallScreen -->
+    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
     <string name="WebRtcAudioOutputToggle__audio_output">Salida de audio</string>
@@ -5395,7 +5404,7 @@
     <!-- String alerting user that backup failed -->
     <string name="AppSettingsFragment__couldnt_complete_backup">Copia de seguridad incompleta</string>
     <!-- String alerting user that backup redemption -->
-    <string name="AppSettingsFragment__couldnt_redeem_your_backups_subscription">No se ha podido recuperar tu suscripción a las copias de seguridad</string>
+    <string name="AppSettingsFragment__couldnt_redeem_your_backups_subscription">No se ha podido validar tu suscripción a las copias de seguridad</string>
     <!-- String alerting user that backup storage limit has been reached -->
     <string name="AppSettingsFragment__backup_storage_limit_reached">Se ha alcanzado el límite de almacenamiento de la copia de seguridad</string>
     <!-- String displayed telling user to invite their friends to Signal -->
@@ -5933,11 +5942,11 @@
     <!-- Hint text that shows in the recipient search bar when no text is entered yet. -->
     <string name="RecipientSearchBar__search_name_or_number">Nombre, alias o número</string>
     <!-- Accessibility label for the button to switch to the numeric keyboard type. -->
-    <string name="RecipientSearchBar_accessibility_switch_to_numeric_keyboard">Switch to numeric keyboard</string>
+    <string name="RecipientSearchBar_accessibility_switch_to_numeric_keyboard">Cambiar al teclado numérico</string>
     <!-- Accessibility label for the button to switch to the alphanumeric keyboard type. -->
-    <string name="RecipientSearchBar_accessibility_switch_to_alphanumeric_keyboard">Switch to alphanumeric keyboard</string>
+    <string name="RecipientSearchBar_accessibility_switch_to_alphanumeric_keyboard">Cambiar al teclado alfanumérico</string>
     <!-- Accessibility label for the button to clear the search filter. -->
-    <string name="RecipientSearchBar_accessibility_clear_search">Reset search filter</string>
+    <string name="RecipientSearchBar_accessibility_clear_search">Restablecer filtro de búsqueda</string>
 
     <!-- VoiceNotePlayerView -->
     <string name="VoiceNotePlayerView__dot_s">· %1$s</string>
@@ -7764,7 +7773,7 @@
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will simply dismiss the megaphone -->
     <string name="TurnOnSignalBackups__not_now">Ahora no</string>
     <!-- Text for a "toast" that pops up at the bottom of the user\'s screen after they respond "not now" to a prompt asking them to enable backups -->
-    <string name="TurnOnSignalBackups__toast_not_now">You can enable backups in \"Settings\"</string>
+    <string name="TurnOnSignalBackups__toast_not_now">Puedes activar las copias de seguridad en Ajustes</string>
 
     <!-- Title of a megaphone shown to prompt the user to verify their recovery key -->
     <string name="VerifyBackupKey__title">Verifica tu clave de recuperación</string>
@@ -7971,7 +7980,7 @@
     <!-- Dialog title when a backup fails to be created -->
     <string name="BackupAlertBottomSheet__backup_failed">Error en la copia de seguridad</string>
     <!-- Dialog title when a backup redemption fails -->
-    <string name="BackupAlertBottomSheet__couldnt_redeem_your_backups_subscription">No se ha podido recuperar tu suscripción a las copias de seguridad</string>
+    <string name="BackupAlertBottomSheet__couldnt_redeem_your_backups_subscription">No se ha podido validar tu suscripción a las copias de seguridad</string>
     <!-- Dialog text for when a backup fails to be created and ways to fix it -->
     <string name="BackupAlertBottomSheet__an_error_occurred">Se ha producido un error y no se ha podido completar tu copia de seguridad. Asegúrate de estar usando la última versión de Signal y vuelve a intentarlo. Si el problema persiste, ponte en contacto con el equipo de asistencia.</string>
     <!-- Dialog text for when a backup fails to be created and ways to fix it. Used for out of remote storage space error. -->
@@ -7979,7 +7988,7 @@
     <!-- Dialog action button that will allow you to check for any Signal version updates -->
     <string name="BackupAlertBottomSheet__check_for_update">Buscar actualizaciones</string>
     <!-- Backup redemption error sheet text line 1 -->
-    <string name="BackupAlertBottomSheet__too_many_devices_have_tried">Se ha intentado recuperar tu suscripción desde demasiados dispositivos este mes. Es posible que:</string>
+    <string name="BackupAlertBottomSheet__too_many_devices_have_tried">Se ha intentado validar tu suscripción desde demasiados dispositivos este mes. Es posible que:</string>
     <!-- Backup redemption error sheet bullet point 1 -->
     <string name="BackupAlertBottomSheet__reregistered_your_signal_account">Hayas vuelto a registrar tu cuenta de Signal demasiadas veces.</string>
     <!-- Backup redemption error sheet bullet point 2 -->
@@ -8500,6 +8509,12 @@
     <string name="MessageBackupsKeyRecordScreen__create_a_new_backup_key">Crea una nueva clave de recuperación</string>
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Solo necesitas crear una clave nueva si otra persona sabe tu clave actual. Tendrás que volver a cargar tu copia de seguridad, incluidos los archivos multimedia. Si estás utilizando la función \"Optimizar almacenamiento\", primero deberás descargar los archivos que se han eliminado del dispositivo.</string>
+    <!-- Dialog title shown when user attempts to exit backup setup before completion -->
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <!-- Dialog body warning user that backup setup is incomplete -->
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <!-- Dialog confirmation button to exit backup setup -->
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8629,7 +8644,7 @@
     <!-- Dialog title shown as a warning when skipping restore during registration -->
     <string name="SelectRestoreMethodFragment__skip_restore_title">¿Omitir restauración?</string>
     <!-- Dialog message shown as a warning when skipping restore during registration -->
-    <string name="SelectRestoreMethodFragment__skip_restore_warning">Si omites la restauración ahora, no podrás hacerlo más tarde. Si vuelves a habilitar las copias de seguridad después de omitir la restauración, tu copia de seguridad actual se reemplazará por tu nuevo historial de mensajes.</string>
+    <string name="SelectRestoreMethodFragment__skip_restore_warning">Si no restauras tu copia de seguridad ahora, no podrás hacerlo más adelante. Si decides omitir la restauración y luego vuelves a habilitar las copias de seguridad, Signal eliminará tu copia de seguridad actual y creará una nueva que no incluirá tus mensajes anteriores.</string>
     <!-- Dialog confirm text shown as a warning when skipping restore during registration -->
     <string name="SelectRestoreMethodFragment__skip_restore">Omitir restauración</string>
 
@@ -8764,6 +8779,16 @@
     <!-- No backup to Restore tonal cta to skip restore -->
     <string name="NoBackupToRestore_skip_restore">Omitir restauración</string>
 
+    <!-- Dialog title when the recovery key change limit is reached -->
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <!-- Dialog body when the recovery key change limit is reached -->
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <!-- Button to acknowledge and dismiss dialog   -->
+    <string name="MessageBackupsKeyRecordScreen__ok">Aceptar</string>
     <!-- Accessibility label for close search button in MainToolbar -->
     <string name="MainToolbar__close_search_content_description">Cerrar búsqueda</string>
     <!-- Accessibility label for clear search query in MainToolbar -->
@@ -8850,6 +8875,12 @@
     <string name="Poll__couldnt_end_poll">No se ha podido finalizar la encuesta</string>
     <!-- Dialog body when a poll fails to end and to try again -->
     <string name="Poll__check_connection">Comprueba tu conexión e inténtalo de nuevo.</string>
+    <!-- Dialog title when you go to end a poll -->
+    <string name="Poll__end_poll_title">¿Finalizar encuesta?</string>
+    <!-- Dialog body when you go to end a poll -->
+    <string name="Poll__end_poll_body">Los participantes del grupo ya no podrán votar en esta encuesta.</string>
+    <!-- Body used in dialog when we are waiting for network -->
+    <string name="Poll__waiting_for_network">Esperando red…</string>
     <!-- Header when creating a new poll -->
     <string name="CreatePollFragment__new_poll">Nueva encuesta</string>
     <!-- Section text to enter in a question for a poll  -->

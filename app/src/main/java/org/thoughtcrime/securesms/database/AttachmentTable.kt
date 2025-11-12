@@ -22,7 +22,6 @@ import android.database.Cursor
 import android.media.MediaDataSource
 import android.os.Parcelable
 import android.text.TextUtils
-import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.content.contentValuesOf
@@ -1590,7 +1589,7 @@ class AttachmentTable(
    * that the content of the attachment will never change.
    */
   @Throws(MmsException::class)
-  fun finalizeAttachmentAfterDownload(mmsId: Long, attachmentId: AttachmentId, inputStream: InputStream, offloadRestoredAt: Duration? = null, archiveRestore: Boolean = false) {
+  fun finalizeAttachmentAfterDownload(mmsId: Long, attachmentId: AttachmentId, inputStream: InputStream, offloadRestoredAt: Duration? = null, archiveRestore: Boolean = false, notify: Boolean = true) {
     Log.i(TAG, "[finalizeAttachmentAfterDownload] Finalizing downloaded data for $attachmentId. (MessageId: $mmsId, $attachmentId)")
 
     val existingPlaceholder: DatabaseAttachment = getAttachment(attachmentId) ?: throw MmsException("No attachment found for id: $attachmentId")
@@ -1680,9 +1679,11 @@ class AttachmentTable(
       threads.updateSnippetUriSilently(threadId, snippetMessageId = mmsId, attachment = PartAuthority.getAttachmentDataUri(attachmentId))
     }
 
-    notifyConversationListeners(threadId)
-    notifyConversationListListeners()
-    AppDependencies.databaseObserver.notifyAttachmentUpdatedObservers()
+    if (notify) {
+      notifyConversationListeners(threadId)
+      notifyConversationListListeners()
+      AppDependencies.databaseObserver.notifyAttachmentUpdatedObservers()
+    }
 
     if (foundDuplicate) {
       if (!fileWriteResult.file.delete()) {
@@ -2150,7 +2151,6 @@ class AttachmentTable(
       .run()
   }
 
-  @RequiresApi(23)
   fun mediaDataSourceFor(attachmentId: AttachmentId, allowReadingFromTempFile: Boolean): MediaDataSource? {
     val dataInfo = getDataFileInfo(attachmentId)
     if (dataInfo != null) {

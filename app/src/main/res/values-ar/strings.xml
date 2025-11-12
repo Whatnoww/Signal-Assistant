@@ -60,6 +60,12 @@
     <string name="ApplicationPreferencesActivity_record_payments_recovery_phrase">تسجيل عبارة استعادة المدفوعات</string>
     <string name="ApplicationPreferencesActivity_record_phrase">تسجيل عبارة</string>
     <string name="ApplicationPreferencesActivity_before_you_can_disable_your_pin">قبل تعطيل رقم التعريف الشخصي (PIN) لديك، يجب عليك تسجيل عبارة استعادة المدفوعات للتأكُّد من إمكانية استعادة حساب المدفوعات الخاص بك.</string>
+    <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">إنشاء مفتاح استعادة جديد</string>
+    <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -1258,7 +1264,7 @@
     <string name="ExpiredBuildReminder_update_now">حدِّث الآن</string>
 
     <!-- A message in a banner shown at the top of the screen indicating that the user must upgrade their device to use signal. -->
-    <string name="DeprecatedSdkBanner_body">لم يعُد تطبيق Signal يَعمل على هذا الجهاز. لاستخدام التطبيق مرة أخرى، يُرجى تحديث الأندرويد على جهازك إلى إصدار أحدث أو قم بالتغيير إلى جهاز أحدث.</string>
+    <string name="DeprecatedSdkBanner_body">لم يعُد تطبيق Signal يَعمل على هذا الجهاز. لاستخدام التطبيق مرّة أخرى، قُم بتحديث الأندرويد على جهازك إلى إصدار أحدث أو قُم بالتغيير إلى جهاز أحدث.</string>
 
     <!-- Title of notification telling users to update Signal -->
     <string name="DeprecatedNotificationJob_update_signal">تحديث سيجنال</string>
@@ -3766,6 +3772,9 @@
     <string name="WebRtcCallScreen__answer">إجابة</string>
     <!-- Label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="WebRtcCallScreen__answer_without_video">أجب بدون فيديو</string>
+
+    <!-- CallScreen -->
+    <string name="CallScreen__change_camera_direction">Change camera direction</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -6493,11 +6502,11 @@
     <!-- Hint text that shows in the recipient search bar when no text is entered yet. -->
     <string name="RecipientSearchBar__search_name_or_number">الاسم، أو اسم المُستخدِم، أو الرقم</string>
     <!-- Accessibility label for the button to switch to the numeric keyboard type. -->
-    <string name="RecipientSearchBar_accessibility_switch_to_numeric_keyboard">Switch to numeric keyboard</string>
+    <string name="RecipientSearchBar_accessibility_switch_to_numeric_keyboard">التبديل إلى لوحة مفاتيح رقمية</string>
     <!-- Accessibility label for the button to switch to the alphanumeric keyboard type. -->
-    <string name="RecipientSearchBar_accessibility_switch_to_alphanumeric_keyboard">Switch to alphanumeric keyboard</string>
+    <string name="RecipientSearchBar_accessibility_switch_to_alphanumeric_keyboard">التبديل إلى لوحة مفاتيح أبجدية ورقمية</string>
     <!-- Accessibility label for the button to clear the search filter. -->
-    <string name="RecipientSearchBar_accessibility_clear_search">Reset search filter</string>
+    <string name="RecipientSearchBar_accessibility_clear_search">إعادة تعيين فلتر البحث</string>
 
     <!-- VoiceNotePlayerView -->
     <string name="VoiceNotePlayerView__dot_s">· %1$s</string>
@@ -8452,7 +8461,7 @@
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will simply dismiss the megaphone -->
     <string name="TurnOnSignalBackups__not_now">ليس الآن</string>
     <!-- Text for a "toast" that pops up at the bottom of the user\'s screen after they respond "not now" to a prompt asking them to enable backups -->
-    <string name="TurnOnSignalBackups__toast_not_now">You can enable backups in \"Settings\"</string>
+    <string name="TurnOnSignalBackups__toast_not_now">يُمكنك تفعيل النسخ الاحتياطية في \"الإعدادات\"</string>
 
     <!-- Title of a megaphone shown to prompt the user to verify their recovery key -->
     <string name="VerifyBackupKey__title">قُم بتأكيد مفتاح الاستعادة الخاص بك</string>
@@ -9228,6 +9237,12 @@
     <string name="MessageBackupsKeyRecordScreen__create_a_new_backup_key">إنشاء مفتاح استعادة جديد</string>
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">لا يُعتبَر إنشاء مفتاح نسخ احتياطي جديد ضروريًا إلّا إذا كان شخص آخر يعرف مفتاحك. سَيتعين عليك تحميل نسختك الاحتياطية من جديد، بما في ذلك ملفات الوسائط. إذا كُنتَ تستخدم خاصية \"تحسين الخزين\"، سَيتعين عليك تنزيل ملفات الوسائط المُفرَّغة أولًا.</string>
+    <!-- Dialog title shown when user attempts to exit backup setup before completion -->
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <!-- Dialog body warning user that backup setup is incomplete -->
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <!-- Dialog confirmation button to exit backup setup -->
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -9500,6 +9515,16 @@
     <!-- No backup to Restore tonal cta to skip restore -->
     <string name="NoBackupToRestore_skip_restore">تخطِّي الاستعادة</string>
 
+    <!-- Dialog title when the recovery key change limit is reached -->
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <!-- Dialog body when the recovery key change limit is reached -->
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <!-- Button to acknowledge and dismiss dialog   -->
+    <string name="MessageBackupsKeyRecordScreen__ok">حسنًا</string>
     <!-- Accessibility label for close search button in MainToolbar -->
     <string name="MainToolbar__close_search_content_description">إغلاق البحث</string>
     <!-- Accessibility label for clear search query in MainToolbar -->
@@ -9598,6 +9623,12 @@
     <string name="Poll__couldnt_end_poll">تعذَّر إنهاء الاستطلاع.</string>
     <!-- Dialog body when a poll fails to end and to try again -->
     <string name="Poll__check_connection">تحقّق من اتصالك بالشبكة ثم حاوِل مرّة أخرى.</string>
+    <!-- Dialog title when you go to end a poll -->
+    <string name="Poll__end_poll_title">هل ترغبُ بإنهاء الاستطلاع؟</string>
+    <!-- Dialog body when you go to end a poll -->
+    <string name="Poll__end_poll_body">لن يستطيع أعضاء المجموعة التصويت في هذا الاستطلاع بعد الآن.</string>
+    <!-- Body used in dialog when we are waiting for network -->
+    <string name="Poll__waiting_for_network">جارٍ انتظار الشبكة…</string>
     <!-- Header when creating a new poll -->
     <string name="CreatePollFragment__new_poll">استطلاع جديد</string>
     <!-- Section text to enter in a question for a poll  -->

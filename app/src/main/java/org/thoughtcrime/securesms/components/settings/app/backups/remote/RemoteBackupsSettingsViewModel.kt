@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.withContext
 import org.signal.core.util.bytes
+import org.signal.core.util.concurrent.SignalDispatchers
 import org.signal.core.util.logging.Log
 import org.signal.core.util.mebiBytes
 import org.signal.core.util.throttleLatest
@@ -34,6 +35,7 @@ import org.thoughtcrime.securesms.backup.v2.ArchiveRestoreProgress
 import org.thoughtcrime.securesms.backup.v2.ArchiveRestoreProgressState.RestoreStatus
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
+import org.thoughtcrime.securesms.backup.v2.ui.subscription.BackupUpgradeAvailabilityChecker
 import org.thoughtcrime.securesms.backup.v2.ui.subscription.MessageBackupsType
 import org.thoughtcrime.securesms.components.settings.app.backups.BackupState
 import org.thoughtcrime.securesms.components.settings.app.backups.BackupStateObserver
@@ -98,6 +100,12 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
         _state.update {
           it.copy(isPaidTierPricingAvailable = paidType is NetworkResult.Success)
         }
+      }
+    }
+
+    viewModelScope.launch {
+      _state.update {
+        it.copy(isGooglePlayServicesAvailable = BackupUpgradeAvailabilityChecker.isUpgradeAvailable(AppDependencies.application))
       }
     }
 
@@ -223,6 +231,22 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
 
   fun requestSnackbar(snackbar: RemoteBackupsSettingsState.Snackbar) {
     _state.update { it.copy(snackbar = snackbar) }
+  }
+
+  fun getKeyRotationLimit() {
+    viewModelScope.launch(SignalDispatchers.IO) {
+      val result = BackupRepository.getKeyRotationLimit()
+      val canRotateKey = if (result is NetworkResult.Success) {
+        result.result.hasPermitsRemaining!!
+      } else {
+        Log.w(TAG, "Error while getting rotation limit: $result. Default to allowing key rotations.")
+        true
+      }
+
+      if (!canRotateKey) {
+        requestDialog(RemoteBackupsSettingsState.Dialog.KEY_ROTATION_LIMIT_REACHED)
+      }
+    }
   }
 
   fun refresh() {

@@ -142,6 +142,7 @@ import org.whispersystems.signalservice.api.ApplicationErrorAction
 import org.whispersystems.signalservice.api.NetworkResult
 import org.whispersystems.signalservice.api.StatusCodeErrorAction
 import org.whispersystems.signalservice.api.archive.ArchiveGetMediaItemsResponse
+import org.whispersystems.signalservice.api.archive.ArchiveKeyRotationLimitResponse
 import org.whispersystems.signalservice.api.archive.ArchiveMediaRequest
 import org.whispersystems.signalservice.api.archive.ArchiveMediaResponse
 import org.whispersystems.signalservice.api.archive.ArchiveServiceAccess
@@ -164,6 +165,7 @@ import org.whispersystems.signalservice.internal.crypto.PaddingInputStream
 import org.whispersystems.signalservice.internal.push.AttachmentUploadForm
 import org.whispersystems.signalservice.internal.push.AuthCredentials
 import org.whispersystems.signalservice.internal.push.SubscriptionsConfiguration
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -981,7 +983,7 @@ object BackupRepository {
         // We're using a snapshot, so the transaction is more for perf than correctness
         dbSnapshot.rawWritableDatabase.withinTransaction {
           progressEmitter?.onAccount()
-          AccountDataArchiveProcessor.export(dbSnapshot, signalStoreSnapshot) { frame ->
+          AccountDataArchiveProcessor.export(dbSnapshot, signalStoreSnapshot, exportState) { frame ->
             writer.write(frame)
             extraFrameOperation?.invoke(frame)
             eventTimer.emit("account")
@@ -2062,6 +2064,10 @@ object BackupRepository {
       .then { SignalNetwork.archive.getSvrBAuthorization(SignalStore.account.requireAci(), it.messageBackupAccess) }
   }
 
+  fun getKeyRotationLimit(): NetworkResult<ArchiveKeyRotationLimitResponse> {
+    return SignalNetwork.archive.getKeyRotationLimit()
+  }
+
   /**
    * During normal operation, ensures that the backupId has been reserved and that your public key has been set,
    * while also returning an archive access data. Should be the basis of all backup operations.
@@ -2394,6 +2400,26 @@ object BackupRepository {
     ).encodeByteString()
   }
 
+  fun getRemoteBackupForwardSecrecyMetadata(): NetworkResult<ByteArray?> {
+    return initBackupAndFetchAuth()
+      .then { credential -> SignalNetwork.archive.getBackupInfo(SignalStore.account.requireAci(), credential.messageBackupAccess) }
+      .then { info -> getCdnReadCredentials(CredentialType.MESSAGE, info.cdn ?: Cdn.CDN_3.cdnNumber).map { it.headers to info } }
+      .then { pair ->
+        val (cdnCredentials, info) = pair
+        val headers = cdnCredentials.toMutableMap().apply {
+          this["range"] = "bytes=0-${EncryptedBackupReader.BACKUP_SECRET_METADATA_UPPERBOUND - 1}"
+        }
+
+        AppDependencies.signalServiceMessageReceiver.retrieveBackupForwardSecretMetadataBytes(
+          info.cdn!!,
+          headers,
+          "backups/${info.backupDir}/${info.backupName}",
+          EncryptedBackupReader.BACKUP_SECRET_METADATA_UPPERBOUND
+        )
+      }
+      .map { bytes -> EncryptedBackupReader.readForwardSecrecyMetadata(ByteArrayInputStream(bytes)) }
+  }
+
   interface ExportProgressListener {
     fun onAccount()
     fun onRecipient()
@@ -2429,6 +2455,8 @@ class ExportState(
   val threadIdToRecipientId: MutableMap<Long, Long> = hashMapOf()
   val recipientIdToAci: MutableMap<Long, ByteString> = hashMapOf()
   val aciToRecipientId: MutableMap<String, Long> = hashMapOf()
+  val recipientIdToE164: MutableMap<Long, Long> = hashMapOf()
+  val customChatColorIds: MutableSet<Long> = hashSetOf()
 }
 
 class ImportState(val mediaRootBackupKey: MediaRootBackupKey) {

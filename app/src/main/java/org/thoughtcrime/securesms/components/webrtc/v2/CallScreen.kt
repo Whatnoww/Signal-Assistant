@@ -56,29 +56,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.signal.core.ui.compose.AllNightPreviews
 import org.signal.core.ui.compose.BottomSheets
 import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.TriggerAlignedPopupState
 import org.signal.core.util.DimensionUnit
 import org.thoughtcrime.securesms.R
+import org.thoughtcrime.securesms.components.webrtc.CallParticipantView
 import org.thoughtcrime.securesms.components.webrtc.WebRtcLocalRenderState
+import org.thoughtcrime.securesms.components.webrtc.controls.RaiseHandSnackbar
 import org.thoughtcrime.securesms.conversation.colors.ChatColorsPalette
 import org.thoughtcrime.securesms.events.CallParticipant
+import org.thoughtcrime.securesms.events.GroupCallRaiseHandEvent
 import org.thoughtcrime.securesms.events.GroupCallReactionEvent
 import org.thoughtcrime.securesms.events.WebRtcViewModel
 import org.thoughtcrime.securesms.recipients.Recipient
+import org.thoughtcrime.securesms.ringrtc.CameraState
 import kotlin.math.max
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
@@ -170,7 +174,6 @@ fun CallScreen(
     val maxSheetHeight = round(constraints.maxHeight * 0.66f)
     val maxOffset = maxHeight - maxSheetHeight
 
-    var offset by remember { mutableFloatStateOf(0f) }
     var peekHeight by remember { mutableFloatStateOf(88f) }
 
     BottomSheetScaffold(
@@ -192,7 +195,7 @@ fun CallScreen(
             .padding(top = SHEET_TOP_PADDING.dp, bottom = SHEET_BOTTOM_PADDING.dp)
             .height(DimensionUnit.PIXELS.toDp(maxSheetHeight).dp)
             .onGloballyPositioned {
-              offset = scaffoldState.bottomSheetState.requireOffset()
+              val offset = it.positionInRoot().y
               val current = maxHeight - offset - DimensionUnit.DP.toPixels(peekHeight)
               val maximum = maxHeight - maxOffset - DimensionUnit.DP.toPixels(peekHeight)
 
@@ -242,14 +245,10 @@ fun CallScreen(
         onPipClick = onLocalPictureInPictureClicked,
         onControlsToggled = onControlsToggled,
         callScreenController = callScreenController,
+        onToggleCameraDirection = callScreenControlsListener::onCameraDirectionChanged,
         modifier = if (isPortrait) {
           Modifier.padding(bottom = padding)
         } else Modifier
-      )
-
-      CallScreenReactionsContainer(
-        reactions = reactions,
-        modifier = Modifier.padding(bottom = padding)
       )
 
       val onCallInfoClick: () -> Unit = {
@@ -282,30 +281,51 @@ fun CallScreen(
           callStatus = callScreenState.callStatus,
           onNavigationClick = onNavigationClick,
           onCallInfoClick = onCallInfoClick,
+          onCameraToggleClick = callScreenControlsListener::onCameraDirectionChanged,
           isLocalVideoEnabled = localParticipant.isVideoEnabled,
+          isMoreThanOneCameraAvailable = localParticipant.isMoreThanOneCameraAvailable,
           modifier = Modifier.padding(bottom = padding)
         )
       }
 
-      raiseHandSnackbar(Modifier.fillMaxWidth())
-
-      AnimatedCallStateUpdate(
-        callControlsChange = callScreenState.callControlsChange,
+      // This content lives "above" the controls sheet and includes raised hands, status updates, etc.
+      Box(
         modifier = Modifier
-          .align(Alignment.BottomCenter)
+          .fillMaxSize()
           .padding(bottom = padding)
-          .padding(bottom = 20.dp)
-      )
+      ) {
+        Column(
+          modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 20.dp)
+        ) {
+          CallScreenReactionsContainer(
+            reactions = reactions,
+            modifier = Modifier.weight(1f)
+          )
 
-      val state = remember(callScreenState.pendingParticipantsState) {
-        callScreenState.pendingParticipantsState
-      }
+          raiseHandSnackbar(
+            Modifier
+          )
+        }
 
-      if (state != null) {
-        PendingParticipants(
-          pendingParticipantsState = state,
-          pendingParticipantsListener = pendingParticipantsListener
+        AnimatedCallStateUpdate(
+          callControlsChange = callScreenState.callControlsChange,
+          modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .padding(bottom = 20.dp)
         )
+
+        val state = remember(callScreenState.pendingParticipantsState) {
+          callScreenState.pendingParticipantsState
+        }
+
+        if (state != null) {
+          PendingParticipants(
+            pendingParticipantsState = state,
+            pendingParticipantsListener = pendingParticipantsListener
+          )
+        }
       }
     }
   }
@@ -331,6 +351,7 @@ private fun BoxScope.Viewport(
   callScreenController: CallScreenController,
   onPipClick: () -> Unit,
   onControlsToggled: (Boolean) -> Unit,
+  onToggleCameraDirection: () -> Unit,
   modifier: Modifier = Modifier
 ) {
   if (webRtcCallState.isPreJoinOrNetworkUnavailable) {
@@ -448,6 +469,7 @@ private fun BoxScope.Viewport(
       localParticipant = localParticipant,
       localRenderState = localRenderState,
       onClick = onPipClick,
+      onToggleCameraDirection = onToggleCameraDirection,
       modifier = modifier
     )
   }
@@ -463,6 +485,8 @@ private fun LargeLocalVideoRenderer(
 ) {
   CallParticipantRenderer(
     callParticipant = localParticipant,
+    isLocalParticipant = true,
+    renderInPip = false,
     modifier = modifier
       .fillMaxSize()
   )
@@ -499,6 +523,9 @@ private fun TinyLocalVideoRenderer(
 
   CallParticipantRenderer(
     callParticipant = localParticipant,
+    isLocalParticipant = true,
+    renderInPip = true,
+    selfPipMode = CallParticipantView.SelfPipMode.MINI_SELF_PIP,
     modifier = modifier
       .padding(padding)
       .height(height)
@@ -516,6 +543,7 @@ private fun SmallMoveableLocalVideoRenderer(
   localParticipant: CallParticipant,
   localRenderState: WebRtcLocalRenderState,
   onClick: () -> Unit,
+  onToggleCameraDirection: () -> Unit,
   modifier: Modifier = Modifier
 ) {
   val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -542,6 +570,14 @@ private fun SmallMoveableLocalVideoRenderer(
   ) {
     CallParticipantRenderer(
       callParticipant = localParticipant,
+      isLocalParticipant = true,
+      renderInPip = true,
+      selfPipMode = if (localRenderState == WebRtcLocalRenderState.EXPANDED) {
+        CallParticipantView.SelfPipMode.EXPANDED_SELF_PIP
+      } else {
+        CallParticipantView.SelfPipMode.NORMAL_SELF_PIP
+      },
+      onToggleCameraDirection = onToggleCameraDirection,
       modifier = Modifier
         .fillMaxSize()
         .clip(MaterialTheme.shapes.medium)
@@ -612,9 +648,7 @@ private fun AnimatedCallStateUpdate(
   }
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, device = Devices.FOLDABLE)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, device = Devices.TABLET)
+@AllNightPreviews
 @Composable
 private fun CallScreenPreview() {
   val participants = remember {
@@ -653,14 +687,35 @@ private fun CallScreenPreview() {
           isResolving = false,
           isSelf = true
         ),
-        isVideoEnabled = true
+        isVideoEnabled = true,
+        cameraState = CameraState(
+          CameraState.Direction.FRONT,
+          2
+        )
       ),
       localRenderState = WebRtcLocalRenderState.SMALL_RECTANGLE,
       callScreenDialogType = CallScreenDialogType.NONE,
       callInfoView = {
         Text(text = "Call Info View Preview", modifier = Modifier.alpha(it))
       },
-      raiseHandSnackbar = {},
+      raiseHandSnackbar = {
+        RaiseHandSnackbar.View(
+          raisedHandsState = listOf(
+            GroupCallRaiseHandEvent(
+              sender = CallParticipant(
+                recipient = Recipient(
+                  isResolving = false,
+                  systemContactName = "Miles Morales"
+                )
+              ),
+              timestampMillis = System.currentTimeMillis()
+            )
+          ),
+          speechEvent = null,
+          showCallInfoListener = {},
+          modifier = it
+        )
+      },
       onNavigationClick = {},
       onLocalPictureInPictureClicked = {},
       overflowParticipants = participants,

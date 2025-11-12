@@ -47,6 +47,10 @@ object ExportSkips {
     return log(sentTimestamp, "Group update record is parseable, but has no updates.")
   }
 
+  fun groupUpdateHasInvalidAuthor(sentTimestamp: Long): String {
+    return log(sentTimestamp, "Group update has an invalid author.")
+  }
+
   fun directStoryReplyHasNoBody(sentTimestamp: Long): String {
     return log(sentTimestamp, "Direct story reply has no body.")
   }
@@ -133,6 +137,14 @@ object ExportSkips {
 
   fun individualChatUpdateInWrongTypeOfChat(sentTimestamp: Long): String {
     return log(sentTimestamp, "A chat update that only makes sense for individual chats was found in a different kind of chat.")
+  }
+
+  fun individualChatUpdateNotAuthoredBySelf(sentTimestamp: Long): String {
+    return log(sentTimestamp, "A chat update that only makes sense to be authored by self has a different author.")
+  }
+
+  fun incomingMessageAuthorDoesNotHaveAciOrE164(sentTimestamp: Long): String {
+    return log(sentTimestamp, "An incoming message author did not have an aci or e164.")
   }
 
   fun callWithMissingRecipient(sentTimestamp: Long): String {

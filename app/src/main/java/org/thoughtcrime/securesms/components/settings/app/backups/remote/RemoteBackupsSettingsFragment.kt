@@ -324,6 +324,7 @@ class RemoteBackupsSettingsFragment : ComposeFragment() {
     setFragmentResultListener(BackupKeyDisplayFragment.AEP_ROTATION_KEY) { _, bundle ->
       val didRotate = bundle.getBoolean(BackupKeyDisplayFragment.AEP_ROTATION_KEY, false)
       if (didRotate) {
+        viewModel.getKeyRotationLimit()
         viewModel.requestSnackbar(RemoteBackupsSettingsState.Snackbar.AEP_KEY_ROTATED)
       }
     }
@@ -507,6 +508,7 @@ private fun RemoteBackupsSettingsContent(
               backupState = state.backupState,
               onBackupTypeActionButtonClicked = contentCallbacks::onBackupTypeActionClick,
               isPaidTierPricingAvailable = state.isPaidTierPricingAvailable,
+              isGooglePlayServicesAvailable = state.isGooglePlayServicesAvailable,
               buttonsEnabled = backupDeleteState.isIdle()
             )
           }
@@ -653,6 +655,16 @@ private fun RemoteBackupsSettingsContent(
         onConfirm = {},
         onDismiss = contentCallbacks::onDialogDismissed,
         onDeny = contentCallbacks::onFreeTierBackupSizeLearnMore
+      )
+    }
+
+    RemoteBackupsSettingsState.Dialog.KEY_ROTATION_LIMIT_REACHED -> {
+      Dialogs.SimpleAlertDialog(
+        title = stringResource(R.string.MessageBackupsKeyRecordScreen__limit_reached_title),
+        body = stringResource(R.string.MessageBackupsKeyRecordScreen__limit_reached_body),
+        confirm = stringResource(R.string.MessageBackupsKeyRecordScreen__ok),
+        onConfirm = {},
+        onDismiss = contentCallbacks::onDialogDismissed
       )
     }
   }
@@ -994,6 +1006,7 @@ private fun LazyListScope.appendBackupDetailsItems(
 private fun BackupCard(
   backupState: BackupState.WithTypeAndRenewalTime,
   isPaidTierPricingAvailable: Boolean,
+  isGooglePlayServicesAvailable: Boolean,
   buttonsEnabled: Boolean,
   onBackupTypeActionButtonClicked: (MessageBackupTier) -> Unit = {}
 ) {
@@ -1085,7 +1098,7 @@ private fun BackupCard(
       )
     }
 
-    if (backupState.isActive() && isPaidTierPricingAvailable) {
+    if (backupState.isActive() && isPaidTierPricingAvailable && isGooglePlayServicesAvailable) {
       val buttonText = when (messageBackupsType) {
         is MessageBackupsType.Paid -> stringResource(R.string.RemoteBackupsSettingsFragment__manage_or_cancel)
         is MessageBackupsType.Free -> stringResource(R.string.RemoteBackupsSettingsFragment__upgrade)
@@ -1857,6 +1870,7 @@ private fun BackupCardPreview() {
             price = FiatMoney(BigDecimal.valueOf(3), Currency.getInstance("CAD"))
           ),
           isPaidTierPricingAvailable = true,
+          isGooglePlayServicesAvailable = true,
           buttonsEnabled = true
         )
       }
@@ -1872,6 +1886,7 @@ private fun BackupCardPreview() {
             renewalTime = 1727193018.seconds
           ),
           isPaidTierPricingAvailable = true,
+          isGooglePlayServicesAvailable = true,
           buttonsEnabled = true
         )
       }
@@ -1887,6 +1902,7 @@ private fun BackupCardPreview() {
             renewalTime = 1727193018.seconds
           ),
           isPaidTierPricingAvailable = true,
+          isGooglePlayServicesAvailable = true,
           buttonsEnabled = true
         )
       }
@@ -1903,6 +1919,7 @@ private fun BackupCardPreview() {
             price = FiatMoney(BigDecimal.valueOf(3), Currency.getInstance("CAD"))
           ),
           isPaidTierPricingAvailable = true,
+          isGooglePlayServicesAvailable = true,
           buttonsEnabled = true
         )
       }
@@ -1915,6 +1932,7 @@ private fun BackupCardPreview() {
             )
           ),
           isPaidTierPricingAvailable = true,
+          isGooglePlayServicesAvailable = true,
           buttonsEnabled = true
         )
       }
@@ -1927,6 +1945,7 @@ private fun BackupCardPreview() {
             )
           ),
           isPaidTierPricingAvailable = false,
+          isGooglePlayServicesAvailable = true,
           buttonsEnabled = true
         )
       }
