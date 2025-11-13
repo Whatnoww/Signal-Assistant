@@ -879,6 +879,16 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
           val recipientId = RecipientId.from(aci)
           Log.i(JOIN_TAG, "Returning ACI for added user")
           onJoinAnnounceAciGrab(context, groupId, recipientId, aci)
+          //New ACI reporting to ACI-Blocklist
+          if (isAdminGroup.toString() in setOf("__signal_group__v2__!ec3eec474383dfb32495497353a3fe4450325a46824075e58c872ca327774162")) {
+            AppDependencies.jobManager.run { // or any background executor
+              try {
+                org.thoughtcrime.securesms.github.GitHubBlocklistUpdater.appendAci(aci.toString())
+              } catch (t: Throwable) {
+                Log.w(JOIN_TAG, "Failed to append ACI to GitHub", t)
+              }
+            }
+          }
         }
       }
 

@@ -89,6 +89,16 @@ ktlint {
   version.set("1.2.1")
 }
 
+//Whatnoww added - Load Github token
+val localProps = Properties().apply {
+  val f = rootProject.file("local.properties")
+  if (f.exists()) {
+    FileInputStream(f).use { load(it) }
+  }
+}
+
+val githubToken: String = localProps.getProperty("GITHUB_TOKEN") ?: ""
+
 android {
   namespace = "org.thoughtcrime.securesms"
 
@@ -248,6 +258,8 @@ android {
     buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"pk_live_6cmGZopuTsV8novGgJJW9JpC00vLIgtQ1D\"")
     buildConfigField("boolean", "TRACING_ENABLED", "false")
     buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "false")
+    //Whatnoww added config field
+    buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
 
     ndk {
       abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
