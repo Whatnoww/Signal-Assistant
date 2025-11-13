@@ -5,8 +5,9 @@ DO NOT USE THIS AS YOUR PERSONAL CLIENT YOUR SECURITY IS EXPLICITLY REDUCED.
 
 ## Current features
 
-- Basically all from Signal-JW
+- Basically all from Signal-JW including the most important websocket force options and preventing arbitrary group adds.
 - Spam reporting based off of a blocklist: https://github.com/Whatnoww/ACI-Blocklist
+- Automatic blocklist updates when adding to an admin exclusive spam reporting group.
 - Will now not notify for messages that don't contain ! so there's less overhead.
 - Will try to mark as read more often to clear safety number changes.
 
@@ -21,7 +22,9 @@ Have something you want to say about Open Whisper Systems projects or want to be
 
 
 ### What we need
-ACI reporting.
+Group rebuild protection.
+Automatic spam removal.
+Built in auto-reply feature.
 
 
 ## Documentation
