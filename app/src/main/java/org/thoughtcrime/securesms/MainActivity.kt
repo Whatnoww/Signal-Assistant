@@ -31,15 +31,22 @@ import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.PaneExpansionAnchor
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.rememberPaneExpansionState
@@ -66,15 +73,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.window.core.layout.WindowSizeClass
-import androidx.window.core.layout.WindowWidthSizeClass
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import io.reactivex.rxjava3.subjects.PublishSubject
+import io.reactivex.rxjava3.subjects.Subject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.signal.core.ui.compose.theme.SignalTheme
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.getSerializableCompat
 import org.signal.core.util.logging.Log
@@ -87,6 +94,8 @@ import org.thoughtcrime.securesms.calls.links.details.CallLinkDetailsActivity
 import org.thoughtcrime.securesms.calls.log.CallLogFilter
 import org.thoughtcrime.securesms.calls.log.CallLogFragment
 import org.thoughtcrime.securesms.calls.new.NewCallActivity
+import org.thoughtcrime.securesms.calls.quality.CallQuality
+import org.thoughtcrime.securesms.calls.quality.CallQualityBottomSheetFragment
 import org.thoughtcrime.securesms.components.DebugLogsPromptDialogFragment
 import org.thoughtcrime.securesms.components.PromptBatterySaverDialogFragment
 import org.thoughtcrime.securesms.components.compose.ConnectivityWarningBottomSheet
@@ -94,8 +103,11 @@ import org.thoughtcrime.securesms.components.compose.DeviceSpecificNotificationB
 import org.thoughtcrime.securesms.components.settings.app.AppSettingsActivity
 import org.thoughtcrime.securesms.components.settings.app.AppSettingsActivity.Companion.manageSubscriptions
 import org.thoughtcrime.securesms.components.settings.app.notifications.manual.NotificationProfileSelectionFragment
+import org.thoughtcrime.securesms.components.settings.app.subscription.GooglePayComponent
+import org.thoughtcrime.securesms.components.settings.app.subscription.GooglePayRepository
 import org.thoughtcrime.securesms.components.voice.VoiceNoteMediaController
 import org.thoughtcrime.securesms.components.voice.VoiceNoteMediaControllerOwner
+import org.thoughtcrime.securesms.compose.SignalTheme
 import org.thoughtcrime.securesms.conversation.ConversationIntents
 import org.thoughtcrime.securesms.conversation.NewConversationActivity
 import org.thoughtcrime.securesms.conversation.v2.MotionEventRelay
@@ -122,6 +134,7 @@ import org.thoughtcrime.securesms.main.MainNavigationDetailLocation
 import org.thoughtcrime.securesms.main.MainNavigationListLocation
 import org.thoughtcrime.securesms.main.MainNavigationRail
 import org.thoughtcrime.securesms.main.MainNavigationViewModel
+import org.thoughtcrime.securesms.main.MainSnackbar
 import org.thoughtcrime.securesms.main.MainToolbar
 import org.thoughtcrime.securesms.main.MainToolbarCallback
 import org.thoughtcrime.securesms.main.MainToolbarMode
@@ -173,7 +186,7 @@ import org.thoughtcrime.securesms.window.isSplitPane
 import org.thoughtcrime.securesms.window.rememberThreePaneScaffoldNavigatorDelegate
 import org.whispersystems.signalservice.api.websocket.WebSocketConnectionState
 
-class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner, MainNavigator.NavigatorProvider, Material3OnScrollHelperBinder, ConversationListFragment.Callback, CallLogFragment.Callback {
+class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner, MainNavigator.NavigatorProvider, Material3OnScrollHelperBinder, ConversationListFragment.Callback, CallLogFragment.Callback, GooglePayComponent {
 
   companion object {
     private val TAG = Log.tag(MainActivity::class)
@@ -229,6 +242,9 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
   private val mainBottomChromeCallback = BottomChromeCallback()
   private val megaphoneActionController = MainMegaphoneActionController()
   private val mainNavigationCallback = MainNavigationCallback()
+
+  override val googlePayRepository: GooglePayRepository by lazy { GooglePayRepository(this) }
+  override val googlePayResultPublisher: Subject<GooglePayComponent.GooglePayResult> = PublishSubject.create()
 
   override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
     return motionEventRelay.offer(ev) || super.dispatchTouchEvent(ev)
@@ -295,6 +311,20 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
       }
     }
 
+    supportFragmentManager.setFragmentResultListener(
+      CallQualityBottomSheetFragment.REQUEST_KEY,
+      this
+    ) { _, bundle ->
+      if (bundle.getBoolean(CallQualityBottomSheetFragment.REQUEST_KEY, false)) {
+        mainNavigationViewModel.setSnackbar(
+          SnackbarState(
+            message = getString(R.string.CallQualitySheet__thanks_for_your_feedback),
+            duration = SnackbarDuration.Short
+          )
+        )
+      }
+    }
+
     shareDataTimestampViewModel.setTimestampFromActivityCreation(savedInstanceState, intent)
 
     setContent {
@@ -313,9 +343,10 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
       }
 
       val isActionModeActive = mainToolbarState.mode == MainToolbarMode.ACTION_MODE
+      val isSearchModeActive = mainToolbarState.mode == MainToolbarMode.SEARCH
       val isNavigationRailVisible = mainToolbarState.mode != MainToolbarMode.SEARCH
       val isNavigationBarVisible = mainToolbarState.mode == MainToolbarMode.FULL
-      val isBackHandlerEnabled = mainToolbarState.destination != MainNavigationListLocation.CHATS && !isActionModeActive
+      val isBackHandlerEnabled = mainToolbarState.destination != MainNavigationListLocation.CHATS && !isActionModeActive && !isSearchModeActive
 
       BackHandler(enabled = isBackHandlerEnabled) {
         mainNavigationViewModel.setFocusedPane(ThreePaneScaffoldRole.Secondary)
@@ -324,6 +355,10 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
 
       BackHandler(enabled = isActionModeActive) {
         toolbarCallback.onCloseActionModeClick()
+      }
+
+      BackHandler(enabled = isSearchModeActive) {
+        toolbarCallback.onCloseSearchClick()
       }
 
       val focusManager = LocalFocusManager.current
@@ -382,9 +417,16 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
         }
 
         LaunchedEffect(windowSizeClass) {
-          val anchor = anchors[paneAnchorIndex]
+          val index = when {
+            paneAnchorIndex < 0 -> 1
+            paneAnchorIndex > anchors.lastIndex -> anchors.lastIndex
+            else -> paneAnchorIndex
+          }
 
-          paneExpansionState.animateTo(anchor)
+          if (index in anchors.indices) {
+            val anchor = anchors[index]
+            paneExpansionState.animateTo(anchor)
+          }
         }
 
         val chatNavGraphState = ChatNavGraphState.remember(windowSizeClass)
@@ -503,6 +545,15 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
           modifier = chatNavGraphState.writeContentToGraphicsLayer(),
           paneExpansionState = paneExpansionState,
           contentWindowInsets = WindowInsets(),
+          snackbarHost = {
+            if (wrappedNavigator.scaffoldValue.primary == PaneAdaptedValue.Expanded) {
+              MainSnackbar(
+                snackbarState = snackbar,
+                onDismissed = mainBottomChromeCallback::onSnackbarDismissed,
+                modifier = Modifier.navigationBarsPadding()
+              )
+            }
+          },
           bottomNavContent = {
             if (isNavigationBarVisible) {
               Column(
@@ -531,7 +582,7 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
             }
           },
           secondaryContent = {
-            val listContainerColor = if (windowSizeClass.isSplitPane() && windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.MEDIUM) {
+            val listContainerColor = if (windowSizeClass.isSplitPane()) {
               SignalTheme.colors.colorSurface1
             } else {
               MaterialTheme.colorScheme.surface
@@ -720,12 +771,19 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
         SignalTheme.colors.colorSurface1
       }
 
-      val modifier = if (windowSizeClass.isSplitPane()) {
-        Modifier
-          .systemBarsPadding()
-          .displayCutoutPadding()
-      } else {
-        Modifier
+      val modifier = when {
+        windowSizeClass.isSplitPane() -> {
+          Modifier
+            .systemBarsPadding()
+            .displayCutoutPadding()
+        }
+
+        else ->
+          Modifier
+            .windowInsetsPadding(
+              WindowInsets.navigationBars.only(WindowInsetsSides.Horizontal)
+                .add(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+            )
       }
 
       BoxWithConstraints(
@@ -797,6 +855,10 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
 
     vitalsViewModel.checkSlowNotificationHeuristics()
     mainNavigationViewModel.refreshNavigationBarState()
+
+    CallQuality.consumeQualityRequest()?.let {
+      CallQualityBottomSheetFragment.create(it).show(supportFragmentManager, BottomSheetUtil.STANDARD_BOTTOM_SHEET_FRAGMENT_TAG)
+    }
   }
 
   override fun onStop() {
@@ -904,6 +966,7 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
     handleSignalMeIntent(intent)
     handleCallLinkInIntent(intent)
     handleDonateReturnIntent(intent)
+    handleQuickRestoreIntent(intent)
   }
 
   @SuppressLint("NewApi")
@@ -960,6 +1023,14 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
     }
   }
 
+  private fun handleQuickRestoreIntent(intent: Intent) {
+    intent.data?.let { data ->
+      CommunicationActions.handlePotentialQuickRestoreUrl(this, data.toString()) {
+        onCameraClick(MainNavigationListLocation.CHATS, isForQuickRestore = true)
+      }
+    }
+  }
+
   private fun updateNotificationProfileStatus(notificationProfiles: List<NotificationProfile>) {
     val activeProfile = NotificationProfiles.getActiveProfile(notificationProfiles)
     if (activeProfile != null) {
@@ -995,6 +1066,39 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
 
     if (!SignalStore.notificationProfile.hasSeenTooltip && Util.hasItems(notificationProfiles)) {
       toolbarViewModel.setShowNotificationProfilesTooltip(true)
+    }
+  }
+
+  private fun onCameraClick(destination: MainNavigationListLocation, isForQuickRestore: Boolean) {
+    val onGranted = {
+      val intent = if (isForQuickRestore) {
+        MediaSelectionActivity.cameraForQuickRestore(context = this@MainActivity)
+      } else {
+        MediaSelectionActivity.camera(
+          context = this@MainActivity,
+          isStory = destination == MainNavigationListLocation.STORIES
+        )
+      }
+      startActivity(intent)
+    }
+
+    if (CameraXUtil.isSupported()) {
+      onGranted()
+    } else {
+      Permissions.with(this@MainActivity)
+        .request(Manifest.permission.CAMERA)
+        .ifNecessary()
+        .withRationaleDialog(getString(R.string.CameraXFragment_allow_access_camera), getString(R.string.CameraXFragment_to_capture_photos_and_video_allow_camera), R.drawable.symbol_camera_24)
+        .withPermanentDenialDialog(
+          getString(R.string.CameraXFragment_signal_needs_camera_access_capture_photos),
+          null,
+          R.string.CameraXFragment_allow_access_camera,
+          R.string.CameraXFragment_to_capture_photos_videos,
+          supportFragmentManager
+        )
+        .onAllGranted(onGranted)
+        .onAnyDenied { Toast.makeText(this@MainActivity, R.string.CameraXFragment_signal_needs_camera_access_capture_photos, Toast.LENGTH_LONG).show() }
+        .execute()
     }
   }
 
@@ -1101,33 +1205,7 @@ class MainActivity : PassphraseRequiredActivity(), VoiceNoteMediaControllerOwner
     }
 
     override fun onCameraClick(destination: MainNavigationListLocation) {
-      val onGranted = {
-        startActivity(
-          MediaSelectionActivity.camera(
-            context = this@MainActivity,
-            isStory = destination == MainNavigationListLocation.STORIES
-          )
-        )
-      }
-
-      if (CameraXUtil.isSupported()) {
-        onGranted()
-      } else {
-        Permissions.with(this@MainActivity)
-          .request(Manifest.permission.CAMERA)
-          .ifNecessary()
-          .withRationaleDialog(getString(R.string.CameraXFragment_allow_access_camera), getString(R.string.CameraXFragment_to_capture_photos_and_video_allow_camera), R.drawable.symbol_camera_24)
-          .withPermanentDenialDialog(
-            getString(R.string.CameraXFragment_signal_needs_camera_access_capture_photos),
-            null,
-            R.string.CameraXFragment_allow_access_camera,
-            R.string.CameraXFragment_to_capture_photos_videos,
-            supportFragmentManager
-          )
-          .onAllGranted(onGranted)
-          .onAnyDenied { Toast.makeText(this@MainActivity, R.string.CameraXFragment_signal_needs_camera_access_capture_photos, Toast.LENGTH_LONG).show() }
-          .execute()
-      }
+      onCameraClick(destination, false)
     }
 
     override fun onMegaphoneVisible(megaphone: Megaphone) {

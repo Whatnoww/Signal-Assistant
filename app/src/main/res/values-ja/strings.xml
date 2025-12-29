@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">新しいリカバリーキーを作成する</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">PINを無効にする前に、新しい回復キーを作成・記録する必要があります。</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">キーを作成する</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -362,6 +362,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">この通話リンクは有効ではありません。リンクに間違いがないことを確認してから、参加してください。</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">あなたはすでに通話中です</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">新しい端末へアカウントを移行しますか？</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">新しい端末へこのアカウントを移行するには、「続ける」をタップしてから、SignalカメラでQRコードをもう一度スキャンしてください。その際は必ず、Signalに直接表示されたQRコードのみをスキャンしてください。</string>
+    <string name="CommunicationActions__dont_transfer">移行しない</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -665,6 +670,22 @@
     <string name="ConversationFragment_group_names">グループネーム</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">写真をダウンロードできませんでした。もう一度試してください。</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">ピン留めしておく期間</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24時間</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7日</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30日</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">無期限</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">最初にピン留めしたものと置き換えますか？</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">メッセージをピン留めすると、一番最初にピン留めしたメッセージと置き換えられます</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">置き換える</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">安全な使い方のヒント</string>
@@ -1181,11 +1202,11 @@
     <string name="AddToGroupActivity_add_member">メンバーを追加しますか？</string>
     <string name="AddToGroupActivity_add_s_to_s">「%1$s」を「%2$s」へ追加しますか？</string>
     <string name="AddToGroupActivity_s_added_to_s">「%1$s」が「%2$s」へ追加されました。</string>
-    <string name="AddToGroupActivity_add_to_group">グループへ追加</string>
     <string name="AddToGroupActivity_add_to_groups">グループへ追加</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">このユーザーはレガシーグループに追加できません。</string>
     <string name="AddToGroupActivity_add">追加する</string>
     <string name="AddToGroupActivity_add_to_a_group">グループへの追加</string>
+    <string name="AddToGroupActivity_search">検索</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">新しい管理者を選択</string>
@@ -1356,10 +1377,15 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">完了</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">このユーザーはレガシーグループに追加できません。</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">「%1$s」を「%2$s」へ追加しますか？</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="other">%3$d人のメンバーを「%2$s」へ追加しますか？</item>
+        <item quantity="other">%1$d人のメンバーを「%2$s」へ追加しますか？</item>
     </plurals>
+
     <string name="AddMembersActivity__add">追加する</string>
     <string name="AddMembersActivity__add_members">メンバーの追加</string>
 
@@ -2064,6 +2090,8 @@
     <string name="MessageRecord_unsupported_feature">%1$s からメッセージが届きましたが、Signalの新機能を利用しているため処理または表示ができません。</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">%1$sが「%2$s」の投票を締め切りました</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">「%1$s」の投票を締め切りました</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">承認する</string>
@@ -2367,6 +2395,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">動画を有効にする：</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">ビデオ画面を小さくする</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">ビデオ画面を大きくする</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">Signal通話</string>
     <string name="WebRtcCallView__signal_video_call">Signalビデオ通話</string>
@@ -2568,6 +2602,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">%1$s からの音声と映像を受信できません</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">%1$s からの音声と映像を受信できません</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">相手があなたの安全番号の変更を検証していないか、相手の端末に問題があるか、あなたがブロックされている可能性があります。</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">カメラを切り替える</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">スワイプすると画面共有を表示します</string>
@@ -3269,7 +3307,7 @@
     <string name="WebRtcCallScreen__answer_without_video">ビデオなしで応答する</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">カメラの向きを変える</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3328,9 +3366,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"「%1$s」はSignalユーザーではありません。ユーザーネームを確認してもう一度試してください。"</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">自分自身をグループに追加する必要はありません</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">グループのサイズが最大値に達しました</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">Signalグループは最大%1$d名まで参加できます。</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">Signalグループは最大%1$s名まで参加できます。</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">推奨されるメンバー数の上限に達しました</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">Signalグループは%1$d人以下が最適です。これよりメンバーを追加すると、メッセージの送受信で遅延が発生します。</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">Signalグループは%1$s人以下が最適です。これよりメンバーを追加すると、メッセージの送受信で遅延が発生します。</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="other">メンバー %1$d人</item>
     </plurals>
@@ -4328,6 +4366,10 @@
     <string name="conversation_selection__menu_payment_details">決済の詳細</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">投票を終了する</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">ピン留めする</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">ピン留めを解除する</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5067,10 +5109,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">スキップ</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="other">メンバー %1$d人</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="other">メンバー %1$s人</item>
@@ -5105,7 +5143,7 @@
     <string name="ChatWallpaperFragment__wallpaper_preview_description">壁紙のプレビュー</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_chat_colors">すべての色を上書きしますか？</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_wallpapers">すべての壁紙を上書きしますか？</string>
-    <string name="ChatWallpaperFragment__reset_default_colors">既定の色をリセットする</string>
+    <string name="ChatWallpaperFragment__reset_default_colors">デフォルトの色をリセットする</string>
     <string name="ChatWallpaperFragment__reset_all_colors">すべての色をリセットする</string>
     <string name="ChatWallpaperFragment__reset_default_wallpaper">既定の壁紙をリセットする</string>
     <string name="ChatWallpaperFragment__reset_all_wallpapers">すべての壁紙をリセットする</string>
@@ -5705,7 +5743,7 @@
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__call">発信</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
-    <string name="ConversationSettingsFragment__mute">ミュート</string>
+    <string name="ConversationSettingsFragment__mute">ミュートする</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__muted">ミュート中</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -5791,11 +5829,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">ブロックできませんでした</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$sはSignalユーザーではありません</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$sはSignalユーザーではありません</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">メニューを開く</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="other">%1$sさんはSignalユーザーではありません</item>
     </plurals>
 
@@ -5968,7 +6006,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">プロフィールを更新できませんでした</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">バッジを選択してください</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">バッジを選択する必要があります</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">プロフィールを更新できませんでした</string>
@@ -6034,7 +6071,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">寄付の領収書</string>
     <string name="ManageDonationsFragment__badges">バッジ</string>
-    <string name="ManageDonationsFragment__subscription_faq">サブスクリプションに関するよくある質問</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">寄付についてのよくある質問</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">その他の支援の方法</string>
     <!-- Preference label to launch badge gifting -->
@@ -7294,8 +7332,10 @@
     <string name="CallLogAdapter__outgoing">発信</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">不在着信</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">通知プロファイルがオンのときの不在着信がありました</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">通知プロファイルがオンのときの不在着信がありました</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">参加する</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7594,6 +7634,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">Signalセキュアバックアップを有効にする</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">Signalセキュアバックアップをお試しください</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">スマートフォンを買い替えたり、Signalを再インストールしてもメッセージを失うことはありません。</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -7871,6 +7913,12 @@
     <string name="BackupStatusRow__your_last_backup">前回のバックアップは完了していません。ご利用中のスマートフォンがWi-Fiに接続されている事をご確認の上、「今すぐバックアップを実行する」をタップしてもう一度お試しください。</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">前回のバックアップは完了していません。Signalが最新のバージョンであることをご確認の上もう一度お試しください。</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">メッセージ数が保存容量の上限を超えています。いくつかのメッセージを削除して、もう一度お試しください。</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">%1$s より以前に送受信したメッセージはバックアップされていません。</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">ストレージ容量が不足しているため、バックアップを完了できませんでした端末の空き容量を増やして、もう一度お試しください。</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">詳しく見る</string>
 
@@ -8328,11 +8376,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">新しいキーを作成する必要があるのは、第三者にあなたのキーを知られた場合だけです。メディアを含むバックアップを再アップロードする必要があります。「ストレージを最適化する」をオンにしている場合は、まずオフロードメディアをダウンロードする必要があります。</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">バックアップの設定を終了しますか？</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">バックアップの設定が完了していないため、バックアップが作成されていません。設定からバックアップを有効にすることができます。</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">バックアップの設定を終了する</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8596,13 +8644,13 @@
     <string name="NoBackupToRestore_skip_restore">復元をスキップする</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">回復キー作成回数の上限に達しました</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">新しい回復キーは正常に作成されましたが、不正使用を防ぐため、作成できる新しいキーの数は制限されています。7日間は別のキーを作成することはできません。回復キーを安全な場所に保管してください。</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">新しいキーを作成できません</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">新しいキーの作成上限回数に達しました。7日後に新しい回復キーを作成できるようになります。誰かがあなたのバックアップにアクセスできる可能性があると思われる場合は、「バックアップをオフにして消去する」を選択できます。</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">OK</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8664,6 +8712,8 @@
     <string name="Poll__poll_question">投票：%1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">%1$sが「%2$s」の投票を締め切りました</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">「%1$s」の投票を締め切りました</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">%1$sが「%2$s」に投票しました</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8714,6 +8764,13 @@
     <string name="CreatePollFragment__add_option">少なくとも2つの選択肢を追加してください</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">質問を追加する</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">QRコードをスキャンする</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">移行させたい端末に表示されたQRコードを、この端末でスキャンしてください</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">OK</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8775,7 +8832,7 @@
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">デバッグログを表示する</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> ことができます</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> ことができます。</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">デバッグログを共有する</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -8784,6 +8841,67 @@
     <string name="CallQualitySheet__submit">送信する</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">フィードバックをありがとうございます！</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">問題がありました</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">良好でした</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">フィードバックを送信できませんでした。</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">もう一度試す</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$sがメッセージをピン留めしました</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">メッセージをピン留めしました</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">メッセージへ移動する</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">メッセージが見つかりません</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">ピン留め中</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">写真</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">動画</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">ステッカー</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">音声メッセージ</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">使い捨てメディア</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">ピン留めを解除する</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">すべてのメッセージを表示する</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">すべてのメッセージのピン留めを解除する</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">消えるメッセージをピン留めする</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">消えるメッセージは、期間が過ぎてチャットから消えた時にピン留めも解除されます。</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">わかりました</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">消えるメッセージ</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">ピン留めされたメッセージ</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">ピン留めを解除する</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">すべてのメッセージのピン留めを解除しますか？</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">メッセージは、メンバー全員のピン留めから解除されます。</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">メッセージをピン留めできませんでした</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">メッセージのピン留めを解除できませんでした</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">メッセージのピン留めを解除できませんでした</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">インターネット接続を確認して再度試してください。</string>
 
     <!-- EOF -->
 </resources>

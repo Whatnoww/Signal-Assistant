@@ -13,14 +13,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -39,11 +38,9 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.window.core.layout.WindowHeightSizeClass
 import org.signal.core.ui.compose.AllDevicePreviews
 import org.signal.core.ui.compose.Previews
 import org.thoughtcrime.securesms.main.MainFloatingActionButtonsCallback
@@ -62,7 +59,7 @@ enum class NavigationType {
       val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
       return remember(windowSizeClass) {
-        if (windowSizeClass.isSplitPane() && windowSizeClass.windowHeightSizeClass.isAtLeast(WindowHeightSizeClass.MEDIUM)) {
+        if (windowSizeClass.isSplitPane()) {
           RAIL
         } else {
           BAR
@@ -102,25 +99,9 @@ fun AppScaffold(
   paneExpansionState: PaneExpansionState = rememberPaneExpansionState(),
   paneExpansionDragHandle: (@Composable ThreePaneScaffoldScope.(PaneExpansionState) -> Unit)? = null,
   snackbarHost: @Composable () -> Unit = {},
-  contentWindowInsets: WindowInsets = ScaffoldDefaults.contentWindowInsets,
+  contentWindowInsets: WindowInsets = WindowInsets.systemBars,
   animatorFactory: AppScaffoldAnimationStateFactory = AppScaffoldAnimationStateFactory.Default
 ) {
-  val isForcedCompact = !LocalInspectionMode.current && !isLargeScreenSupportEnabled()
-  val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-
-  if (isForcedCompact) {
-    ListAndNavigation(
-      topBarContent = topBarContent,
-      listContent = secondaryContent,
-      navRailContent = navRailContent,
-      bottomNavContent = bottomNavContent,
-      contentWindowInsets = contentWindowInsets,
-      modifier = modifier
-    )
-
-    return
-  }
-
   val minPaneWidth = navigator.scaffoldDirective.defaultPanePreferredWidth
   val navigationState = navigator.state
 
@@ -229,9 +210,7 @@ fun AppScaffold(
       },
       paneExpansionDragHandle = paneExpansionDragHandle,
       paneExpansionState = paneExpansionState,
-      modifier = Modifier
-        .padding(paddingValues)
-        .consumeWindowInsets(contentWindowInsets)
+      modifier = Modifier.padding(paddingValues)
     )
   }
 }

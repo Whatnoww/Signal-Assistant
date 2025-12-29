@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">Создать новый ключ восстановления</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">Вам нужно создать и записать новый ключ восстановления, прежде чем можно будет отключить Пин-код.</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Создать ключ</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -371,6 +371,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Это недействительная ссылка на звонок. Убедитесь, что ссылка не повреждена и корректна, перед тем как попробовать присоединиться.</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">Вы уже участвуете в другом звонке</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">Перенести учётную запись на новое устройство?</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">Чтобы перенести эту учётную запись Signal на новое устройство, нажмите «Продолжить» и просканируйте QR-код ещё раз с помощью камеры Signal. Убедитесь, что вы сканируете только те QR-коды, которые приходят непосредственно от Signal.</string>
+    <string name="CommunicationActions__dont_transfer">Не переносить</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -695,6 +700,22 @@
     <string name="ConversationFragment_group_names">Названия групп</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">Не удалось загрузить фото. Попробуйте ещё раз.</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">Оставить закреплённым на…</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24 часа</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7 дней</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30 дней</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">Бессрочно</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">Заменить самое старое закреплённое сообщение?</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">Закреплённое сообщение заменит самое старое</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">Заменить</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Советы по безопасности</string>
@@ -1250,11 +1271,11 @@
     <string name="AddToGroupActivity_add_member">Добавить участника?</string>
     <string name="AddToGroupActivity_add_s_to_s">Добавить «%1$s» в «%2$s»?</string>
     <string name="AddToGroupActivity_s_added_to_s">«%1$s» добавлен(-а) в «%2$s».</string>
-    <string name="AddToGroupActivity_add_to_group">Добавить в группу</string>
     <string name="AddToGroupActivity_add_to_groups">Добавить в группы</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">Этот человек не может быть добавлен в старые группы.</string>
     <string name="AddToGroupActivity_add">Добавить</string>
     <string name="AddToGroupActivity_add_to_a_group">Добавить в группу</string>
+    <string name="AddToGroupActivity_search">Поиск</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">Выберите нового администратора</string>
@@ -1470,13 +1491,18 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">Готово</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">Этот человек не может быть добавлен в старые группы.</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">Добавить «%1$s» в «%2$s»?</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="one">Добавить «%1$s» в «%2$s»?</item>
-        <item quantity="few">Добавить %3$d участников в «%2$s»?</item>
-        <item quantity="many">Добавить %3$d участников в «%2$s»?</item>
-        <item quantity="other">Добавить %3$d участника в «%2$s»?</item>
+        <item quantity="one">Добавить «{2}» в «%2$s»?</item>
+        <item quantity="few">Добавить %1$d участников в «%2$s»?</item>
+        <item quantity="many">Добавить %1$d участников в «%2$s»?</item>
+        <item quantity="other">Добавить %1$d участника в «%2$s»?</item>
     </plurals>
+
     <string name="AddMembersActivity__add">Добавить</string>
     <string name="AddMembersActivity__add_members">Добавить участников</string>
 
@@ -2244,6 +2270,8 @@
     <string name="MessageRecord_unsupported_feature">%1$s отправил(-a) вам сообщение, которое не может быть обработано или отображено, поскольку оно использует новую функцию Signal.</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">%1$s завершил(а) опрос «%2$s»</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">Вы завершили опрос: «%1$s»</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Принять</string>
@@ -2586,6 +2614,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">Чтобы включить видео:</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">Сжать локальное видео</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">Развернуть локальное видео</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">Звонок Signal</string>
     <string name="WebRtcCallView__signal_video_call">Видеозвонок Signal</string>
@@ -2832,6 +2866,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">Невозможно получать аудио и видео от %1$s</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">Невозможно получать аудио и видео от %1$s</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">Возможно, это из-за того, что этот участник не подтвердил изменение вашего кода безопасности, или есть какая-то проблема с его устройством, или он вас заблокировал.</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">Переключение направления камеры</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">Проведите, чтобы просмотреть показ экрана</string>
@@ -3572,7 +3610,7 @@
     <string name="WebRtcCallScreen__answer_without_video">Ответить без видео</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">Смена направления камеры</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3631,9 +3669,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"«%1$s» — не пользователь Signal. Пожалуйста, проверьте имя пользователя и попробуйте ещё раз."</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">Вам не нужно добавлять себя в группу</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">Достигнут максимальный размер группы</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">В группах Signal могут находиться максимум %1$d участников.</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">В группах Signal могут находиться максимум %1$s участников.</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">Достигнут рекомендуемый предел участников</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">Группы Signal работают лучше всего с %1$d участниками или меньше. Добавление большего количества участников приведёт к задержкам при отправке и получении сообщений.</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">Группы Signal работают лучше всего с %1$s участниками или меньше. Добавление большего количества участников приведёт к задержкам при отправке и получении сообщений.</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="one">%1$d участник</item>
         <item quantity="few">%1$d участника</item>
@@ -4673,6 +4711,10 @@
     <string name="conversation_selection__menu_payment_details">Подробности платежа</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">Завершить опрос</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">Прикрепить</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">Открепить</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5454,13 +5496,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Пропустить</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="one">%1$d участник</item>
-        <item quantity="few">%1$d участника</item>
-        <item quantity="many">%1$d участников</item>
-        <item quantity="other">%1$d участников</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="one">%1$s участник</item>
@@ -5498,7 +5533,7 @@
     <string name="ChatWallpaperFragment__wallpaper_preview_description">Предпросмотр обоев</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_chat_colors">Вы хотите заменить цвета всех чатов?</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_wallpapers">Вы хотите заменить обои всех чатов?</string>
-    <string name="ChatWallpaperFragment__reset_default_colors">Сбросить цвета по умолчанию</string>
+    <string name="ChatWallpaperFragment__reset_default_colors">Сбросить цвет по умолчанию</string>
     <string name="ChatWallpaperFragment__reset_all_colors">Сбросить все цвета</string>
     <string name="ChatWallpaperFragment__reset_default_wallpaper">Сбросить обои по умолчанию</string>
     <string name="ChatWallpaperFragment__reset_all_wallpapers">Сбросить все обои</string>
@@ -6122,7 +6157,7 @@
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__call">Позвонить</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
-    <string name="ConversationSettingsFragment__mute">Откл. звук</string>
+    <string name="ConversationSettingsFragment__mute">Откл.</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__muted">Без звука</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -6208,11 +6243,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">Сбой блокировки</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s не является пользователем Signal</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$s не является пользователем Signal</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">Открыть меню</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="one">%1$s не является пользователем Signal</item>
         <item quantity="few">%1$s не являются пользователями Signal</item>
         <item quantity="many">%1$s не являются пользователями Signal</item>
@@ -6406,7 +6441,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">Не удалось обновить профиль</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">Выберите значок</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">Вы должны выбрать значок</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">Не удалось обновить профиль</string>
@@ -6472,7 +6506,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">Квитанции о пожертвованиях</string>
     <string name="ManageDonationsFragment__badges">Значки</string>
-    <string name="ManageDonationsFragment__subscription_faq">ЧаВо о подписке</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">ЧаВо о пожертвованиях</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">Другие способы пожертвовать</string>
     <!-- Preference label to launch badge gifting -->
@@ -7795,8 +7830,10 @@
     <string name="CallLogAdapter__outgoing">Исходящие</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">Пропущенные</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">Пропущенные при включённом профиле уведомлений</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">Пропущенные при включённом профиле уведомлений</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">Войти</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -8110,6 +8147,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">Включить безопасное резервное копирование Signal</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">Попробуйте безопасное резервное копирование Signal</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">Вы не потеряете ни одно сообщение при покупке нового телефона или переустановке Signal.</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -8396,6 +8435,12 @@
     <string name="BackupStatusRow__your_last_backup">Не удалось завершить последнее резервное копирование. Убедитесь, что телефон подключён к сети Wi-Fi, и нажмите «Создать резервную копию сейчас», чтобы повторить попытку.</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">Не удалось завершить последнее резервное копирование. Убедитесь, что на вашем устройстве установлена последняя версия Signal, и повторите попытку.</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">Количество сообщений превышает лимит хранилища. Удалите несколько сообщений и попробуйте ещё раз.</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">Сообщения, отправленные или полученные до %1$s, не сохраняются в резервной копии.</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">Ваше резервное копирование не завершено, так как у вас недостаточно места в хранилище. Освободите место на вашем устройстве и попробуйте ещё раз.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">Узнать больше</string>
 
@@ -8874,11 +8919,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Создание нового ключа необходимо только в случае, если ваш ключ стал известен кому-то ещё. Вам придётся загрузить резервную копию повторно, включая медиафайлы. Если вы используете функцию «Оптимизировать хранилище», вам придётся сначала загрузить выгруженные медиафайлы.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Выйти из настройки резервного копирования?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">Вы не завершили настройку резервного копирования, поэтому резервное копирование не создано. Вы можете включить резервное копирование в настройках.</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Выход из настройки резервного копирования</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -9148,13 +9193,13 @@
     <string name="NoBackupToRestore_skip_restore">Пропустить восстановление</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Достигнут лимит ключей восстановления</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">Вы успешно создали новый ключ восстановления, но во избежание злоупотреблений количество новых ключей, которые вы можете создать, ограничено. Вы не сможете создать ещё один ключ в течение 7 дней. Храните ваш ключ восстановления в безопасном месте.</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Не удаётся создать новый ключ</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">Вы исчерпали количество новых ключей, которые можете создать. Вы сможете создать новый ключ восстановления через 7 дней. Если вы считаете, что кто-то может получить доступ к вашей резервной копии, выберите опцию «Отключить и удалить резервную копию».</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">ОК</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -9222,6 +9267,8 @@
     <string name="Poll__poll_question">Опрос: %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">%1$s завершил(а) опрос «%2$s»</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">Вы завершили опрос: «%1$s»</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">%1$s проголосовал(а) в опросе: «%2$s»</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -9275,6 +9322,13 @@
     <string name="CreatePollFragment__add_option">Добавьте как минимум 2 варианта</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">Добавить вопрос</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">Сканировать QR-код</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">Используйте данное устройство для сканирования QR-кода с устройства, на которое хотите перенести</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">Хорошо</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -9336,7 +9390,7 @@
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">просмотреть свой журнал отладки</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> перед отправкой</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> перед отправкой.</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">Поделиться журналом отладки</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -9345,6 +9399,67 @@
     <string name="CallQualitySheet__submit">Отправить</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">Спасибо за ваш отзыв!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">У меня были проблемы с этим звонком</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">Звонок прошёл отлично</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">Ваш отзыв не был отправлен.</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">Попробовать ещё раз</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$s закрепил(-а) сообщение</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">Вы закрепили сообщение</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">Перейти к сообщению</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">Сообщение не найдено</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">Прикреплённые</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">Фото</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">Видео</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">Стикер</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">Голосовое сообщение</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">Одноразовое медиа</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">Открепить</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">Просмотреть все сообщения</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">Открепить все сообщения</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">Закрепление исчезающих сообщений</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">Исчезающие сообщения будут откреплены, когда истечёт таймер и сообщение будет удалено из чата.</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">Понятно</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">Исчезающие сообщения</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">Закреплённые сообщения</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">Открепить</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">Открепить все сообщения?</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">Сообщения будут откреплены для всех участников.</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">Не удалось закрепить сообщение</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">Не удалось открепить сообщение</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">Не удалось открепить сообщения</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">Проверьте ваше подключение к интернету и попробуйте ещё раз.</string>
 
     <!-- EOF -->
 </resources>

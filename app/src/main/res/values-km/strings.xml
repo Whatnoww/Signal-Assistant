@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">បង្កើតសោស្តារថ្មី</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">អ្នកត្រូវតែបង្កើត និងកត់ត្រាសោស្តារថ្មី មុនពេលអ្នកអាចបិទលេខកូដសម្ងាត់របស់អ្នក។</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">បង្កើតសោ</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -362,6 +362,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">នេះមិនមែនជាតំណហៅត្រឹមត្រូវនោះទេ។ សូមប្រាកដថា តំណទាំងមូលនេះនៅមិនទាន់ខូច និងពិតជាត្រឹមត្រូវ មុនពេលព្យាយាមចូលរួម។</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">អ្នកស្ថិតនៅក្នុងការហៅទូរសព្ទស្រាប់ហើយ</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">ផ្ទេរគណនីទៅឧបករណ៍ថ្មី?</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">ដើម្បីផ្ទេរគណនីនេះទៅឧបករណ៍ថ្មី សូមចុច \"បន្ត\" ហើយស្គែនកូដ QR ម្តងទៀតដោយប្រើកាមេរ៉ា Signal។ ត្រូវប្រាកដថាអ្នកស្គែនតែកូដ QR ដែលមកពី Signal ដោយផ្ទាល់ប៉ុណ្ណោះ។</string>
+    <string name="CommunicationActions__dont_transfer">កុំផ្ទេរ</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -665,6 +670,22 @@
     <string name="ConversationFragment_group_names">ឈ្មោះក្រុម</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">ការទាញយករូបថតមិនបានជោគជ័យទេ។ ព្យាយាមម្តងទៀត។</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">បន្តខ្ទាស់សម្រាប់…</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24 ម៉ោង</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7 ថ្ងៃ</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30 ថ្ងៃ</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">ជារៀងរហូត</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">ជំនួសការខ្ទាស់ដែលយូរបំផុត?</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">ការខ្ទាស់សារនឹងជំនួសសារដែលយូរជាងគេ</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">ប្តូរ</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">គន្លឹះសុវត្ថិភាព</string>
@@ -1181,11 +1202,11 @@
     <string name="AddToGroupActivity_add_member">បន្ថែមសមាជិក?</string>
     <string name="AddToGroupActivity_add_s_to_s">បន្ថែម \"%1$s\" ទៅ \"%2$s\"?</string>
     <string name="AddToGroupActivity_s_added_to_s">\"%1$s\" បានបន្ថែមទៅ \"%2$s\"។</string>
-    <string name="AddToGroupActivity_add_to_group">បន្ថែមចូលក្រុម</string>
     <string name="AddToGroupActivity_add_to_groups">បន្ថែមទៅក្រុម</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">បុគ្គលនេះ មិនអាចបន្ថែមចូលក្រុមមុនទេ។</string>
     <string name="AddToGroupActivity_add">បន្ថែម</string>
     <string name="AddToGroupActivity_add_to_a_group">បន្ថែមទៅក្រុមមួយ</string>
+    <string name="AddToGroupActivity_search">ស្វែងរក</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">ជ្រើសរើសអ្នកអភិបាលថ្មី</string>
@@ -1356,10 +1377,15 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">បញ្ចប់</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">បុគ្គលនេះ មិនអាចបន្ថែមចូលក្រុមមុនបានទេ។</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">បន្ថែម \"%1$s\" ទៅ \"%2$s\"?</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="other">បញ្ចូលសមាជិក %3$d នាក់ទៅ \"%2$s\"?</item>
+        <item quantity="other">បញ្ចូលសមាជិក %1$d នាក់ទៅ \"%2$s\"?</item>
     </plurals>
+
     <string name="AddMembersActivity__add">បន្ថែម</string>
     <string name="AddMembersActivity__add_members">បន្ថែមសមាជិក</string>
 
@@ -2064,6 +2090,8 @@
     <string name="MessageRecord_unsupported_feature">%1$s បានផ្ញើសារមួយ ដែលមិនអាចដំណើរការ ឬបង្ហាញបាន ព្រោះវាប្រើប្រាស់មុខងារថ្មីរបស់ Signal។</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">%1$s បានបញ្ចប់ការស្ទង់មតិ៖ \"%2$s\"</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">អ្នកបានបញ្ចប់ការស្ទង់មតិ៖ \"%1$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">យល់ព្រម</string>
@@ -2367,6 +2395,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">ដើម្បីបើកវីដេអូរបស់អ្នក៖</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">បង្រួមវីដេអូក្នុងឧបករណ៍</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">ពង្រីកវីដេអូក្នុងឧបករណ៍</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">ការហៅ Signal</string>
     <string name="WebRtcCallView__signal_video_call">ការហៅវីដេអូ Signal</string>
@@ -2568,6 +2602,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">មិនទទួលសំឡេង &amp; វីដែអូពី %1$s</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">មិនអាចទទួលសំឡេងនិងវីដេអូពី %1$s</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">វាអាចមកពីពួកគេមិនបានផ្ទៀងផ្ទាត់ការផ្លាស់ប្តូរលេខសុវត្ថិភាពរបស់អ្នក ឧបករណ៍របស់ពួកគេមានបញ្ហា ឬពួកគេបានទប់ស្កាត់អ្នក។</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">ប្តូរទិសដៅកាមេរ៉ា</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">អូស ដើម្បីបង្ហាញអេក្រង់ចែករំលែក</string>
@@ -3269,7 +3307,7 @@
     <string name="WebRtcCallScreen__answer_without_video">ឆ្លើយដោយគ្មានវីដេអូ</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">ប្តូរទិសដៅកាមេរ៉ា</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3328,9 +3366,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"%1$s មិនមែនជាអ្នកប្រើ Signal ទេ។ សូមពិនិត្យឈ្មោះអ្នកប្រើ រួចព្យាយាមម្តងទៀត។"</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">អ្នកមិនចាំបាច់បន្ថែមខ្លួនឯងចូលក្នុងក្រុមទេ</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">បានឈានដល់ទំហំក្រុមអតិបរមា</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">ក្រុម Signal អាចមានសមាជិកអតិបរមាចំនួន %1$d ។</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">ក្រុម Signal អាចមានសមាជិកអតិបរមាចំនួន %1$s ។</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">បានឈានដល់ដែនកំណត់សមាជិកដែលបានណែនាំ</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">ក្រុម Signal ដំណើរការល្អបំផុតជាមួយសមាជិក %1$d នាក់ ឬតិចជាងនេះ។ ការបន្ថែមសមាជិកច្រើន នឹងបណ្តាលឱ្យមានការពន្យារពេលការផ្ញើ និងទទួលសារ។</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">ក្រុម Signal ដំណើរការល្អបំផុតជាមួយសមាជិក %1$s នាក់ ឬតិចជាងនេះ។ ការបន្ថែមសមាជិកច្រើន នឹងបណ្តាលឱ្យមានការពន្យារពេលការផ្ញើ និងទទួលសារ។</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="other">សមាជិក %1$d នាក់</item>
     </plurals>
@@ -4328,6 +4366,10 @@
     <string name="conversation_selection__menu_payment_details">ព័ត៌មានលម្អិតអំពីការបង់ប្រាក់</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">បញ្ចប់ការស្ទង់មតិ</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">ខ្ទាស់</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">ឈប់ខ្ទាស់</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5067,10 +5109,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">រំលង</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="other">%1$d សមាជិក</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="other">សមាជិក %1$s នាក់</item>
@@ -5791,11 +5829,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">ការទប់ស្កាត់មិនបានជោគជ័យទេ</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s មិនមែនជាអ្នកប្រើ Signal ទេ</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$s មិនមែនជាអ្នកប្រើ Signal ទេ</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">បើកម៉ឺនុយ</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="other">%1$s មិនមែនជាអ្នកប្រើ Signal ទេ</item>
     </plurals>
 
@@ -5968,7 +6006,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">បរាជ័យធ្វើបច្ចុប្បន្នភាពគណនី</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">ជ្រើសរើសស្លាកមួយ</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">អ្នកត្រូវជ្រើសរើសស្លាកមួយ</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">បរាជ័យធ្វើបច្ចុប្បន្នភាពគណនី</string>
@@ -6034,7 +6071,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">បង្កាន់ដៃបរិច្ចាគ</string>
     <string name="ManageDonationsFragment__badges">ស្លាក</string>
-    <string name="ManageDonationsFragment__subscription_faq">សំណួរសួរញឹកញាប់អំពីការជាវ</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">សំណួរសួរញឹកញាប់អំពីម្ចាស់ជំនួយ</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">វិធីផ្សេងទៀតក្នុងការផ្តល់ជូន</string>
     <!-- Preference label to launch badge gifting -->
@@ -7294,8 +7332,10 @@
     <string name="CallLogAdapter__outgoing">ហៅចេញ</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">ខកមិនបានទទួល</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">ខកមិនបានទទួល ពេលបើកប្រូហ្វាល់ជូនដំណឹង</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">ខកមិនបានទទួល ពេលបើកប្រូហ្វាល់ជូនដំណឹង</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">ចូលរួម</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7594,6 +7634,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">បើកការបម្រុងទុកសុវត្ថិភាព Signal</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">សាកល្បងការបម្រុងទុកសុវត្ថិភាព Signal</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">មិនបាត់បង់សារនៅពេលអ្នកមានទូរសព្ទថ្មី ឬដំឡើង Signal ឡើងវិញ។</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -7871,6 +7913,12 @@
     <string name="BackupStatusRow__your_last_backup">ការបម្រុងទុកចុងក្រោយរបស់អ្នកមិនអាចបញ្ចប់បានទេ។ ត្រូវប្រាកដថាទូរសព្ទរបស់អ្នកបានភ្ជាប់ Wi-Fi រួចចុច \"បម្រុងទុកឥឡូវនេះ\" ដើម្បីព្យាយាមម្តងទៀត។</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">ការបម្រុងទុកចុងក្រោយរបស់អ្នកមិនអាចបញ្ចប់បានទេ។ ត្រូវប្រាកដថាអ្នកកំពុងតែប្រើកំណែចុងក្រោយបំផុតរបស់ Signal រួចព្យាយាមម្តងទៀត។</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">ចំនួនសារដែលអ្នកមានលើសពីដែនកំណត់ផ្ទុកហើយ។ លុបសារមួយចំនួន ហើយព្យាយាមម្តងទៀត។</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">សារដែលបានផ្ញើ ឬទទួលមុន %1$s មិនត្រូវបានបម្រុងទុកទេ។</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">ការបម្រុងទុករបស់អ្នកមិនអាចបញ្ចប់បានទេ ដោយសារអ្នកមានទំហំផ្ទុកតិច។ បង្កើនទំហំផ្ទុកនៅលើឧបករណ៍របស់អ្នក ហើយព្យាយាមម្តងទៀត។</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">ស្វែងយល់បន្ថែម</string>
 
@@ -8328,11 +8376,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">ការបង្កើតសោថ្មីគឺចាំបាច់លុះត្រាតែមានអ្នកផ្សេងស្គាល់សោរបស់អ្នក។ អ្នកនឹងត្រូវផ្ទុកឡើងវិញនូវការបម្រុងទុករបស់អ្នក រួមទាំងមេឌៀផងដែរ។ ប្រសិនបើអ្នកកំពុងប្រើ \"បង្កើនប្រសិទ្ធភាពការផ្ទុក\" អ្នកនឹងត្រូវទាញយកមេឌៀដែលមិនបានផ្ទុកជាមុនសិន។</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">ចាកចេញពីការរៀបចំការបម្រុងទុក?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">អ្នកមិនទាន់បានបញ្ចប់ការរៀបចំការបម្រុងទុកទេ ហើយគ្មានការបម្រុងទុកណាមួយត្រូវបានបង្កើតឡើងទេ។ អ្នកអាចបើកការបម្រុងទុកនៅក្នុងការកំណត់។</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">ចាកចេញពីការរៀបចំការបម្រុងទុក</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8360,7 +8408,7 @@
     <!-- Verify your key title -->
     <string name="VerifyBackupPinScreen__enter_your_backup_key">បញ្ចូលសោស្តាររបស់អ្នក</string>
     <!-- Verify your key subtitle -->
-    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">បញ្ចូលលេខកូដ 64 ខ្ទង់ដែលអ្នកបានកត់ត្រានៅពេលអ្នកបើកការបម្រុងទុក។</string>
+    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">បញ្ចូលលេខកូដ 64 តួអក្សរដែលអ្នកបានកត់ត្រានៅពេលអ្នកបើកការបម្រុងទុក។</string>
     <!-- Button text when you forget your recovery key -->
     <string name="VerifyBackupPinScreen__forgot_key">ភ្លេចសោ?</string>
 
@@ -8596,13 +8644,13 @@
     <string name="NoBackupToRestore_skip_restore">រំលងការស្តារឡើងវិញ</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">សោស្តារបានដល់ចំនួនកំណត់ហើយ</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">អ្នកបានបង្កើតសោស្តារថ្មីដោយជោគជ័យ ប៉ុន្តែដើម្បីការពារការរំលោភបំពាន ចំនួនសោថ្មីដែលអ្នកអាចបង្កើតបានគឺមានកំណត់។ អ្នកនឹងមិនអាចបង្កើតសោមួយផ្សេងទៀតបានទេសម្រាប់រយៈពេល 7 ថ្ងៃ។ រក្សាទុកសោស្តាររបស់អ្នកនៅកន្លែងណាដែលមានសុវត្ថិភាព។</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">មិនអាចបង្កើតសោថ្មីបានទេ</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">ចំនួនសោថ្មីដែលអ្នកអាចបង្កើតបានគឺអស់ហើយ។ អ្នកនឹងអាចបង្កើតសោស្តារថ្មីក្នុងរយៈពេល 7 ថ្ងៃ។ ប្រសិនបើអ្នកជឿថានរណាម្នាក់អាចនឹងចូលប្រើការបម្រុងទុករបស់អ្នក អ្នកអាចជ្រើសរើស “បិទ និងលុបការបម្រុងទុក”។</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">យល់ព្រម</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8664,6 +8712,8 @@
     <string name="Poll__poll_question">ការស្ទង់មតិ៖ %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">%1$s បានបញ្ចប់ការស្ទង់មតិ៖ \"%2$s\"</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">អ្នកបានបញ្ចប់ការស្ទង់មតិ៖ \"%1$s\"</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">%1$s បានបោះឆ្នោតនៅក្នុងការស្ទង់មតិ៖ \"%2$s\"</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8689,9 +8739,9 @@
     <!-- Dialog body when a poll fails to end and to try again -->
     <string name="Poll__check_connection">សូមពិនិត្យមើលសេវាអ៊ីនធឺណិតរបស់អ្នក រួចព្យាយាមម្តងទៀត។</string>
     <!-- Dialog title when you go to end a poll -->
-    <string name="Poll__end_poll_title">End poll?</string>
+    <string name="Poll__end_poll_title">បញ្ចប់ការស្ទង់មតិ?</string>
     <!-- Dialog body when you go to end a poll -->
-    <string name="Poll__end_poll_body">Group members will no longer be able to vote in this poll.</string>
+    <string name="Poll__end_poll_body">សមាជិកក្រុមនឹងមិនអាចបោះឆ្នោតនៅក្នុងការស្ទង់មតិនេះទៀតទេ។</string>
     <!-- Body used in dialog when we are waiting for network -->
     <string name="Poll__waiting_for_network">កំពុងរង់ចាំបណ្តាញ…</string>
     <!-- Header when creating a new poll -->
@@ -8714,6 +8764,13 @@
     <string name="CreatePollFragment__add_option">បញ្ចូលជម្រើសយ៉ាងហោចណាស់ 2</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">បញ្ចូលសំណួរ</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">ស្គែនកូដ QR</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">ប្រើឧបករណ៍នេះដើម្បីស្គែនកូដ QR នៅលើឧបករណ៍ដែលអ្នកចង់ផ្ទេរទៅ</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">យល់ព្រម</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8784,6 +8841,67 @@
     <string name="CallQualitySheet__submit">ដាក់បញ្ជូន</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">សូមអរគុណចំពោះមតិកែលម្អរបស់អ្នក!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">ខ្ញុំមានបញ្ហាជាមួយការហៅទូរសព្ទ</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">ការហៅទូរសព្ទនោះពិតជាអស្ចារ្យណាស់</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">មិនអាចផ្ញើមតិកែលម្អរបស់អ្នកបានទេ។</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">ព្យាយាមម្តងទៀត</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$s បានខ្ទាស់សារមួយ</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">អ្នកបានខ្ទាស់សារមួយ</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">ចូលទៅកាន់សារ</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">រកមិនឃើញសារទេ</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">បានខ្ទាស់</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">រូបភាព</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">វីដេអូ</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">ស្ទីកគ័រ</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">សារសំឡេង</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">មេឌៀមើលបានតែម្តង</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">ឈប់ខ្ទាស់</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">មើលសារទាំងអស់</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">ឈប់ខ្ទាស់សារទាំងអស់</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">ខ្ទាស់សារដែលបាត់ដោយស្វ័យប្រវត្តិ</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">សារដែលបាត់ដោយស្វ័យប្រវត្តិនឹងឈប់ខ្ទាស់ នៅពេលមុខងារកំណត់ម៉ោងរបស់វាផុតកំណត់ ហើយសារត្រូវបានដកចេញពីការជជែក។</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">យល់ហើយ</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">សារដែលបាត់ដោយស្វ័យប្រវត្តិ</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">សារដែលបានខ្ទាស់</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">ឈប់ខ្ទាស់</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">ឈប់ខ្ទាស់សារទាំងអស់?</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">សារនឹងឈប់ខ្ទាស់សម្រាប់សមាជិកទាំងអស់។</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">មិនអាចខ្ទាស់សារទេ</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">មិនអាចឈប់ខ្ទាស់សារបានទេ</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">មិនអាចឈប់ខ្ទាស់សារបានទេ</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">សូមពិនិត្យមើលសេវាអ៊ីនធឺណិតរបស់អ្នក រួចព្យាយាមម្តងទៀត។</string>
 
     <!-- EOF -->
 </resources>

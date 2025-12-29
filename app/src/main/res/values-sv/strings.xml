@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">Skapa en ny återställningsnyckel</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">Du måste skapa och registrera en ny återställningsnyckel innan du kan inaktivera din pinkod.</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Skapa nyckel</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -365,6 +365,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Detta är inte en giltig samtalslänk. Kontrollera att hela länken är intakt och korrekt innan du försöker gå med.</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">Du är redan i ett samtal</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">Överför kontot till ny enhet?</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">För att överföra det här kontot till en ny enhet trycker du på Fortsätt och skannar QR-koden igen med Signal-kameran. Se till att du bara skannar QR-koder som kommer direkt från Signal.</string>
+    <string name="CommunicationActions__dont_transfer">Överför inte</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -675,6 +680,22 @@
     <string name="ConversationFragment_group_names">Gruppnamn</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">Det gick inte att ladda ner fotot. Försök igen.</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">Håll fäst i …</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24 timmar</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7 dagar</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30 dagar</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">För alltid</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">Ersätt det äldsta fästa meddelandet?</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">Meddelandet som fästs ersätter det äldsta</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">Ersätt</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Säkerhetstips</string>
@@ -1204,11 +1225,11 @@
     <string name="AddToGroupActivity_add_member">Lägg till medlem?</string>
     <string name="AddToGroupActivity_add_s_to_s">Lägg till \"%1$s\" i \"%2$s\"?</string>
     <string name="AddToGroupActivity_s_added_to_s">\"%1$s\" lagd till \"%2$s\".</string>
-    <string name="AddToGroupActivity_add_to_group">Lägg till i grupp</string>
     <string name="AddToGroupActivity_add_to_groups">Lägg till i grupper</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">Denna person kan inte läggas till i äldre grupper.</string>
     <string name="AddToGroupActivity_add">Lägg till</string>
     <string name="AddToGroupActivity_add_to_a_group">Lägg till i en grupp</string>
+    <string name="AddToGroupActivity_search">Sök</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">Välj ny administratör</string>
@@ -1394,11 +1415,16 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">Klar</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">Denna person kan inte läggas till i äldre grupper.</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">Lägg till \"%1$s\" i \"%2$s\"?</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="one">Lägg till %1$s i %2$s?</item>
-        <item quantity="other">Lägg till %3$d medlemmar i %2$s?</item>
+        <item quantity="one">Lägg till {2} i %2$s?</item>
+        <item quantity="other">Lägg till %1$d medlemmar i %2$s?</item>
     </plurals>
+
     <string name="AddMembersActivity__add">Lägg till</string>
     <string name="AddMembersActivity__add_members">Lägg till medlemmar</string>
 
@@ -2124,6 +2150,8 @@
     <string name="MessageRecord_unsupported_feature">%1$s skickade dig ett meddelande som inte kan bearbetas eller visas eftersom det använder en ny Signal-funktion.</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">%1$s avslutade omröstningen: %2$s</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">Du avslutade omröstningen: \"%1$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Acceptera</string>
@@ -2440,6 +2468,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">Så här aktiverar du din video:</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">Minska lokal video</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">Expandera lokal video</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">Signal-samtal</string>
     <string name="WebRtcCallView__signal_video_call">Signal-videosamtal</string>
@@ -2656,6 +2690,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">Kan inte ta emot ljud &amp; video från %1$s</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">Kan inte ta emot ljud och video från %1$s</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">Det kan bero på att de inte har verifierat ditt säkerhetsnummerbyte, det finns ett problem med deras enhet eller att de har blockerat dig.</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">Byt riktning på kameran</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">Svep för att visa skärmdelning</string>
@@ -3370,7 +3408,7 @@
     <string name="WebRtcCallScreen__answer_without_video">Svara utan video</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">Ändra kamerariktning</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3429,9 +3467,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"\"%1$s\" är inte en Signal-användare. Kontrollera användarnamnet och försök igen."</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">Du behöver inte lägga till dig själv i gruppen</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">Störst gruppstorlek uppnådd</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">Signal-grupper kan ha högst %1$d medlemmar.</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">Signal-grupper kan ha högst %1$s medlemmar.</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">Rekommenderad medlemsgräns uppnådd</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">Signal-grupper fungerar bäst med %1$d medlemmar eller färre. Om du lägger till fler medlemmar kommer det att orsaka förseningar när du skickar och tar emot meddelanden.</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">Signal-grupper fungerar bäst med %1$s medlemmar eller färre. Om du lägger till fler medlemmar kommer det att orsaka förseningar när du skickar och tar emot meddelanden.</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="one">%1$d medlem</item>
         <item quantity="other">%1$d medlemmar</item>
@@ -4443,6 +4481,10 @@
     <string name="conversation_selection__menu_payment_details">Betalningsuppgifter</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">Avsluta omröstning</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">Nåla</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">Lösgör</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5196,11 +5238,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Hoppa över</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="one">%1$d medlem</item>
-        <item quantity="other">%1$d medlemmar</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="one">%1$s medlem</item>
@@ -5930,11 +5967,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">Det gick inte att blockera</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s är inte en Signal-användare</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$s är inte en Signal-användare</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">Öppna menyn</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="one">%1$s är inte en Signal-användare</item>
         <item quantity="other">%1$s är inte Signal-användare</item>
     </plurals>
@@ -6114,7 +6151,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">Det gick inte att uppdatera profilen</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">Välj ett märke</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">Du måste välja ett märke</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">Det gick inte att uppdatera profilen</string>
@@ -6180,7 +6216,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">Donationskvitton</string>
     <string name="ManageDonationsFragment__badges">Märken</string>
-    <string name="ManageDonationsFragment__subscription_faq">Vanliga frågor om abonnemang</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">Vanliga frågor för donatorer</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">Andra sätt att ge</string>
     <!-- Preference label to launch badge gifting -->
@@ -7461,8 +7498,10 @@
     <string name="CallLogAdapter__outgoing">Utgående</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">Missat</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">Missad när aviseringsprofilen var på</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">Missad när aviseringsprofilen var på</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">Gå med</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7766,6 +7805,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">Aktivera Säkerhetskopiering av Signal</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">Prova Säker säkerhetskopiering</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">Förlora aldrig ett meddelande när du skaffar en ny telefon eller installerar om Signal.</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -8046,6 +8087,12 @@
     <string name="BackupStatusRow__your_last_backup">Din senaste säkerhetskopiering kunde inte slutföras. Kontrollera att din telefon är ansluten till wifi och tryck på Säkerhetskopiera nu för att försöka igen.</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">Din senaste säkerhetskopiering kunde inte slutföras. Kontrollera att du använder den senaste versionen av Signal och försök igen.</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">Antalet meddelanden överskrider lagringsgränsen. Ta bort några meddelanden och försök igen.</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">Meddelanden som skickats eller mottagits före den %1$s säkerhetskopieras inte.</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">Din säkerhetskopiering kunde inte slutföras eftersom du har ont om lagringsutrymme. Frigör utrymme på enheten och försök igen.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">Läs mer</string>
 
@@ -8510,11 +8557,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Att skapa en ny nyckel är bara nödvändigt om någon annan känner till din nyckel. Du måste ladda upp din säkerhetskopia igen, inklusive media. Om du använder Optimera lagring måste du först ladda ner avlastade media.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Avsluta säkerhetskopieringsinställning?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">Du har inte slutfört konfigureringen av säkerhetskopior, och ingen säkerhetskopia har skapats. Du kan aktivera säkerhetskopiering i Inställningar.</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Avsluta säkerhetskopieringsinställning</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8780,13 +8827,13 @@
     <string name="NoBackupToRestore_skip_restore">Hoppa över återställning</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Gränsen för återställningsnycklar har nåtts</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">Du har skapat en ny återställningsnyckel, men för att förhindra missbruk är antalet nya nycklar du kan skapa begränsat. Du kommer inte att kunna skapa en ny nyckel på sju dagar. Förvara din återställningsnyckel någonstans säkert.</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Det går inte att skapa ny nyckel</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">Du har nått gränsen för hur många nya nycklar du kan skapa. Du kommer att kunna skapa en ny återställningsnyckel om sju dagar. Om du tror att någon kan få åtkomst till din säkerhetskopia kan du välja ”Stäng av och radera säkerhetskopia.”</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">OK</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8850,6 +8897,8 @@
     <string name="Poll__poll_question">Omröstning: %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">%1$s avslutade omröstningen: %2$s</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">Du avslutade omröstningen: \"%1$s\"</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">%1$s röstade i omröstningen: %2$s</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8901,6 +8950,13 @@
     <string name="CreatePollFragment__add_option">Lägg till minst två alternativ</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">Lägg till en fråga</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">Skanna QR-kod</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">Använd den här enheten för att skanna QR-koden på den enhet du vill överföra till</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">Okej</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8962,7 +9018,7 @@
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">visa din felsökningslogg</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> innan du skickar in</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> innan du skickar in.</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">Dela felsökningslogg</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -8971,6 +9027,67 @@
     <string name="CallQualitySheet__submit">Skicka</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">Tack för din feedback!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">Jag hade problem med samtalet</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">Samtalet var jättebra</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">Det gick inte att skicka din feedback.</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">Försök igen</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$s fäste ett meddelande</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">Du har fäst ett meddelande</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">Gå till Meddelande</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">Meddelandet hittades inte</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">Nålade</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">Foto</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">Video</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">Klistermärke</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">Röstmeddelande</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">Visa-en-gång media</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">Lösgör</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">Visa alla meddelanden</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">Lösgör alla meddelanden</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">Fäster försvinnande meddelanden</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">Försvinnande meddelanden tas bort när timern löper ut och meddelandet tas bort från chatten.</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">Uppfattat</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">Försvinnande meddelanden</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">Fästa meddelanden</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">Lösgör</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">Lösgör alla meddelanden?</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">Meddelanden kommer att lösgöras för alla medlemmar.</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">Det gick inte att fästa meddelandet</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">Det gick inte att lösgöra meddelandet</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">Det gick inte att lösgöra meddelandena</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">Kontrollera din anslutning och försök igen.</string>
 
     <!-- EOF -->
 </resources>

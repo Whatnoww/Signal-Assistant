@@ -7,8 +7,6 @@ package org.thoughtcrime.securesms.backup.v2
 
 import android.app.PendingIntent
 import android.database.Cursor
-import android.os.Environment
-import android.os.StatFs
 import androidx.annotation.CheckResult
 import androidx.annotation.Discouraged
 import androidx.annotation.WorkerThread
@@ -20,10 +18,16 @@ import kotlinx.coroutines.withContext
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
 import org.greenrobot.eventbus.EventBus
+import org.signal.core.models.AccountEntropyPool
+import org.signal.core.models.ServiceId.ACI
+import org.signal.core.models.ServiceId.PNI
+import org.signal.core.models.backup.MediaName
+import org.signal.core.models.backup.MediaRootBackupKey
+import org.signal.core.models.backup.MessageBackupKey
 import org.signal.core.util.Base64
 import org.signal.core.util.Base64.decodeBase64OrThrow
-import org.signal.core.util.ByteSize
 import org.signal.core.util.CursorUtil
+import org.signal.core.util.DiskUtil
 import org.signal.core.util.EventTimer
 import org.signal.core.util.PendingIntentFlags.cancelCurrent
 import org.signal.core.util.Stopwatch
@@ -102,6 +106,8 @@ import org.thoughtcrime.securesms.groups.GroupId
 import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.jobmanager.impl.DataRestoreConstraint
 import org.thoughtcrime.securesms.jobs.ArchiveAttachmentBackfillJob
+import org.thoughtcrime.securesms.jobs.ArchiveThumbnailBackfillJob
+import org.thoughtcrime.securesms.jobs.ArchiveThumbnailUploadJob
 import org.thoughtcrime.securesms.jobs.AvatarGroupsV2DownloadJob
 import org.thoughtcrime.securesms.jobs.BackupDeleteJob
 import org.thoughtcrime.securesms.jobs.BackupMessagesJob
@@ -118,6 +124,7 @@ import org.thoughtcrime.securesms.jobs.StickerPackDownloadJob
 import org.thoughtcrime.securesms.jobs.StorageForcePushJob
 import org.thoughtcrime.securesms.jobs.Svr2MirrorJob
 import org.thoughtcrime.securesms.jobs.UploadAttachmentToArchiveJob
+import org.thoughtcrime.securesms.keyvalue.BackupValues
 import org.thoughtcrime.securesms.keyvalue.BackupValues.ArchiveServiceCredentials
 import org.thoughtcrime.securesms.keyvalue.KeyValueStore
 import org.thoughtcrime.securesms.keyvalue.SignalStore
@@ -137,7 +144,6 @@ import org.thoughtcrime.securesms.util.RemoteConfig
 import org.thoughtcrime.securesms.util.ServiceUtil
 import org.thoughtcrime.securesms.util.TextSecurePreferences
 import org.thoughtcrime.securesms.util.toMillis
-import org.whispersystems.signalservice.api.AccountEntropyPool
 import org.whispersystems.signalservice.api.ApplicationErrorAction
 import org.whispersystems.signalservice.api.NetworkResult
 import org.whispersystems.signalservice.api.StatusCodeErrorAction
@@ -150,15 +156,10 @@ import org.whispersystems.signalservice.api.archive.ArchiveServiceAccessPair
 import org.whispersystems.signalservice.api.archive.ArchiveServiceCredential
 import org.whispersystems.signalservice.api.archive.DeleteArchivedMediaRequest
 import org.whispersystems.signalservice.api.archive.GetArchiveCdnCredentialsResponse
-import org.whispersystems.signalservice.api.backup.MediaName
-import org.whispersystems.signalservice.api.backup.MediaRootBackupKey
-import org.whispersystems.signalservice.api.backup.MessageBackupKey
 import org.whispersystems.signalservice.api.crypto.AttachmentCipherStreamUtil
 import org.whispersystems.signalservice.api.link.TransferArchiveResponse
 import org.whispersystems.signalservice.api.messages.AttachmentTransferProgress
 import org.whispersystems.signalservice.api.messages.SignalServiceAttachment.ProgressListener
-import org.whispersystems.signalservice.api.push.ServiceId.ACI
-import org.whispersystems.signalservice.api.push.ServiceId.PNI
 import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException
 import org.whispersystems.signalservice.api.svr.SvrBApi
 import org.whispersystems.signalservice.internal.crypto.PaddingInputStream
@@ -361,21 +362,11 @@ object BackupRepository {
   }
 
   /**
-   * Gets the free storage space in the device's data partition.
-   */
-  fun getFreeStorageSpace(): ByteSize {
-    val statFs = StatFs(Environment.getDataDirectory().absolutePath)
-    val free = (statFs.availableBlocksLong) * statFs.blockSizeLong
-
-    return free.bytes
-  }
-
-  /**
    * Checks whether or not we do not have enough storage space for our remaining attachments to be downloaded.
    * Caller from the attachment / thumbnail download jobs.
    */
   fun checkForOutOfStorageError(tag: String): Boolean {
-    val availableSpace = getFreeStorageSpace()
+    val availableSpace = DiskUtil.getAvailableSpace(AppDependencies.application)
     val remainingAttachmentSize = SignalDatabase.attachments.getRemainingRestorableAttachmentSize().bytes
 
     return if (availableSpace < remainingAttachmentSize) {
@@ -401,8 +392,8 @@ object BackupRepository {
     CancelRestoreMediaJob.enqueue()
   }
 
-  fun markBackupFailure() {
-    SignalStore.backup.markMessageBackupFailure()
+  fun markBackupCreationFailed(error: BackupValues.BackupCreationError) {
+    SignalStore.backup.markBackupCreationFailed(error)
     ArchiveUploadProgress.onMainBackupFileUploadFailure()
 
     if (!SignalStore.backup.hasBackupBeenUploaded) {
@@ -428,7 +419,7 @@ object BackupRepository {
   }
 
   fun clearBackupFailure() {
-    SignalStore.backup.clearMessageBackupFailure()
+    SignalStore.backup.backupCreationError = null
     ServiceUtil.getNotificationManager(AppDependencies.application).cancel(NotificationIds.INITIAL_BACKUP_FAILED)
   }
 
@@ -479,7 +470,7 @@ object BackupRepository {
    */
   @JvmStatic
   fun shouldDisplayBackupFailedIndicator(): Boolean {
-    if (shouldNotDisplayBackupFailedMessaging() || !SignalStore.backup.hasBackupFailure) {
+    if (shouldNotDisplayBackupFailedMessaging() || !SignalStore.backup.hasBackupCreationError) {
       return false
     }
 
@@ -492,30 +483,6 @@ object BackupRepository {
   @JvmStatic
   fun shouldDisplayBackupAlreadyRedeemedIndicator(): Boolean {
     return !(shouldNotDisplayBackupFailedMessaging() || !SignalStore.backup.hasBackupAlreadyRedeemedError)
-  }
-
-  /**
-   * Whether the "Backup Failed" row should be displayed in settings.
-   * Shown when the initial backup creation has failed
-   */
-  fun shouldDisplayBackupFailedSettingsRow(): Boolean {
-    if (shouldNotDisplayBackupFailedMessaging()) {
-      return false
-    }
-
-    return !SignalStore.backup.hasBackupBeenUploaded && SignalStore.backup.hasBackupFailure
-  }
-
-  /**
-   * Whether the "Could not complete backup" row should be displayed in settings.
-   * Shown when a new backup could not be created but there is an existing one already
-   */
-  fun shouldDisplayCouldNotCompleteBackupSettingsRow(): Boolean {
-    if (shouldNotDisplayBackupFailedMessaging()) {
-      return false
-    }
-
-    return SignalStore.backup.hasBackupBeenUploaded && SignalStore.backup.hasBackupFailure
   }
 
   /**
@@ -566,7 +533,7 @@ object BackupRepository {
       return false
     }
 
-    return (!SignalStore.backup.hasBackupBeenUploaded || SignalStore.backup.hasValidationError) && SignalStore.backup.hasBackupFailure && System.currentTimeMillis().milliseconds > SignalStore.backup.nextBackupFailureSheetSnoozeTime
+    return SignalStore.backup.hasBackupCreationError && SignalStore.backup.backupCreationError != BackupValues.BackupCreationError.TRANSIENT && System.currentTimeMillis().milliseconds > SignalStore.backup.nextBackupFailureSheetSnoozeTime
   }
 
   /**
@@ -624,7 +591,12 @@ object BackupRepository {
 
   @JvmStatic
   fun maybeFixAnyDanglingUploadProgress() {
+    if (SignalStore.account.isLinkedDevice) {
+      return
+    }
+
     if (SignalStore.backup.archiveUploadState?.backupPhase == ArchiveUploadProgressState.BackupPhase.Message && AppDependencies.jobManager.find { it.factoryKey == BackupMessagesJob.KEY }.isEmpty()) {
+      Log.w(TAG, "Found a situation where message backup was in progress, but there's no active BackupMessageJob! Re-enqueueing.")
       SignalStore.backup.archiveUploadState = null
       BackupMessagesJob.enqueue()
       return
@@ -636,9 +608,16 @@ object BackupRepository {
 
     if (!AppDependencies.jobManager.areQueuesEmpty(UploadAttachmentToArchiveJob.QUEUES)) {
       if (SignalStore.backup.archiveUploadState?.state == ArchiveUploadProgressState.State.None) {
+        Log.w(TAG, "Found a situation where attachment uploads are in progress, but the progress state was None! Fixing.")
         ArchiveUploadProgress.onAttachmentSectionStarted(SignalDatabase.attachments.getPendingArchiveUploadBytes())
       }
       return
+    }
+
+    if (AppDependencies.jobManager.areQueuesEmpty(ArchiveThumbnailUploadJob.QUEUES) && SignalDatabase.attachments.areAnyThumbnailsPendingUpload()) {
+      Log.w(TAG, "Found a situation where there's no thumbnail jobs in progress, but thumbnails are in the pending upload state! Clearing the pending state and re-enqueueing.")
+      SignalDatabase.attachments.clearArchiveThumbnailTransferStateForInProgressItems()
+      AppDependencies.jobManager.add(ArchiveThumbnailBackfillJob())
     }
 
     val pendingBytes = SignalDatabase.attachments.getPendingArchiveUploadBytes()
@@ -687,7 +666,7 @@ object BackupRepository {
     }
   }
 
-  private fun shouldNotDisplayBackupFailedMessaging(): Boolean {
+  fun shouldNotDisplayBackupFailedMessaging(): Boolean {
     return !SignalStore.account.isRegistered || !SignalStore.backup.areBackupsEnabled
   }
 
@@ -802,7 +781,8 @@ object BackupRepository {
       progressEmitter = localBackupProgressEmitter,
       cancellationSignal = cancellationSignal,
       forTransfer = false,
-      extraFrameOperation = null
+      extraFrameOperation = null,
+      messageInclusionCutoffTime = 0
     ) { dbSnapshot ->
       val localArchivableAttachments = dbSnapshot
         .attachmentTable
@@ -836,6 +816,7 @@ object BackupRepository {
     forwardSecrecyToken: BackupForwardSecrecyToken,
     forwardSecrecyMetadata: ByteArray,
     currentTime: Long,
+    messageInclusionCutoffTime: Long = 0,
     progressEmitter: ExportProgressListener? = null,
     cancellationSignal: () -> Boolean = { false },
     extraFrameOperation: ((Frame) -> Unit)?
@@ -857,7 +838,8 @@ object BackupRepository {
       progressEmitter = progressEmitter,
       cancellationSignal = cancellationSignal,
       extraFrameOperation = extraFrameOperation,
-      endingExportOperation = null
+      endingExportOperation = null,
+      messageInclusionCutoffTime = messageInclusionCutoffTime
     )
   }
 
@@ -887,7 +869,8 @@ object BackupRepository {
       progressEmitter = progressEmitter,
       cancellationSignal = cancellationSignal,
       extraFrameOperation = null,
-      endingExportOperation = null
+      endingExportOperation = null,
+      messageInclusionCutoffTime = 0
     )
   }
 
@@ -922,7 +905,8 @@ object BackupRepository {
       progressEmitter = progressEmitter,
       cancellationSignal = cancellationSignal,
       extraFrameOperation = null,
-      endingExportOperation = null
+      endingExportOperation = null,
+      messageInclusionCutoffTime = 0
     )
   }
 
@@ -942,6 +926,7 @@ object BackupRepository {
     isLocal: Boolean,
     writer: BackupExportWriter,
     forTransfer: Boolean,
+    messageInclusionCutoffTime: Long,
     progressEmitter: ExportProgressListener?,
     cancellationSignal: () -> Boolean,
     extraFrameOperation: ((Frame) -> Unit)?,
@@ -958,9 +943,9 @@ object BackupRepository {
       val signalStoreSnapshot: SignalStore = createSignalStoreSnapshot(keyValueDbName)
       eventTimer.emit("store-db-snapshot")
 
-      val exportState = ExportState(backupTime = currentTime, forTransfer = forTransfer)
       val selfAci = signalStoreSnapshot.accountValues.aci!!
       val selfRecipientId = dbSnapshot.recipientTable.getByAci(selfAci).get().toLong().let { RecipientId.from(it) }
+      val exportState = ExportState(backupTime = currentTime, forTransfer = forTransfer, selfRecipientId = selfRecipientId)
 
       var frameCount = 0L
 
@@ -995,7 +980,7 @@ object BackupRepository {
           }
 
           progressEmitter?.onRecipient()
-          RecipientArchiveProcessor.export(dbSnapshot, signalStoreSnapshot, exportState, selfRecipientId, selfAci) {
+          RecipientArchiveProcessor.export(dbSnapshot, signalStoreSnapshot, exportState, selfAci) {
             writer.write(it)
             extraFrameOperation?.invoke(it)
             eventTimer.emit("recipient")
@@ -1068,7 +1053,7 @@ object BackupRepository {
           val approximateMessageCount = dbSnapshot.messageTable.getApproximateExportableMessageCount(exportState.threadIds)
           val frameCountStart = frameCount
           progressEmitter?.onMessage(0, approximateMessageCount)
-          ChatItemArchiveProcessor.export(dbSnapshot, exportState, selfRecipientId, cancellationSignal) { frame ->
+          ChatItemArchiveProcessor.export(dbSnapshot, exportState, selfRecipientId, messageInclusionCutoffTime, cancellationSignal) { frame ->
             writer.write(frame)
             extraFrameOperation?.invoke(frame)
             eventTimer.emit("message")
@@ -2180,9 +2165,13 @@ object BackupRepository {
     try {
       DataRestoreConstraint.isRestoringData = true
       return withContext(Dispatchers.IO) {
-        return@withContext BackupProgressService.start(context, context.getString(R.string.BackupProgressService_title)).use {
+        val result = BackupProgressService.start(context, context.getString(R.string.BackupProgressService_title)).use {
           restoreRemoteBackup(controller = it, cancellationSignal = { !isActive })
         }
+        if (result !is RemoteRestoreResult.Success) {
+          ArchiveRestoreProgress.onRestoreFailed()
+        }
+        return@withContext result
       }
     } finally {
       DataRestoreConstraint.isRestoringData = false
@@ -2446,7 +2435,8 @@ data class ArchivedMediaObject(val mediaId: String, val cdn: Int)
 
 class ExportState(
   val backupTime: Long,
-  val forTransfer: Boolean
+  val forTransfer: Boolean,
+  val selfRecipientId: RecipientId
 ) {
   val recipientIds: MutableSet<Long> = hashSetOf()
   val threadIds: MutableSet<Long> = hashSetOf()
@@ -2457,6 +2447,7 @@ class ExportState(
   val aciToRecipientId: MutableMap<String, Long> = hashMapOf()
   val recipientIdToE164: MutableMap<Long, Long> = hashMapOf()
   val customChatColorIds: MutableSet<Long> = hashSetOf()
+  var releaseNoteRecipientId: Long? = null
 }
 
 class ImportState(val mediaRootBackupKey: MediaRootBackupKey) {

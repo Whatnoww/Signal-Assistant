@@ -7,6 +7,7 @@ package org.thoughtcrime.securesms.backup.v2.processor
 
 import okio.ByteString.Companion.toByteString
 import org.signal.core.util.Base64
+import org.signal.core.util.UuidUtil
 import org.signal.core.util.insertInto
 import org.signal.core.util.logging.Log
 import org.signal.core.util.toInt
@@ -24,7 +25,6 @@ import org.thoughtcrime.securesms.database.serialize
 import org.thoughtcrime.securesms.notifications.profiles.NotificationProfile
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.storage.StorageSyncHelper
-import org.whispersystems.signalservice.api.util.UuidUtil
 import java.time.DayOfWeek
 import org.thoughtcrime.securesms.backup.v2.proto.NotificationProfile as NotificationProfileProto
 
@@ -39,7 +39,7 @@ object NotificationProfileArchiveProcessor {
     db.notificationProfileTables
       .getProfiles()
       .forEach { profile ->
-        val frame = profile.toBackupFrame(includeRecipient = { id -> exportState.recipientIds.contains(id.toLong()) })
+        val frame = profile.toBackupFrame(includeRecipient = { id -> exportState.recipientIds.contains(id.toLong()) && id != exportState.selfRecipientId })
         emitter.emit(frame)
       }
   }

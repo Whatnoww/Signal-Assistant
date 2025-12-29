@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">رمز بازیابی جدید ایجاد کنید</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">باید قبل از غیرفعال کردن پین خود، رمز بازیابی جدیدی ایجاد و ثبت کنید.</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">ایجاد رمز</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -365,6 +365,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">این پیوند تماس معتبری نیست. قبل از تلاش برای پیوستن، مطمئن شوید که پیوند کامل و درست است.</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">شما در حال حاضر در یک تماس هستید</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">حساب به دستگاه جدید منتقل شود؟</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">برای انتقال این حساب به دستگاه جدید، روی «ادامه» ضربه بزنید و کد QR را دوباره با دوربین سیگنال اسکن کنید. مطمئن شوید فقط کدهای QR را اسکن می‌کنید که مستقیماً از طرف سیگنال ارسال می‌شوند.</string>
+    <string name="CommunicationActions__dont_transfer">انتقال داده نشود</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -675,6 +680,22 @@
     <string name="ConversationFragment_group_names">نام گروه</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">عکس دانلود نشد. دوباره امتحان کنید.</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">سنجاق بماند به‌مدت…</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">۲۴ ساعت</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">۷ روز</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">۳۰ روز</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">برای همیشه</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">قدیمی‌ترین سنجاق جایگزین شود؟</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">پیام سنجاق‌شده جدید جایگزین قدیمی‌ترین سنجاق خواهد شد</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">جایگزینی</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">نکات ایمنی</string>
@@ -1204,11 +1225,11 @@
     <string name="AddToGroupActivity_add_member">افزودن عضو؟</string>
     <string name="AddToGroupActivity_add_s_to_s">افزودن «%1$s» به «%2$s»؟</string>
     <string name="AddToGroupActivity_s_added_to_s">«%1$s» به «%2$s» افزوده شد.</string>
-    <string name="AddToGroupActivity_add_to_group">افزودن به گروه</string>
     <string name="AddToGroupActivity_add_to_groups">افزودن به گروه‌ها</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">این فرد نمی‌تواند به گروه‌های قدیمی اضافه شود.</string>
     <string name="AddToGroupActivity_add">افزودن</string>
     <string name="AddToGroupActivity_add_to_a_group">افزودن به گروه</string>
+    <string name="AddToGroupActivity_search">جستجو</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">مدیر جدید را انتخاب کنید</string>
@@ -1394,11 +1415,16 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">انجام شد</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">این فرد نمی‌تواند به گروه‌های قدیمی اضافه شود.</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">افزودن «%1$s» به «%2$s»؟</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="one">«%1$s» به «%2$s» افزوده شود؟</item>
-        <item quantity="other">%3$d عضو به «%2$s» افزوده شوند؟</item>
+        <item quantity="one">«{2}» به «%2$s» افزوده شود؟</item>
+        <item quantity="other">%1$d عضو به «%2$s» افزوده شوند؟</item>
     </plurals>
+
     <string name="AddMembersActivity__add">افزودن</string>
     <string name="AddMembersActivity__add_members">افزودن اعضا</string>
 
@@ -2124,6 +2150,8 @@
     <string name="MessageRecord_unsupported_feature">پیامی را برای شما ارسال کرد که پردازش یا نمایش داده نمی شود زیرا از ویژگی جدید سیگنال استفاده می کند.%1$s</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">‏%1$s نظرسنجی «%2$s» را به پایان رساند</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">شما نظرسنجی را پایان دادید: «%1$s»</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">پذیرفتن</string>
@@ -2440,6 +2468,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">برای فعال کردن ویدیو:</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">کوچک کردن ویدئوی محلی</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">بزرگ کردن ویدئوی محلی</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">تماس سیگنال</string>
     <string name="WebRtcCallView__signal_video_call">تماس ویدئویی سیگنال</string>
@@ -2656,6 +2690,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">دریافت صدا و تصویر از %1$s ممکن نیست</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">دریافت صدا و تصویر از %1$s ممکن نیست</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">این می‌تواند به این دلیل باشد که او تغییر شماره ایمنی شما را تأیید نکرده، مشکلی برای دستگاهش پیش آمده یا شما را مسدود کرده است.</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">جهت دوربین را تغییر دهید.</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">برای مشاهدهٔ اشتراک صفحه به انگشت‌تان را به کناره‌ها بکشید</string>
@@ -3370,7 +3408,7 @@
     <string name="WebRtcCallScreen__answer_without_video">پاسخ دادن بدون تصویر</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">تغییر جهت دوربین</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3429,9 +3467,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"\"%1$s\" کاربر سیگنال نیست. لطفاً نام کاربری را بررسی کرده و دوباره تلاش کنید."</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">نیازی نیست که خود را به گروه اضافه کنید</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">به حداکثر اندازهٔ گروه رسیدید</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">گروه‌های سیگنال می‌توانند حداکثر %1$d عضو داشته باشند.</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">گروه‌های سیگنال می‌توانند حداکثر %1$s عضو داشته باشند.</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">به محدودیت توصیه شدهٔ تعداد اعضا رسیدید</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">گروه‌های سیگنال با %1$d عضو یا کمتر به بهترین شکل عمل می‌کنند. افزودن اعضای بیشتر باعث بوجود آمدن تأخیر در ارسال و دریافت پیام‌ها خواهد شد.</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">گروه‌های سیگنال با %1$s عضو یا کمتر به بهترین شکل عمل می‌کنند. افزودن اعضای بیشتر باعث بوجود آمدن تأخیر در ارسال و دریافت پیام‌ها خواهد شد.</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="one">%1$d عضو</item>
         <item quantity="other">%1$d عضو</item>
@@ -4443,6 +4481,10 @@
     <string name="conversation_selection__menu_payment_details">جزئیات پرداخت</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">پایان نظرسنجی</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">سنجاق کردن</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">برداشتن سنجاق</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5196,11 +5238,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">رد کردن</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="one">%1$d عضو</item>
-        <item quantity="other">%1$d عضو</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="one">%1$s عضو</item>
@@ -5236,7 +5273,7 @@
     <string name="ChatWallpaperFragment__wallpaper_preview_description">پیش‌نمایش کاغذدیواری</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_chat_colors">می‌خواهید همهٔ رنگ‌های گفتگو را نادیده بگیرید؟</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_wallpapers">می‌خواهید همهٔ کاغذدیواری‌ها را نادیده بگیرید؟</string>
-    <string name="ChatWallpaperFragment__reset_default_colors">بازنشانی رنگ‌های پیش‌فرض</string>
+    <string name="ChatWallpaperFragment__reset_default_colors">بازنشانی رنگ پیش‌فرض</string>
     <string name="ChatWallpaperFragment__reset_all_colors">بازنشانی همهٔ رنگ‌ها</string>
     <string name="ChatWallpaperFragment__reset_default_wallpaper">بازنشانی کاغذدیواری پیش‌فرض</string>
     <string name="ChatWallpaperFragment__reset_all_wallpapers">بازنشانی همهٔ کاغذدیواری‌ها</string>
@@ -5844,7 +5881,7 @@
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__call">تماس</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
-    <string name="ConversationSettingsFragment__mute">بی‌صدا</string>
+    <string name="ConversationSettingsFragment__mute">قطع صدا</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__muted">بی‌صداشده</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -5930,11 +5967,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">مسدود نشد</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s کاربر سیگنال نیست</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$s کاربر سیگنال نیست</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">باز کردن منو</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="one">%1$s کاربر سیگنال نیست</item>
         <item quantity="other">%1$s کاربر سیگنال نیستند</item>
     </plurals>
@@ -6114,7 +6151,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">به‌روزرسانی پروفایل ناموفق بود</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">انتخاب یک نشان</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">باید یک نشان انتخاب کنید</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">به‌روزرسانی پروفایل ناموفق بود</string>
@@ -6180,7 +6216,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">رسید کمک مالی</string>
     <string name="ManageDonationsFragment__badges">نشان‌ها</string>
-    <string name="ManageDonationsFragment__subscription_faq">پرسش‌های متداول اشتراک</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">پرسش‌های متداول حامیان</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">سایر روش‌های اهداء</string>
     <!-- Preference label to launch badge gifting -->
@@ -7461,8 +7498,10 @@
     <string name="CallLogAdapter__outgoing">خروجی</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">ازدست‌رفته</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">ازدست‌رفته درحالی که نمایۀ اعلان فعال است</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">ازدست‌رفته درحالی که نمایۀ اعلان فعال است</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">پیوستن</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7766,6 +7805,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">«پشتیبان‌های امن سیگنال» را روشن کنید</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">پشتیبان‌گیری امن سیگنال را امتحان کنید</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">وقتی تلفن جدید می‌گیرید یا سیگنال را دوباره نصب می‌کنید، هرگز پیامی را از دست ندهید.</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -8046,6 +8087,12 @@
     <string name="BackupStatusRow__your_last_backup">آخرین پشتیبان‌گیری شما انجام نشد. مطمئن شوید که تلفن شما به Wi-Fi متصل است و با ضربه زدن روی «اکنون پشتیبان‌گیری شود»، دوباره امتحان کنید.</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">آخرین پشتیبان‌گیری شما انجام نشد. مطمئن شوید که از جدیدترین نسخه سیگنال استفاده می‌کنید و سپس دوباره امتحان کنید.</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">تعداد پیام‌های شما از حد مجاز حافظه بیشتر شده است. چند پیام را حذف کنید و دوباره امتحان کنید.</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">پیام‌های ارسالی یا دریافتی قبل از %1$s پشتیبان‌گیری نمی‌شوند.</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">پشتیبان‌گیری تکمیل نشد، چون فضای ذخیره‌سازی موجود کافی نیست. فضا در دستگاهتان آزاد کنید و دوباره امتحان کنید.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">اطلاعات بیشتر</string>
 
@@ -8510,11 +8557,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">ایجاد رمز جدید فقط در صورتی ضروری است که شخص دیگری رمز شما را بداند. باید نسخه پشتیبان خود، از‌جمله فایل رسانه را دوباره بارگذاری کنید. اگر از «بهینه‌سازی فضای ذخیره‌سازی» استفاده می‌کنید، ابتدا باید رسانه آفلودشده را دانلود کنید.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">از راه‌اندازی نسخه پشتیبان خارج می‌شوید؟</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">راه‌اندازی نسخه پشتیبان را تکمیل نکردید، و هیچ نسخه پشتیبان ایجاد نشد. می‌توانید پشتیبان‌گیری را در «تنظیمات» فعال کنید.</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">خروج از راه‌اندازی نسخه پشتیبان</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8542,7 +8589,7 @@
     <!-- Verify your key title -->
     <string name="VerifyBackupPinScreen__enter_your_backup_key">رمز بازیابی‌تان را وارد کنید</string>
     <!-- Verify your key subtitle -->
-    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">کد ۶۴ رقمی را که هنگام فعال‌سازی پشتیبان‌گیری ثبت کرده‌اید وارد کنید.</string>
+    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">کد ۶۴ نویسه‌ای که هنگام فعال کردن نسخه‌های پشتیبان ثبت کردید را وارد کنید.</string>
     <!-- Button text when you forget your recovery key -->
     <string name="VerifyBackupPinScreen__forgot_key">رمز را فراموش کردید؟</string>
 
@@ -8780,13 +8827,13 @@
     <string name="NoBackupToRestore_skip_restore">رد کردن بازیابی</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">به سقف ایجاد رمز بازیابی رسیده‌اید</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">باموفقیت رمز بازیابی جدید ایجاد کرده‌اید، اما برای جلوگیری از سوءاستفاده، تعداد رمزهایی که می‌توانید ایجاد کنید محدود است. تا ۷ روز قادر به ایجاد رمز دیگری نخواهید بود. رمز بازیابی‌تان را در جای امن و مطمئنی نگه دارید.</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">رمز جدید قابل‌ایجاد نیست</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">به سقف تعداد مجاز رمزهای جدیدی که می‌توانید ایجاد کنید رسیده‌اید. ظرف ۷ روز قادر به ایجاد رمز بازیابی جدید خواهید بود. اگر فکر می‌کنید که ممکن است کسی بتواند به نسخه پشتیبان شما دسترسی پیدا کند، می‌توانید «خاموش کردن و حذف نسخه پشتیبان» را انتخاب کنید.</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">تأیید</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8850,6 +8897,8 @@
     <string name="Poll__poll_question">نظرسنجی: %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">‏%1$s نظرسنجی «%2$s» را به پایان رساند</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">شما نظرسنجی را پایان دادید: «%1$s»</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">‏%1$s در نظرسنجی «%2$s» رأی داد</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8901,6 +8950,13 @@
     <string name="CreatePollFragment__add_option">حداقل ۲ گزینه اضافه کنید</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">سؤال اضافه کنید</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">کد QR را اسکن کنید</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">از این دستگاه برای اسکن کد QR روی دستگاهی که می‌خواهید به آن انتقال دهید استفاده کنید</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">تأیید</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8962,7 +9018,7 @@
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">گزارش اشکال‌زدایی</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> را ببینید</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> را ببینید.</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">هم‌رسانی گزارش اشکال‌زدایی</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -8971,6 +9027,67 @@
     <string name="CallQualitySheet__submit">ارسال</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">از بازخورد شما متشکریم!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">مشکلاتی در تماس داشتم</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">تماس عالی بود</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">بازخورد شما ارسال نشد.</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">دوباره امتحان کنید</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$s یک پیام را سنجاق کرد</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">شما یک پیام را سنجاق کردید</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">رفتن به پیام</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">پیام یافت نشد</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">سنجاق شده</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">عکس</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">ویدئو</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">استیکر</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">پیام صوتی</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">گیف</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">رسانهٔ یکبار مصرف</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">برداشتن سنجاق</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">مشاهده همه پیام‌ها</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">برداشتن سنجاق همه پیام‌ها</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">سنجاق کردن پیام‌های ناپدیدشونده</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">سنجاق پیام‌های ناپدیدشونده پس از پایان زمان‌سنج آنها برداشته خواهد شد و از گفتگو حذف می‌شوند.</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">فهمیدم</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">پیام ناپدیدشونده</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">پیام‌های سنجاق‌شده</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">برداشتن سنجاق</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">سنجاق همه پیام‌ها برداشته شود؟</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">سنجاق پیام‌ها برای همه اعضا برداشته خواهد شد.</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">پیام سنجاق نشد</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">سنجاق پیام برداشته نشد</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">سنجاق پیام‌ها برداشته نشد</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">اتصال خود را بررسی و دوباره تلاش کنید.</string>
 
     <!-- EOF -->
 </resources>

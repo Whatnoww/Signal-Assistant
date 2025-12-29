@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">Gumawa ng bagong recovery key</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">Kailangan mong gumawa at i-record ang panibagong recovery key mo bago mo ma-disable ang iyong PIN.</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Gumawa ng key</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -365,6 +365,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Hindi valid ang call link na ito. Siguraduhing buo at tama ang link bago sumali sa tawag.</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">Nasa call ka na</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">Ilipat ang account sa bagong device?</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">Para ilipat ang account na ito sa bagong device, i-tap ang \"Magpatuloy\" at i-scan ulit ang QR code gamit ang Signal camera. Siguraduhing i-scan lang ang QR codes na direktang nanggaling sa Signal.</string>
+    <string name="CommunicationActions__dont_transfer">\'Wag ilipat</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -675,6 +680,22 @@
     <string name="ConversationFragment_group_names">Group names</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">Failed ang pag-download ng photo. Subukan ulit.</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">Panatilihing naka-pin sa loob ng…</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24 oras</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7 araw</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30 days</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">Forever</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">Palitan ang pinakalumang pin?</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">Papalitan ng naka-pin na message na ito ang pinakalumang message</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">Palitan</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Tips Para Sa Kaligtasan</string>
@@ -1204,11 +1225,11 @@
     <string name="AddToGroupActivity_add_member">Gusto mo bang mag-add ng member?</string>
     <string name="AddToGroupActivity_add_s_to_s">I-add si \"%1$s\" sa \"%2$s\"?</string>
     <string name="AddToGroupActivity_s_added_to_s">\"%1$s\" added to \"%2$s\".</string>
-    <string name="AddToGroupActivity_add_to_group">I-add sa group</string>
     <string name="AddToGroupActivity_add_to_groups">I-add sa groups</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">Hindi ma-add sa legacy groups ang user na ito.</string>
     <string name="AddToGroupActivity_add">Mag-add</string>
     <string name="AddToGroupActivity_add_to_a_group">I-add sa isang group</string>
+    <string name="AddToGroupActivity_search">Maghanap</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">Pumili ng bagong admin</string>
@@ -1394,11 +1415,16 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">Tapos na</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">Hindi ma-add sa legacy groups ang user na ito.</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">I-add si \"%1$s\" sa \"%2$s\"?</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="one">Gusto mo bang i-add si \"%1$s\" sa \"%2$s\"?</item>
-        <item quantity="other">Gusto mo bang i-add ang %3$d members sa \"%2$s\"?</item>
+        <item quantity="one">Gusto mo bang i-add si \"{2}\" sa \"%2$s\"?</item>
+        <item quantity="other">Gusto mo bang i-add ang %1$d members sa \"%2$s\"?</item>
     </plurals>
+
     <string name="AddMembersActivity__add">Mag-add</string>
     <string name="AddMembersActivity__add_members">Magdagdag ng mga kasapi</string>
 
@@ -2124,6 +2150,8 @@
     <string name="MessageRecord_unsupported_feature">Nag-send ng message si %1$s that can\'t be processed or displayed dahil gumagamit siya ng bagong Signal feature.</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">Tinapos ni %1$s ang poll na: \"%2$s\"</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">Tinapos mo ang poll: \"%1$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Tanggapin</string>
@@ -2440,6 +2468,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">Para i-enable ang video mo:</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">Paliitin ang local video</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">Palakihin ang local video</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">Tawag sa Signal</string>
     <string name="WebRtcCallView__signal_video_call">Signal Video Call</string>
@@ -2656,6 +2690,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">Hindi ma-receive ang audio at video galing kay %1$s</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">Hindi ma-receive ang audio at video galing kay %1$s</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">Maaaring ito ay dahil hindi niya na-verify ang iyong safety number change, may problema sa kanyang device, o binlock ka n\'ya.</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">Palitan ang direksyon ng camera</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">I-swipe para ma-view ang screen share</string>
@@ -3370,7 +3408,7 @@
     <string name="WebRtcCallScreen__answer_without_video">Answer without video</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">Baguhin ang direksyon ng camera</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3429,9 +3467,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"Hindi gumagamit ng Signal si \"%1$s\" . Pakisuri ang username at subukang muli."</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">Hindi mo kailangang i-add ang iyong sarili sa group</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">Maximum group size reached</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">Ang Signal groups ay may maximum na %1$d members.</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">Ang Signal groups ay may maximum na %1$s members.</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">Recommended member limit reached</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">Signal groups perform best with %1$d members or fewer. Ang pagdagdag ng mas maraming members ay maaaring magdulot ng delay sa pag-send at pag-receive ng messages.</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">Signal groups perform best with %1$s members or fewer. Ang pagdagdag ng mas maraming members ay maaaring magdulot ng delay sa pag-send at pag-receive ng messages.</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="one">%1$d member</item>
         <item quantity="other">%1$d members</item>
@@ -4443,6 +4481,10 @@
     <string name="conversation_selection__menu_payment_details">Payment details</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">Tapusin ang poll</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">I-pin</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">I-unpin</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5196,11 +5238,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Laktawan</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="one">%1$d member</item>
-        <item quantity="other">%1$d members</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="one">%1$s member</item>
@@ -5236,7 +5273,7 @@
     <string name="ChatWallpaperFragment__wallpaper_preview_description">Wallpaper preview</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_chat_colors">Gusto mo bang i-undo ang lahat ng chat colors?</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_wallpapers">Gusto mo bang i-undo ang lahat ng chat colors?</string>
-    <string name="ChatWallpaperFragment__reset_default_colors">I-reset sa default colors</string>
+    <string name="ChatWallpaperFragment__reset_default_colors">I-reset sa default color</string>
     <string name="ChatWallpaperFragment__reset_all_colors">I-reset ang lahat ng colors</string>
     <string name="ChatWallpaperFragment__reset_default_wallpaper">I-reset sa default wallpaper</string>
     <string name="ChatWallpaperFragment__reset_all_wallpapers">I-reset ang lahat ng wallpapers</string>
@@ -5930,11 +5967,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">Failed ang pag-block</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">Hindi Signal user si %1$s</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">Hindi Signal user si %1$s</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">Buksan ang menu</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="one">Si %1$s ay hindi isang Signal user</item>
         <item quantity="other">Sila %1$s ay hindi Signal users</item>
     </plurals>
@@ -6114,7 +6151,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">Failed to update profile</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">Pumili ng badge</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">Kailangan mong pumili ng badge</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">Failed to update profile</string>
@@ -6180,7 +6216,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">Donation Receipts</string>
     <string name="ManageDonationsFragment__badges">Badges</string>
-    <string name="ManageDonationsFragment__subscription_faq">Subscription FAQ</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">Donor FAQ</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">Other ways to give</string>
     <!-- Preference label to launch badge gifting -->
@@ -7461,8 +7498,10 @@
     <string name="CallLogAdapter__outgoing">Outgoing</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">Missed</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">Hindi nasagot habang naka-on ang notification profile</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">Hindi nasagot habang naka-on ang notification profile</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">Sumali</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7766,6 +7805,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">I-on ang Signal Secure Backups</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">Subukan ang Signal Secure Backups</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">Hindi ka mawawalan ng anumang message kapag may bago kang bagong phone o nagre-install ng Signal.</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -8046,6 +8087,12 @@
     <string name="BackupStatusRow__your_last_backup">Hindi makumpleto ang huling backup mo. Siguraduhing connected sa Wi-Fi ang phone mo at i-tap ang \"Back up now\" para subukan ulit.</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">Hindi makumpleto ang huling backup mo. Siguraduhing gamit mo ang latest version ng Signal at subukan ulit.</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">Lagpas sa storage limit mo ang bilang ng messages na mayroon ka. Burahin ang ibang messages at subukan ulit.</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">Hindi naka-back up ang messages na ipinadala o natanggap bago %1$s.</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">Hindi makumpleto ang backup mo dahil kulang ang storage space mo. Magbawas ng files sa device mo at subukan ulit.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">Matuto pa</string>
 
@@ -8510,11 +8557,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Kinakailangan lang ang paggawa ng bagong key kung may ibang nakakaalam ng iyong key. Kailangan mong i-upload ulit ang iyong backup, kasama ang media. Kung gumagamit ka ng \"Optimize storage\" kailangan mo munang mag-download ng na-offload na media.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Umalis sa pag-setup ng backup?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">Hindi mo pa natapos ang pag-set up ng backups, at walang backup na nagawa. Maaari mong i-enable ang backups sa Settings.</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Umalis sa setup ng backup</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8542,7 +8589,7 @@
     <!-- Verify your key title -->
     <string name="VerifyBackupPinScreen__enter_your_backup_key">Ilagay ang iyong recovery key</string>
     <!-- Verify your key subtitle -->
-    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">Ilagay ang 64-character code na ni-record mo noong in-on mo ang backups.</string>
+    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">Ilagay ang 64-character code na ni-record mo noong in-enable mo ang backups.</string>
     <!-- Button text when you forget your recovery key -->
     <string name="VerifyBackupPinScreen__forgot_key">Nakalimutan ang key?</string>
 
@@ -8780,13 +8827,13 @@
     <string name="NoBackupToRestore_skip_restore">I-skip ang restore</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Naabot na ang limitasyon ng recovery key</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">Matagumpay kang nakagawa ng bagong recovery key, ngunit para maiwasan ang pag-abuso nito, limitado na ang bilang ng bagong keys na maaari mong gawin. Hindi ka makakagawa ng panibagong key sa loob ng 7 araw. Ingatan ang recovery key mo sa isang ligtas na lugar.</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Hindi makagawa ng bagong key</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">Naubos mo na ang bilang ng bagong keys na maaari mong gawin. Maaari kang gumawa ng bagong recovery key matapos ang 7 araw. Kung sa tingin mo ay may ibang naka-access ng backup mo, maaari mong piliin ang \"I-off at burahin ang backup.\"</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">OK</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8850,6 +8897,8 @@
     <string name="Poll__poll_question">Poll: %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">Tinapos ni %1$s ang poll na: \"%2$s\"</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">Tinapos mo ang poll: \"%1$s\"</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">Si %1$s ay bumoto sa poll na: \"%2$s\"</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8876,9 +8925,9 @@
     <!-- Dialog body when a poll fails to end and to try again -->
     <string name="Poll__check_connection">I-check ang iyong connection at subukan ulit.</string>
     <!-- Dialog title when you go to end a poll -->
-    <string name="Poll__end_poll_title">End poll?</string>
+    <string name="Poll__end_poll_title">Gusto mo bang tapusin ang poll?</string>
     <!-- Dialog body when you go to end a poll -->
-    <string name="Poll__end_poll_body">Group members will no longer be able to vote in this poll.</string>
+    <string name="Poll__end_poll_body">Ang mga miyembro ng grupo ay hindi na makakaboto sa poll na ito.</string>
     <!-- Body used in dialog when we are waiting for network -->
     <string name="Poll__waiting_for_network">Naghihintay ng network connection…</string>
     <!-- Header when creating a new poll -->
@@ -8901,6 +8950,13 @@
     <string name="CreatePollFragment__add_option">Magdagdag ng 2 o higit pang options</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">Magdagdag ng tanong</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">I-scan ang QR Code</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">Gamitin ang device na ito para i-scan ang QR code sa device na gusto mong lipatan</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">Okay</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8958,11 +9014,11 @@
     <!-- Title asking user to help improve Signal -->
     <string name="CallQualitySheet__help_us_improve">Tulungan kaming mag-improve</string>
     <!-- First part of description explaining diagnostics help improve call quality -->
-    <string name="CallQualitySheet__help_us_improve_description_prefix">Ang pag-send sa amin ng diagnostics info mo ay nakatutulong sa amin para mapabuti ang kalidad ng tawag. Maaari mong </string>
+    <string name="CallQualitySheet__help_us_improve_description_prefix">Nakatutulong sa amin ang pag-send ng diagnostics info mo para mapabuti ang call quality. Maaari mong </string>
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">tignan ang debug log mo</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> bago mag-submit</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> bago mag-submit.</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">I-share ang debug log</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -8971,6 +9027,67 @@
     <string name="CallQualitySheet__submit">Isumite</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">Maraming salamat sa feedback mo!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">Nagkaroon ako ng problema sa call</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">Maganda ang call quality</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">Hindi naipadala ang feedback mo.</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">Subukang muli</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">Si %1$s ay nag-pin ng message</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">Nag-pin ka ng message</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">Pumunta sa message</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">Hindi matagpuan ang message</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">Pinned</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">Larawan</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">Video</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">Sticker</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">Voice message</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">View-once na media</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">I-unpin</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">Tignan lahat ng messages</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">I-unpin Lahat ng Messages</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">Pag-pin ng disappearing message</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">Matatanggal ang pin ng disappearing messages kapag nag-expire ang timer nito at natanggal ang message mula sa chat.</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">OK</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">Disappearing message</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">Pinned messages</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">I-unpin</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">Gusto mo bang i-unpin ang lahat ng messages?</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">Magiging unpinned ang messages sa lahat ng members.</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">Hindi ma-pin ang message</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">Hindi ma-unpin ang message</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">Hindi ma-unpin ang messages</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">I-check ang iyong connection at subukan ulit.</string>
 
     <!-- EOF -->
 </resources>

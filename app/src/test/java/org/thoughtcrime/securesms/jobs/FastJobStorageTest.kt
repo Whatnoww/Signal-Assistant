@@ -66,6 +66,30 @@ class FastJobStorageTest {
   }
 
   @Test
+  fun `insertJobs - depends on memory-only job`() {
+    val database = mockDatabase()
+    val subject = FastJobStorage(database)
+
+    val dependsOnFullSpec = fullSpec("j1", "f1", isMemoryOnly = true)
+
+    val job = jobSpec("j2", "f2", isMemoryOnly = false)
+    val dependencySpec = DependencySpec(jobId = "j2", dependsOnJobId = dependsOnFullSpec.jobSpec.id, isMemoryOnly = true)
+    val fullSpec = FullSpec(jobSpec = job, constraintSpecs = emptyList(), dependencySpecs = listOf(dependencySpec))
+
+    subject.insertJobs(listOf(dependsOnFullSpec))
+    verify(exactly = 0) { database.insertJobs(any()) }
+
+    val fullSpecList = listOf(fullSpec)
+    subject.insertJobs(fullSpecList)
+    verify(exactly = 1) { database.insertJobs(fullSpecList) }
+
+    assertThat(subject.getNextEligibleJob(10, NO_PREDICATE)).isEqualTo(dependsOnFullSpec.jobSpec)
+    subject.deleteJob(dependsOnFullSpec.jobSpec.id)
+
+    assertThat(subject.getNextEligibleJob(10, NO_PREDICATE)).isEqualTo(fullSpec.jobSpec)
+  }
+
+  @Test
   fun `insertJobs - data can be found`() {
     val subject = FastJobStorage(mockDatabase())
     subject.insertJobs(DataSet1.FULL_SPECS)
@@ -827,6 +851,45 @@ class FastJobStorageTest {
     subject.deleteJob(fullSpec2.jobSpec.id)
 
     assertThat(subject.getNextEligibleJob(20, NO_PREDICATE)).isEqualTo(fullSpec1.jobSpec)
+  }
+
+  @Test
+  fun `getNextEligibleJob - job chain with same createTime processes in correct order`() {
+    // Simulates a real job chain where all jobs are created in the same millisecond
+    // Jobs should process in dependency order, not alphabetical ID order
+
+    val job1 = FullSpec(
+      jobSpec(id = "z-first", factoryKey = "f1", queueKey = "q1", createTime = 1000),
+      emptyList(),
+      emptyList()
+    )
+    val job2 = FullSpec(
+      jobSpec(id = "m-second", factoryKey = "f2", queueKey = "q1", createTime = 1000),
+      emptyList(),
+      listOf(DependencySpec(jobId = "m-second", dependsOnJobId = "z-first", isMemoryOnly = false))
+    )
+    val job3 = FullSpec(
+      jobSpec(id = "a-third", factoryKey = "f3", queueKey = "q1", createTime = 1000),
+      emptyList(),
+      listOf(DependencySpec(jobId = "a-third", dependsOnJobId = "m-second", isMemoryOnly = false))
+    )
+
+    val subject = FastJobStorage(mockDatabase(listOf(job1, job2, job3)))
+    subject.init()
+
+    // First eligible should be job1 (no dependencies)
+    val first = subject.getNextEligibleJob(2000, NO_PREDICATE)
+    assertThat(first).isNotNull().prop(JobSpec::id).isEqualTo("z-first")
+    subject.deleteJob("z-first")
+
+    // After deleting job1, job2 should be eligible (dependency resolved)
+    val second = subject.getNextEligibleJob(2000, NO_PREDICATE)
+    assertThat(second).isNotNull().prop(JobSpec::id).isEqualTo("m-second")
+    subject.deleteJob("m-second")
+
+    // After deleting job2, job3 should be eligible
+    val third = subject.getNextEligibleJob(2000, NO_PREDICATE)
+    assertThat(third).isNotNull().prop(JobSpec::id).isEqualTo("a-third")
   }
 
   @Test

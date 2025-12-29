@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">Жаңа қалпына келтіру кілтін жасау</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">PIN кодын өшірмес бұрын, жаңа қалпына келтіру кілтін жасауыңызға және жазуыңызға болады.</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Кілт жасау</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -365,6 +365,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Бұл жарамсыз қоңырау сілтемесі. Қоңырауға қосылмас бұрын, сілтеменің дұрыс екеніне көз жеткізіңіз.</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">Сіздің қоңырауға қатысып жатырсыз</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">Аккаунтты жаңа құрылғыға тасымалдау керек пе?</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">Бұл аккаунтты жаңа құрылғыға тасымалдау үшін \"Жалғастыру\" түймесін түртіңіз және Signal камерасының көмегімен QR кодын қайта сканерлеңіз. Signal-дан тікелей келетін QR кодтарын ғана сканерлеңіз.</string>
+    <string name="CommunicationActions__dont_transfer">Тасымалдамау</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -675,6 +680,22 @@
     <string name="ConversationFragment_group_names">Топ атаулары</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">Фотосурет жүктеп алынбады. Әрекетті қайталап көріңіз.</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">Бекітілу ұзақтығы…</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24 сағат</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7 күн</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30 күн</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">Біржола</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">Ең ескі бекітілген хабарды ауыстыру керек пе?</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">Хабарды бекітсеңіз, ол ескі хабардың орнын басады</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">Ауыстыру</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Қауіпсіздікке қатысты кеңестер</string>
@@ -1204,11 +1225,11 @@
     <string name="AddToGroupActivity_add_member">Топ мүшесін қосу керек пе?</string>
     <string name="AddToGroupActivity_add_s_to_s">\"%1$s\" контактісін \"%2$s\" тобына қосу керек пе?</string>
     <string name="AddToGroupActivity_s_added_to_s">\"%1$s\" контактісі \"%2$s\" тобына қосылды.</string>
-    <string name="AddToGroupActivity_add_to_group">Топқа қосу</string>
     <string name="AddToGroupActivity_add_to_groups">Топтарға қосу</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">Бұл адамды ескі топтарға қоса алмайсыз.</string>
     <string name="AddToGroupActivity_add">Қосу</string>
     <string name="AddToGroupActivity_add_to_a_group">Топқа қосу</string>
+    <string name="AddToGroupActivity_search">Іздеу</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">Жаңа әкімші таңдау</string>
@@ -1394,11 +1415,16 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">Дайын</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">Бұл адамды ескі топтарға қоса алмайсыз.</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">\"%1$s\" контактісін \"%2$s\" тобына қосу керек пе?</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="one">\"%1$s\" деген кісіні \"%2$s\" тобына қосу керек пе?</item>
-        <item quantity="other">%3$d мүшені \"%2$s\" тобына қосу керек пе?</item>
+        <item quantity="one">\"{2}\" деген кісіні \"%2$s\" тобына қосу керек пе?</item>
+        <item quantity="other">%1$d мүшені \"%2$s\" тобына қосу керек пе?</item>
     </plurals>
+
     <string name="AddMembersActivity__add">Қосу</string>
     <string name="AddMembersActivity__add_members">Мүшелерді қосу</string>
 
@@ -2124,6 +2150,8 @@
     <string name="MessageRecord_unsupported_feature">%1$s сізге жіберген хаты өңделмейді немесе көрсетілмейді, себебі жаңа Signal функциясын пайдаланады.</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">%1$s сауалнаманы аяқтады: «%2$s»</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">Сауалнаманы толтырдыңыз: \"%1$s\"</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Қабылдау</string>
@@ -2440,6 +2468,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">Видеоны қосу үшін:</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">Жергілікті бейнені жию</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">Жергілікті бейнені жаю</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">Signal қоңырауы</string>
     <string name="WebRtcCallView__signal_video_call">Signal видеоқоңырауы</string>
@@ -2656,6 +2690,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">%1$s деген кісінің аудио және видеоларын ала алмайсыз</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">%1$s жіберген аудио және видеоларды ала алмайсыз</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">Бұл сіздің қауіпсіздік нөміріңіздің өзгергені верификацияланбаған, құрылғыда ақау болуы немесе ол сізді блоктап қойған болуы мүмкін.</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">Камера бағытын ауыстыру</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">Экранды ортақ көру үшін свайп жасаңыз</string>
@@ -3370,7 +3408,7 @@
     <string name="WebRtcCallScreen__answer_without_video">Видеосыз жауап беру</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">Камера бағытын өзгерту</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3429,9 +3467,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"\"%1$s\" Signal пайдаланушысы емес. Пайдаланушы атын тексеріп, қайталап көріңіз."</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">Өзіңізді топқа қосудың қажеті жоқ</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">Топ өлшемі максималды мәнге жетті</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">Signal тобында максимум %1$d мүше болуы керек.</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">Signal тобында максимум %1$s мүше болуы керек.</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">Мүшелердің ұсынылған санына жетті</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">Signal топтарындағы мүшелердің саны %1$d немесе одан аз болса, жақсы жұмыс істейді. Мүшелердің саны одан көп болып кетсе, хаттарды жіберу және алу кезінде кідірістер болуы мүмкін.</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">Signal топтарындағы мүшелердің саны %1$s немесе одан аз болса, жақсы жұмыс істейді. Мүшелердің саны одан көп болып кетсе, хаттарды жіберу және алу кезінде кідірістер болуы мүмкін.</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="one">%1$d мүше</item>
         <item quantity="other">%1$d мүше</item>
@@ -4443,6 +4481,10 @@
     <string name="conversation_selection__menu_payment_details">Төлем туралы мәлімет</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">Сауалнаманы аяқтау</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">Бекіту</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">Босату</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5196,11 +5238,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Өткізіп жіберу</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="one">%1$d мүше</item>
-        <item quantity="other">%1$d мүше</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="one">%1$s мүше</item>
@@ -5236,7 +5273,7 @@
     <string name="ChatWallpaperFragment__wallpaper_preview_description">Тұсқағазды алдын ала көру</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_chat_colors">Барлық чат түсін қайта орнатқыңыз келе ме?</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_wallpapers">Барлық тұсқағазды қайта орнатқыңыз келе ме?</string>
-    <string name="ChatWallpaperFragment__reset_default_colors">Әдепкі түстерді қалпына келтіру</string>
+    <string name="ChatWallpaperFragment__reset_default_colors">Әдепкі түсті қалпына келтіру</string>
     <string name="ChatWallpaperFragment__reset_all_colors">Барлық түсті бастапқы күйге қайтару</string>
     <string name="ChatWallpaperFragment__reset_default_wallpaper">Әдепкі тұсқағазды қайтару</string>
     <string name="ChatWallpaperFragment__reset_all_wallpapers">Барлық тұсқағазды бастапқы күйге қайтару</string>
@@ -5844,7 +5881,7 @@
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__call">Қоңырау</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
-    <string name="ConversationSettingsFragment__mute">Дыбысын өшіру</string>
+    <string name="ConversationSettingsFragment__mute">Дыбыссыз</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__muted">Дыбысы өшірілген</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -5930,11 +5967,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">Блокталмады</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s Signal пайдаланушысы емес</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$s Signal пайдаланушысы емес</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">Мәзірді ашу</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="one">%1$s Signal пайдаланушысы емес</item>
         <item quantity="other">%1$s Signal пайдаланушылары емес</item>
     </plurals>
@@ -6114,7 +6151,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">Профиль жаңартылмады</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">Таңбаны таңдау</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">Таңбаны таңдауыңыз керек</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">Профиль жаңартылмады</string>
@@ -6180,7 +6216,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">Демеушілік чектері</string>
     <string name="ManageDonationsFragment__badges">Таңбалар</string>
-    <string name="ManageDonationsFragment__subscription_faq">Жазылым туралы жиі қойылатын сұрақтар</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">Демеуші туралы сұрақ-жауап</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">Демеудің басқа жолдары</string>
     <!-- Preference label to launch badge gifting -->
@@ -7461,8 +7498,10 @@
     <string name="CallLogAdapter__outgoing">Шығыс</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">Қабылданбаған</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">Хабарландыру профилі ашылып тұрғанда, қабылданбады</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">Хабарландыру профилі ашылып тұрғанда, қабылданбады</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">Қосылу</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7766,6 +7805,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">Signal қауіпсіз сақтық көшірмесін қосу</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">Қауіпсіз сақтық көшірмені қолданып көріңіз</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">Жаңа телефон алғанда немесе Signal-ды қайта орнатқанда, хатты жоғалтып алмаңыз.</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -8046,6 +8087,12 @@
     <string name="BackupStatusRow__your_last_backup">Соңғы сақтық көшірме жасалмады. Телефоныңыз Wi-Fi желісіне қосылып тұрғанын тексеріп, \"Сақтық көшірмені қазір жасау\" түймесін түртіңіз де, әрекетті қайталап көріңіз.</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">Соңғы сақтық көшірме жасалмады. Signal қолданбасының жаңартылғанын тексеріп, әрекетті қайталап көріңіз.</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">Хабарлар саны жад шегінен асып кетті. Кейбір хабарларды жойып, әрекетті қайталап көріңіз.</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">%1$s күніне дейін жіберілген немесе қабылданған хабарлардың сақтық көшірмесі жасалмайды.</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">Сақтық көшірме жасау аяқталмады, себебі жадта орын жеткіліксіз. Құрылғыңызда орын босатып, әрекетті қайталап көріңіз.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">Толық ақпарат</string>
 
@@ -8510,11 +8557,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Кілтіңіз біреуге мәлім болған жағдайда ғана жаңасын жасау керек. Сақтық көшірмені, соның ішінде мультимедианы қайта жүктеп салуыңыз керек. \"Сақтау орнын оңтайландыру\" функциясын қолданып жатсаңыз, алдымен мультимедианы жүктеп алуыңыз керек.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Сақтық көшірме параметрінен шығу керек пе?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">Сақтық көшірме параметрлерін реттеп болған жоқсыз және сақтық көшірме жасалмады. Сақтық көшірмелерді \"Параметрлер\" бөлімінен қоса аласыз.</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Сақтық көшірме параметрінен шығу</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8542,7 +8589,7 @@
     <!-- Verify your key title -->
     <string name="VerifyBackupPinScreen__enter_your_backup_key">Қалпына келтіру кілтін енгізіңіз</string>
     <!-- Verify your key subtitle -->
-    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">Сақтық көшірмелерді іске қосқан соң, сіз жазған 64 цифрлық кодты енгізіңіз.</string>
+    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">Сақтық көшірмелерді іске қосқан соң, сіз жазған 64 таңбалық кодты енгізіңіз.</string>
     <!-- Button text when you forget your recovery key -->
     <string name="VerifyBackupPinScreen__forgot_key">Кілтті ұмытып қалдыңыз ба?</string>
 
@@ -8780,13 +8827,13 @@
     <string name="NoBackupToRestore_skip_restore">Қалпына келтіру функциясын өткізіп жіберу</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Қалпына келтіру кілті шегіне жетті</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">Жаңа қалпына келтіру кілтін жасадыңыз, бірақ жаңа кілттер жасау санын теріс пайдаланудың алдын алу мақсатында жаңа кілттердің санына шектеу қойылады. Алдағы 7 күнде басқа кілт жасай алмайсыз. Қалпына келтіру кілтін қауіпсіз бір жерде сақтаңыз.</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Жаңа кілт жасау мүмкін емес</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">Жаңа кілт жасайтын мүмкіндіктеріңіздің барлығын қолданып қойдыңыз. Жаңа қалпына келтіру кілтін 7 күннен кейін жасай аласыз. Сақтық көшірмеңізді біреу қолдана алады деп ойласаңыз, \"Сақтық көшірмені өшіру және жою\" опциясын таңдай аласыз.</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">OK</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8850,6 +8897,8 @@
     <string name="Poll__poll_question">Сауалнама: %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">%1$s сауалнаманы аяқтады: «%2$s»</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">Сауалнаманы толтырдыңыз: \"%1$s\"</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">%1$s сауалнамада жауап берді: «%2$s»</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8876,9 +8925,9 @@
     <!-- Dialog body when a poll fails to end and to try again -->
     <string name="Poll__check_connection">Байланысты тексеріп, қайталап көріңіз.</string>
     <!-- Dialog title when you go to end a poll -->
-    <string name="Poll__end_poll_title">End poll?</string>
+    <string name="Poll__end_poll_title">Сауалнаманы аяқтау керек пе?</string>
     <!-- Dialog body when you go to end a poll -->
-    <string name="Poll__end_poll_body">Group members will no longer be able to vote in this poll.</string>
+    <string name="Poll__end_poll_body">Топ мүшелері бұл сауалнамада дауыс бере алмайтын болады.</string>
     <!-- Body used in dialog when we are waiting for network -->
     <string name="Poll__waiting_for_network">Желіге қосылу күтіліп жатыр…</string>
     <!-- Header when creating a new poll -->
@@ -8901,6 +8950,13 @@
     <string name="CreatePollFragment__add_option">Кемінде 2 нұсқа қосыңыз</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">Сұрақ қосу</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">QR кодты сканерлеу</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">Тасымалдағыңыз келетін құрылғыдағы QR кодын сканерлеу үшін осы құрылғыны пайдаланыңыз</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">Жарайды</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8962,7 +9018,7 @@
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">ақауларды түзету журналын көру</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> мүмкіндігіңіз бар</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> мүмкіндігіңіз бар.</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">Ақауларды түзету журналын бөлісу</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -8971,6 +9027,67 @@
     <string name="CallQualitySheet__submit">Жіберу</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">Пікіріңіз үшін рақмет!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">Қоңырауға қатысты ақаулар орын алды</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">Қоңырау сапасы керемет болды</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">Пікіріңіз жіберілмеді.</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">Қайталап көру</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$s хабарды бекітті</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">Хабарды бекіттіңіз</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">Хабарға өту</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">Хабар табылмады</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">Бекітілді</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">Фотосурет</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">Бейнефайл</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">Жапсырма</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">Дауыстық хат</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">Бір-ақ рет көрінетін ақпарат файлы</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">Босату</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">Барлық хабарды көру</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">Барлық хабарды босату</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">Жойылатын хабарларды бекіту</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">Жойылатын хабарлар таймер уақыты аяқталғанда босатылып, чаттан жойылады.</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">Түсінікті</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">Жойылатын хабар</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">Бекітілген хабарлар</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">Босату</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">Барлық хабарды босату керек пе?</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">Хабарлар барлық мүше үшін босатылады.</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">Хабар бекітілмеді</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">Хабар босатылмады</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">Хабарлар босатылмады</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">Байланысты тексеріп, қайталап көріңіз.</string>
 
     <!-- EOF -->
 </resources>

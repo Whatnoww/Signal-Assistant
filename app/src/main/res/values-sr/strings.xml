@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">Креирајте нови кључ за опоравак</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">Пре деактивирања PIN-а морате да креирате и сачувате нови кључ за опоравак.</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Креирај кључ</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -365,6 +365,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">Овај линк није важећи линк за позив. Проверите да ли је цео линк комплетан и исправан пре него што покушате да се придружите.</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">Већ сте у позиву</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">Желите ли да пребаците налог на нови уређај?</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">Да пребаците овај налог на нови уређај, додирните „настави“ и скенирајте поново QR код преко камере на Signal-у. Уверите се да скенирате само QR кодове које вам директно шаље Signal.</string>
+    <string name="CommunicationActions__dont_transfer">Немој да пренесеш</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -675,6 +680,22 @@
     <string name="ConversationFragment_group_names">Имена група</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">Преузимање фотографије није успело. Пробајте поново.</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">Нека порука остане закачена…</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24 сата</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7 дана</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30 дана</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">Заувек</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">Желите ли да замените најстарију закачену поруку?</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">Качење поруке замениће најстарију закачену поруку</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">Замени</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">Савети за безбедност</string>
@@ -1204,11 +1225,11 @@
     <string name="AddToGroupActivity_add_member">Желите ли да додате члана?</string>
     <string name="AddToGroupActivity_add_s_to_s">Желите ли да додате корисника „%1$s“ у групу „%2$s“?</string>
     <string name="AddToGroupActivity_s_added_to_s">„%1$s“ је додат(а) у групу „%2$s“.</string>
-    <string name="AddToGroupActivity_add_to_group">Додај у групу</string>
     <string name="AddToGroupActivity_add_to_groups">Додај у групе</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">Ова особа се не може додати у старе групе.</string>
     <string name="AddToGroupActivity_add">Додај</string>
     <string name="AddToGroupActivity_add_to_a_group">Додај у групу</string>
+    <string name="AddToGroupActivity_search">Претражи</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">Изаберите новог администратора</string>
@@ -1394,11 +1415,16 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">Готово</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">Ова особа се не може додати у старе групе.</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">Желите ли да додате корисника „%1$s“ у групу „%2$s“?</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="one">Желите ли да додате корисника „%1$s“ у групу „%2$s“?</item>
-        <item quantity="other">Желите ли да додате њих %3$d у групу „%2$s“?</item>
+        <item quantity="one">Желите ли да додате корисника „{2}“ у групу „%2$s“?</item>
+        <item quantity="other">Желите ли да додате њих %1$d у групу „%2$s“?</item>
     </plurals>
+
     <string name="AddMembersActivity__add">Додај</string>
     <string name="AddMembersActivity__add_members">Додајте чланове</string>
 
@@ -2124,6 +2150,8 @@
     <string name="MessageRecord_unsupported_feature">%1$s вам је послао/ла поруку која не може бити обрађена нити приказана јер користи нову функционалност Signal-а.</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">%1$s је прекинуо/-ла анкету „%2$s“</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">Прекинули сте анкету: „%1$s“</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">Прихватам</string>
@@ -2440,6 +2468,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">Да бисте активирали видео:</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">Смањи видео-клип са уређаја</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">Прошири видео-клип са уређаја</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">Позив преко Signal-а</string>
     <string name="WebRtcCallView__signal_video_call">Видео позив преко Signal-а</string>
@@ -2656,6 +2690,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">Није могуће примити аудио и видео од корисника %1$s</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">Није могуће примити аудио и видео од корисника %1$s</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">То је можда зато што корисник није потврдио промену вашег сигурносног броја, постоји проблем са његовим уређајем или вас је блокирао.</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">Промени смер камере</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">Превуците да видите дељење екрана</string>
@@ -3370,7 +3408,7 @@
     <string name="WebRtcCallScreen__answer_without_video">Јави се без видео приказа</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">Промените смер камере</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3429,9 +3467,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"%1$s није корисник Signal-а. Проверите корисничко име и пробајте поново."</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">Не морате да додајете себе у групу</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">Достигнута је максимална величина групе</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">Максималан број чланова које Signal групе могу имати је %1$d.</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">Максималан број чланова које Signal групе могу имати је %1$s.</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">Достигнуто је ограничење препорученог броја чланова</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">Signal групе најбоље функционишу када број чланова не прелази %1$d. Ако додате још чланова, може доћи до кашњења у слању и примању порука.</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">Signal групе најбоље функционишу када број чланова не прелази %1$s. Ако додате још чланова, може доћи до кашњења у слању и примању порука.</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="one">Чланова: %1$d</item>
         <item quantity="other">Чланова: %1$d</item>
@@ -4443,6 +4481,10 @@
     <string name="conversation_selection__menu_payment_details">Подаци о плаћању</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">Прекини анкету</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">Закачи</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">Откачи</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5196,11 +5238,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">Прескочи</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="one">Чланова: %1$d</item>
-        <item quantity="other">Чланова: %1$d</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="one">Чланова: %1$s</item>
@@ -5236,7 +5273,7 @@
     <string name="ChatWallpaperFragment__wallpaper_preview_description">Приказ позадине</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_chat_colors">Желите ли да замените све боје ћаскања?</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_wallpapers">Желите ли да замените све позадине?</string>
-    <string name="ChatWallpaperFragment__reset_default_colors">Ресетуј подразумеване боје</string>
+    <string name="ChatWallpaperFragment__reset_default_colors">Ресетуј стандардну боју</string>
     <string name="ChatWallpaperFragment__reset_all_colors">Ресетуј све боје</string>
     <string name="ChatWallpaperFragment__reset_default_wallpaper">Ресетуј подразумевану позадину</string>
     <string name="ChatWallpaperFragment__reset_all_wallpapers">Ресетуј све позадине</string>
@@ -5844,7 +5881,7 @@
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__call">Позови</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
-    <string name="ConversationSettingsFragment__mute">Искључи обавештења</string>
+    <string name="ConversationSettingsFragment__mute">Утишај</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__muted">Обавештења су искључена</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -5930,11 +5967,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">Блокирање није успело</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s није корисник Signal-а</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$s није корисник Signal-а</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">Отвори мени</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="one">%1$s није корисник Signal-а</item>
         <item quantity="other">%1$s нису корисници Signal-а</item>
     </plurals>
@@ -6114,7 +6151,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">Ажурирање профила није успело</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">Одаберите значку</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">Морате одабрати значку</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">Ажурирање профила није успело</string>
@@ -6180,7 +6216,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">Потврде о донацији</string>
     <string name="ManageDonationsFragment__badges">Значке</string>
-    <string name="ManageDonationsFragment__subscription_faq">Честа питања о претплати</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">Честа питања донатора</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">Други начини за донирање</string>
     <!-- Preference label to launch badge gifting -->
@@ -7461,8 +7498,10 @@
     <string name="CallLogAdapter__outgoing">Одлазни</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">Пропуштени</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">Пропуштено док је профил за обавештења био укључен</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">Пропуштено док је профил за обавештења био укључен</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">Придружите се</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7766,6 +7805,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">Укључите безбедне резервне копије Signal-а</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">Испробајте Signal-ове безбедне резервне копије</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">Нека вам се сачувају поруке када набављате нови телефон или поново инсталирате Signal.</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -8046,6 +8087,12 @@
     <string name="BackupStatusRow__your_last_backup">Последње креирање резервне копије није успело. Проверите да ли је ваш телефон повезан на Wi-Fi и додирните „Направи резервну копију“ да пробате поново.</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">Последње креирање резервне копије није успело. Проверите да ли користите најновију верзију Signal-а и пробајте поново.</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">Ваш број порука превазилази меморијско ограничење. Обришите неке поруке и пробајте поново.</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">Резервне копије се неће креирати за поруке послате или примљене пре овог датума: %1$s</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">Прављење резервне копије није завршено због недостатка меморијског простора. Ослободите меморију уређаја и пробајте поново.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">Сазнајте више</string>
 
@@ -8510,11 +8557,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Креирање новог кључа је потребно само ако неко други зна ваш кључ. Мораћете поново да отпремите резервну копију, укључујући медије. Ако користите оптимизацију чувања мораћете прво да преузмете уклоњене медије.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Желите ли да изађете из подешавања резервних копија?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">Подешавање резервних копија није довршено и резервна копија није креирана. Прављење резервних копија можете дозволити у подешавањима.</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Изађи из подешавања резервне копије</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8542,7 +8589,7 @@
     <!-- Verify your key title -->
     <string name="VerifyBackupPinScreen__enter_your_backup_key">Унесите кључ за опоравак</string>
     <!-- Verify your key subtitle -->
-    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">Унесите 64-цифрени код који сте снимили када сте активирали резервне копије.</string>
+    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">Унесите код од 64 карактера који сте снимили када сте активирали резервне копије.</string>
     <!-- Button text when you forget your recovery key -->
     <string name="VerifyBackupPinScreen__forgot_key">Заборавили сте кључ?</string>
 
@@ -8780,13 +8827,13 @@
     <string name="NoBackupToRestore_skip_restore">Прескочи враћање</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Достигли сте максимални број кључева за опоравак</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">Успешно сте креирали нови кључ за опоравак, али да би се спречила злоупотреба, број нових кључева које можете да креирате је ограничен. У наредних 7 дана нећете моћи да креирате нови кључ за опоравак. Забележите кључ за опоравак на сигурном месту.</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Креирање новог кључа није могуће</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">Дозвољени број нових кључева је истрошен. Моћи ћете да креирате нови кључ за опоравак за 7 дана. Ако верујете да неко може да приступи вашој резервној копији, можете да изаберете \"Искључи и избриши резервну копију\".</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">У реду</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8850,6 +8897,8 @@
     <string name="Poll__poll_question">Анкета: %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">%1$s је прекинуо/-ла анкету „%2$s“</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">Прекинули сте анкету: „%1$s“</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">%1$s је гласао/-ла у анкети „%2$s“</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8901,6 +8950,13 @@
     <string name="CreatePollFragment__add_option">Додај барем две опције</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">Додај питање</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">Скенирајте QR кôд</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">Овим уређајем скенирајте QR код приказан на уређају на који желите да се пребаците</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">У реду</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8962,7 +9018,7 @@
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">видите извештај о грешкама</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> пре слања</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> пре слања.</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">Пошаљи извештај о грешкама</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -8971,6 +9027,67 @@
     <string name="CallQualitySheet__submit">Пошаљи</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">Хвала вам на повратним информацијама!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">Било је проблема с позивом</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">Квалитет позива је био одличан</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">Слање повратне информације није успело.</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">Пробајте поново</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$s је послао/ла закачену поруку</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">Закачили сте поруку</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">Иди на поруку</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">Порука није пронађена</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">Закачено</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">Слика</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">Видео</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">Налепница</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">Гласовна порука</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">Једнократни медиј</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">Откачи</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">Види све поруке</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">Откачи све поруке</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">Качење нестајућих порука</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">Нестајуће поруке ће бити откачене када истекну и нестану из ћаскања.</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">Разумем</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">Нестајућа порука</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">Закачене поруке</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">Откачи</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">Желите ли да откачите све поруке?</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">Поруке ће бити откачене за све чланове.</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">Качење поруке није успело</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">Откачињање поруке није успело</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">Откачињање порука није успело</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">Проверите да ли сте повезани на интернет и пробајте поново.</string>
 
     <!-- EOF -->
 </resources>

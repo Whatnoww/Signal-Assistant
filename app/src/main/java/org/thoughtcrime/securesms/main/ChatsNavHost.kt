@@ -21,7 +21,6 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.ImageBitmap
@@ -52,7 +51,6 @@ import org.thoughtcrime.securesms.conversation.v2.ConversationFragment
 import org.thoughtcrime.securesms.serialization.JsonSerializableNavType
 import org.thoughtcrime.securesms.window.AppScaffoldAnimationDefaults
 import org.thoughtcrime.securesms.window.AppScaffoldAnimationState
-import org.thoughtcrime.securesms.window.isLargeScreenSupportEnabled
 import org.thoughtcrime.securesms.window.isSplitPane
 import kotlin.reflect.typeOf
 import kotlin.time.Duration.Companion.milliseconds
@@ -72,8 +70,6 @@ fun NavGraphBuilder.chatNavGraphBuilder(
     val route = navBackStackEntry.toRoute<MainNavigationDetailLocation.Chats.Conversation>()
     val fragmentState = key(route) { rememberFragmentState() }
     val context = LocalContext.current
-    val insets by rememberVerticalInsets()
-    val insetFlow = remember { snapshotFlow { insets } }
 
     // Because it can take a long time to load content, we use a "fake" chat list image to delay displaying
     // the fragment and prevent pop-in
@@ -124,14 +120,6 @@ fun NavGraphBuilder.chatNavGraphBuilder(
         .background(MaterialTheme.colorScheme.background)
         .fillMaxSize()
     ) { fragment ->
-      fragment.viewLifecycleOwner.lifecycleScope.launch {
-        fragment.repeatOnLifecycle(Lifecycle.State.STARTED) {
-          insetFlow.collect {
-            fragment.applyRootInsets(insets)
-          }
-        }
-      }
-
       backPressedState.attach(fragment)
 
       fragment.viewLifecycleOwner.lifecycleScope.launch {
@@ -214,7 +202,7 @@ class ChatNavGraphState private constructor(
   private var hasWrittenToGraphicsLayer: Boolean by mutableStateOf(false)
 
   suspend fun writeGraphicsLayerToBitmap() {
-    if (isLargeScreenSupportEnabled() && !windowSizeClass.isSplitPane() && hasWrittenToGraphicsLayer) {
+    if (!windowSizeClass.isSplitPane() && hasWrittenToGraphicsLayer) {
       chatBitmap = graphicsLayer.toImageBitmap()
     }
   }

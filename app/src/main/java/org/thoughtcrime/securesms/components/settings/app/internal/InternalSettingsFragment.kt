@@ -23,6 +23,7 @@ import org.signal.core.util.readToList
 import org.signal.core.util.requireLong
 import org.signal.core.util.requireString
 import org.signal.ringrtc.CallManager
+import org.signal.storageservice.protos.calls.quality.SubmitCallQualitySurveyRequest
 import org.thoughtcrime.securesms.BuildConfig
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.calls.quality.CallQualityBottomSheetFragment
@@ -59,6 +60,7 @@ import org.thoughtcrime.securesms.payments.DataExportUtil
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.storage.StorageSyncHelper
+import org.thoughtcrime.securesms.util.BottomSheetUtil
 import org.thoughtcrime.securesms.util.ConversationUtil
 import org.thoughtcrime.securesms.util.Util
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingAdapter
@@ -174,19 +176,7 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
       sectionHeaderPref(DSLSettingsText.from("App UI"))
 
       switchPref(
-        title = DSLSettingsText.from("Enable new split pane UI."),
-        summary = DSLSettingsText.from("Warning: Some bugs and non functional buttons are expected. App will restart."),
-        isChecked = state.largeScreenUi,
-        onClick = {
-          viewModel.setUseLargeScreenUi(!state.largeScreenUi)
-          AppUtil.restart(requireContext())
-        }
-      )
-
-      switchPref(
-        isEnabled = state.largeScreenUi,
         title = DSLSettingsText.from("Force split pane UI on phones."),
-        summary = DSLSettingsText.from("This setting requires split pane UI to be enabled."),
         isChecked = state.forceSplitPane,
         onClick = {
           viewModel.setForceSplitPane(!state.forceSplitPane)
@@ -593,9 +583,11 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
       )
 
       clickPref(
-        title = DSLSettingsText.from("Display Call Quality Survey UX"),
+        title = DSLSettingsText.from("Display call quality survey"),
         onClick = {
-          CallQualityBottomSheetFragment().show(parentFragmentManager, null)
+          CallQualityBottomSheetFragment
+            .create(SubmitCallQualitySurveyRequest())
+            .show(parentFragmentManager, BottomSheetUtil.STANDARD_BOTTOM_SHEET_FRAGMENT_TAG)
         }
       )
 

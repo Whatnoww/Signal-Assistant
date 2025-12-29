@@ -329,6 +329,7 @@ class DonateToSignalFragment :
           isEnabled = state.continueEnabled,
           onClick = {
             if (state.canContinue) {
+              requireView().clearFocus()
               viewModel.requestSelectGateway()
             } else {
               showDonationPendingDialog(state)
@@ -469,7 +470,7 @@ class DonateToSignalFragment :
   }
 
   override fun onBoostThanksSheetDismissed() {
-    findNavController().popBackStack()
+    requireActivity().onBackPressedDispatcher.onBackPressed()
   }
 
   override fun navigateToStripePaymentInProgress(inAppPayment: InAppPaymentTable.InAppPayment) {

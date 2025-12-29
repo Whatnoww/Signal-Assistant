@@ -135,6 +135,10 @@ object ExportSkips {
     return log(sentTimestamp, "Poll option was invalid.")
   }
 
+  fun pollNotInGroupChat(sentTimestamp: Long): String {
+    return log(sentTimestamp, "Poll was not in a group chat.")
+  }
+
   fun individualChatUpdateInWrongTypeOfChat(sentTimestamp: Long): String {
     return log(sentTimestamp, "A chat update that only makes sense for individual chats was found in a different kind of chat.")
   }
@@ -147,8 +151,16 @@ object ExportSkips {
     return log(sentTimestamp, "An incoming message author did not have an aci or e164.")
   }
 
+  fun outgoingMessageToReleaseNotesChat(sentTimestamp: Long): String {
+    return log(sentTimestamp, "An outgoing message was sent to the release notes chat.")
+  }
+
   fun callWithMissingRecipient(sentTimestamp: Long): String {
     return log(sentTimestamp, "A call had a ringer with no matching exported Recipient.")
+  }
+
+  fun duplicateRecipientId(recipientId: Long): String {
+    return log(0, "Tried to export multiple recipients with RecipientId::$recipientId")
   }
 
   private fun log(sentTimestamp: Long, message: String): String {
@@ -216,6 +228,10 @@ object ExportOddities {
 
   fun bodyGreaterThanMaxLength(sentTimestamp: Long, length: Int): String {
     return log(sentTimestamp, "The body length was greater than the max allowed ($length bytes). Trimming to fit.")
+  }
+
+  fun releaseChannelRecipientMissing(): String {
+    return log(0, "No release channel recipient was found.")
   }
 
   private fun log(sentTimestamp: Long, message: String): String {

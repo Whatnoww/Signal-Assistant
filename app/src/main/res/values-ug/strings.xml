@@ -63,9 +63,9 @@
     <!-- The title of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
     <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_title">يېڭى بىر ئەسلىگە كەلتۈرۈش ئاچقۇچى قۇرۇڭ</string>
     <!-- The body of a dialog letting the user know they have to rotate their recovery key if they want to disable PINs -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">You must create and record a new recovery key before you can disable your PIN.</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_body">PIN نومۇرنى چەكلەشتىن بۇرۇن چوقۇم يېڭى بىر ئەسلىگە كەلتۈرۈش ئاچقۇچىنى قۇرۇشىڭىز ۋە خاتىرىلىشىڭىز كېرەك.</string>
     <!-- The confirmation button for a dialog letting the user know they have to rotate their recovery key if they want to disable PINs. If they click the button, they will be taken to a flow to rotate their key. -->
-    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">Create key</string>
+    <string name="AdvancedPinSettingsFragment_rotate_aep_dialog_positive_button">ئاچقۇچ قۇرۇش</string>
 
     <!-- NumericKeyboardView -->
   <!-- Removed by excludeNonTranslatables <string name="NumericKeyboardView__1" translatable="false">1</string> -->
@@ -362,6 +362,11 @@
     <string name="CommunicationActions_this_is_not_a_valid_call_link">بۇ ئىناۋەتلىك چاقىرىق ئۇلىنىشى ئەمەس. توپقا قوشۇلۇشتىن بۇرۇن پۈتۈن ئۇلانمىنىڭ بىخەتەر ۋە توغرا ئىكەنلىكىنى جەزملەشتۈرۈڭ.</string>
     <!-- Displayed in a snackbar when the user is already in a call -->
     <string name="CommunicationActions__you_are_already_in_a_call">سىز ئاللىبۇرۇن چاقىرىقتا</string>
+    <!-- Title on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_title">ھېساباتنى يېڭى ئۈسكۈنىگە يۆتكەمسىز؟</string>
+    <!-- Message on dialog when quick restore qr code is scanned in system camera -->
+    <string name="CommunicationActions__transfer_dialog_message">بۇ ھېساباتنى يېڭى ئۈسكۈنىگە يۆتكەش ئۈچۈن «داۋاملاشتۇرۇش» نى چېكىپ، Signal كامېراسى ئارقىلىق QR كودىنى قايتا سكاننېرلاڭ. پەقەت Signal دىنلا كەلگەن QR كودىنى سكاننېرلاڭ.</string>
+    <string name="CommunicationActions__dont_transfer">يۆتكىمەڭ</string>
 
     <!-- ConfirmIdentityDialog -->
 
@@ -665,6 +670,22 @@
     <string name="ConversationFragment_group_names">گۇرۇپپا ناملىرى</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">رەسىمنى چۈشۈرەلمىدى. قايتا سىناڭ.</string>
+    <!-- Dialog for how to long to keep a messaged pinned for -->
+    <string name="ConversationFragment__keep_pinned">مىقلانغان ئۇچۇرنىڭ ساقلىنىش ۋاقتى…</string>
+    <!-- Dialog option to keep message pin for 24 hours -->
+    <string name="ConversationFragment__24_hours">24 سائەت</string>
+    <!-- Dialog option to keep message pin for 7 days -->
+    <string name="ConversationFragment__7_days">7 كۈن</string>
+    <!-- Dialog option to keep message pin for 30 days -->
+    <string name="ConversationFragment__30_days">30 كۈن</string>
+    <!-- Dialog option to keep message pin forever -->
+    <string name="ConversationFragment__forever">مەڭگۈ</string>
+    <!-- Dialog title when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_title">ئەڭ بېشىدا مىقلاپ قويغان ئۇچۇرنى ئالماشتۇرامسىز؟</string>
+    <!-- Dialog body when replacing the oldest pin -->
+    <string name="ConversationFragment__replace_body">مىقلانغان ئۇچۇر ئەڭ كونىسىنىڭ ئورنىنى ئالىدۇ</string>
+    <!-- Dialog button when replacing the oldest pin -->
+    <string name="ConversationFragment__replace">ئالماشتۇرۇش</string>
 
     <!-- Title of Safety Tips bottom sheet dialog -->
     <string name="SafetyTips_title">بىخەتەرلىك ئەسكەرتىشلىرى</string>
@@ -1181,11 +1202,11 @@
     <string name="AddToGroupActivity_add_member">ئەزا قوشامسىز؟</string>
     <string name="AddToGroupActivity_add_s_to_s">«%1$s»نى «%2$s» گە قوشامسىز؟</string>
     <string name="AddToGroupActivity_s_added_to_s">«%1$s» «%2$s» گە قوشۇلدى.</string>
-    <string name="AddToGroupActivity_add_to_group">گۇرۇپپىغا قوشۇش</string>
     <string name="AddToGroupActivity_add_to_groups">گۇرۇپپىلارغا قوشۇش</string>
     <string name="AddToGroupActivity_this_person_cant_be_added_to_legacy_groups">بۇ ئادەمنى كونا گۇرۇپپىلارغا قوشقىلى بولمايدۇ.</string>
     <string name="AddToGroupActivity_add">قوشۇش</string>
     <string name="AddToGroupActivity_add_to_a_group">گۇرۇپپىغا قوش</string>
+    <string name="AddToGroupActivity_search">ئىزدە</string>
 
     <!-- ChooseNewAdminActivity -->
     <string name="ChooseNewAdminActivity_choose_new_admin">يېڭى باشقۇرغۇچى تاللاش</string>
@@ -1356,10 +1377,15 @@
     <!-- AddMembersActivity -->
     <string name="AddMembersActivity__done">بولدى</string>
     <string name="AddMembersActivity__this_person_cant_be_added_to_legacy_groups">بۇ ئادەمنى كونا گۇرۇپپىلارغا قوشقىلى بولمايدۇ.</string>
-    <!-- Confirmation text when adding a member to a group. If one person is added, %1$s is their name. If multiple people are added, the total number is %3$d. %2$s is the name of the group -->
+
+    <!-- Confirmation text when adding one member to a group. %1$s is the member\'s name, %2$s is the group name. -->
+    <string name="AddMembersActivity__add_member_to_s">«%1$s»نى «%2$s» گە قوشامسىز؟</string>
+
+    <!-- Confirmation text when adding members to a group. %1$d is the number of members added. %2$s is the name of the group. -->
     <plurals name="AddMembersActivity__add_d_members_to_s">
-        <item quantity="other">«%2$s» غا %3$d ئەزانى قوشامسىز؟</item>
+        <item quantity="other">«%2$s» غا %1$d ئەزانى قوشامسىز؟</item>
     </plurals>
+
     <string name="AddMembersActivity__add">قوشۇش</string>
     <string name="AddMembersActivity__add_members">ئەزا قوشۇش</string>
 
@@ -2064,6 +2090,8 @@
     <string name="MessageRecord_unsupported_feature">%1$s سىزگە ئەۋەتكەن ئۇچۇردا Signal نىڭ بىر يېڭى ئىقتىدارى قوللىنىلغاچقا، ئۇنى بىر تەرەپ قىلالمىدى ياكى كۆرسىتەلمىدى.</string>
     <!-- Update message shown when someone ends the poll. %1$s is the person who ended the poll and %2$s is the poll question. -->
     <string name="MessageRecord_ended_the_poll">%1$s بېلەت تاشلاشنى ئاخىرلاشتۇردى: «%2$s»</string>
+    <!-- Update message shown when you end the poll. %1$s is the poll question. -->
+    <string name="MessageRecord_you_ended_the_poll">«%1$s»: راي سىنىقىنى ئاخىرلاشتۇردىڭىز</string>
 
     <!-- MessageRequestBottomView -->
     <string name="MessageRequestBottomView_accept">قوبۇل قىل</string>
@@ -2367,6 +2395,12 @@
     <!-- Dialog description that will explain the steps needed to give camera permissions -->
     <string name="WebRtcCallActivity__to_enable_video">ۋىدېيونى قوزغىتىش ئۈچۈن:</string>
 
+    <!-- MoveableLocalVideoRenderer -->
+    <!-- Content description for button to shrink local video from focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__shrink_local_video">يەرلىك سىننى تارايتىڭ</string>
+    <!-- Content description for button to expand local video to focused/full-screen mode -->
+    <string name="MoveableLocalVideoRenderer__expand_local_video">يەرلىك سىننى كېڭەيتىڭ</string>
+
     <!-- WebRtcCallView -->
     <string name="WebRtcCallView__signal_call">‫Signal چاقىرىقى</string>
     <string name="WebRtcCallView__signal_video_call">‏Signal سىنلىق چاقىرىقى</string>
@@ -2568,6 +2602,10 @@
     <string name="CallParticipantView__cant_receive_audio_video_from_s">%1$s دىن ئۈن ۋە سىن تاپشۇرۇۋالالمايدۇ</string>
     <string name="CallParticipantView__cant_receive_audio_and_video_from_s">%1$s دىن ئۈن ۋە سىن تاپشۇرۇۋالالمايدۇ</string>
     <string name="CallParticipantView__this_may_be_Because_they_have_not_verified_your_safety_number_change">بۇنداق بولۇشىنىڭ سەۋەبى ئۇلار سىزنىڭ بىخەتەرلىك نومۇرىنى ئۆزگەرتكەنلىكىڭىزنى دەلىللىمىگەن بولۇشى مۇمكىن، ياكى ئۇلارنىڭ ئۈسكۈنىسىدە مەسىلە بار ۋە ياكى ئۇلار سىزنى چەكلىۋەتكەن بولۇشى مۇمكىن.</string>
+
+    <!-- SwitchCameraButton -->
+    <!-- Content description for the button that switches between front and back camera during a call -->
+    <string name="SwitchCameraButton__switch_camera_direction">ئالدى كەينى كامېرا ئالماشتۇر</string>
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">سىيرىلسا ئېكران ھەمبەھىرلەشنى كۆرسىتىدۇ</string>
@@ -3269,7 +3307,7 @@
     <string name="WebRtcCallScreen__answer_without_video">سىنسىز جاۋاب</string>
 
     <!-- CallScreen -->
-    <string name="CallScreen__change_camera_direction">Change camera direction</string>
+    <string name="CallScreen__change_camera_direction">كامېرا يۆنىلىشىنى ئۆزگەرتىڭ</string>
 
     <!-- WebRtcAudioOutputToggle -->
     <!-- Label for a dialog asking the user to switch the audio output device during a call -->
@@ -3328,9 +3366,9 @@
     <string name="ContactSelectionListFragment_s_is_not_a_signal_user">"%1$s بولسا Signal ئىشلەتكۈچى ئەمەس. ئىشلەتكۈچى نامىنى تەكشۈرۈپ قايتا سىناڭ."</string>
     <string name="ContactSelectionListFragment_you_do_not_need_to_add_yourself_to_the_group">ئۆزىڭىزنى گۇرۇپپىغا قوشۇشىڭىز ھاجەتسىز</string>
     <string name="ContactSelectionListFragment_maximum_group_size_reached">گۇرۇپپىنىڭ ئادەم سانى چېكىگە يەتتى</string>
-    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_d_members">Signal  گۇرۇپپىسى %1$d ئەزانى سىغدۇرالايدۇ.</string>
+    <string name="ContactSelectionListFragment_signal_groups_can_have_a_maximum_of_s_members">Signal  گۇرۇپپىسى %1$s ئەزانى سىغدۇرالايدۇ.</string>
     <string name="ContactSelectionListFragment_recommended_member_limit_reached">تەۋسىيە ئەزا چېكىگە يەتتى</string>
-    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_d_members_or_fewer">ئەزا سانى %1$d ياكى ئاز بولغاندا Signal گۇرۇپپىسىنىڭ ئىقتىدارى ئەڭ ياخشى. تېخىمۇ كۆپ ئەزا قوشۇلسا ئۇچۇر يوللاش ۋە تاپشۇرۇۋېلىش سەل كېچىكىدۇ.</string>
+    <string name="ContactSelectionListFragment_signal_groups_perform_best_with_s_members_or_fewer">ئەزا سانى %1$s ياكى ئاز بولغاندا Signal گۇرۇپپىسىنىڭ ئىقتىدارى ئەڭ ياخشى. تېخىمۇ كۆپ ئەزا قوشۇلسا ئۇچۇر يوللاش ۋە تاپشۇرۇۋېلىش سەل كېچىكىدۇ.</string>
     <plurals name="ContactSelectionListFragment_d_members">
         <item quantity="other">%1$d ئەزا</item>
     </plurals>
@@ -4328,6 +4366,10 @@
     <string name="conversation_selection__menu_payment_details">پۇل تۆلەش تەپسىلاتلىرى</string>
     <!-- Button to end a poll -->
     <string name="conversation_selection__menu_end_poll">راي سىناشنى توختىتىش</string>
+    <!-- Button to pin a message -->
+    <string name="conversation_selection__menu_pin_message">مىخلاش</string>
+    <!-- Button to unpin a message -->
+    <string name="conversation_selection__menu_unpin_message">ئاجرىتىش</string>
 
     <!-- conversation_expiring_on -->
 
@@ -5067,10 +5109,6 @@
     <!-- CreateGroupActivity -->
     <string name="CreateGroupActivity__skip">ئاتلا</string>
 
-    <plurals name="CreateGroupActivity__d_members">
-        <item quantity="other">‏%1$d ئەزا</item>
-    </plurals>
-
     <!-- Create group screen title displayed when there is at least one group member selected. The placeholder is the total number of group members. -->
     <plurals name="CreateGroupActivity__s_members">
         <item quantity="other">‏%1$s ئەزا</item>
@@ -5105,7 +5143,7 @@
     <string name="ChatWallpaperFragment__wallpaper_preview_description">تام قەغىزىنى ئالدىن كۆرۈش</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_chat_colors">بارلىق پاراڭ رەڭگىنى قاپلىۋېتەمسىز؟</string>
     <string name="ChatWallpaperFragment__would_you_like_to_override_all_wallpapers">ھەممە تام قەغەزنى قاپلىۋېتەمسىز؟</string>
-    <string name="ChatWallpaperFragment__reset_default_colors">كۆڭۈلدىكى رەڭنى ئەسلىگە قايتۇر</string>
+    <string name="ChatWallpaperFragment__reset_default_colors">ئالدىن بەلگىلەنگەن رەڭنى ئەسلىگە قايتۇرۇش</string>
     <string name="ChatWallpaperFragment__reset_all_colors">ھەممە رەڭنى ئەسلىگە قايتۇر</string>
     <string name="ChatWallpaperFragment__reset_default_wallpaper">كۆڭۈلدىكى تام قەغەزنى ئەسلىگە قايتۇر</string>
     <string name="ChatWallpaperFragment__reset_all_wallpapers">بارلىق تام قەغەزلىرىنى قايتا تەڭشە</string>
@@ -5705,7 +5743,7 @@
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__call">چاقىر</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
-    <string name="ConversationSettingsFragment__mute">ئۈنسىز قىلىش</string>
+    <string name="ConversationSettingsFragment__mute">ئۈنسىزلاش</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
     <string name="ConversationSettingsFragment__muted">ئۈنسىز</string>
     <!-- Button label with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -5791,11 +5829,11 @@
     <!-- Snackbar message when blocking a contact has failed -->
     <string name="NewConversationActivity__block_failed">چەكلەش مەغلۇپ بولدى</string>
     <!-- Error message shown when looking up a person by phone number and that phone number is not associated with a signal account -->
-    <string name="NewConversationActivity__s_is_not_a_signal_user">%1$s بولسا Signal ئىشلەتكۈچى ئەمەس</string>
+    <string name="RecipientLookup_error__s_is_not_a_signal_user">%1$s بولسا Signal ئىشلەتكۈچى ئەمەس</string>
     <!-- Accessibility label for opening the screen specific dropdown menu. -->
     <string name="NewConversationActivity__accessibility_open_top_bar_menu">تىزىملىكنى ئېچىش</string>
     <!-- Error message shown in a dialog when trying to create a new group with non-signal users (e.g., unregistered or phone number only contacts) -->
-    <plurals name="CreateGroupActivity_not_signal_users">
+    <plurals name="RecipientLookup_error__not_signal_users">
         <item quantity="other">%1$s سىگنال ئىشلەتكۈچىسى ئەمەس</item>
     </plurals>
 
@@ -5968,7 +6006,6 @@
     <string name="BadgesOverviewFragment__failed_to_update_profile">ئارخىپ يېڭىلاش ئوڭۇشسىز بولدى</string>
 
 
-
     <string name="SelectFeaturedBadgeFragment__select_a_badge">بىر ئىزناك تاللاڭ</string>
     <string name="SelectFeaturedBadgeFragment__you_must_select_a_badge">بىر ئىزناك تاللىشىڭىز كېرەك</string>
     <string name="SelectFeaturedBadgeFragment__failed_to_update_profile">ئارخىپ يېڭىلاش ئوڭۇشسىز بولدى</string>
@@ -6034,7 +6071,8 @@
     <!-- Label for Donation Receipts button -->
     <string name="ManageDonationsFragment__donation_receipts">ئىئانە تالونى</string>
     <string name="ManageDonationsFragment__badges">ئىزناكلار</string>
-    <string name="ManageDonationsFragment__subscription_faq">مۇشتەرىلىك ھەققىدە كۆپ سورالغان سوئاللار</string>
+    <!-- Label that externally links to Signal Donor FAQ page -->
+    <string name="ManageDonationsFragment__subscription_faq">ئىئانە قىلغۇچىلار كۆپ سورايدىغان سوئاللار</string>
     <!-- Preference heading for other ways to donate -->
     <string name="ManageDonationsFragment__other_ways_to_give">باشقا ئىئانە ئۇسۇللىرى</string>
     <!-- Preference label to launch badge gifting -->
@@ -7294,8 +7332,10 @@
     <string name="CallLogAdapter__outgoing">ئۇرۇلغىنى</string>
     <!-- Displayed for missed calls -->
     <string name="CallLogAdapter__missed">ئېلىنمىغىنى</string>
-    <!-- Displayed for missed calls declined by notification profile -->
+    <!-- Displayed for one missed call declined by notification profile -->
     <string name="CallLogAdapter__missed_notification_profile">ئۇقتۇرۇش ئارخىپى ئوچۇق ۋاقىتتا رەت قىلىنغانلار</string>
+    <!-- Displayed for multiple missed calls declined by notification profile -->
+    <string name="CallLogAdapter__missed_notification_profile_multiple">ئۇقتۇرۇش ئارخىپى ئوچۇق ۋاقىتتا رەت قىلىنغانلار</string>
     <!-- Displayed on Group Call button if user is not in the call -->
     <string name="CallLogAdapter__join">قوشۇلۇش</string>
     <!-- Displayed on Group Call button if user is in the call -->
@@ -7594,6 +7634,8 @@
 
     <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__title">Signal بىخەتەر زاپاسلانمىللىرىنى قوزغىتىڭ</string>
+    <!-- Title of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups. Special string for the beta period. -->
+    <string name="TurnOnSignalBackups__title_beta">Signal بىخەتەر زاپاسلانمىللىرنى سىناپ بېقىڭ</string>
     <!-- Body of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups -->
     <string name="TurnOnSignalBackups__body">يېڭى تېلېفون ئالغاندا ياكى سىگنالنى قايتا قاچىلىغاندا ھەرقانداق ئۇچۇرنى يۈتتۈرۈپ قويمايسىز.</string>
     <!-- Button of a megaphone shown at the bottom of the chat list to prompt the user to enable message backups that will take the user to the flow to enable backups -->
@@ -7871,6 +7913,12 @@
     <string name="BackupStatusRow__your_last_backup">ئاخىرقى زاپاسلىشىڭىزنى تاماملىيالمىدى. تېلېفونىڭىزنىڭ Wi-Fi غا ئۇلانغانلىقىنى جەزملەشتۈرۈڭ ۋە «ھازىر زاپاسلاش» نى چېكىپ قايتا سىناڭ.</string>
     <!-- Text displayed when a backup could not be completed and to check that they are on the latest version of Signal -->
     <string name="BackupStatusRow__your_last_backup_latest_version">ئاخىرقى زاپاسلىشىڭىزنى تاماملىيالمىدى. سىگنالنىڭ ئەڭ يېڭى نەشرىنى ئشلەتكەنلىكىڭىزنى جەزملەشتۈرۈڭ ۋە قايتا سىناڭ.</string>
+    <!-- Text displayed when a backup file exceeds the storage limit during upload. -->
+    <string name="BackupStatusRow__backup_file_too_large">سىزدە بار ئۇچۇرلارنىڭ سانى ساقلاش چېكىدىن ئېشىپ كەتكەن. بەزى ئۇچۇرلارنى ئۆچۈرۈپ قايتا سىناڭ.</string>
+    <!-- Text displayed when we\'re not backing up all messages. The placeholder represents the cutoff date for the messages we\'re backing up. -->
+    <string name="BackupStatusRow__not_backing_up_old_messages">%1$s دىن بۇرۇن ئەۋەتىلگەن ياكى تاپشۇرۇۋېلىنغان ئۇچۇرلار زاپاسلانمىغان.</string>
+    <!-- Text displayed when we failed to create a backup because of low disk space. -->
+    <string name="BackupStatusRow__not_enough_disk_space">ساقلاش بوشلۇقىڭىز ئاز قالغاچقا زاپاسلاشنى تاماملىغىلى بولمىدى. ئۈسكۈنىڭىزدىكى بوشلۇقنى بىكارلاپ قايتا سىناڭ.</string>
     <!-- Text displayed in a row to learn more about why a backup failed -->
     <string name="BackupStatusRow__learn_more">تەپسىلاتى</string>
 
@@ -8328,11 +8376,11 @@
     <!-- Bottom Sheet body for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">يېڭى ئاچقۇچ قۇرۇش پەقەت ئاچقۇچنى باشقا بىرى بىلىپ قالغاندىلا زۆرۈر. مېدىيانى ئۆز ئىچىگە ئالغان زاپاسلاشنى قايتا يۈكلىشىڭىز كېرەك. ئەگەر «ساقلاشنى ئەلالاشتۇرۇش» نى ئىشلىتىۋاتقان بولسىڭىز ، ئالدى بىلەن چۈشۈرۈۋېتىلگەن مېدىيانى چۈشۈرۈشىڭىز كېرەك.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Exit backup setup?</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">زاپاسلاشنى قۇرۇشتىن چېكىنەمىسىز؟</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
-    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">You have not finished setting up backups, and no backup has been created. You can enable backups in Settings.</string>
+    <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">زاپاسلاشنى قۇرۇشنى تاماملاپ بولالمىدىڭىز، ھېچقانداق زاپاسلاش قۇرۇلمىدى. «تەڭشەك»تىن زاپاسلاشنى قوزغىتالايسىز.</string>
     <!-- Dialog confirmation button to exit backup setup -->
-    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Exit backup setup</string>
+    <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">زاپاسلاشنى قۇرۇشتىن چېكىنىش</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -8360,7 +8408,7 @@
     <!-- Verify your key title -->
     <string name="VerifyBackupPinScreen__enter_your_backup_key">ئەسلىگە كەلتۈرۈش ئاچقۇچىڭىزنى كىرگۈزۈڭ</string>
     <!-- Verify your key subtitle -->
-    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">زاپاسلاشنى قوزغاتقاندا ، خاتىرىلىگەن 64 خانىلىق كودنى كىرگۈزۈڭ.</string>
+    <string name="VerifyBackupPinScreen__enter_the_backup_key_that_you_recorded">زاپاسلاشنى قوزغاتقاندا خاتىرىلىگەن 64 خانىلىق كودنى كىرگۈزۈڭ.</string>
     <!-- Button text when you forget your recovery key -->
     <string name="VerifyBackupPinScreen__forgot_key">ئاچقۇچنى ئۇنتۇپ قالدىڭىزمۇ؟</string>
 
@@ -8596,13 +8644,13 @@
     <string name="NoBackupToRestore_skip_restore">ئەسلىگە كەلتۈرۈشتى ئاتلاڭ</string>
 
     <!-- Dialog title when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">Recovery key limit reached</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_title">ئەسلىگە كەلتۈرۈش ئاچقۇچىنى ئۆزگەرتىش قېتىم سانى چېكىگە يەتتى</string>
     <!-- Dialog body when the recovery key change limit is reached -->
-    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">You successfully created a new recovery key, but to prevent abuse the number of new keys you can create is limited. You will not be able to create another key for 7 days. Store your recovery key somewhere safe and secure.</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_reached_body">سىز مۇۋەپپەقىيەتلىك ھالدا يېڭى ئەسلىگە كەلتۈرۈش ئاچقۇچىنى قۇردىڭىز، ئەمما قالايمىقان ئىشلىتىشنىڭ ئالدىنى ئېلىش ئۈچۈن سىز قۇرالايدىغان يېڭى ئاچقۇچلارنىڭ سانى چەكلىك. 7 كۈن ئىچىدە يەنە بىر ئاچقۇچ قۇرالمايسىز. ئەسلىگە كەلتۈرۈش ئاچقۇچىڭىزنى بىخەتەر ۋە ئىشەنچىلىك جايدا ساقلاڭ.</string>
     <!-- Dialog title when the recovery key change limit is exhausted and you cannot create a new key -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">Can’t create new key</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_title">يېڭى ئاچقۇچ قۇرالمىدى</string>
     <!-- Dialog body when the recovery key change limit is exhausted and you cannot create a new key. Placeholder is number of days remaining until they can create a new key. -->
-    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">You’ve exhausted the number of new keys you can create. You will be able to create a new recovery key in 7 days. If you believe someone may be able to access your backup, you can choose to “Turn off and delete backup.”</string>
+    <string name="MessageBackupsKeyRecordScreen__limit_exceeded_body">يېڭى ئاچقۇچلارنى قۇرۇشقا بېرىلگەن قېتىم سانىنى تۈگىتىپ بولدىڭىز. 7 كۈندىن كىيىن يېڭى بىر ئەسلىگە كەلتۈرۈش ئاچقۇچى قۇرالايسىز. ئەگەر باشقىلارنىڭ زاپىسىڭىزنى زىيارەت قىلالايدىغانلىقىنى جەزىملەشتۈرسىڭىز، «تاقاش ۋە زاپاسلاشنى ئۆچۈرۈش» نى تاللىسىڭىز بولىدۇ.</string>
     <!-- Button to acknowledge and dismiss dialog   -->
     <string name="MessageBackupsKeyRecordScreen__ok">بولىدۇ</string>
     <!-- Accessibility label for close search button in MainToolbar -->
@@ -8664,6 +8712,8 @@
     <string name="Poll__poll_question">راي سىناش: %1$s</string>
     <!-- Notification message sent when a poll ends. %1$s is the creator. %2$s is the question of the poll -->
     <string name="Poll__poll_end">%1$s بېلەت تاشلاشنى ئاخىرلاشتۇردى: «%2$s»</string>
+    <!-- Thread body message when a poll ends. %1$s is the question of the poll -->
+    <string name="Poll__you_poll_end">«%1$s»: راي سىنىقىنى ئاخىرلاشتۇردىڭىز</string>
     <!-- Notification message sent when someone votes in the poll. %1$s is the voter. %2$s is the question of the poll -->
     <string name="Poll__poll_voted">«%2$s»غا: %1$s بېلەت تاشلىدى</string>
     <!-- Option in settings to configure notifications for polls -->
@@ -8714,6 +8764,13 @@
     <string name="CreatePollFragment__add_option">كەم دېگەندە 2 تاللاش قوشۇش</string>
     <!-- Snackbar text to add a question before creating a poll -->
     <string name="CreatePollFragment__add_question">بىر سۇئال قوشۇش</string>
+
+    <!-- Bottom sheet title telling users to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__scan_qr_code">QR كودى تارا</string>
+    <!-- Bottom sheet description telling users how to scan a qr code -->
+    <string name="QuickRestoreInfoDialog__use_this_device_to_scan_qr_code">بۇ ئۈسكۈنىنى ئىشلىتىپ سىز يۆتكەلمەكچى بولغان ئۈسكۈنىدىكى QR كودىنى سكاننېرلاڭ</string>
+    <!-- Confirmation button to dismiss bottom sheet dialog -->
+    <string name="QuickRestoreInfoDialog__okay">جەزملە</string>
 
     <!-- CallQualityIssue -->
     <!-- Label for general audio issue category -->
@@ -8775,7 +8832,7 @@
     <!-- Link text to view debug log -->
     <string name="CallQualitySheet__view_your_debug_log">كاشىلا ھەل قىلىش خاتىرىڭىزنى كۆرۈش</string>
     <!-- Last part of description about viewing debug log before submitting -->
-    <string name="CallQualitySheet__help_us_improve_description_suffix"> يوللاشتىن بۇرۇن</string>
+    <string name="CallQualitySheet__help_us_improve_description_suffix"> يوللاشتىن بۇرۇن.</string>
     <!-- Toggle label for sharing debug log -->
     <string name="CallQualitySheet__share_debug_log">كاشىلا ھەل قىلىش خاتىرىسىنى ئورتاقلىشىش</string>
     <!-- Privacy notice explaining what debug logs contain and why they are helpful -->
@@ -8784,6 +8841,67 @@
     <string name="CallQualitySheet__submit">تاپشۇر</string>
     <!-- Displayed as a snackbar after submitting feedback -->
     <string name="CallQualitySheet__thanks_for_your_feedback">ئىنكاسىڭىزغا رەھمەت!</string>
+    <!-- Content description for the thumbs down button indicating user had issues with the call -->
+    <string name="CallQualitySheet__had_issues_content_description">تېلېفونلىشىش جەريانىدا مەسىلە كۆرۈلدى</string>
+    <!-- Content description for the thumbs up button indicating the call was great -->
+    <string name="CallQualitySheet__great_content_description">تېلېفونلىشىش ناھايىتى ياخشى بولدى</string>
+    <!-- Dialog body shown when feedback submission fails due to network issues -->
+    <string name="CallQualitySheet__your_feedback_failed_to_send">سىزنىڭ پىكىر-تەكلىپىڭىزنى يوللاش مەغلۇپ بولدى.</string>
+    <!-- Dialog button to retry sending feedback after a failure -->
+    <string name="CallQualitySheet__try_again">قايتا سىناڭ</string>
+
+    <!-- Message body when someone pins a message where %1$s is the name of the person -->
+    <string name="PinnedMessage__s_pinned_a_message">%1$s بىر ئۇچۇرنى مىقلاپ قويدى</string>
+    <!-- Message body when you pin a message -->
+    <string name="PinnedMessage__you_pinned_a_message">سىز بىر ئۇچۇرنى مىقلاپ قويدىڭىز</string>
+    <!-- Button body to go to the pinned message -->
+    <string name="PinnedMessage__go_to_message">«ئۇچۇر»غا ئۆتۈڭ</string>
+    <!-- Toast shown when a pinned message is not found -->
+    <string name="PinnedMessage__not_found">ئۇچۇر تېپىلمىدى</string>
+    <!-- Content description for the pin icon -->
+    <string name="PinnedMessage__pinned">قوندۇرۇلدى</string>
+    <!-- Caption shown when the pinned message is a photo -->
+    <string name="PinnedMessage__photo">سۈرەت</string>
+    <!-- Caption shown when the pinned message is a video -->
+    <string name="PinnedMessage__video">سىن</string>
+    <!-- Caption shown when the pinned message is a sticker -->
+    <string name="PinnedMessage__sticker">چىراي ئىپادە</string>
+    <!-- Caption shown when the pinned message is a voice message  -->
+    <string name="PinnedMessage__voice">ئۈن ئۇچۇر</string>
+    <!-- Caption shown when the pinned message is a gif -->
+    <string name="PinnedMessage__gif">GIF</string>
+    <!-- Caption shown when the pinned message is a view once media -->
+    <string name="PinnedMessage__view_once">بىرلا كۆرسەت ۋاسىتە</string>
+    <!-- Context menu option to unpin the message -->
+    <string name="PinnedMessage__unpin_message">ئاجرىتىش</string>
+    <!-- Context menu option to view all the message -->
+    <string name="PinnedMessage__view_all_messages">بارلىق ئۇچۇرلارنى كۆرۈش</string>
+    <!-- Text to unpin all messages -->
+    <string name="PinnedMessage__unpin_all_messages">بارلىق ئۇچۇرلارنىڭ مىقىنى ئېلىۋېتىش</string>
+    <!-- Title of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_title">غايىب بولۇش ئالدىدىكى ئۇچۇرلارنى مىقلاش</string>
+    <!-- Body of bottom sheet when pinning a disappearing message -->
+    <string name="PinnedMessage__disappearing_message_body">غايىب بولۇش ئالدىدىكى ئۇچۇرلار ۋاقىت خاتىرلىگۈچتىكى ۋاقتى توشقاندا مىقىدىن ئېلىۋېتىلىدۇ ھەمدە سۆھبەتتىن ئۆچۈرۈۋېتىلىدۇ.</string>
+    <!-- Confirmation button for bottom sheet -->
+    <string name="PinnedMessage__got_it">بىلدىم</string>
+    <!-- Content description of disappearing timer icon -->
+    <string name="PinnedMessage__disappearing_message_content_description">غايىب بولۇش ئالدىدىكى ئۇچۇر</string>
+    <!-- Title of bottom sheet -->
+    <string name="PinnedMessage__pinned_messages">مىقلانغان ئۇچۇرلار</string>
+    <!-- Context menu option to unpin message -->
+    <string name="PinnedMessage__unpin">ئاجرىتىش</string>
+    <!-- Title of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_title">بارلىق ئۇچۇرلارنىڭ مىقىنى ئېلىۋېتەمسىز؟</string>
+    <!-- Body of dialog to unpin all messages -->
+    <string name="PinnedMessage__unpin_body">بارلىق ئەزالار ئۈچۈن ئۇچۇرلارنىڭ مىقى ئېلىۋېتىلىدۇ.</string>
+    <!-- Dialog title when failing to pin a message -->
+    <string name="PinnedMessage__couldnt_pin">ئۇچۇرنى مىقلىيالمىدى</string>
+    <!-- Dialog title when failing to unpin a message -->
+    <string name="PinnedMessage__couldnt_unpin">ئۇچۇرنىڭ مىقىنى ئېلىۋېتىشكە بولمىدى</string>
+    <!-- Dialog title when failing to unpin all messages -->
+    <string name="PinnedMessage__couldnt_unpin_all">ئۇچۇرلارنىڭ مىقىنى ئېلىۋېتىشكە بولمىدى</string>
+    <!-- Dialog body when failing to pin a message -->
+    <string name="PinnedMessage__check_connection">تور ئۇلىنىشىڭىزنى تەكشۈرۈپ قايتا سىناڭ.</string>
 
     <!-- EOF -->
 </resources>

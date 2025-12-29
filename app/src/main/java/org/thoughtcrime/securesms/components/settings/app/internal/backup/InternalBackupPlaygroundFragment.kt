@@ -82,6 +82,7 @@ import org.thoughtcrime.securesms.jobs.ArchiveAttachmentReconciliationJob
 import org.thoughtcrime.securesms.jobs.ArchiveThumbnailBackfillJob
 import org.thoughtcrime.securesms.jobs.BackupRestoreMediaJob
 import org.thoughtcrime.securesms.jobs.LocalBackupJob
+import org.thoughtcrime.securesms.keyvalue.BackupValues
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.util.Util
 
@@ -197,9 +198,9 @@ class InternalBackupPlaygroundFragment : ComposeFragment() {
               .setTitle("Are you sure?")
               .setMessage("This will delete all of your chats! Make sure you've finished a backup first, we don't check for you. Only do this on a test device!")
               .setPositiveButton("Wipe and restore") { _, _ ->
-                Toast.makeText(this@InternalBackupPlaygroundFragment.requireContext(), "Restoring backup...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Restoring backup...", Toast.LENGTH_SHORT).show()
                 viewModel.wipeAllDataAndRestoreFromRemote {
-                  startActivity(MainActivity.clearTop(this@InternalBackupPlaygroundFragment.requireActivity()))
+                  context.startActivity(MainActivity.clearTop(context))
                 }
               }
               .show()
@@ -561,10 +562,10 @@ fun Screen(
       )
 
       Rows.TextRow(
-        text = "Mark backup failure",
+        text = "Mark backup validation failure",
         label = "This will display the error sheet when returning to the chats list.",
         onClick = {
-          BackupRepository.markBackupFailure()
+          BackupRepository.markBackupCreationFailed(BackupValues.BackupCreationError.VALIDATION)
         }
       )
 
