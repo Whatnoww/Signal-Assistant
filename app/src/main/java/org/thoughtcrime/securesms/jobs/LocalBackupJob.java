@@ -18,17 +18,17 @@ import org.thoughtcrime.securesms.backup.BackupPassphrase;
 import org.thoughtcrime.securesms.backup.BackupVerifier;
 import org.thoughtcrime.securesms.backup.FullBackupExporter;
 import org.thoughtcrime.securesms.crypto.AttachmentSecretProvider;
-import org.thoughtcrime.securesms.database.NoExternalStorageException;
+import org.signal.core.util.NoExternalStorageException;
 import org.thoughtcrime.securesms.database.SignalDatabase;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.jobmanager.Job;
 import org.thoughtcrime.securesms.jobmanager.JobManager;
 import org.thoughtcrime.securesms.notifications.NotificationChannels;
-import org.thoughtcrime.securesms.permissions.Permissions;
+import org.signal.core.ui.permissions.Permissions;
 import org.thoughtcrime.securesms.service.GenericForegroundService;
 import org.thoughtcrime.securesms.service.NotificationController;
 import org.thoughtcrime.securesms.util.BackupUtil;
-import org.thoughtcrime.securesms.util.StorageUtil;
+import org.signal.core.ui.util.StorageUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public final class LocalBackupJob extends BaseJob {
 
@@ -44,6 +45,7 @@ public final class LocalBackupJob extends BaseJob {
   private static final String TAG = Log.tag(LocalBackupJob.class);
 
   public static final String QUEUE = "__LOCAL_BACKUP__";
+  public static final String PLAINTEXT_ARCHIVE_QUEUE = "__LOCAL_PLAINTEXT_ARCHIVE__";
 
   public static final String TEMP_BACKUP_FILE_PREFIX = ".backup";
   public static final String TEMP_BACKUP_FILE_SUFFIX = ".tmp";
@@ -65,14 +67,25 @@ public final class LocalBackupJob extends BaseJob {
     }
   }
 
-  public static void enqueueArchive() {
+  public static void enqueueArchive(boolean delay) {
     JobManager         jobManager = AppDependencies.getJobManager();
     Parameters.Builder parameters = new Parameters.Builder()
                                                   .setQueue(QUEUE)
                                                   .setMaxInstancesForFactory(1)
+                                                  .setInitialDelay(delay ? TimeUnit.MINUTES.toMillis(30) : 0)
                                                   .setMaxAttempts(3);
 
     jobManager.add(new LocalArchiveJob(parameters.build()));
+  }
+
+  public static void enqueuePlaintextArchive(String destinationUri, boolean includeMedia) {
+    JobManager         jobManager = AppDependencies.getJobManager();
+    Parameters.Builder parameters = new Parameters.Builder()
+        .setQueue(PLAINTEXT_ARCHIVE_QUEUE)
+        .setMaxInstancesForFactory(1)
+        .setMaxAttempts(3);
+
+    jobManager.add(new LocalPlaintextArchiveJob(destinationUri, includeMedia, parameters.build()));
   }
 
   private LocalBackupJob(@NonNull Job.Parameters parameters) {

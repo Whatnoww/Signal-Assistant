@@ -32,36 +32,38 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.delay
 import org.signal.core.ui.compose.Buttons
+import org.signal.core.ui.compose.ComposeFragment
 import org.signal.core.ui.compose.DayNightPreviews
 import org.signal.core.ui.compose.Dividers
 import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.Rows
 import org.signal.core.ui.compose.Scaffolds
+import org.signal.core.ui.compose.SignalIcons
 import org.signal.core.ui.compose.Texts
 import org.signal.core.util.money.FiatMoney
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.backup.DeletionState
 import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
 import org.thoughtcrime.securesms.backup.v2.ui.subscription.MessageBackupsType
-import org.thoughtcrime.securesms.components.compose.TextWithBetaLabel
 import org.thoughtcrime.securesms.components.settings.app.subscription.MessageBackupsCheckoutLauncher.createBackupsCheckoutLauncher
-import org.thoughtcrime.securesms.compose.ComposeFragment
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.payments.FiatMoneyUtil
 import org.thoughtcrime.securesms.util.DateUtils
+import org.thoughtcrime.securesms.util.Environment
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
 import java.math.BigDecimal
 import java.util.Currency
 import java.util.Locale
+import kotlin.getValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
@@ -76,10 +78,15 @@ class BackupsSettingsFragment : ComposeFragment() {
   private lateinit var checkoutLauncher: ActivityResultLauncher<MessageBackupTier?>
 
   private val viewModel: BackupsSettingsViewModel by viewModels()
+  private val args: BackupsSettingsFragmentArgs by navArgs()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     checkoutLauncher = createBackupsCheckoutLauncher {
       findNavController().safeNavigate(R.id.action_backupsSettingsFragment_to_remoteBackupsSettingsFragment)
+    }
+
+    if (savedInstanceState == null && args.launchCheckoutFlow) {
+      checkoutLauncher.launch(null)
     }
   }
 
@@ -103,7 +110,13 @@ class BackupsSettingsFragment : ComposeFragment() {
           }
         }
       },
-      onOnDeviceBackupsRowClick = { findNavController().safeNavigate(R.id.action_backupsSettingsFragment_to_backupsPreferenceFragment) },
+      onOnDeviceBackupsRowClick = {
+        if (SignalStore.backup.newLocalBackupsEnabled || (Environment.Backups.isNewFormatSupportedForLocalBackup() && !SignalStore.settings.isBackupEnabled)) {
+          findNavController().safeNavigate(R.id.action_backupsSettingsFragment_to_localBackupsFragment)
+        } else {
+          findNavController().safeNavigate(R.id.action_backupsSettingsFragment_to_backupsPreferenceFragment)
+        }
+      },
       onBackupTierInternalOverrideChanged = { viewModel.onBackupTierInternalOverrideChanged(it) }
     )
   }
@@ -119,7 +132,7 @@ private fun BackupsSettingsContent(
 ) {
   Scaffolds.Settings(
     title = stringResource(R.string.preferences_chats__backups),
-    navigationIcon = ImageVector.vectorResource(R.drawable.symbol_arrow_start_24),
+    navigationIcon = SignalIcons.ArrowStart.imageVector,
     onNavigationClick = onNavigationClick
   ) { paddingValues ->
     LazyColumn(
@@ -127,7 +140,7 @@ private fun BackupsSettingsContent(
     ) {
       if (backupsSettingsState.showBackupTierInternalOverride) {
         item {
-          Column(modifier = Modifier.padding(horizontal = dimensionResource(id = org.signal.core.ui.R.dimen.gutter))) {
+          Column(modifier = Modifier.padding(horizontal = dimensionResource(id = CoreUiR.dimen.gutter))) {
             Text(
               text = "ALPHA ONLY",
               style = MaterialTheme.typography.titleMedium
@@ -228,6 +241,7 @@ private fun BackupsSettingsContent(
       item {
         Rows.TextRow(
           text = stringResource(R.string.RemoteBackupsSettingsFragment__on_device_backups),
+          icon = ImageVector.vectorResource(R.drawable.symbol_device_phone_24),
           label = stringResource(R.string.RemoteBackupsSettingsFragment__save_your_backups_to),
           onClick = onOnDeviceBackupsRowClick
         )
@@ -258,16 +272,16 @@ private fun NeverEnabledBackupsRow(
           .align(Alignment.Top)
       ) {
         Icon(
-          painter = painterResource(R.drawable.symbol_backup_24),
+          painter = SignalIcons.Backup.painter,
           contentDescription = null
         )
       }
     },
     text = {
       Column {
-        TextWithBetaLabel(
+        Text(
           text = stringResource(R.string.RemoteBackupsSettingsFragment__signal_backups),
-          textStyle = MaterialTheme.typography.bodyLarge
+          style = MaterialTheme.typography.bodyLarge
         )
 
         Text(
@@ -311,9 +325,9 @@ private fun InactiveBackupsRow(
   Rows.TextRow(
     text = {
       Column {
-        TextWithBetaLabel(
+        Text(
           text = stringResource(R.string.RemoteBackupsSettingsFragment__signal_backups),
-          textStyle = MaterialTheme.typography.bodyLarge
+          style = MaterialTheme.typography.bodyLarge
         )
 
         Text(
@@ -326,7 +340,7 @@ private fun InactiveBackupsRow(
     },
     icon = {
       Icon(
-        imageVector = ImageVector.vectorResource(R.drawable.symbol_backup_24),
+        imageVector = SignalIcons.Backup.imageVector,
         contentDescription = stringResource(R.string.preferences_chats__backups),
         tint = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier
@@ -350,16 +364,16 @@ private fun NotFoundBackupRow(
           .align(Alignment.Top)
       ) {
         Icon(
-          painter = painterResource(R.drawable.symbol_backup_24),
+          painter = SignalIcons.Backup.painter,
           contentDescription = null
         )
       }
     },
     text = {
       Column {
-        TextWithBetaLabel(
+        Text(
           text = stringResource(R.string.RemoteBackupsSettingsFragment__signal_backups),
-          textStyle = MaterialTheme.typography.bodyLarge
+          style = MaterialTheme.typography.bodyLarge
         )
 
         Text(
@@ -392,9 +406,9 @@ private fun PendingBackupRow(
     },
     text = {
       Column {
-        TextWithBetaLabel(
+        Text(
           text = stringResource(R.string.RemoteBackupsSettingsFragment__signal_backups),
-          textStyle = MaterialTheme.typography.bodyLarge
+          style = MaterialTheme.typography.bodyLarge
         )
 
         Text(
@@ -436,16 +450,16 @@ private fun LocalStoreBackupRow(
           .align(Alignment.Top)
       ) {
         Icon(
-          painter = painterResource(R.drawable.symbol_backup_24),
+          painter = SignalIcons.Backup.painter,
           contentDescription = null
         )
       }
     },
     text = {
       Column {
-        TextWithBetaLabel(
+        Text(
           text = stringResource(R.string.RemoteBackupsSettingsFragment__signal_backups),
-          textStyle = MaterialTheme.typography.bodyLarge
+          style = MaterialTheme.typography.bodyLarge
         )
 
         val tierText = when (backupState.tier) {
@@ -481,16 +495,16 @@ private fun ActiveBackupsRow(
           .align(Alignment.Top)
       ) {
         Icon(
-          painter = painterResource(R.drawable.symbol_backup_24),
+          painter = SignalIcons.Backup.painter,
           contentDescription = null
         )
       }
     },
     text = {
       Column {
-        TextWithBetaLabel(
+        Text(
           text = stringResource(R.string.RemoteBackupsSettingsFragment__signal_backups),
-          textStyle = MaterialTheme.typography.bodyLarge
+          style = MaterialTheme.typography.bodyLarge
         )
 
         when (val type = backupState.messageBackupsType) {

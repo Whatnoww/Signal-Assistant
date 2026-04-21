@@ -3,7 +3,6 @@ package org.thoughtcrime.securesms.delete;
 import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
 
-import com.annimon.stream.Stream;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 
 import org.signal.core.util.E164Util;
@@ -24,19 +23,9 @@ import org.whispersystems.signalservice.internal.EmptyResponse;
 import org.whispersystems.signalservice.internal.ServiceResponse;
 
 import java.io.IOException;
-import java.text.Collator;
-import java.util.Comparator;
-import java.util.List;
 
 class DeleteAccountRepository {
   private static final String TAG = Log.tag(DeleteAccountRepository.class);
-
-  @NonNull List<Country> getAllCountries() {
-    return Stream.of(PhoneNumberUtil.getInstance().getSupportedRegions())
-                 .map(DeleteAccountRepository::getCountryForRegion)
-                 .sorted(new RegionComparator())
-                 .toList();
-  }
 
   @NonNull String getRegionDisplayName(@NonNull String region) {
     return E164Util.getRegionDisplayName(region).orElse("");
@@ -125,26 +114,5 @@ class DeleteAccountRepository {
         onDeleteAccountEvent.accept(DeleteAccountEvent.LocalDataDeletionFailed.INSTANCE);
       }
     });
-  }
-
-  private static @NonNull Country getCountryForRegion(@NonNull String region) {
-    return new Country(E164Util.getRegionDisplayName(region).orElse(""),
-                       PhoneNumberUtil.getInstance().getCountryCodeForRegion(region),
-                       region);
-  }
-
-  private static class RegionComparator implements Comparator<Country> {
-
-    private final Collator collator;
-
-    RegionComparator() {
-      collator = Collator.getInstance();
-      collator.setStrength(Collator.PRIMARY);
-    }
-
-    @Override
-    public int compare(Country lhs, Country rhs) {
-      return collator.compare(lhs.getDisplayName(), rhs.getDisplayName());
-    }
   }
 }

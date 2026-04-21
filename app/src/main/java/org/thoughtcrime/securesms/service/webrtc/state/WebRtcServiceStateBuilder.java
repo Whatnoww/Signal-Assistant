@@ -3,8 +3,6 @@ package org.thoughtcrime.securesms.service.webrtc.state;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.annimon.stream.OptionalLong;
-
 import org.checkerframework.checker.units.qual.N;
 import org.signal.ringrtc.CallId;
 import org.signal.ringrtc.CallManager;
@@ -28,6 +26,7 @@ import org.webrtc.PeerConnection;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -137,6 +136,11 @@ public class WebRtcServiceStateBuilder {
 
     public @NonNull LocalDeviceStateBuilder setBluetoothPermissionDenied(boolean bluetoothPermissionDenied) {
       toBuild.setBluetoothPermissionDenied(bluetoothPermissionDenied);
+      return this;
+    }
+
+    public @NonNull LocalDeviceStateBuilder setAudioDeviceChangePending(boolean isAudioDeviceChangePending) {
+      toBuild.setAudioDeviceChangePending(isAudioDeviceChangePending);
       return this;
     }
 
@@ -354,7 +358,7 @@ public class WebRtcServiceStateBuilder {
     }
 
     public @NonNull CallInfoStateBuilder remoteDevicesCount(long remoteDevicesCount) {
-      toBuild.setRemoteDevicesCount(OptionalLong.of(remoteDevicesCount));
+      toBuild.setRemoteDevicesCount(Optional.of(remoteDevicesCount));
       return this;
     }
 

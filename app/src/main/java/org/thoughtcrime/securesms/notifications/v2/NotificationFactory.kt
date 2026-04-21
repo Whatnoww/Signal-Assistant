@@ -11,7 +11,7 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.TransactionTooLargeException
-import android.text.SpannableStringBuilder
+import androidx.annotation.WorkerThread
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -39,6 +39,7 @@ import org.thoughtcrime.securesms.util.ServiceUtil
 import org.thoughtcrime.securesms.util.TextSecurePreferences
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import org.signal.core.ui.R as CoreUiR
 
 /**
  * Given a notification state consisting of conversations of messages, show appropriate system notifications.
@@ -50,6 +51,7 @@ object NotificationFactory {
   private val STILL_DECRYPTING_INDIVIDUAL_THROTTLE: Duration = 5.seconds
   private val GROUP_THROTTLE: Duration = 20.seconds
 
+  @WorkerThread
   fun notify(
     context: Context,
     state: NotificationState,
@@ -97,6 +99,7 @@ object NotificationFactory {
     }
   }
 
+  @WorkerThread
   private fun notify19(
     context: Context,
     state: NotificationState,
@@ -144,6 +147,7 @@ object NotificationFactory {
     return threadsThatNewlyAlerted
   }
 
+  @WorkerThread
   @TargetApi(24)
   private fun notify24(
     context: Context,
@@ -213,6 +217,7 @@ object NotificationFactory {
     return ((conversation.hasNewNotifications() && canAlertBasedOnTime) || alertOverride) && !conversation.mostRecentNotification.authorRecipient.isSelf
   }
 
+  @WorkerThread
   private fun notifyForConversation(
     context: Context,
     conversation: NotificationConversation,
@@ -438,7 +443,7 @@ object NotificationFactory {
 
     builder.apply {
       setSmallIcon(R.drawable.ic_notification)
-      setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.symbol_info_24))
+      setLargeIcon(BitmapFactory.decodeResource(context.resources, CoreUiR.drawable.symbol_info_24))
       setContentTitle(context.getString(R.string.MessageNotifier_message_delivery_paused))
       setContentText(context.getString(R.string.MessageNotifier_verify_to_continue_messaging_on_signal))
       setContentIntent(NotificationPendingIntentHelper.getActivity(context, 0, intent, PendingIntentFlags.mutable()))
@@ -451,6 +456,7 @@ object NotificationFactory {
     NotificationManagerCompat.from(context).safelyNotify(recipient, NotificationIds.getNotificationIdForMessageDeliveryFailed(thread), builder.build())
   }
 
+  @WorkerThread
   @JvmStatic
   fun notifyToBubbleConversation(context: Context, recipient: Recipient, threadId: Long) {
     val builder: NotificationBuilder = NotificationBuilder.create(context)

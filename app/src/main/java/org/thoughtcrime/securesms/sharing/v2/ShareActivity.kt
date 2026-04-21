@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Process
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -16,6 +18,7 @@ import androidx.core.text.buildSpannedString
 import com.google.android.material.appbar.MaterialToolbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import org.signal.core.models.media.Media
 import org.signal.core.util.Result
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.concurrent.addTo
@@ -33,7 +36,6 @@ import org.thoughtcrime.securesms.conversation.MessageSendType
 import org.thoughtcrime.securesms.conversation.mutiselect.forward.MultiselectForwardFragment
 import org.thoughtcrime.securesms.conversation.mutiselect.forward.MultiselectForwardFragmentArgs
 import org.thoughtcrime.securesms.conversation.mutiselect.forward.MultiselectForwardFullScreenDialogFragment
-import org.thoughtcrime.securesms.mediasend.Media
 import org.thoughtcrime.securesms.mediasend.v2.MediaSelectionActivity.Companion.share
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.sharing.MultiShareDialogs
@@ -44,6 +46,7 @@ import org.thoughtcrime.securesms.util.ConversationUtil
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme
 import org.thoughtcrime.securesms.util.visible
 import java.util.concurrent.TimeUnit
+import org.signal.core.ui.R as CoreUiR
 
 class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.Callback {
 
@@ -109,7 +112,7 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
 
     if (intent?.getBooleanExtra(EXTRA_NAVIGATION, false) == true) {
       toolbar.setTitle(getTitleFromExtras())
-      toolbar.setNavigationIcon(R.drawable.symbol_arrow_start_24)
+      toolbar.setNavigationIcon(CoreUiR.drawable.symbol_arrow_start_24)
       toolbar.setNavigationOnClickListener { finish() }
     } else {
       toolbar.visible = false
@@ -193,12 +196,14 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
   override fun getDialogBackgroundColor(): Int = ContextCompat.getColor(this, R.color.signal_background_primary)
 
   private fun getUnresolvedShareData(): Result<UnresolvedShareData, IntentError> {
+    val isInternalShare = Build.VERSION.SDK_INT >= 34 && getLaunchedFromUid() == Process.myUid()
+
     return when (intent.action) {
       Intent.ACTION_SEND_MULTIPLE if intent.hasExtra(Intent.EXTRA_STREAM) -> {
         intent.getParcelableArrayListExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let { uris ->
           val text: CharSequence? = intent.getCharSequenceArrayListExtra(Intent.EXTRA_TEXT)
             ?.let { textExtras -> combineTextExtras(textExtras) }
-          Result.success(UnresolvedShareData.ExternalMultiShare(uris, text))
+          Result.success(UnresolvedShareData.ExternalMultiShare(uris, text, isInternalShare))
         } ?: Result.failure(IntentError.SEND_MULTIPLE_STREAM)
       }
 
@@ -214,7 +219,7 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
           extractSingleExtraTextFromIntent(IntentError.SEND_STREAM)
         } else {
           val text: CharSequence? = if (intent.hasExtra(Intent.EXTRA_TEXT)) intent.getCharSequenceExtra(Intent.EXTRA_TEXT) else null
-          Result.success(UnresolvedShareData.ExternalSingleShare(uri, intent.type, text))
+          Result.success(UnresolvedShareData.ExternalSingleShare(uri, intent.type, text, isInternalShare))
         }
       }
 
@@ -283,9 +288,13 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
           .asBorderless(multiShareArgs.isBorderless)
           .withShareDataTimestamp(System.currentTimeMillis())
 
-        val mainActivityIntent = MainActivity.clearTop(this)
+        val conversationIntent = conversationIntentBuilder.build()
+        val mainActivityIntent = MainActivity.clearTop(this).apply {
+          action = ConversationIntents.ACTION
+          putExtras(conversationIntent)
+        }
         finish()
-        startActivities(arrayOf(mainActivityIntent, conversationIntentBuilder.build()))
+        startActivity(mainActivityIntent)
       }
   }
 

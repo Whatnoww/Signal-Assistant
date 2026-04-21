@@ -30,8 +30,9 @@ import androidx.core.view.ViewKt;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.vectordrawable.graphics.drawable.AnimatorInflaterCompat;
 
-import com.annimon.stream.Stream;
+import java.util.stream.Stream;
 
+import org.signal.core.ui.compose.SignalIcons;
 import org.signal.core.util.DimensionUnit;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
@@ -43,11 +44,14 @@ import org.thoughtcrime.securesms.database.model.MessageRecord;
 import org.thoughtcrime.securesms.database.model.ReactionRecord;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.thoughtcrime.securesms.util.Util;
+import org.signal.core.util.Util;
 import org.thoughtcrime.securesms.util.ViewUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.LongStream;
+import java.util.stream.Collectors;
 
 import kotlin.Unit;
 
@@ -407,6 +411,10 @@ public final class ConversationReactionOverlay extends FrameLayout {
   }
 
   private void hideInternal(@Nullable OnHideListener onHideListener) {
+    if (overlayState == OverlayState.HIDDEN || selectedConversationModel == null) {
+      return;
+    }
+
     overlayState = OverlayState.HIDDEN;
 
     AnimatorSet animatorSet = newHideAnimatorSet();
@@ -665,15 +673,15 @@ public final class ConversationReactionOverlay extends FrameLayout {
   }
 
   private static @Nullable String getOldEmoji(@NonNull MessageRecord messageRecord) {
-    return Stream.of(messageRecord.getReactions())
-                 .filter(record -> record.getAuthor()
+    return messageRecord.getReactions().stream()
+                        .filter(record -> record.getAuthor()
                                          .serialize()
                                          .equals(Recipient.self()
                                                           .getId()
                                                           .serialize()))
-                 .findFirst()
-                 .map(ReactionRecord::getEmoji)
-                 .orElse(null);
+                        .findFirst()
+                        .map(ReactionRecord::getEmoji)
+                        .orElse(null);
   }
 
   private @NonNull List<ActionItem> getMenuActionItems(@NonNull ConversationMessage conversationMessage) {
@@ -686,11 +694,11 @@ public final class ConversationReactionOverlay extends FrameLayout {
     }
 
     if (menuState.shouldShowEditAction()) {
-      items.add(new ActionItem(R.drawable.symbol_edit_24, getResources().getString(R.string.conversation_selection__menu_edit), () -> handleActionItemClicked(Action.EDIT)));
+      items.add(new ActionItem(org.signal.core.ui.R.drawable.symbol_edit_24, getResources().getString(R.string.conversation_selection__menu_edit), () -> handleActionItemClicked(Action.EDIT)));
     }
 
     if (menuState.shouldShowForwardAction()) {
-      items.add(new ActionItem(R.drawable.symbol_forward_24, getResources().getString(R.string.conversation_selection__menu_forward), () -> handleActionItemClicked(Action.FORWARD)));
+      items.add(new ActionItem(org.signal.core.ui.R.drawable.symbol_forward_24, getResources().getString(R.string.conversation_selection__menu_forward), () -> handleActionItemClicked(Action.FORWARD)));
     }
 
     if (menuState.shouldShowResendAction()) {
@@ -698,21 +706,21 @@ public final class ConversationReactionOverlay extends FrameLayout {
     }
 
     if (menuState.shouldShowSaveAttachmentAction()) {
-      items.add(new ActionItem(R.drawable.symbol_save_android_24, getResources().getString(R.string.conversation_selection__menu_save), () -> handleActionItemClicked(Action.DOWNLOAD)));
+      items.add(new ActionItem(org.signal.core.ui.R.drawable.symbol_save_android_24, getResources().getString(R.string.conversation_selection__menu_save), () -> handleActionItemClicked(Action.DOWNLOAD)));
     }
 
     if (menuState.shouldShowCopyAction()) {
-      items.add(new ActionItem(R.drawable.symbol_copy_android_24, getResources().getString(R.string.conversation_selection__menu_copy), () -> handleActionItemClicked(Action.COPY)));
+      items.add(new ActionItem(org.signal.core.ui.R.drawable.symbol_copy_android_24, getResources().getString(R.string.conversation_selection__menu_copy), () -> handleActionItemClicked(Action.COPY)));
     }
 
     if (menuState.shouldShowPaymentDetails()) {
       items.add(new ActionItem(R.drawable.symbol_payment_24, getResources().getString(R.string.conversation_selection__menu_payment_details), () -> handleActionItemClicked(Action.PAYMENT_DETAILS)));
     }
 
-    items.add(new ActionItem(R.drawable.symbol_check_circle_24, getResources().getString(R.string.conversation_selection__menu_multi_select), () -> handleActionItemClicked(Action.MULTISELECT)));
+    items.add(new ActionItem(org.signal.core.ui.R.drawable.symbol_check_circle_24, getResources().getString(R.string.conversation_selection__menu_multi_select), () -> handleActionItemClicked(Action.MULTISELECT)));
 
     if (menuState.shouldShowDetailsAction()) {
-      items.add(new ActionItem(R.drawable.symbol_info_24, getResources().getString(R.string.conversation_selection__menu_message_details), () -> handleActionItemClicked(Action.VIEW_INFO)));
+      items.add(new ActionItem(org.signal.core.ui.R.drawable.symbol_info_24, getResources().getString(R.string.conversation_selection__menu_message_details), () -> handleActionItemClicked(Action.VIEW_INFO)));
     }
 
     if (menuState.shouldShowPollTerminateAction()) {
@@ -727,10 +735,18 @@ public final class ConversationReactionOverlay extends FrameLayout {
       items.add(new ActionItem(R.drawable.symbol_pin_slash_24, getResources().getString(R.string.conversation_selection__menu_unpin_message), () -> handleActionItemClicked(Action.UNPIN_MESSAGE)));
     }
 
+    if (menuState.shouldShowStarMessage()) {
+      items.add(new ActionItem(R.drawable.symbol_star_outline_24, getResources().getString(R.string.conversation_selection__menu_star), () -> handleActionItemClicked(Action.STAR_MESSAGE)));
+    }
+
+    if (menuState.shouldShowUnstarMessage()) {
+      items.add(new ActionItem(R.drawable.symbol_star_outline_24, getResources().getString(R.string.conversation_selection__menu_unstar), () -> handleActionItemClicked(Action.UNSTAR_MESSAGE)));
+    }
+
     backgroundView.setVisibility(menuState.shouldShowReactions() ? View.VISIBLE : View.INVISIBLE);
     foregroundView.setVisibility(menuState.shouldShowReactions() ? View.VISIBLE : View.INVISIBLE);
 
-    items.add(new ActionItem(R.drawable.symbol_trash_24, getResources().getString(R.string.conversation_selection__menu_delete), () -> handleActionItemClicked(Action.DELETE)));
+    items.add(new ActionItem(org.signal.core.ui.R.drawable.symbol_trash_24, getResources().getString(R.string.conversation_selection__menu_delete), () -> handleActionItemClicked(Action.DELETE)));
 
     return items;
   }
@@ -762,14 +778,14 @@ public final class ConversationReactionOverlay extends FrameLayout {
     int revealDuration = getContext().getResources().getInteger(R.integer.reaction_scrubber_reveal_duration);
     int revealOffset = getContext().getResources().getInteger(R.integer.reaction_scrubber_reveal_offset);
 
-    List<Animator> reveals = Stream.of(emojiViews)
-        .mapIndexed((idx, v) -> {
-          Animator anim = AnimatorInflaterCompat.loadAnimator(getContext(), R.animator.reactions_scrubber_reveal);
-          anim.setTarget(v);
-          anim.setStartDelay(idx * animationEmojiStartDelayFactor);
-          return anim;
-        })
-        .toList();
+    List<Animator> reveals = LongStream.range(0, emojiViews.length)
+                                       .boxed()
+                                       .map(idx -> {
+                                         Animator anim = AnimatorInflaterCompat.loadAnimator(getContext(), R.animator.reactions_scrubber_reveal);
+                                         anim.setTarget(emojiViews[idx.intValue()]);
+                                         anim.setStartDelay(idx * animationEmojiStartDelayFactor);
+                                         return anim;
+                                       }).collect(Collectors.toList());
 
     Animator backgroundRevealAnim = AnimatorInflaterCompat.loadAnimator(getContext(), android.R.animator.fade_in);
     backgroundRevealAnim.setTarget(backgroundView);
@@ -807,12 +823,12 @@ public final class ConversationReactionOverlay extends FrameLayout {
     int duration = getContext().getResources().getInteger(R.integer.reaction_scrubber_hide_duration);
 
     List<Animator> animators = new ArrayList<>(Stream.of(emojiViews)
-                                                     .mapIndexed((idx, v) -> {
-                                                       Animator anim = AnimatorInflaterCompat.loadAnimator(getContext(), R.animator.reactions_scrubber_hide);
+                                                     .map( v -> {
+                                                            Animator anim = AnimatorInflaterCompat.loadAnimator(getContext(), R.animator.reactions_scrubber_hide);
                                                        anim.setTarget(v);
                                                        return anim;
                                                      })
-                                                     .toList());
+                                                     .collect(Collectors.toList()));
 
     Animator backgroundHideAnim = AnimatorInflaterCompat.loadAnimator(getContext(), android.R.animator.fade_out);
     backgroundHideAnim.setTarget(backgroundView);
@@ -914,6 +930,8 @@ public final class ConversationReactionOverlay extends FrameLayout {
     DELETE,
     END_POLL,
     PIN_MESSAGE,
-    UNPIN_MESSAGE
+    UNPIN_MESSAGE,
+    STAR_MESSAGE,
+    UNSTAR_MESSAGE
   }
 }

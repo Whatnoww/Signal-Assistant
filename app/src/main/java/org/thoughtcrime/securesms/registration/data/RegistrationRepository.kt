@@ -42,6 +42,7 @@ import org.thoughtcrime.securesms.database.model.databaseprotos.LocalRegistratio
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.gcm.FcmUtil
 import org.thoughtcrime.securesms.jobmanager.runJobBlocking
+import org.thoughtcrime.securesms.jobs.CheckKeyTransparencyJob
 import org.thoughtcrime.securesms.jobs.DirectoryRefreshJob
 import org.thoughtcrime.securesms.jobs.PreKeysSyncJob
 import org.thoughtcrime.securesms.jobs.RefreshOwnProfileJob
@@ -242,6 +243,9 @@ object RegistrationRepository {
     AppDependencies.resetNetwork()
     AppDependencies.startNetwork()
     PreKeysSyncJob.enqueue()
+
+    recipientTable.clearSelfKeyTransparencyData()
+    CheckKeyTransparencyJob.enqueueIfNecessary(addDelay = true)
 
     val jobManager = AppDependencies.jobManager
 
@@ -511,6 +515,8 @@ object RegistrationRepository {
       .registrationApi
       .registerAsSecondaryDevice(message.provisioningCode!!, accountAttributes, aciPreKeys, pniPreKeys, registrationData.fcmToken)
       .map { respone ->
+        val aep = AccountEntropyPool(message.accountEntropyPool!!)
+
         RegisterAsLinkedDeviceResponse(
           deviceId = respone.deviceId.toInt(),
           accountRegistrationResult = AccountRegistrationResult(
@@ -518,7 +524,7 @@ object RegistrationRepository {
             pni = pni.toString(),
             storageCapable = false,
             number = message.number!!,
-            masterKey = MasterKey(message.masterKey!!.toByteArray()),
+            masterKey = aep.deriveMasterKey(),
             pin = null,
             aciPreKeyCollection = aciPreKeys,
             pniPreKeyCollection = pniPreKeys,

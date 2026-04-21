@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="RegistrationActivity_take_privacy_with_you_be_yourself_in_every_message">讓私隱與您同在。\n每封訊息都做返自己、講人話。</string>
+    <!-- Non-English translations should use "Signal is a nonprofit" instead, dropping the 501c3 reference. -->
+    <string name="RegistrationActivity_terms_and_privacy">Signal 係一間非牟利機構\n條款同私隱政策</string>
+    <string name="RegistrationActivity_continue">繼續</string>
+    <!-- Screen title for restoring or transfering account -->
+    <string name="registration_activity__restore_or_transfer">還原或者轉移</string>
+
+    <!-- GrantPermissionsFragment -->
+    <!-- Displayed as a title at the top of the screen -->
+    <string name="GrantPermissionsFragment__allow_permissions">允許權限</string>
+    <!-- Displayed as a subtitle at the top of the screen -->
+    <string name="GrantPermissionsFragment__to_help_you_message_people_you_know">Signal 會要求取得以下權限，協助你同識得嘅人傳送訊息。 </string>
+    <!-- Displayed as a text-only action button at the bottom start of the screen -->
+    <string name="GrantPermissionsFragment__not_now">遲啲先啦</string>
+    <!-- Displayed as an action button at the bottom end of the screen -->
+    <string name="GrantPermissionsFragment__next">下一步</string>
+    <!-- Notifications permission row title -->
+    <string name="GrantPermissionsFragment__notifications">通知</string>
+    <!-- Notifications permission row description -->
+    <string name="GrantPermissionsFragment__get_notified_when">收到新訊息嘅時候通知我。</string>
+    <!-- Contacts permission row title -->
+    <string name="GrantPermissionsFragment__contacts">聯絡人</string>
+    <!-- Contacts permission row description -->
+    <string name="GrantPermissionsFragment__find_people_you_know">尋找你識得嘅人。你嘅聯絡人清單已經加密，Signal 唔會睇到。</string>
+    <!-- Phone calls permission row title -->
+    <string name="GrantPermissionsFragment__phone_calls">電話通話</string>
+    <!-- Phone calls permission row description -->
+    <string name="GrantPermissionsFragment__make_registering_easier">簡化註冊過程，同埋啟用額外通話功能。</string>
+    <!-- Storage permission row title -->
+    <string name="GrantPermissionsFragment__storage">儲存空間</string>
+    <!-- Storage permission row description -->
+    <string name="GrantPermissionsFragment__send_photos_videos_and_files">由你部機傳送相片、影片同檔案。</string>
+
+    <!-- PhoneNumberEntryScreen -->
+    <!-- Title of registration screen when asking for the users phone number -->
+    <string name="RegistrationActivity_phone_number">電話冧把</string>
+    <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
+    <string name="RegistrationActivity_you_will_receive_a_verification_code">你將會收到一個驗證碼。視乎個別情況，電訊商可能會向你收費。</string>
+    <!-- Hint text to select a country -->
+    <string name="RegistrationActivity_select_a_country">揀選國家/地區</string>
+    <string name="RegistrationActivity_phone_number_description">電話冧把</string>
+    <string name="RegistrationActivity_next">下一步</string>
+    <!-- Dialog title to confirm phone number -->
+    <string name="RegistrationActivity_is_the_phone_number">以下嘅電話冧把係咪正確？</string>
+    <!-- Dialog body to confirm phone number -->
+    <string name="RegistrationActivity_a_verification_code">驗證碼會傳送到呢個號碼。電訊商可能會收取費用。</string>
+    <!-- Dialog button to edit the number entered -->
+    <string name="RegistrationActivity_edit_number">改過個冧把</string>
+
+    <!-- CountryCodePickerScreen -->
+    <!-- Title of the country code selection screen -->
+    <string name="CountryCodeSelectScreen__your_country">你嘅國家/地區</string>
+    <!-- Close button content description -->
+    <string name="CountryCodeSelectScreen__close">關閉</string>
+    <!-- Search bar hint text -->
+    <string name="CountryCodeSelectScreen__search_by">搜尋國家/地區名稱或代碼</string>
+    <!-- Fallback text for countries with no name -->
+    <string name="CountryCodeSelectScreen__unknown_country">未知國家/地區</string>
+
+    <!-- VerificationCodeScreen -->
+    <!-- Title of the verification code entry screen -->
+    <string name="VerificationCodeScreen__verification_code">驗證碼</string>
+    <!-- Subtitle explaining where the code was sent. Placeholder is the phone number -->
+    <string name="VerificationCodeScreen__enter_the_code_we_sent_to_s">請輸入剛才發送到 %1$s 嘅驗證碼</string>
+    <!-- Button text for wrong number action -->
+    <string name="VerificationCodeScreen__wrong_number">個電話冧把唔啱？</string>
+    <!-- Button text for resend SMS action -->
+    <string name="VerificationCodeScreen__resend_code">重新發送驗證碼</string>
+    <!-- Button text for call me action -->
+    <string name="VerificationCodeScreen__call_me_instead">都係打電話畀我啦</string>
+    <!-- Countdown text shown below the resend code button. Placeholders are minutes and seconds -->
+    <string name="VerificationCodeScreen__countdown_format">（%1$02d:%2$02d）</string>
+    <!-- Button text for call me when countdown is active. Placeholders are minutes and seconds -->
+    <string name="VerificationCodeScreen__call_me_available_in">打俾我 (%1$02d:%2$02d)</string>
+    <!-- Toast shown when the user enters an incorrect verification code -->
+    <string name="VerificationCodeScreen__incorrect_code">個驗證碼唔啱</string>
+    <!-- Snackbar shown when there is a network error -->
+    <string name="VerificationCodeScreen__network_error">連唔到線。請檢查你嘅網絡連線，然後再試多次。</string>
+    <!-- Snackbar shown when rate limited. Placeholder is the retry duration -->
+    <string name="VerificationCodeScreen__too_many_attempts_try_again_in_s">白撞太多次。請你喺 %1$s 後再試。</string>
+    <!-- Snackbar shown for generic/unknown errors -->
+    <string name="VerificationCodeScreen__an_unexpected_error_occurred">出現咗未知錯誤。請你再試多次。</string>
+    <!-- Snackbar shown when we are unable to send an SMS to the user\'s number -->
+    <string name="VerificationCodeScreen__unable_to_send_sms">我哋傳送唔到 SMS 短訊畀你嘅電話號碼。請你幾個鐘之後再試過啦。</string>
+    <!-- Snackbar shown when the selected transport (SMS/voice) is unavailable -->
+    <string name="VerificationCodeScreen__could_not_send_code_via_selected_method">用你揀嘅方法發送唔到驗證碼。請你再揀過第二種方法。</string>
+    <!-- Snackbar shown for registration errors -->
+    <string name="VerificationCodeScreen__registration_error">註冊失敗。請你再試多次。</string>
+    <!-- Button text for having trouble with verification -->
+    <string name="VerificationCodeScreen__having_trouble">遇到問題？</string>
+
+    <!-- RestoreWelcomeBottomSheet -->
+    <!-- Row title for restore/transfer using a previous registered phone/device -->
+    <string name="WelcomeFragment_restore_action_i_have_my_old_phone">部舊手機喺我手上</string>
+    <!-- Row subtitle for restore/transfer using a previous registered phone/device -->
+    <string name="WelcomeFragment_restore_action_scan_qr">用你而家嘅 Signal 帳戶掃描二維碼，就可以即刻開始用喇</string>
+    <!-- Row title for restore/transfer without using a previous device -->
+    <string name="WelcomeFragment_restore_action_i_dont_have_my_old_phone">部舊手機唔喺我手上</string>
+    <!-- Row subtitle for restore/transfer without using a previous device -->
+    <string name="WelcomeFragment_restore_action_reinstalling">或者如果你係喺同一部機度重新安裝緊 Signal</string>
+
+    <!-- ArchiveRestoreSelectionScreen -->
+    <!-- Title text for the archive restore selection screen -->
+    <string name="ArchiveRestoreSelectionScreen__restore_or_transfer_account">還原或者轉移帳戶</string>
+    <!-- Subtitle text for the archive restore selection screen -->
+    <string name="ArchiveRestoreSelectionScreen__subheading">選擇還原訊息紀錄同埋帳戶資料嘅方式。</string>
+    <!-- Title for the Signal Backups option card -->
+    <string name="ArchiveRestoreSelectionScreen__from_signal_backups">由 Signal 備份</string>
+    <!-- Subtitle for the Signal Backups option card -->
+    <string name="ArchiveRestoreSelectionScreen__your_free_or_paid_signal_backup_plan">你嘅免費或者課咗金嘅 Signal 備份計劃</string>
+    <!-- Title for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__local_backup_card_title">攞返裝置入面個備份嚟還原</string>
+    <!-- Description for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__local_backup_card_description">用你儲存咗喺部機度嘅備份嚟還原訊息。</string>
+    <!-- Title for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_title">繼續但係唔轉移</string>
+    <!-- Description for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_description">唔會轉移訊息同埋媒體</string>
+    <!-- Title for the backup folder option card (V2 format) -->
+    <string name="ArchiveRestoreSelectionScreen__from_a_backup_folder">由備份資料夾</string>
+    <!-- Title for the backup file option card (V1 legacy format) -->
+    <string name="ArchiveRestoreSelectionScreen__from_a_backup_file">由備份檔案</string>
+    <!-- Subtitle for the backup folder/file option cards -->
+    <string name="ArchiveRestoreSelectionScreen__choose_a_backup_youve_saved">揀你儲存咗嘅備份</string>
+    <!-- Title for the device transfer option card -->
+    <string name="ArchiveRestoreSelectionScreen__from_your_old_phone">由你部舊手機</string>
+    <!-- Subtitle for the device transfer option card -->
+    <string name="ArchiveRestoreSelectionScreen__transfer_directly_from_old">直接由你部舊嘅 Android 機轉移</string>
+    <!-- Skip button text -->
+    <string name="ArchiveRestoreSelectionScreen__skip">跳過</string>
+    <!-- Title for the skip restore confirmation dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_title">係咪要跳過還原？</string>
+    <!-- Warning body text for the skip restore confirmation dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_warning">如果而家跳過還原嘅話，遲啲就冇得再搞㗎喇。如果你喺跳過還原之後再重新啟用備份功能，新嘅訊息紀錄就會取代你而家嘅備份內容。</string>
+    <!-- Confirm button text for the skip restore dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_confirm_button">跳過還原</string>
+
+    <!-- LocalBackupRestoreScreen -->
+    <!-- Title for the local backup restore screen -->
+    <string name="LocalBackupRestoreScreen__restore_on_device_backup">攞返裝置入面嘅備份嚟還原</string>
+    <!-- Description on the folder selection screen -->
+    <string name="LocalBackupRestoreScreen__select_folder_description">用你儲存咗喺部機度嘅備份嚟還原訊息。如果而家唔還原嘅話，遲啲就冇得再搞㗎喇。</string>
+    <!-- Title for the choose backup folder card -->
+    <string name="LocalBackupRestoreScreen__choose_backup_folder">揀備份資料夾</string>
+    <!-- Subtitle for the choose backup folder card -->
+    <string name="LocalBackupRestoreScreen__choose_folder_subtitle">揀返你部機入面儲存備份嘅資料夾</string>
+    <!-- Text shown while scanning for backups -->
+    <string name="LocalBackupRestoreScreen__scanning_folder">搵緊備份……</string>
+    <!-- Description shown when a backup is found -->
+    <string name="LocalBackupRestoreScreen__backup_found_description">用你儲存咗喺部機度嘅備份嚟還原訊息。如果而家唔還原嘅話，遲啲就冇得再搞㗎喇。</string>
+    <!-- Title for the latest backup card -->
+    <string name="LocalBackupRestoreScreen__your_latest_backup">你嘅最新備份：</string>
+    <!-- Restore backup button text -->
+    <string name="LocalBackupRestoreScreen__restore_backup">還原備份</string>
+    <!-- Link to choose an earlier backup -->
+    <string name="LocalBackupRestoreScreen__choose_earlier_backup">揀個再早啲嘅備份</string>
+    <!-- Title for the backup picker bottom sheet -->
+    <string name="LocalBackupRestoreScreen__choose_a_backup_to_restore">揀個備份嚟還原</string>
+    <!-- Warning text in the backup picker bottom sheet -->
+    <string name="LocalBackupRestoreScreen__choosing_an_older_backup_warning">揀舊啲嘅備份可能會攪到冇咗啲訊息或者媒體。</string>
+    <!-- Title when no backup is found -->
+    <string name="LocalBackupRestoreScreen__no_backup_found">搵唔到備份</string>
+    <!-- Description when no backup is found -->
+    <string name="LocalBackupRestoreScreen__no_backup_found_description">喺揀咗嘅資料夾度搵唔到 Signal 備份。請試下其他資料夾。</string>
+    <!-- Button to try a different folder -->
+    <string name="LocalBackupRestoreScreen__try_different_folder">試下其他資料夾</string>
+    <!-- Title for V1 passphrase entry screen -->
+    <string name="LocalBackupRestoreScreen__enter_backup_passphrase">輸入備份密碼</string>
+    <!-- Description for V1 passphrase entry screen -->
+    <string name="LocalBackupRestoreScreen__enter_the_30_digit_passphrase">你嘅本機備份密碼係用嚟恢復你嘅帳戶同資料嘅一組 30 位數字代碼。</string>
+    <!-- Label for the recovery key text field -->
+    <string name="LocalBackupRestoreScreen__recovery_key">恢復金鑰</string>
+    <!-- Error text when passphrase is too long -->
+    <string name="LocalBackupRestoreScreen__too_long">太長 (%1$d/%2$d)</string>
+    <!-- Link for users who don\'t have their passphrase -->
+    <string name="LocalBackupRestoreScreen__no_passphrase">係咪冇密碼？</string>
+    <!-- Next button text -->
+    <string name="LocalBackupRestoreScreen__next">下一步</string>
+    <!-- EnterAepScreen -->
+    <!-- Title for recovery key entry screen -->
+    <string name="EnterAepScreen__enter_your_recovery_key">輸入你嘅恢復金鑰</string>
+    <!-- Description for recovery key entry screen -->
+    <string name="EnterAepScreen__your_recovery_key_is_a_64_character_code">你嘅恢復金鑰係一組 64 個字元嘅代碼，用嚟恢復帳戶同資料。</string>
+    <!-- Label for the recovery key text field -->
+    <string name="EnterAepScreen__recovery_key">恢復金鑰</string>
+    <!-- Link for users who don\'t have their recovery key -->
+    <string name="EnterAepScreen__no_recovery_key">冇恢復金鑰？</string>
+    <!-- Error text when key is too long -->
+    <string name="EnterAepScreen__too_long">太長 (%1$d/%2$d)</string>
+    <!-- Error text when key is invalid -->
+    <string name="EnterAepScreen__invalid_recovery_key">恢復金鑰無效</string>
+    <!-- Text shown while preparing the restore -->
+    <string name="LocalBackupRestoreScreen__preparing_restore">準備緊還原……</string>
+    <!-- Title shown while restore is in progress -->
+    <string name="LocalBackupRestoreScreen__restoring_backup">還原緊備份</string>
+    <!-- Description shown while restore is in progress -->
+    <string name="LocalBackupRestoreScreen__restoring_description">請等等，系統還原緊你嘅訊息同埋資料。</string>
+    <!-- Description shown when restore is complete -->
+    <string name="LocalBackupRestoreScreen__restore_complete_description">Your messages and account data have been restored successfully.</string>
+    <!-- Continue button text after restore is complete -->
+    <string name="LocalBackupRestoreScreen__continue_button">繼續</string>
+    <!-- Title shown when restore fails -->
+    <string name="LocalBackupRestoreScreen__restore_failed">還原唔到</string>
+    <!-- Description shown when restore fails with an unknown error -->
+    <string name="LocalBackupRestoreScreen__restore_failed_description">還原備份嗰陣出現錯誤。請再試多次。</string>
+    <!-- Button to retry restore after failure -->
+    <string name="LocalBackupRestoreScreen__try_again">再試多次</string>
+    <!-- Button to link an existing Signal account to this device -->
+    <string name="WelcomeScreen__link_your_account">連結你嘅帳戶</string>
+    <!-- Prompt shown to users who don\'t have a Signal account yet -->
+    <string name="WelcomeScreen__not_on_signal_yet">仲未加入 Signal？</string>
+    <!-- Button to create a new Signal account -->
+    <string name="WelcomeScreen__create_account">建立帳戶</string>
+</resources>

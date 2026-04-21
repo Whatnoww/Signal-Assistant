@@ -63,6 +63,7 @@ import org.thoughtcrime.securesms.push.SignalServiceNetworkAccess;
 import org.thoughtcrime.securesms.recipients.LiveRecipientCache;
 import org.thoughtcrime.securesms.revealable.ViewOnceMessageManager;
 import org.thoughtcrime.securesms.service.DeletedCallEventManager;
+import org.thoughtcrime.securesms.service.ExpiringArchivedStoriesManager;
 import org.thoughtcrime.securesms.service.ExpiringMessageManager;
 import org.thoughtcrime.securesms.service.ExpiringStoriesManager;
 import org.thoughtcrime.securesms.service.PendingRetryReceiptManager;
@@ -175,6 +176,7 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
                                             Optional.of(new SecurityEventListener(context)),
                                             SignalExecutors.newCachedBoundedExecutor("signal-messages", ThreadUtil.PRIORITY_IMPORTANT_BACKGROUND_THREAD, 1, 16, 30),
                                             RemoteConfig.maxEnvelopeSizeBytes(),
+                                            RemoteConfig.maxIncrementalMacsPerEnvelope(),
                                             RemoteConfig::useMessageSendRestFallback,
                                             RemoteConfig.useBinaryId(),
                                             BuildConfig.USE_STRING_ID);
@@ -258,6 +260,11 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
   }
 
   @Override
+  public @NonNull ExpiringArchivedStoriesManager provideExpiringArchivedStoriesManager() {
+    return new ExpiringArchivedStoriesManager(context);
+  }
+
+  @Override
   public @NonNull ExpiringMessageManager provideExpiringMessageManager() {
     return new ExpiringMessageManager(context);
   }
@@ -279,9 +286,8 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
 
   @Override
   public @NonNull Network provideLibsignalNetwork(@NonNull SignalServiceConfiguration config) {
-    Network network = new Network(BuildConfig.LIBSIGNAL_NET_ENV, StandardUserAgentInterceptor.USER_AGENT);
+    Network network = new Network(BuildConfig.LIBSIGNAL_NET_ENV, StandardUserAgentInterceptor.USER_AGENT, RemoteConfig.getLibsignalConfigs(), Network.BuildVariant.PRODUCTION);
     LibSignalNetworkExtensions.applyConfiguration(network, config);
-    network.setRemoteConfig(RemoteConfig.getLibsignalConfigs());
 
     return network;
   }
@@ -336,7 +342,7 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
   @Override
   public @NonNull SignalWebSocket.AuthenticatedWebSocket provideAuthWebSocket(@NonNull Supplier<SignalServiceConfiguration> signalServiceConfigurationSupplier, @NonNull Supplier<Network> libSignalNetworkSupplier) {
     SleepTimer                   sleepTimer    = !SignalStore.account().isFcmEnabled() || SignalStore.internal().isWebsocketModeForced() ? new AlarmSleepTimer(context) : new UptimeSleepTimer();
-    SignalWebSocketHealthMonitor healthMonitor = new SignalWebSocketHealthMonitor(sleepTimer);
+    SignalWebSocketHealthMonitor healthMonitor = new SignalWebSocketHealthMonitor(sleepTimer, true);
 
     WebSocketFactory authFactory = () -> {
       DynamicCredentialsProvider credentialsProvider = new DynamicCredentialsProvider();
@@ -369,7 +375,7 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
   @Override
   public @NonNull SignalWebSocket.UnauthenticatedWebSocket provideUnauthWebSocket(@NonNull Supplier<SignalServiceConfiguration> signalServiceConfigurationSupplier, @NonNull Supplier<Network> libSignalNetworkSupplier) {
     SleepTimer                   sleepTimer    = !SignalStore.account().isFcmEnabled() || SignalStore.internal().isWebsocketModeForced() ? new AlarmSleepTimer(context) : new UptimeSleepTimer();
-    SignalWebSocketHealthMonitor healthMonitor = new SignalWebSocketHealthMonitor(sleepTimer);
+    SignalWebSocketHealthMonitor healthMonitor = new SignalWebSocketHealthMonitor(sleepTimer, false);
 
     WebSocketFactory unauthFactory = () -> {
       Network network = libSignalNetworkSupplier.get();
@@ -577,6 +583,11 @@ public class ApplicationDependencyProvider implements AppDependencies.Provider {
   @Override
   public @NonNull SvrBApi provideSvrBApi(@NotNull Network libSignalNetwork) {
     return new SvrBApi(libSignalNetwork);
+  }
+
+  @Override
+  public @NonNull KeyTransparencyApi provideKeyTransparencyApi(@NonNull SignalWebSocket.UnauthenticatedWebSocket unauthWebSocket) {
+    return new KeyTransparencyApi(unauthWebSocket);
   }
 
   @VisibleForTesting

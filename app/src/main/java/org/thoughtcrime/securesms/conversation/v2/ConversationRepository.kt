@@ -25,6 +25,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.core.SingleEmitter
 import io.reactivex.rxjava3.schedulers.Schedulers
 import org.signal.core.util.StreamUtil
+import org.signal.core.util.Util
 import org.signal.core.util.concurrent.MaybeCompat
 import org.signal.core.util.concurrent.SignalExecutors
 import org.signal.core.util.dp
@@ -96,7 +97,6 @@ import org.thoughtcrime.securesms.util.GroupUtil
 import org.thoughtcrime.securesms.util.MediaUtil
 import org.thoughtcrime.securesms.util.MessageUtil
 import org.thoughtcrime.securesms.util.SignalLocalMetrics
-import org.thoughtcrime.securesms.util.Util
 import org.thoughtcrime.securesms.util.hasLinkPreview
 import org.thoughtcrime.securesms.util.hasSharedContact
 import org.thoughtcrime.securesms.util.hasTextSlide
@@ -155,7 +155,7 @@ class ConversationRepository(
         metadata.threadSize
       )
       val config = PagingConfig.Builder().setPageSize(25)
-        .setBufferPages(2)
+        .setBufferPages(3)
         .setStartIndex(max(metadata.getStartPosition(), 0))
         .build()
 
@@ -218,12 +218,18 @@ class ConversationRepository(
       val threadRecipient = SignalDatabase.threads.getRecipientForThreadId(messageRecord.threadId)!!
       val pollSentTimestamp = messageRecord.dateSent
 
-      if (threadRecipient.groupId.getOrNull()?.isV2 != true) {
+      if (threadRecipient.isPushV2Group && threadRecipient.groupId.getOrNull()?.isV2 != true) {
         Log.w(TAG, "Missing group id")
         emitter.tryOnError(Exception("Poll terminate failed"))
+        return@create
       }
 
-      val groupId = threadRecipient.requireGroupId().requireV2()
+      if (threadRecipient.isPushV2Group && !SignalDatabase.groups.isActive(threadRecipient.requireGroupId())) {
+        Log.w(TAG, "Cannot end poll in terminated or inactive group")
+        emitter.tryOnError(Exception("Poll terminate failed"))
+        return@create
+      }
+
       val message = OutgoingMessage.pollTerminateMessage(
         threadRecipient = threadRecipient,
         sentTimeMillis = System.currentTimeMillis(),
@@ -233,12 +239,17 @@ class ConversationRepository(
 
       Log.i(TAG, "Sending poll terminate to " + message.threadRecipient.id + ", thread: " + messageRecord.threadId)
 
-      val possibleTargets: List<Recipient> = SignalDatabase.groups.getGroupMembers(groupId, GroupTable.MemberSet.FULL_MEMBERS_EXCLUDING_SELF)
-        .map { it.resolve() }
-        .distinctBy { it.id }
+      val possibleTargets: List<Recipient> = if (threadRecipient.isPushV2Group) {
+        SignalDatabase.groups.getGroupMembers(threadRecipient.requireGroupId().requireV2(), GroupTable.MemberSet.FULL_MEMBERS_EXCLUDING_SELF)
+          .map { it.resolve() }
+          .distinctBy { it.id }
+      } else {
+        listOf(threadRecipient)
+      }
+      val isSelf = threadRecipient.isSelf
 
       val eligibleTargets: List<Recipient> = RecipientUtil.getEligibleForSending(possibleTargets)
-      val results = sendEndPoll(threadRecipient, message, eligibleTargets, poll.messageId)
+      val results = sendEndPoll(threadRecipient, message, eligibleTargets, isSelf, poll.messageId)
       val sendResults = GroupSendJobHelper.getCompletedSends(eligibleTargets, results)
 
       if (sendResults.completed.isNotEmpty() || possibleTargets.isEmpty()) {
@@ -271,9 +282,9 @@ class ConversationRepository(
   }
 
   @Throws(IOException::class, GroupNotAMemberException::class, UndeliverableMessageException::class)
-  fun sendEndPoll(group: Recipient, message: OutgoingMessage, destinations: List<Recipient>, messageId: Long): List<SendMessageResult?> {
-    val groupId = group.requireGroupId().requireV2()
-    val groupRecord: GroupRecord? = SignalDatabase.groups.getGroup(group.requireGroupId()).getOrNull()
+  fun sendEndPoll(threadRecipient: Recipient, message: OutgoingMessage, destinations: List<Recipient>, isSelf: Boolean, messageId: Long): List<SendMessageResult?> {
+    val groupId = if (threadRecipient.isPushV2Group) threadRecipient.requireGroupId().requireV2() else null
+    val groupRecord: GroupRecord? = if (threadRecipient.isPushV2Group) SignalDatabase.groups.getGroup(threadRecipient.requireGroupId()).getOrNull() else null
 
     if (groupRecord != null && groupRecord.isAnnouncementGroup && !groupRecord.isAdmin(Recipient.self())) {
       throw UndeliverableMessageException("Non-admins cannot send messages in announcement groups!")
@@ -281,29 +292,35 @@ class ConversationRepository(
 
     val builder = newBuilder()
 
-    GroupUtil.setDataMessageGroupContext(AppDependencies.application, builder, groupId)
+    if (groupId != null) {
+      GroupUtil.setDataMessageGroupContext(AppDependencies.application, builder, groupId)
+    }
 
     val sentTime = System.currentTimeMillis()
-    val groupMessage = builder
+    val message = builder
       .withTimestamp(sentTime)
       .withExpiration((message.expiresIn / 1000).toInt())
       .withProfileKey(ProfileKeyUtil.getSelfProfileKey().serialize())
       .withPollTerminate(SignalServiceDataMessage.PollTerminate(message.messageExtras!!.pollTerminate!!.targetTimestamp))
       .build()
 
-    return GroupSendUtil.sendResendableDataMessage(
-      applicationContext,
-      groupId,
-      null,
-      destinations,
-      false,
-      ContentHint.RESENDABLE,
-      MessageId(messageId),
-      groupMessage,
-      true,
-      false,
-      null
-    ) { System.currentTimeMillis() - sentTime > POLL_TERMINATE_TIMEOUT.inWholeMilliseconds }
+    return if (isSelf) {
+      listOf(AppDependencies.signalServiceMessageSender.sendSyncMessage(message))
+    } else {
+      GroupSendUtil.sendResendableDataMessage(
+        applicationContext,
+        groupId,
+        null,
+        destinations,
+        false,
+        ContentHint.RESENDABLE,
+        MessageId(messageId),
+        message,
+        true,
+        false,
+        null
+      ) { System.currentTimeMillis() - sentTime > POLL_TERMINATE_TIMEOUT.inWholeMilliseconds }
+    }
   }
 
   fun getPinnedMessages(threadId: Long): List<MmsMessageRecord> {
@@ -339,8 +356,9 @@ class ConversationRepository(
         listOf(threadRecipient)
       }
 
+      val includeSelf = threadRecipient.isSelf
       val eligibleTargets = RecipientUtil.getEligibleForSending(possibleTargets)
-      val results = PinSendUtil.sendPinMessage(applicationContext, threadRecipient, message, eligibleTargets, messageRecord.id)
+      val results = PinSendUtil.sendPinMessage(applicationContext, threadRecipient, message, eligibleTargets, includeSelf, messageRecord.id)
 
       val sendResults = GroupSendJobHelper.getCompletedSends(eligibleTargets, results)
 
@@ -396,8 +414,9 @@ class ConversationRepository(
         listOf(threadRecipient)
       }
 
+      val includeSelf = threadRecipient.isSelf
       val eligibleTargets: List<Recipient> = RecipientUtil.getEligibleForSending(possibleTargets)
-      val results = PinSendUtil.sendUnpinMessage(applicationContext, threadRecipient, message.fromRecipient.requireServiceId(), message.dateSent, eligibleTargets, messageId)
+      val results = PinSendUtil.sendUnpinMessage(applicationContext, threadRecipient, message.fromRecipient.requireServiceId(), message.dateSent, eligibleTargets, includeSelf, messageId)
       val sendResults = GroupSendJobHelper.getCompletedSends(eligibleTargets, results)
 
       if (sendResults.completed.isNotEmpty() || possibleTargets.isEmpty()) {
@@ -416,6 +435,16 @@ class ConversationRepository(
       } else {
         emitter.tryOnError(Exception("Unpin message failed"))
       }
+    }.subscribeOn(Schedulers.io())
+  }
+
+  fun setMessageStarred(messageId: Long, starred: Boolean): Completable {
+    return setMessagesStarred(setOf(messageId), starred)
+  }
+
+  fun setMessagesStarred(messageIds: Set<Long>, starred: Boolean): Completable {
+    return Completable.fromAction {
+      SignalDatabase.messages.setStarred(messageIds, starred)
     }.subscribeOn(Schedulers.io())
   }
 
@@ -818,6 +847,18 @@ class ConversationRepository(
     return Single
       .fromCallable { SignalDatabase.messages.getEarliestMessageSentDate(threadId) }
       .subscribeOn(Schedulers.io())
+  }
+
+  fun collapseEvents(messageId: Long) {
+    SignalDatabase.messages.collapseEvents(messageId)
+  }
+
+  fun collapseAllEvents() {
+    SignalDatabase.messages.collapseAllEvents()
+  }
+
+  fun expandEvents(messageId: Long) {
+    SignalDatabase.messages.expandEvents(messageId)
   }
 
   /**

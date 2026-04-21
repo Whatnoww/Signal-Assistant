@@ -23,6 +23,7 @@ import org.thoughtcrime.securesms.conversationlist.chatfilter.ConversationFilter
 import org.thoughtcrime.securesms.database.model.DistributionListPrivacyMode
 import org.thoughtcrime.securesms.groups.SelectionLimits
 import org.thoughtcrime.securesms.recipients.Recipient
+import org.thoughtcrime.securesms.search.SearchFilter
 import org.thoughtcrime.securesms.search.SearchRepository
 import org.thoughtcrime.securesms.util.livedata.Store
 import org.whispersystems.signalservice.api.util.Preconditions
@@ -33,6 +34,7 @@ import org.whispersystems.signalservice.api.util.Preconditions
 class ContactSearchViewModel(
   private val savedStateHandle: SavedStateHandle,
   private val selectionLimits: SelectionLimits,
+  private val isMultiSelect: Boolean,
   private val contactSearchRepository: ContactSearchRepository,
   private val performSafetyNumberChecks: Boolean,
   private val arbitraryRepository: ArbitraryRepository?,
@@ -92,6 +94,10 @@ class ContactSearchViewModel(
     configurationStore.update { it.copy(conversationFilterRequest = conversationFilterRequest) }
   }
 
+  fun setSearchFilter(searchFilter: SearchFilter) {
+    configurationStore.update { it.copy(searchFilter = searchFilter) }
+  }
+
   fun expandSection(sectionKey: ContactSearchConfiguration.SectionKey) {
     configurationStore.update { it.copy(expandedSections = it.expandedSections + sectionKey) }
   }
@@ -116,7 +122,11 @@ class ContactSearchViewModel(
         safetyNumberRepository.batchSafetyNumberCheck(newSelectionEntries)
       }
 
-      internalSelectedContacts.update { it + newSelectionEntries }
+      if (!isMultiSelect && newSelectionEntries.isNotEmpty()) {
+        internalSelectedContacts.update { newSelectionEntries.toSet() }
+      } else {
+        internalSelectedContacts.update { it + newSelectionEntries }
+      }
     }
   }
 
@@ -172,6 +182,7 @@ class ContactSearchViewModel(
 
   class Factory(
     private val selectionLimits: SelectionLimits,
+    private val isMultiSelect: Boolean = true,
     private val repository: ContactSearchRepository,
     private val performSafetyNumberChecks: Boolean,
     private val arbitraryRepository: ArbitraryRepository?,
@@ -183,6 +194,7 @@ class ContactSearchViewModel(
         ContactSearchViewModel(
           savedStateHandle = handle,
           selectionLimits = selectionLimits,
+          isMultiSelect = isMultiSelect,
           contactSearchRepository = repository,
           performSafetyNumberChecks = performSafetyNumberChecks,
           arbitraryRepository = arbitraryRepository,

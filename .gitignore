@@ -48,3 +48,5 @@ kls_database.db
 /app/playProd/release/Signal-Android-play-prod-x86_64-release-7.38.7.apk
 /app/playProd/release/baselineProfiles/0/Signal-Android-play-prod-x86_64-release-7.38.7.dm
 /app/playProd/release/baselineProfiles/1/Signal-Android-play-prod-x86_64-release-7.38.7.dm
+lefthook-local.yml
+sample-videos/

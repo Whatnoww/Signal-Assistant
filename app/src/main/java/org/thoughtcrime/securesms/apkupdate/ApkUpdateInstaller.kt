@@ -5,6 +5,7 @@
 
 package org.thoughtcrime.securesms.apkupdate
 
+import android.app.DownloadManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -18,7 +19,6 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobs.ApkUpdateJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.util.AppForegroundObserver
-import org.thoughtcrime.securesms.util.Environment
 import org.thoughtcrime.securesms.util.FileUtils
 import java.io.FileInputStream
 import java.io.IOException
@@ -51,6 +51,13 @@ object ApkUpdateInstaller {
       Log.w(TAG, "DownloadId matches, but digest is null! Inconsistent state. Failing and clearing state.")
       SignalStore.apkUpdate.clearDownloadAttributes()
       ApkUpdateNotifications.showInstallFailed(context, ApkUpdateNotifications.FailureReason.UNKNOWN)
+      return
+    }
+
+    if (!isDownloadSuccessful(context, downloadId)) {
+      Log.w(TAG, "DownloadId matches, but the download was not successful. The download may have failed due to a network issue. Clearing state and re-checking for updates.")
+      SignalStore.apkUpdate.clearDownloadAttributes()
+      AppDependencies.jobManager.add(ApkUpdateJob())
       return
     }
 
@@ -135,6 +142,35 @@ object ApkUpdateInstaller {
     }
   }
 
+  private fun isDownloadSuccessful(context: Context, downloadId: Long): Boolean {
+    val query = DownloadManager.Query().setFilterById(downloadId)
+    val cursor = context.getDownloadManager().query(query)
+
+    return cursor.use { cursor ->
+      if (cursor.moveToFirst()) {
+        val status = cursor
+          .getColumnIndex(DownloadManager.COLUMN_STATUS)
+          .takeUnless { it == -1 }
+          ?.let { cursor.getInt(it) } ?: DownloadManager.STATUS_FAILED
+
+        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+          return@use true
+        }
+
+        val reason = cursor
+          .getColumnIndex(DownloadManager.COLUMN_REASON)
+          .takeUnless { it == -1 }
+          ?.let { cursor.getInt(it) }
+
+        Log.w(TAG, "Download not successful. Status: $status, Reason: $reason")
+        false
+      } else {
+        Log.w(TAG, "Download ID $downloadId not found in DownloadManager.")
+        false
+      }
+    }
+  }
+
   private fun isMatchingDigest(context: Context, downloadId: Long, expectedDigest: ByteArray): Boolean {
     return try {
       FileInputStream(context.getDownloadManager().openDownloadedFile(downloadId).fileDescriptor).use { stream ->
@@ -148,7 +184,12 @@ object ApkUpdateInstaller {
   }
 
   private fun shouldAutoUpdate(): Boolean {
-    // TODO Auto-updates temporarily restricted to nightlies. Once we have designs for allowing users to opt-out of auto-updates, we can re-enable this
-    return Environment.IS_NIGHTLY && Build.VERSION.SDK_INT >= 31 && SignalStore.apkUpdate.autoUpdate && !AppForegroundObserver.isForegrounded()
+    // Once we have designs for allowing users to opt-out of auto-updates, we can re-enable this
+    return false
+
+//    val webRtcViewModel = EventBus.getDefault().getStickyEvent(WebRtcViewModel::class.java)
+//    val isCallActive = webRtcViewModel != null && webRtcViewModel.state != WebRtcViewModel.State.IDLE
+//
+//    return Build.VERSION.SDK_INT >= 31 && SignalStore.apkUpdate.autoUpdate && !AppForegroundObserver.isForegrounded() && !isCallActive
   }
 }

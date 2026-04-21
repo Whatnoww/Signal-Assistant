@@ -17,7 +17,7 @@ import org.signal.core.ui.compose.Dialogs
 import org.signal.qr.QrScannerView
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.linkdevice.LinkDeviceRepository.LinkDeviceResult
-import org.thoughtcrime.securesms.mediasend.camerax.CameraXModelBlocklist
+import org.thoughtcrime.securesms.mediasend.camerax.CameraXRemoteConfig
 import org.thoughtcrime.securesms.qr.QrScanScreens
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
 import java.util.concurrent.TimeUnit
@@ -34,7 +34,6 @@ fun LinkDeviceQrScanScreen(
   onQrCodeScanned: (String) -> Unit,
   onQrCodeAccepted: () -> Unit,
   onQrCodeDismissed: () -> Unit,
-  onQrCodeRetry: () -> Unit,
   linkDeviceResult: LinkDeviceResult,
   onLinkDeviceSuccess: () -> Unit,
   onLinkDeviceFailure: () -> Unit,
@@ -45,12 +44,11 @@ fun LinkDeviceQrScanScreen(
   val context = LocalContext.current
 
   when (qrCodeState) {
-    LinkDeviceSettingsState.QrCodeState.NONE -> {
-      Unit
-    }
+    LinkDeviceSettingsState.QrCodeState.NONE -> Unit
     LinkDeviceSettingsState.QrCodeState.VALID_WITH_SYNC -> {
       navController?.safeNavigate(R.id.action_addLinkDeviceFragment_to_linkDeviceSyncBottomSheet)
     }
+
     LinkDeviceSettingsState.QrCodeState.VALID_WITHOUT_SYNC -> {
       Dialogs.SimpleAlertDialog(
         title = stringResource(id = R.string.DeviceProvisioningActivity_link_this_device),
@@ -61,13 +59,13 @@ fun LinkDeviceQrScanScreen(
         onDismiss = onQrCodeDismissed
       )
     }
+
     LinkDeviceSettingsState.QrCodeState.INVALID -> {
       Dialogs.SimpleAlertDialog(
         title = stringResource(id = R.string.AddLinkDeviceFragment__linking_device_failed),
         body = stringResource(id = R.string.AddLinkDeviceFragment__this_qr_code_not_valid),
         confirm = stringResource(id = R.string.AddLinkDeviceFragment__retry),
-        onConfirm = onQrCodeRetry,
-        dismiss = stringResource(id = android.R.string.cancel),
+        onConfirm = { },
         onDismiss = onQrCodeDismissed
       )
     }
@@ -106,7 +104,7 @@ fun LinkDeviceQrScanScreen(
           view
         },
         update = { view: QrScannerView ->
-          view.start(lifecycleOwner = lifecycleOwner, forceLegacy = CameraXModelBlocklist.isBlocklisted())
+          view.start(lifecycleOwner = lifecycleOwner, forceLegacy = CameraXRemoteConfig.isBlocklisted())
           if (showFrontCamera != null) {
             view.toggleCamera()
           }

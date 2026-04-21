@@ -1,7 +1,6 @@
 package org.thoughtcrime.securesms.jobs
 
 import android.content.Context
-import com.annimon.stream.Stream
 import org.signal.core.models.storageservice.StorageKey
 import org.signal.core.util.Base64
 import org.signal.core.util.SqlUtil
@@ -37,7 +36,6 @@ import org.thoughtcrime.securesms.util.RemoteConfig
 import org.whispersystems.signalservice.api.crypto.UntrustedIdentityException
 import org.whispersystems.signalservice.api.messages.multidevice.RequestMessage
 import org.whispersystems.signalservice.api.messages.multidevice.SignalServiceSyncMessage
-import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException
 import org.whispersystems.signalservice.api.storage.SignalAccountRecord
 import org.whispersystems.signalservice.api.storage.SignalCallLinkRecord
 import org.whispersystems.signalservice.api.storage.SignalChatFolderRecord
@@ -239,7 +237,7 @@ class StorageSyncJob private constructor(parameters: Parameters, private var loc
   }
 
   override fun onShouldRetry(e: Exception): Boolean {
-    return e is PushNetworkException || e is RetryLaterException
+    return e is IOException || e is RetryLaterException
   }
 
   override fun onFailure() {
@@ -332,7 +330,7 @@ class StorageSyncJob private constructor(parameters: Parameters, private var loc
           processKnownRecords(context, remoteOnly)
 
           val unknownInserts: List<SignalStorageRecord> = remoteOnly.unknown
-          val unknownDeletes = Stream.of(idDifference.localOnlyIds).filter { obj: StorageId -> obj.isUnknown }.toList()
+          val unknownDeletes = idDifference.localOnlyIds.stream().filter { obj: StorageId -> obj.isUnknown }.collect(Collectors.toList())
 
           Log.i(TAG, "[Remote Sync] Unknowns :: " + unknownInserts.size + " inserts, " + unknownDeletes.size + " deletes")
 
@@ -378,7 +376,7 @@ class StorageSyncJob private constructor(parameters: Parameters, private var loc
       val localStorageIds = getAllLocalStorageIds(self)
       val idDifference = StorageSyncHelper.findIdDifference(remoteManifest.storageIds, localStorageIds)
       val remoteInserts = buildLocalStorageRecords(context, self, idDifference.localOnlyIds.stream().filter { it: StorageId -> !it.isUnknown }.collect(Collectors.toList()))
-      val remoteDeletes = Stream.of(idDifference.remoteOnlyIds).map { obj: StorageId -> obj.raw }.toList()
+      val remoteDeletes = idDifference.remoteOnlyIds.stream().map { obj: StorageId -> obj.raw }.collect(Collectors.toList())
 
       Log.i(TAG, "ID Difference :: $idDifference")
 

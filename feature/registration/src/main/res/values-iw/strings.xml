@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="RegistrationActivity_take_privacy_with_you_be_yourself_in_every_message">קח פרטיות איתך.\nהייה עצמך בכל הודעה.</string>
+    <!-- Non-English translations should use "Signal is a nonprofit" instead, dropping the 501c3 reference. -->
+    <string name="RegistrationActivity_terms_and_privacy">Signal היא עמותה ללא מטרות רווח\nתנאים ומדיניות פרטיות</string>
+    <string name="RegistrationActivity_continue">המשך</string>
+    <!-- Screen title for restoring or transfering account -->
+    <string name="registration_activity__restore_or_transfer">שחזור או העברה</string>
+
+    <!-- GrantPermissionsFragment -->
+    <!-- Displayed as a title at the top of the screen -->
+    <string name="GrantPermissionsFragment__allow_permissions">הפעלת הרשאות</string>
+    <!-- Displayed as a subtitle at the top of the screen -->
+    <string name="GrantPermissionsFragment__to_help_you_message_people_you_know">כדי שתהיה אפשרות לשלוח הודעות לאנשים שאת.ה מכיר.ה, Signal תבקש את ההרשאות האלה. </string>
+    <!-- Displayed as a text-only action button at the bottom start of the screen -->
+    <string name="GrantPermissionsFragment__not_now">לא עכשיו</string>
+    <!-- Displayed as an action button at the bottom end of the screen -->
+    <string name="GrantPermissionsFragment__next">הבא</string>
+    <!-- Notifications permission row title -->
+    <string name="GrantPermissionsFragment__notifications">התראות</string>
+    <!-- Notifications permission row description -->
+    <string name="GrantPermissionsFragment__get_notified_when">לקבל התראה כשמגיעות הודעות חדשות.</string>
+    <!-- Contacts permission row title -->
+    <string name="GrantPermissionsFragment__contacts">אנשי קשר</string>
+    <!-- Contacts permission row description -->
+    <string name="GrantPermissionsFragment__find_people_you_know">למצוא אנשים שאת.ה מכיר.ה. אנשי הקשר שלך מוצפנים ואינם גלויים לשירות Signal.</string>
+    <!-- Phone calls permission row title -->
+    <string name="GrantPermissionsFragment__phone_calls">שיחות טלפון</string>
+    <!-- Phone calls permission row description -->
+    <string name="GrantPermissionsFragment__make_registering_easier">להפוך את ההרשמה למהירה יותר ולאפשר פיצ׳רים נוספים של התקשרות.</string>
+    <!-- Storage permission row title -->
+    <string name="GrantPermissionsFragment__storage">אחסון</string>
+    <!-- Storage permission row description -->
+    <string name="GrantPermissionsFragment__send_photos_videos_and_files">לשלוח תמונות, סרטונים וקבצים מהמכשיר שלך.</string>
+
+    <!-- PhoneNumberEntryScreen -->
+    <!-- Title of registration screen when asking for the users phone number -->
+    <string name="RegistrationActivity_phone_number">מספר טלפון</string>
+    <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
+    <string name="RegistrationActivity_you_will_receive_a_verification_code">תקבל קוד וידוא. תשלומי מפעיל עשויים לחול.</string>
+    <!-- Hint text to select a country -->
+    <string name="RegistrationActivity_select_a_country">בחירת מדינה</string>
+    <string name="RegistrationActivity_phone_number_description">מספר טלפון</string>
+    <string name="RegistrationActivity_next">הבא</string>
+    <!-- Dialog title to confirm phone number -->
+    <string name="RegistrationActivity_is_the_phone_number">האם מספר הטלפון למטה נכון?</string>
+    <!-- Dialog body to confirm phone number -->
+    <string name="RegistrationActivity_a_verification_code">קוד אימות ישלח למספר זה. יתכן שיחולו תעריפי ספק.</string>
+    <!-- Dialog button to edit the number entered -->
+    <string name="RegistrationActivity_edit_number">ערוך מספר</string>
+
+    <!-- CountryCodePickerScreen -->
+    <!-- Title of the country code selection screen -->
+    <string name="CountryCodeSelectScreen__your_country">המדינה שלך</string>
+    <!-- Close button content description -->
+    <string name="CountryCodeSelectScreen__close">סגור</string>
+    <!-- Search bar hint text -->
+    <string name="CountryCodeSelectScreen__search_by">חיפוש לפי שם או קידומת מדינה</string>
+    <!-- Fallback text for countries with no name -->
+    <string name="CountryCodeSelectScreen__unknown_country">מדינה בלתי ידועה</string>
+
+    <!-- VerificationCodeScreen -->
+    <!-- Title of the verification code entry screen -->
+    <string name="VerificationCodeScreen__verification_code">קוד וידוא</string>
+    <!-- Subtitle explaining where the code was sent. Placeholder is the phone number -->
+    <string name="VerificationCodeScreen__enter_the_code_we_sent_to_s">הכנס את הקוד ששלחנו אל %1$s</string>
+    <!-- Button text for wrong number action -->
+    <string name="VerificationCodeScreen__wrong_number">מספר שגוי?</string>
+    <!-- Button text for resend SMS action -->
+    <string name="VerificationCodeScreen__resend_code">שליחת קוד מחדש</string>
+    <!-- Button text for call me action -->
+    <string name="VerificationCodeScreen__call_me_instead">תתקשרו אלי במקום</string>
+    <!-- Countdown text shown below the resend code button. Placeholders are minutes and seconds -->
+    <string name="VerificationCodeScreen__countdown_format">(%1$02d:%2$02d)</string>
+    <!-- Button text for call me when countdown is active. Placeholders are minutes and seconds -->
+    <string name="VerificationCodeScreen__call_me_available_in">תתקשרו אלי (%1$02d:%2$02d)</string>
+    <!-- Toast shown when the user enters an incorrect verification code -->
+    <string name="VerificationCodeScreen__incorrect_code">קוד שגוי</string>
+    <!-- Snackbar shown when there is a network error -->
+    <string name="VerificationCodeScreen__network_error">לא ניתן להתחבר. כדאי לבדוק את הרשת שלך ולנסות שוב.</string>
+    <!-- Snackbar shown when rate limited. Placeholder is the retry duration -->
+    <string name="VerificationCodeScreen__too_many_attempts_try_again_in_s">יותר מדי ניסיונות יש לנסות שוב עוד %1$s.</string>
+    <!-- Snackbar shown for generic/unknown errors -->
+    <string name="VerificationCodeScreen__an_unexpected_error_occurred">קרתה שגיאה לא צפויה. נא לנסות שוב.</string>
+    <!-- Snackbar shown when we are unable to send an SMS to the user\'s number -->
+    <string name="VerificationCodeScreen__unable_to_send_sms">אין לנו אפשרות לשלוח SMS למספר שלך. נא לנסות שוב בעוד כמה שעות.</string>
+    <!-- Snackbar shown when the selected transport (SMS/voice) is unavailable -->
+    <string name="VerificationCodeScreen__could_not_send_code_via_selected_method">לא ניתן היה לשלוח קוד באמצעות השיטה שנבחרה. יש לנסות אפשרות אחרת.</string>
+    <!-- Snackbar shown for registration errors -->
+    <string name="VerificationCodeScreen__registration_error">ההרשמה נכשלה. נא לנסות שוב.</string>
+    <!-- Button text for having trouble with verification -->
+    <string name="VerificationCodeScreen__having_trouble">נתקלת בבעיה?</string>
+
+    <!-- RestoreWelcomeBottomSheet -->
+    <!-- Row title for restore/transfer using a previous registered phone/device -->
+    <string name="WelcomeFragment_restore_action_i_have_my_old_phone">יש לי את הטלפון הישן שלי</string>
+    <!-- Row subtitle for restore/transfer using a previous registered phone/device -->
+    <string name="WelcomeFragment_restore_action_scan_qr">אפשר לסרוק קוד QR מחשבון Signal הנוכחי שלך כדי להתחיל במהירות</string>
+    <!-- Row title for restore/transfer without using a previous device -->
+    <string name="WelcomeFragment_restore_action_i_dont_have_my_old_phone">אין לי את הטלפון הישן שלי</string>
+    <!-- Row subtitle for restore/transfer without using a previous device -->
+    <string name="WelcomeFragment_restore_action_reinstalling">או שמדובר בהתקנה חוזרת של Signal על אותו מכשיר</string>
+
+    <!-- ArchiveRestoreSelectionScreen -->
+    <!-- Title text for the archive restore selection screen -->
+    <string name="ArchiveRestoreSelectionScreen__restore_or_transfer_account">שחזור או העברת חשבון</string>
+    <!-- Subtitle text for the archive restore selection screen -->
+    <string name="ArchiveRestoreSelectionScreen__subheading">איך ברצונך לשחזר את היסטוריית ההודעות ונתוני החשבון שלך?</string>
+    <!-- Title for the Signal Backups option card -->
+    <string name="ArchiveRestoreSelectionScreen__from_signal_backups">מגיבויי Signal</string>
+    <!-- Subtitle for the Signal Backups option card -->
+    <string name="ArchiveRestoreSelectionScreen__your_free_or_paid_signal_backup_plan">תכנית הגיבוי שלך ב–Signal (בחינם או בתשלום)</string>
+    <!-- Title for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__local_backup_card_title">שחזור גיבוי מקומי במכשיר</string>
+    <!-- Description for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__local_backup_card_description">שחזור ההודעות שלך מקובץ גיבוי ששמרת במכשיר שלך.</string>
+    <!-- Title for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_title">להמשיך בלי להעביר</string>
+    <!-- Description for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_description">הודעות ומדיה לא יועברו</string>
+    <!-- Title for the backup folder option card (V2 format) -->
+    <string name="ArchiveRestoreSelectionScreen__from_a_backup_folder">מתיקיית גיבוי</string>
+    <!-- Title for the backup file option card (V1 legacy format) -->
+    <string name="ArchiveRestoreSelectionScreen__from_a_backup_file">מקובץ גיבוי</string>
+    <!-- Subtitle for the backup folder/file option cards -->
+    <string name="ArchiveRestoreSelectionScreen__choose_a_backup_youve_saved">יש לבחור גיבוי ששמרת</string>
+    <!-- Title for the device transfer option card -->
+    <string name="ArchiveRestoreSelectionScreen__from_your_old_phone">מהטלפון הישן שלך</string>
+    <!-- Subtitle for the device transfer option card -->
+    <string name="ArchiveRestoreSelectionScreen__transfer_directly_from_old">להעביר ישירות ממכשיר ה–Android הישן שלך</string>
+    <!-- Skip button text -->
+    <string name="ArchiveRestoreSelectionScreen__skip">דלג</string>
+    <!-- Title for the skip restore confirmation dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_title">לדלג על שחזור?</string>
+    <!-- Warning body text for the skip restore confirmation dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_warning">אם תדלג/י על השחזור כעת, לא תהיה לך אפשרות לשחזר מאוחר יותר. אם תפעיל/י מחדש גיבויים לאחר דילוג על שחזור, הגיבוי הנוכחי שלך יוחלף עם היסטוריית ההודעות החדשה שלך.</string>
+    <!-- Confirm button text for the skip restore dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_confirm_button">דילוג על שחזור</string>
+
+    <!-- LocalBackupRestoreScreen -->
+    <!-- Title for the local backup restore screen -->
+    <string name="LocalBackupRestoreScreen__restore_on_device_backup">שחזור גיבוי מקומי במכשיר</string>
+    <!-- Description on the folder selection screen -->
+    <string name="LocalBackupRestoreScreen__select_folder_description">שחזור ההודעות שלך מקובץ גיבוי ששמרת במכשיר שלך. אם לא תשחזר/י עכשיו, לא תהיה לך אפשרות לשחזר מאוחר יותר.</string>
+    <!-- Title for the choose backup folder card -->
+    <string name="LocalBackupRestoreScreen__choose_backup_folder">בחירת תיקיית גיבוי</string>
+    <!-- Subtitle for the choose backup folder card -->
+    <string name="LocalBackupRestoreScreen__choose_folder_subtitle">בחירת התיקייה במכשיר שלך שבה הגיבוי שלך מאוחסן</string>
+    <!-- Text shown while scanning for backups -->
+    <string name="LocalBackupRestoreScreen__scanning_folder">מתבצע חיפוש אחר גיבויים…</string>
+    <!-- Description shown when a backup is found -->
+    <string name="LocalBackupRestoreScreen__backup_found_description">שחזור ההודעות שלך מתיקיית הגיבוי ששמרת במכשיר שלך. אם לא תשחזר/י עכשיו, לא תהיה לך אפשרות לשחזר מאוחר יותר.</string>
+    <!-- Title for the latest backup card -->
+    <string name="LocalBackupRestoreScreen__your_latest_backup">הגיבוי האחרון שלך:</string>
+    <!-- Restore backup button text -->
+    <string name="LocalBackupRestoreScreen__restore_backup">שחזר גיבוי</string>
+    <!-- Link to choose an earlier backup -->
+    <string name="LocalBackupRestoreScreen__choose_earlier_backup">בחירת גיבוי ישן יותר</string>
+    <!-- Title for the backup picker bottom sheet -->
+    <string name="LocalBackupRestoreScreen__choose_a_backup_to_restore">בחירת גיבוי לשחזור</string>
+    <!-- Warning text in the backup picker bottom sheet -->
+    <string name="LocalBackupRestoreScreen__choosing_an_older_backup_warning">בחירת גיבוי ישן יותר עלולה לגרום לאובדן הודעות או מדיה.</string>
+    <!-- Title when no backup is found -->
+    <string name="LocalBackupRestoreScreen__no_backup_found">לא נמצא גיבוי</string>
+    <!-- Description when no backup is found -->
+    <string name="LocalBackupRestoreScreen__no_backup_found_description">לא נמצא גיבוי של Signal בתיקייה שנבחרה. נא לנסות תיקייה אחרת.</string>
+    <!-- Button to try a different folder -->
+    <string name="LocalBackupRestoreScreen__try_different_folder">בחירת תיקייה אחרת</string>
+    <!-- Title for V1 passphrase entry screen -->
+    <string name="LocalBackupRestoreScreen__enter_backup_passphrase">הכנס משפט־סיסמה של גיבוי</string>
+    <!-- Description for V1 passphrase entry screen -->
+    <string name="LocalBackupRestoreScreen__enter_the_30_digit_passphrase">משפט הסיסמה לגיבויים המקומיים שלך הוא קוד בן 30 ספרות שנדרש כדי לשחזר את החשבון והנתונים שלך.</string>
+    <!-- Label for the recovery key text field -->
+    <string name="LocalBackupRestoreScreen__recovery_key">מפתח שחזור</string>
+    <!-- Error text when passphrase is too long -->
+    <string name="LocalBackupRestoreScreen__too_long">ארוך מדי (%1$d/%2$d)</string>
+    <!-- Link for users who don\'t have their passphrase -->
+    <string name="LocalBackupRestoreScreen__no_passphrase">אין לך משפט-סיסמה?</string>
+    <!-- Next button text -->
+    <string name="LocalBackupRestoreScreen__next">הבא</string>
+    <!-- EnterAepScreen -->
+    <!-- Title for recovery key entry screen -->
+    <string name="EnterAepScreen__enter_your_recovery_key">הזנת מפתח השחזור שלך</string>
+    <!-- Description for recovery key entry screen -->
+    <string name="EnterAepScreen__your_recovery_key_is_a_64_character_code">מפתח השחזור שלך הוא קוד בן 64 ספרות שמאפשר לך לשחזר את החשבון והנתונים שלך.</string>
+    <!-- Label for the recovery key text field -->
+    <string name="EnterAepScreen__recovery_key">מפתח שחזור</string>
+    <!-- Link for users who don\'t have their recovery key -->
+    <string name="EnterAepScreen__no_recovery_key">אין מפתח שחזור?</string>
+    <!-- Error text when key is too long -->
+    <string name="EnterAepScreen__too_long">ארוך מדי (%1$d/%2$d)</string>
+    <!-- Error text when key is invalid -->
+    <string name="EnterAepScreen__invalid_recovery_key">מפתח שחזור לא תקין</string>
+    <!-- Text shown while preparing the restore -->
+    <string name="LocalBackupRestoreScreen__preparing_restore">שחזור בהכנה…</string>
+    <!-- Title shown while restore is in progress -->
+    <string name="LocalBackupRestoreScreen__restoring_backup">שחזור גיבוי</string>
+    <!-- Description shown while restore is in progress -->
+    <string name="LocalBackupRestoreScreen__restoring_description">נא להמתין בזמן שההודעות והנתונים שלך משוחזרים.</string>
+    <!-- Description shown when restore is complete -->
+    <string name="LocalBackupRestoreScreen__restore_complete_description">Your messages and account data have been restored successfully.</string>
+    <!-- Continue button text after restore is complete -->
+    <string name="LocalBackupRestoreScreen__continue_button">המשך</string>
+    <!-- Title shown when restore fails -->
+    <string name="LocalBackupRestoreScreen__restore_failed">שחזור נכשל</string>
+    <!-- Description shown when restore fails with an unknown error -->
+    <string name="LocalBackupRestoreScreen__restore_failed_description">אירעה שגיאה בעת שחזור הגיבוי שלך. נא לנסות שוב.</string>
+    <!-- Button to retry restore after failure -->
+    <string name="LocalBackupRestoreScreen__try_again">ניסיון חוזר</string>
+    <!-- Button to link an existing Signal account to this device -->
+    <string name="WelcomeScreen__link_your_account">קישור החשבון שלך</string>
+    <!-- Prompt shown to users who don\'t have a Signal account yet -->
+    <string name="WelcomeScreen__not_on_signal_yet">עדיין לא ב-Signal?</string>
+    <!-- Button to create a new Signal account -->
+    <string name="WelcomeScreen__create_account">יצירת חשבון</string>
+</resources>

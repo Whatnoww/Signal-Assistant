@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="RegistrationActivity_take_privacy_with_you_be_yourself_in_every_message">Не відмовляйте собі в конфіденційності.\nБудьте собою в кожному повідомленні.</string>
+    <!-- Non-English translations should use "Signal is a nonprofit" instead, dropping the 501c3 reference. -->
+    <string name="RegistrationActivity_terms_and_privacy">Signal є неприбутковою організацією\nУмови надання послуг і Політика конфіденційності</string>
+    <string name="RegistrationActivity_continue">Продовжити</string>
+    <!-- Screen title for restoring or transfering account -->
+    <string name="registration_activity__restore_or_transfer">Відновлення або перенесення акаунту</string>
+
+    <!-- GrantPermissionsFragment -->
+    <!-- Displayed as a title at the top of the screen -->
+    <string name="GrantPermissionsFragment__allow_permissions">Надайте дозволи</string>
+    <!-- Displayed as a subtitle at the top of the screen -->
+    <string name="GrantPermissionsFragment__to_help_you_message_people_you_know">Щоб вам було легше обмінюватися повідомленнями зі знайомими, Signal потребує таких дозволів. </string>
+    <!-- Displayed as a text-only action button at the bottom start of the screen -->
+    <string name="GrantPermissionsFragment__not_now">Не зараз</string>
+    <!-- Displayed as an action button at the bottom end of the screen -->
+    <string name="GrantPermissionsFragment__next">Далі</string>
+    <!-- Notifications permission row title -->
+    <string name="GrantPermissionsFragment__notifications">Сповіщення</string>
+    <!-- Notifications permission row description -->
+    <string name="GrantPermissionsFragment__get_notified_when">Отримуйте сповіщення про нові повідомлення.</string>
+    <!-- Contacts permission row title -->
+    <string name="GrantPermissionsFragment__contacts">Контакти</string>
+    <!-- Contacts permission row description -->
+    <string name="GrantPermissionsFragment__find_people_you_know">Знаходьте своїх знайомих. Ваші контакти зашифровано й приховано від служби Signal.</string>
+    <!-- Phone calls permission row title -->
+    <string name="GrantPermissionsFragment__phone_calls">Телефонні виклики</string>
+    <!-- Phone calls permission row description -->
+    <string name="GrantPermissionsFragment__make_registering_easier">Спростіть процес реєстрації і ввімкніть додаткові функції, пов\'язані з викликами.</string>
+    <!-- Storage permission row title -->
+    <string name="GrantPermissionsFragment__storage">Пам\'ять</string>
+    <!-- Storage permission row description -->
+    <string name="GrantPermissionsFragment__send_photos_videos_and_files">Надсилайте фото, відео й файли зі свого пристрою.</string>
+
+    <!-- PhoneNumberEntryScreen -->
+    <!-- Title of registration screen when asking for the users phone number -->
+    <string name="RegistrationActivity_phone_number">Номер телефону</string>
+    <!-- Text explaining to users that they will be receiving a verification for their phone number and that carrier rates could apply -->
+    <string name="RegistrationActivity_you_will_receive_a_verification_code">Ви отримаєте код підтвердження. Може стягуватися плата згідно з тарифами оператора.</string>
+    <!-- Hint text to select a country -->
+    <string name="RegistrationActivity_select_a_country">Оберіть країну</string>
+    <string name="RegistrationActivity_phone_number_description">Номер телефону</string>
+    <string name="RegistrationActivity_next">Далі</string>
+    <!-- Dialog title to confirm phone number -->
+    <string name="RegistrationActivity_is_the_phone_number">Чи правильно зазначено номер телефону?</string>
+    <!-- Dialog body to confirm phone number -->
+    <string name="RegistrationActivity_a_verification_code">На цей номер буде надіслано код підтвердження. Може стягуватися плата згідно з тарифами оператора.</string>
+    <!-- Dialog button to edit the number entered -->
+    <string name="RegistrationActivity_edit_number">Виправити номер</string>
+
+    <!-- CountryCodePickerScreen -->
+    <!-- Title of the country code selection screen -->
+    <string name="CountryCodeSelectScreen__your_country">Ваша країна</string>
+    <!-- Close button content description -->
+    <string name="CountryCodeSelectScreen__close">Закрити</string>
+    <!-- Search bar hint text -->
+    <string name="CountryCodeSelectScreen__search_by">Пошук країни або коду</string>
+    <!-- Fallback text for countries with no name -->
+    <string name="CountryCodeSelectScreen__unknown_country">Невідома країна</string>
+
+    <!-- VerificationCodeScreen -->
+    <!-- Title of the verification code entry screen -->
+    <string name="VerificationCodeScreen__verification_code">Код підтвердження</string>
+    <!-- Subtitle explaining where the code was sent. Placeholder is the phone number -->
+    <string name="VerificationCodeScreen__enter_the_code_we_sent_to_s">Введіть код, який ми надіслали на %1$s</string>
+    <!-- Button text for wrong number action -->
+    <string name="VerificationCodeScreen__wrong_number">Неправильний номер?</string>
+    <!-- Button text for resend SMS action -->
+    <string name="VerificationCodeScreen__resend_code">Надішліть код ще раз</string>
+    <!-- Button text for call me action -->
+    <string name="VerificationCodeScreen__call_me_instead">Подзвоніть мені</string>
+    <!-- Countdown text shown below the resend code button. Placeholders are minutes and seconds -->
+    <string name="VerificationCodeScreen__countdown_format">(%1$02d:%2$02d)</string>
+    <!-- Button text for call me when countdown is active. Placeholders are minutes and seconds -->
+    <string name="VerificationCodeScreen__call_me_available_in">Подзвоніть мені (%1$02d:%2$02d)</string>
+    <!-- Toast shown when the user enters an incorrect verification code -->
+    <string name="VerificationCodeScreen__incorrect_code">Неправильний код</string>
+    <!-- Snackbar shown when there is a network error -->
+    <string name="VerificationCodeScreen__network_error">Не вдається під\'єднатися. Перевірте з\'єднання з мережею і спробуйте знову.</string>
+    <!-- Snackbar shown when rate limited. Placeholder is the retry duration -->
+    <string name="VerificationCodeScreen__too_many_attempts_try_again_in_s">Забагато спроб. Спробуйте ще раз через %1$s.</string>
+    <!-- Snackbar shown for generic/unknown errors -->
+    <string name="VerificationCodeScreen__an_unexpected_error_occurred">Сталася неочікувана помилка. Спробуйте ще раз.</string>
+    <!-- Snackbar shown when we are unable to send an SMS to the user\'s number -->
+    <string name="VerificationCodeScreen__unable_to_send_sms">Не вдається надіслати SMS на ваш номер. Будь ласка, спробуйте знову через кілька годин.</string>
+    <!-- Snackbar shown when the selected transport (SMS/voice) is unavailable -->
+    <string name="VerificationCodeScreen__could_not_send_code_via_selected_method">Не вдалося надіслати код обраним способом. Будь ласка, оберіть інший.</string>
+    <!-- Snackbar shown for registration errors -->
+    <string name="VerificationCodeScreen__registration_error">Помилка реєстрації. Будь ласка, спробуйте ще раз.</string>
+    <!-- Button text for having trouble with verification -->
+    <string name="VerificationCodeScreen__having_trouble">Виникли проблеми?</string>
+
+    <!-- RestoreWelcomeBottomSheet -->
+    <!-- Row title for restore/transfer using a previous registered phone/device -->
+    <string name="WelcomeFragment_restore_action_i_have_my_old_phone">У мене лишився старий телефон</string>
+    <!-- Row subtitle for restore/transfer using a previous registered phone/device -->
+    <string name="WelcomeFragment_restore_action_scan_qr">Для швидшого початку зіскануйте QR-код пристроєм, на якому зараз використовуєте Signal</string>
+    <!-- Row title for restore/transfer without using a previous device -->
+    <string name="WelcomeFragment_restore_action_i_dont_have_my_old_phone">У мене не лишилося старого телефона</string>
+    <!-- Row subtitle for restore/transfer without using a previous device -->
+    <string name="WelcomeFragment_restore_action_reinstalling">Або ви перевстановлюєте Signal на цьому ж пристрої</string>
+
+    <!-- ArchiveRestoreSelectionScreen -->
+    <!-- Title text for the archive restore selection screen -->
+    <string name="ArchiveRestoreSelectionScreen__restore_or_transfer_account">Відновлення або перенесення акаунту</string>
+    <!-- Subtitle text for the archive restore selection screen -->
+    <string name="ArchiveRestoreSelectionScreen__subheading">Виберіть спосіб відновлення історії повідомлень і даних акаунту.</string>
+    <!-- Title for the Signal Backups option card -->
+    <string name="ArchiveRestoreSelectionScreen__from_signal_backups">Зі сховища резервних копій Signal</string>
+    <!-- Subtitle for the Signal Backups option card -->
+    <string name="ArchiveRestoreSelectionScreen__your_free_or_paid_signal_backup_plan">З безкоштовної або платної резервної копії від Signal</string>
+    <!-- Title for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__local_backup_card_title">З резервної копії на пристрої</string>
+    <!-- Description for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__local_backup_card_description">Дані буде відновлено з резервної копії, збереженої на пристрої.</string>
+    <!-- Title for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_title">Продовжити без перенесення</string>
+    <!-- Description for an option that, when clicked, will take the user to a flow to restore form a local backup -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_description">Повідомлення і медіафайли не буде перенесено</string>
+    <!-- Title for the backup folder option card (V2 format) -->
+    <string name="ArchiveRestoreSelectionScreen__from_a_backup_folder">З папки з резервною копією</string>
+    <!-- Title for the backup file option card (V1 legacy format) -->
+    <string name="ArchiveRestoreSelectionScreen__from_a_backup_file">З файлу резервної копії</string>
+    <!-- Subtitle for the backup folder/file option cards -->
+    <string name="ArchiveRestoreSelectionScreen__choose_a_backup_youve_saved">Виберіть збережену резервну копію</string>
+    <!-- Title for the device transfer option card -->
+    <string name="ArchiveRestoreSelectionScreen__from_your_old_phone">Зі старого телефона</string>
+    <!-- Subtitle for the device transfer option card -->
+    <string name="ArchiveRestoreSelectionScreen__transfer_directly_from_old">Перенести безпосередньо зі старого пристрою з ОС Android</string>
+    <!-- Skip button text -->
+    <string name="ArchiveRestoreSelectionScreen__skip">Пропустити</string>
+    <!-- Title for the skip restore confirmation dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_title">Пропустити відновлення?</string>
+    <!-- Warning body text for the skip restore confirmation dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_warning">Якщо ви не відновите дані зараз, то не зможете зробити цього пізніше. Якщо пропустити відновлення, а потім знову ввімкнути резервне копіювання, поточну резервну копію буде замінено на нову історію повідомлень.</string>
+    <!-- Confirm button text for the skip restore dialog -->
+    <string name="ArchiveRestoreSelectionScreen__skip_restore_dialog_confirm_button">Не відновлювати</string>
+
+    <!-- LocalBackupRestoreScreen -->
+    <!-- Title for the local backup restore screen -->
+    <string name="LocalBackupRestoreScreen__restore_on_device_backup">Відновлення з резервної копії на пристрої</string>
+    <!-- Description on the folder selection screen -->
+    <string name="LocalBackupRestoreScreen__select_folder_description">Відновіть повідомлення з резервної копії, збереженої на пристрої. Якщо ви не відновите їх зараз, то не зможете зробити цього пізніше.</string>
+    <!-- Title for the choose backup folder card -->
+    <string name="LocalBackupRestoreScreen__choose_backup_folder">Папка резервної копії</string>
+    <!-- Subtitle for the choose backup folder card -->
+    <string name="LocalBackupRestoreScreen__choose_folder_subtitle">Виберіть папку з резервною копією на пристрої</string>
+    <!-- Text shown while scanning for backups -->
+    <string name="LocalBackupRestoreScreen__scanning_folder">Пошук резервних копій…</string>
+    <!-- Description shown when a backup is found -->
+    <string name="LocalBackupRestoreScreen__backup_found_description">Відновіть повідомлення з папки з резервною копією, збереженою на пристрої. Якщо ви не відновите їх зараз, то не зможете зробити цього пізніше.</string>
+    <!-- Title for the latest backup card -->
+    <string name="LocalBackupRestoreScreen__your_latest_backup">Остання резервна копія:</string>
+    <!-- Restore backup button text -->
+    <string name="LocalBackupRestoreScreen__restore_backup">Відновити з резервної копії</string>
+    <!-- Link to choose an earlier backup -->
+    <string name="LocalBackupRestoreScreen__choose_earlier_backup">Вибрати попередню резервну копію</string>
+    <!-- Title for the backup picker bottom sheet -->
+    <string name="LocalBackupRestoreScreen__choose_a_backup_to_restore">Виберіть резервну копію</string>
+    <!-- Warning text in the backup picker bottom sheet -->
+    <string name="LocalBackupRestoreScreen__choosing_an_older_backup_warning">Якщо вибрати старішу резервну копію, ви можете втратити якісь повідомлення і медіафайли.</string>
+    <!-- Title when no backup is found -->
+    <string name="LocalBackupRestoreScreen__no_backup_found">Резервної копії не знайдено</string>
+    <!-- Description when no backup is found -->
+    <string name="LocalBackupRestoreScreen__no_backup_found_description">У цій папці не було знайдено резервної копії Signal. Виберіть іншу папку.</string>
+    <!-- Button to try a different folder -->
+    <string name="LocalBackupRestoreScreen__try_different_folder">Вибрати іншу папку</string>
+    <!-- Title for V1 passphrase entry screen -->
+    <string name="LocalBackupRestoreScreen__enter_backup_passphrase">Введіть пароль</string>
+    <!-- Description for V1 passphrase entry screen -->
+    <string name="LocalBackupRestoreScreen__enter_the_30_digit_passphrase">Ваш пароль від локальної резервної копії — це 30-значний код, який дозволяє відновити акаунт і пов\'язані з ним дані.</string>
+    <!-- Label for the recovery key text field -->
+    <string name="LocalBackupRestoreScreen__recovery_key">Ключ відновлення</string>
+    <!-- Error text when passphrase is too long -->
+    <string name="LocalBackupRestoreScreen__too_long">Ключ задовгий (%1$d/%2$d)</string>
+    <!-- Link for users who don\'t have their passphrase -->
+    <string name="LocalBackupRestoreScreen__no_passphrase">Забули пароль?</string>
+    <!-- Next button text -->
+    <string name="LocalBackupRestoreScreen__next">Далі</string>
+    <!-- EnterAepScreen -->
+    <!-- Title for recovery key entry screen -->
+    <string name="EnterAepScreen__enter_your_recovery_key">Введіть ключ відновлення</string>
+    <!-- Description for recovery key entry screen -->
+    <string name="EnterAepScreen__your_recovery_key_is_a_64_character_code">Ключ відновлення — це код із 64 символів, який дає змогу відновити акаунт і пов\'язані з ним дані.</string>
+    <!-- Label for the recovery key text field -->
+    <string name="EnterAepScreen__recovery_key">Ключ відновлення</string>
+    <!-- Link for users who don\'t have their recovery key -->
+    <string name="EnterAepScreen__no_recovery_key">Забули ключ відновлення?</string>
+    <!-- Error text when key is too long -->
+    <string name="EnterAepScreen__too_long">Ключ задовгий (%1$d/%2$d)</string>
+    <!-- Error text when key is invalid -->
+    <string name="EnterAepScreen__invalid_recovery_key">Недійсний ключ відновлення</string>
+    <!-- Text shown while preparing the restore -->
+    <string name="LocalBackupRestoreScreen__preparing_restore">Підготовка до відновлення…</string>
+    <!-- Title shown while restore is in progress -->
+    <string name="LocalBackupRestoreScreen__restoring_backup">Відновлення даних з резервної копії</string>
+    <!-- Description shown while restore is in progress -->
+    <string name="LocalBackupRestoreScreen__restoring_description">Відновлення повідомлень і даних займе певний час.</string>
+    <!-- Description shown when restore is complete -->
+    <string name="LocalBackupRestoreScreen__restore_complete_description">Your messages and account data have been restored successfully.</string>
+    <!-- Continue button text after restore is complete -->
+    <string name="LocalBackupRestoreScreen__continue_button">Продовжити</string>
+    <!-- Title shown when restore fails -->
+    <string name="LocalBackupRestoreScreen__restore_failed">Помилка відновлення</string>
+    <!-- Description shown when restore fails with an unknown error -->
+    <string name="LocalBackupRestoreScreen__restore_failed_description">Під час відновлення даних з резервної копії сталася помилка. Будь ласка, спробуйте ще раз.</string>
+    <!-- Button to retry restore after failure -->
+    <string name="LocalBackupRestoreScreen__try_again">Повторити спробу</string>
+    <!-- Button to link an existing Signal account to this device -->
+    <string name="WelcomeScreen__link_your_account">Зв\'язати акаунт</string>
+    <!-- Prompt shown to users who don\'t have a Signal account yet -->
+    <string name="WelcomeScreen__not_on_signal_yet">Ще не зареєстровані?</string>
+    <!-- Button to create a new Signal account -->
+    <string name="WelcomeScreen__create_account">Створіть акаунт</string>
+</resources>

@@ -6,6 +6,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
+import org.signal.core.models.media.Media
 import org.signal.core.util.Base64
 import org.signal.core.util.StreamUtil
 import org.signal.core.util.concurrent.MaybeCompat
@@ -29,9 +30,9 @@ import org.thoughtcrime.securesms.database.model.MessageId
 import org.thoughtcrime.securesms.database.model.MessageRecord
 import org.thoughtcrime.securesms.database.model.MmsMessageRecord
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
+import org.thoughtcrime.securesms.database.withAttachments
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.keyboard.KeyboardUtil
-import org.thoughtcrime.securesms.mediasend.Media
 import org.thoughtcrime.securesms.mms.GifSlide
 import org.thoughtcrime.securesms.mms.ImageSlide
 import org.thoughtcrime.securesms.mms.PartAuthority
@@ -219,7 +220,8 @@ class DraftRepository(
 
   private fun loadDraftMessageEditInternal(serialized: String): ConversationMessage? {
     val messageId = MessageId.deserialize(serialized)
-    val messageRecord: MessageRecord = SignalDatabase.messages.getMessageRecordOrNull(messageId.id) ?: return null
+    var messageRecord: MessageRecord = SignalDatabase.messages.getMessageRecordOrNull(messageId.id) ?: return null
+    messageRecord = messageRecord.withAttachments()
     val threadRecipient: Recipient = requireNotNull(SignalDatabase.threads.getRecipientForThreadId(messageRecord.threadId))
     if (messageRecord.hasTextSlide()) {
       val textSlide = messageRecord.requireTextSlide()

@@ -31,12 +31,17 @@ object PinSendUtil {
   private val PIN_TERMINATE_TIMEOUT = 7000.milliseconds
 
   @Throws(IOException::class, GroupNotAMemberException::class, UndeliverableMessageException::class)
-  fun sendPinMessage(applicationContext: Context, threadRecipient: Recipient, message: OutgoingMessage, destinations: List<Recipient>, relatedMessageId: Long): List<SendMessageResult?> {
+  fun sendPinMessage(applicationContext: Context, threadRecipient: Recipient, message: OutgoingMessage, destinations: List<Recipient>, includeSelf: Boolean, relatedMessageId: Long): List<SendMessageResult?> {
     val builder = newBuilder()
     val groupId = if (threadRecipient.isPushV2Group) threadRecipient.requireGroupId().requireV2() else null
 
     if (groupId != null) {
       val groupRecord: GroupRecord? = SignalDatabase.groups.getGroup(groupId).getOrNull()
+
+      if (groupRecord != null && !groupRecord.isActive) {
+        throw UndeliverableMessageException("Cannot pin messages in an inactive group!")
+      }
+
       if (groupRecord != null && groupRecord.attributesAccessControl == GroupAccessControl.ONLY_ADMINS && !groupRecord.isAdmin(Recipient.self())) {
         throw UndeliverableMessageException("Non-admins cannot pin messages!")
       }
@@ -58,27 +63,36 @@ object PinSendUtil {
       )
       .build()
 
-    return GroupSendUtil.sendResendableDataMessage(
-      applicationContext,
-      groupId,
-      null,
-      destinations,
-      false,
-      ContentHint.RESENDABLE,
-      MessageId(relatedMessageId),
-      message,
-      false,
-      false,
-      null
-    ) { System.currentTimeMillis() - sentTime > PIN_TERMINATE_TIMEOUT.inWholeMilliseconds }
+    return if (includeSelf) {
+      listOf(AppDependencies.signalServiceMessageSender.sendSyncMessage(message))
+    } else {
+      GroupSendUtil.sendResendableDataMessage(
+        applicationContext,
+        groupId,
+        null,
+        destinations,
+        false,
+        ContentHint.RESENDABLE,
+        MessageId(relatedMessageId),
+        message,
+        false,
+        false,
+        null
+      ) { System.currentTimeMillis() - sentTime > PIN_TERMINATE_TIMEOUT.inWholeMilliseconds }
+    }
   }
 
   @Throws(IOException::class, GroupNotAMemberException::class, UndeliverableMessageException::class)
-  fun sendUnpinMessage(applicationContext: Context, threadRecipient: Recipient, targetAuthor: ServiceId, targetSentTimestamp: Long, destinations: List<Recipient>, relatedMessageId: Long): List<SendMessageResult?> {
+  fun sendUnpinMessage(applicationContext: Context, threadRecipient: Recipient, targetAuthor: ServiceId, targetSentTimestamp: Long, destinations: List<Recipient>, includeSelf: Boolean, relatedMessageId: Long): List<SendMessageResult?> {
     val builder = newBuilder()
     val groupId = if (threadRecipient.isPushV2Group) threadRecipient.requireGroupId().requireV2() else null
     if (groupId != null) {
       val groupRecord: GroupRecord? = SignalDatabase.groups.getGroup(groupId).getOrNull()
+
+      if (groupRecord != null && !groupRecord.isActive) {
+        throw UndeliverableMessageException("Cannot unpin messages in an inactive group!")
+      }
+
       if (groupRecord != null && groupRecord.attributesAccessControl == GroupAccessControl.ONLY_ADMINS && !groupRecord.isAdmin(Recipient.self())) {
         throw UndeliverableMessageException("Non-admins cannot pin messages!")
       }
@@ -98,18 +112,22 @@ object PinSendUtil {
       )
       .build()
 
-    return GroupSendUtil.sendResendableDataMessage(
-      applicationContext,
-      groupId,
-      null,
-      destinations,
-      false,
-      ContentHint.RESENDABLE,
-      MessageId(relatedMessageId),
-      message,
-      false,
-      false,
-      null
-    ) { System.currentTimeMillis() - sentTime > PIN_TERMINATE_TIMEOUT.inWholeMilliseconds }
+    return if (includeSelf) {
+      listOf(AppDependencies.signalServiceMessageSender.sendSyncMessage(message))
+    } else {
+      GroupSendUtil.sendResendableDataMessage(
+        applicationContext,
+        groupId,
+        null,
+        destinations,
+        false,
+        ContentHint.RESENDABLE,
+        MessageId(relatedMessageId),
+        message,
+        false,
+        false,
+        null
+      ) { System.currentTimeMillis() - sentTime > PIN_TERMINATE_TIMEOUT.inWholeMilliseconds }
+    }
   }
 }

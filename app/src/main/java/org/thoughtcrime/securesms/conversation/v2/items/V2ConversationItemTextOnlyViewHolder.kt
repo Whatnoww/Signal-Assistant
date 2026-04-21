@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
+import org.signal.core.ui.util.ThemeUtil
 import org.signal.core.util.StringUtil
 import org.signal.core.util.dp
 import org.thoughtcrime.securesms.R
@@ -48,12 +49,12 @@ import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.util.InterceptableLongClickCopyLinkSpan
 import org.thoughtcrime.securesms.util.LongClickMovementMethod
+import org.thoughtcrime.securesms.util.MAX_BODY_DISPLAY_LENGTH
 import org.thoughtcrime.securesms.util.PlaceholderURLSpan
 import org.thoughtcrime.securesms.util.Projection
 import org.thoughtcrime.securesms.util.ProjectionList
 import org.thoughtcrime.securesms.util.SearchUtil
 import org.thoughtcrime.securesms.util.SignalLocalMetrics
-import org.thoughtcrime.securesms.util.ThemeUtil
 import org.thoughtcrime.securesms.util.VibrateUtil
 import org.thoughtcrime.securesms.util.ViewUtil
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingModel
@@ -96,7 +97,8 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     binding.footerExpiry,
     binding.deliveryStatus,
     binding.footerBackground,
-    binding.footerPinned
+    binding.footerPinned,
+    binding.footerStarred
   )
 
   override val reactionsView: View = binding.reactions
@@ -241,7 +243,7 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     }
 
     if (ConversationAdapterBridge.PAYLOAD_NAME_COLORS in payload) {
-      presentSenderNameColor()
+      presentSender()
       hasProcessedSupportedPayload = true
     }
 
@@ -250,7 +252,7 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
       hasProcessedSupportedPayload = true
     }
 
-    if (hasProcessedSupportedPayload) {
+    if (hasProcessedSupportedPayload && V2Payload.WALLPAPER !in payload) {
       return
     }
 
@@ -259,12 +261,12 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     presentDeliveryStatus()
     presentFooterBackground()
     presentFooterPinned()
+    presentFooterStarred()
+    presentStarredSource()
     presentFooterExpiry()
     presentFooterEndPadding()
     presentAlert()
     presentSender()
-    presentSenderNameColor()
-    presentSenderNameBackground()
     presentReactions()
 
     bodyBubbleDrawable.setCorners(shapeDelegate.cornersLTR)
@@ -419,8 +421,11 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     styledText = SearchUtil.getHighlightedSpan(Locale.getDefault(), STYLE_FACTORY, styledText, conversationContext.searchQuery, SearchUtil.MATCH_ALL)
     if (record.hasExtraText()) {
       binding.body.setOverflowText(getLongMessageSpan())
+      val trimmedLength = StringUtil.trim(styledText).length
+      binding.body.setMaxLength(minOf(MAX_BODY_DISPLAY_LENGTH, trimmedLength - 2))
     } else {
       binding.body.setOverflowText(null)
+      binding.body.setMaxLength(-1)
     }
 
     if (isContentCondensed()) {
@@ -539,6 +544,27 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     pinned.visible = conversationMessage.messageRecord.pinnedUntil > 0
   }
 
+  private fun presentFooterStarred() {
+    val starred = binding.footerStarred
+    starred.setColorFilter(themeDelegate.getFooterForegroundColor(conversationMessage), PorterDuff.Mode.SRC_IN)
+    starred.visible = conversationMessage.messageRecord.isStarred
+  }
+
+  private fun presentStarredSource() {
+    val wrapper = binding.starredSourceWrapper ?: return
+    val sourceView = binding.starredSource ?: return
+
+    if (conversationContext.displayMode is ConversationItemDisplayMode.Starred) {
+      val senderName = conversationMessage.messageRecord.fromRecipient.getShortDisplayName(context)
+      val chatName = conversationMessage.threadRecipient.getShortDisplayName(context)
+      sourceView.text = context.getString(R.string.StarredMessages__s_chevron_s, senderName, chatName)
+      wrapper.visible = true
+      binding.starredSourceAvatar?.setAvatar(conversationContext.requestManager, conversationMessage.messageRecord.fromRecipient, false)
+    } else {
+      wrapper.visible = false
+    }
+  }
+
   private fun presentFooterEndPadding() {
     binding.footerSpace?.visibility = if (isForcedFooter() || shape.isEndingShape) {
       View.INVISIBLE
@@ -547,42 +573,27 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
     }
   }
 
-  private fun presentSenderNameBackground() {
-    if (binding.senderName == null || !shape.isStartingShape || !conversationMessage.threadRecipient.isGroup || !conversationMessage.messageRecord.hasNoBubble(context)) {
-      return
-    }
-
-    if (conversationContext.hasWallpaper()) {
-      senderDrawable.setCorners(footerCorners)
-      senderDrawable.setLocalChatColors(ChatColors.forColor(ChatColors.Id.BuiltIn, themeDelegate.getFooterBubbleColor(conversationMessage)))
-
-      binding.senderName.background = senderDrawable
+  private fun presentSender() {
+    val isStarredMode = conversationContext.displayMode is ConversationItemDisplayMode.Starred
+    if (conversationMessage.threadRecipient.isGroup && !isStarredMode) {
+      presentSenderPhoto()
+      presentSenderBadge()
+      presentSenderNameWithLabel()
     } else {
-      binding.senderName.background = null
+      binding.senderPhoto?.visible = false
+      binding.senderBadge?.visible = false
+      binding.senderNameWithLabel?.visible = false
     }
   }
 
-  private fun presentSender() {
-    if (binding.senderName == null || binding.senderPhoto == null || binding.senderBadge == null) {
-      return
-    }
+  private fun presentSenderPhoto() {
+    val photoView = binding.senderPhoto ?: return
 
-    if (conversationMessage.threadRecipient.isGroup) {
-      val sender = conversationMessage.messageRecord.fromRecipient
+    photoView.apply {
+      visibility = if (shape.isEndingShape) View.VISIBLE else View.INVISIBLE
+      setAvatar(conversationContext.requestManager, conversationMessage.messageRecord.fromRecipient, false)
 
-      binding.senderPhoto.visibility = if (shape.isEndingShape) {
-        View.VISIBLE
-      } else {
-        View.INVISIBLE
-      }
-
-      binding.senderName.visible = shape.isStartingShape
-      binding.senderBadge.visible = shape.isEndingShape
-
-      binding.senderName.text = sender.getDisplayName(context)
-      binding.senderPhoto.setAvatar(conversationContext.requestManager, sender, false)
-      binding.senderBadge.setBadgeFromRecipient(sender, conversationContext.requestManager)
-      binding.senderPhoto.setOnClickListener {
+      setOnClickListener {
         if (conversationContext.selectedItems.isEmpty()) {
           conversationContext.clickListener.onGroupMemberClicked(
             conversationMessage.messageRecord.fromRecipient.id,
@@ -592,20 +603,55 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
           conversationContext.clickListener.onItemClick(getMultiselectPartForLatestTouch())
         }
       }
-    } else {
-      binding.senderName.visible = false
-      binding.senderPhoto.visible = false
-      binding.senderBadge.visible = false
     }
   }
 
-  private fun presentSenderNameColor() {
-    if (binding.senderName == null || !conversationMessage.threadRecipient.isGroup) {
+  private fun presentSenderBadge() {
+    val badgeView = binding.senderBadge ?: return
+
+    badgeView.apply {
+      visible = shape.isEndingShape
+      setBadgeFromRecipient(conversationMessage.messageRecord.fromRecipient, conversationContext.requestManager)
+    }
+  }
+
+  private fun presentSenderNameWithLabel() {
+    val nameWithLabelView = binding.senderNameWithLabel ?: return
+
+    if (!shape.isStartingShape) {
+      nameWithLabelView.visible = false
+
+      binding.body.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        topMargin = context.resources.getDimensionPixelSize(R.dimen.message_bubble_top_padding)
+      }
       return
     }
 
     val sender = conversationMessage.messageRecord.fromRecipient
-    binding.senderName.setTextColor(conversationContext.getColorizer().getIncomingGroupSenderColor(context, sender))
+    val tintColor = conversationContext.getColorizer().getIncomingGroupSenderColor(context, sender)
+
+    nameWithLabelView.apply {
+      bind(sender.getDisplayName(context), tintColor, conversationMessage.memberLabel)
+      visible = true
+    }
+
+    binding.body.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+      topMargin = 0
+    }
+
+    presentSenderNameBackground()
+  }
+
+  private fun presentSenderNameBackground() {
+    val nameWithLabelView = binding.senderNameWithLabel ?: return
+
+    if (shape.isStartingShape && conversationMessage.messageRecord.hasNoBubble(context) && conversationContext.hasWallpaper()) {
+      senderDrawable.setCorners(footerCorners)
+      senderDrawable.setLocalChatColors(ChatColors.forColor(ChatColors.Id.BuiltIn, themeDelegate.getFooterBubbleColor(conversationMessage)))
+      nameWithLabelView.background = senderDrawable
+    } else {
+      nameWithLabelView.background = null
+    }
   }
 
   private fun presentAlert() {
@@ -709,13 +755,17 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
       binding.footerDate.text = conversationMessage.computedProperties.formattedDate.value
     } else {
       var dateLabel = conversationMessage.computedProperties.formattedDate.value
+      var dateLabelContentDesc = conversationMessage.computedProperties.formattedDate.contentDescValue
       if (conversationContext.displayMode != ConversationItemDisplayMode.Detailed && record is MmsMessageRecord && record.isEditMessage) {
-        dateLabel = if (conversationMessage.computedProperties.formattedDate.isNow) {
-          getContext().getString(R.string.ConversationItem_edited_now_timestamp_footer)
+        if (conversationMessage.computedProperties.formattedDate.isNow) {
+          dateLabel = getContext().getString(R.string.ConversationItem_edited_now_timestamp_footer)
+          dateLabelContentDesc = dateLabel
         } else if (conversationMessage.computedProperties.formattedDate.isRelative) {
-          getContext().getString(R.string.ConversationItem_edited_relative_timestamp_footer, dateLabel)
+          dateLabel = getContext().getString(R.string.ConversationItem_edited_relative_timestamp_footer, dateLabel)
+          dateLabelContentDesc = getContext().getString(R.string.ConversationItem_edited_relative_timestamp_footer, dateLabelContentDesc)
         } else {
-          getContext().getString(R.string.ConversationItem_edited_absolute_timestamp_footer, dateLabel)
+          dateLabel = getContext().getString(R.string.ConversationItem_edited_absolute_timestamp_footer, dateLabel)
+          dateLabelContentDesc = getContext().getString(R.string.ConversationItem_edited_absolute_timestamp_footer, dateLabelContentDesc)
         }
 
         binding.footerDate.setOnClickListener {
@@ -728,6 +778,7 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
       }
 
       binding.footerDate.text = dateLabel
+      binding.footerDate.contentDescription = dateLabelContentDesc
     }
   }
 
@@ -790,15 +841,19 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
       conversationContext.selectedItems.isNotEmpty() -> {
         conversationContext.clickListener.onItemClick(getMultiselectPartForLatestTouch())
       }
+
       messageRecord.isFailed -> {
         conversationContext.clickListener.onMessageWithErrorClicked(messageRecord)
       }
+
       messageRecord.isRateLimited && SignalStore.rateLimit.needsRecaptcha() -> {
         conversationContext.clickListener.onMessageWithRecaptchaNeededClicked(messageRecord)
       }
+
       messageRecord.isOutgoing && messageRecord.isIdentityMismatchFailure -> {
         conversationContext.clickListener.onIncomingIdentityMismatchClicked(messageRecord.fromRecipient.id)
       }
+
       else -> {
         conversationContext.clickListener.onItemClick(getMultiselectPartForLatestTouch())
       }
@@ -810,7 +865,7 @@ open class V2ConversationItemTextOnlyViewHolder<Model : MappingModel<Model>>(
   }
 
   private fun isForcedFooter(): Boolean {
-    return conversationMessage.messageRecord.isEditMessage || conversationMessage.messageRecord.expiresIn > 0L || conversationMessage.messageRecord.pinnedUntil > 0
+    return conversationMessage.messageRecord.isEditMessage || conversationMessage.messageRecord.expiresIn > 0L || conversationMessage.messageRecord.pinnedUntil > 0 || conversationMessage.messageRecord.isStarred
   }
 
   private inner class ReactionMeasureListener : V2ConversationItemLayout.OnMeasureListener {
