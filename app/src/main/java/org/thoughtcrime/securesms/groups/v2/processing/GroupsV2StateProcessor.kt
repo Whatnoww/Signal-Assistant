@@ -709,7 +709,6 @@ class GroupsV2StateProcessor private constructor(
         if (addedBy != null) {
           Log.i(TAG, "Added as a full member of $groupId by ${addedBy.id}")
 
-          // JW: changed logic with more options but not for linked device, otherwise auto leave will always be triggered
           if (!mayAdd && (previousGroupState == null || !DecryptedGroupUtil.isRequesting(previousGroupState, aci))) {
             Log.i(TAG, "Added by a blocked user. Leaving group.")
             AppDependencies.jobManager.add(LeaveGroupV2Job(groupId))
@@ -732,7 +731,7 @@ class GroupsV2StateProcessor private constructor(
         val mayAdd: Boolean = if (SignalStore.account.isLinkedDevice) (addedBy?.isBlocked == true) else mayThisPersonAddYouToAGroup(addedBy!!) // JW
 
         if (!mayAdd) { // JW: replaced blocked by more general permission
-          Log.i(TAG, "Added to group $groupId by a blocked user ${addedBy!!.id}. Leaving group.")
+          Log.i(TAG, "Added to group $groupId by a blocked user ${addedBy?.id!!}. Leaving group.") // JW kotlin stuff
           AppDependencies.jobManager.add(LeaveGroupV2Job(groupId))
           return
         } else {

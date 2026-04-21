@@ -25,15 +25,16 @@ import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.signal.core.util.NoExternalStorageException;
+import org.signal.core.ui.permissions.Permissions;
 import org.signal.core.util.logging.Log;
+import org.signal.core.ui.compose.SignalIcons;
 import org.thoughtcrime.securesms.backup.BackupDialog;
 import org.thoughtcrime.securesms.database.EncryptedBackupExporter;
-import org.thoughtcrime.securesms.database.NoExternalStorageException;
 import org.thoughtcrime.securesms.database.PlaintextBackupExporter;
 import org.thoughtcrime.securesms.database.PlaintextBackupImporter;
 import org.thoughtcrime.securesms.database.WhatsappBackupImporter;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
-import org.thoughtcrime.securesms.permissions.Permissions;
 import org.thoughtcrime.securesms.util.UriUtils;
 
 import java.io.File;
@@ -449,7 +450,7 @@ public class ImportExportFragment extends Fragment {
   private void handleExportEncryptedBackup() {
     CheckAndGetAccessPermissionApi30();
     AlertDialog.Builder builder = new MaterialAlertDialogBuilder(getActivity());
-    builder.setIcon(R.drawable.symbol_info_24);
+    builder.setIcon(org.signal.core.ui.R.drawable.symbol_info_24);
     builder.setTitle(getActivity().getString(R.string.ExportFragment_export_to_sd_card));
     builder.setMessage(getActivity().getString(R.string.ExportFragment_this_will_export_your_encrypted_keys_settings_and_messages));
     builder.setPositiveButton(getActivity().getString(R.string.ExportFragment_export), (dialog, which) -> {

@@ -33,6 +33,8 @@
   <string name="preferences_chats__keep_view_once_messages_summary">Bei aktivierter Option werden eingehende Medien, die einmal angesehen werden, als normale Medien behandelt, die immer angesehen werden können und nach der Ansicht nicht gelöscht werden.</string>
   <string name="preferences_chats__chat_ignore_remote_delete">Remote-Löschen ignorieren</string>
   <string name="preferences_chats__chat_ignore_remote_delete_summary">Wenn diese Option aktiviert ist, verhindert sie das Löschen von Nachrichten durch den Absender.</string>
+  <string name="preferences_chats__chat_ignore_admin_delete">Administratorlöschung ignorieren</string>
+  <string name="preferences_chats__chat_ignore_admin_delete_summary">Wenn diese Option aktiviert ist, wird verhindert, dass ein Gruppenadministrator auf Ihrem Gerät Nachrichten löscht.</string>
   <string name="preferences_chats__delete_media_only">Nur Medien löschen</string>
   <string name="preferences_chats__delete_media_only_summary">Löschen Sie nur Medien, nicht die Nachricht selbst, wenn Medien im Bildschirm Alle Medien gelöscht werden</string>
   <!--backup location-->

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.hardware.Camera.CameraInfo;
 import android.net.Uri;
 import android.provider.Settings;
 
@@ -86,6 +87,7 @@ public class TextSecurePreferences {
 
   public  static final String SYSTEM_EMOJI_PREF                = "pref_system_emoji";
   private static final String MULTI_DEVICE_PROVISIONED_PREF    = "pref_multi_device";
+  public  static final String DIRECT_CAPTURE_CAMERA_ID         = "pref_direct_capture_camera_id";
   public  static final String ALWAYS_RELAY_CALLS_PREF          = "pref_turn_only";
   public  static final String READ_RECEIPTS_PREF               = "pref_read_receipts";
   public  static final String INCOGNITO_KEYBOARD_PREF          = "pref_incognito_keyboard";
@@ -170,6 +172,8 @@ public class TextSecurePreferences {
   public static final String KEEP_VIEW_ONCE_MESSAGES = "pref_keep_view_once_messages";
   // used to see if we ignore remote delete messages or not
   public static final String IGNORE_REMOTE_DELETE = "pref_ignore_remote_delete";
+  // used to see if we ignore admin delete of group messages or not
+  public static final String IGNORE_ADMIN_DELETE = "pref_ignore_admin_delete";
   // select map type for location picker
   public static final String GOOGLE_MAP_TYPE = "pref_google_map_type";
   // delete only media, not the rest of the message, from the All media screen
@@ -199,6 +203,7 @@ public class TextSecurePreferences {
                                                               BACKUP_STORE_ZIPFILE_PLAIN_PREF,
                                                               KEEP_VIEW_ONCE_MESSAGES,
                                                               IGNORE_REMOTE_DELETE,
+                                                              IGNORE_ADMIN_DELETE,
                                                               DELETE_MEDIA_ONLY};
 
   private static final String[] stringPreferencesToBackup = {LED_COLOR_PREF,
@@ -464,6 +469,15 @@ public class TextSecurePreferences {
 
   public static boolean isTurnOnly(Context context) {
     return getBooleanPreference(context, ALWAYS_RELAY_CALLS_PREF, false);
+  }
+
+  public static void setDirectCaptureCameraId(Context context, int value) {
+    setIntegerPrefrence(context, DIRECT_CAPTURE_CAMERA_ID, value);
+  }
+
+  @SuppressWarnings("deprecation")
+  public static int getDirectCaptureCameraId(Context context) {
+    return getIntegerPreference(context, DIRECT_CAPTURE_CAMERA_ID, CameraInfo.CAMERA_FACING_FRONT);
   }
 
   @Deprecated
@@ -1001,6 +1015,14 @@ public class TextSecurePreferences {
 
   public static void setIgnoreRemoteDelete(Context context, boolean value) {
     setBooleanPreference(context, IGNORE_REMOTE_DELETE, value);
+  }
+
+  public static boolean isIgnoreAdminDelete(Context context) {
+    return getBooleanPreference(context, IGNORE_ADMIN_DELETE, false);
+  }
+
+  public static void setIgnoreAdminDelete(Context context, boolean value) {
+    setBooleanPreference(context, IGNORE_ADMIN_DELETE, value);
   }
 
   public static boolean isDeleteMediaOnly(Context context) {

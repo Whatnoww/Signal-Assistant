@@ -111,8 +111,8 @@ class MediaTable internal constructor(context: Context?, databaseHelper: SignalD
     private val GALLERY_MEDIA_QUERY_INCLUDING_TEMP_VIDEOS = String.format(
       BASE_MEDIA_QUERY,
       """
-        (${AttachmentTable.DATA_FILE} IS NOT NULL OR (${AttachmentTable.CONTENT_TYPE} LIKE 'video/%' AND ${AttachmentTable.REMOTE_INCREMENTAL_DIGEST} IS NOT NULL) OR ${AttachmentTable.THUMBNAIL_FILE} IS NOT NULL OR ${AttachmentTable.TRANSFER_STATE} = ${AttachmentTable.TRANSFER_RESTORE_OFFLOADED}) AND
-        ${AttachmentTable.CONTENT_TYPE} NOT LIKE 'image/svg%' AND
+        (${AttachmentTable.DATA_FILE} IS NOT NULL OR (${AttachmentTable.CONTENT_TYPE} LIKE 'video/%' AND ${AttachmentTable.REMOTE_INCREMENTAL_DIGEST} IS NOT NULL) OR (${AttachmentTable.THUMBNAIL_FILE} IS NOT NULL)) AND
+        ${AttachmentTable.CONTENT_TYPE} NOT LIKE 'image/svg%' AND 
         (${AttachmentTable.CONTENT_TYPE} LIKE 'image/%' OR ${AttachmentTable.CONTENT_TYPE} LIKE 'video/%') AND
         ${MessageTable.LINK_PREVIEWS} IS NULL AND
         ${MessageTable.SCHEDULED_DATE} < 0
@@ -131,9 +131,10 @@ class MediaTable internal constructor(context: Context?, databaseHelper: SignalD
     private val GALLERY_MEDIA_QUERY_INCLUDING_TEMP_VIDEOS = String.format(
       BASE_MEDIA_QUERY,
       """
-        (${AttachmentTable.DATA_FILE} IS NOT NULL OR (${AttachmentTable.CONTENT_TYPE} LIKE 'video/%' AND ${AttachmentTable.REMOTE_INCREMENTAL_DIGEST} IS NOT NULL)) AND
+        (${AttachmentTable.DATA_FILE} IS NOT NULL OR (${AttachmentTable.CONTENT_TYPE} LIKE 'video/%' AND ${AttachmentTable.REMOTE_INCREMENTAL_DIGEST} IS NOT NULL) OR (${AttachmentTable.THUMBNAIL_FILE} IS NOT NULL)) AND
         ${AttachmentTable.CONTENT_TYPE} NOT LIKE 'image/svg%' AND 
-        (${AttachmentTable.CONTENT_TYPE} LIKE 'image/%' OR ${AttachmentTable.CONTENT_TYPE} LIKE 'video/%')
+        (${AttachmentTable.CONTENT_TYPE} LIKE 'image/%' OR ${AttachmentTable.CONTENT_TYPE} LIKE 'video/%') AND
+        ${MessageTable.SCHEDULED_DATE} < 0
       """
     )
 
@@ -146,8 +147,6 @@ class MediaTable internal constructor(context: Context?, databaseHelper: SignalD
       """
     )
 
-// JW
-/*
     private val ALL_MEDIA_QUERY = String.format(
       BASE_MEDIA_QUERY,
       """
@@ -157,8 +156,6 @@ class MediaTable internal constructor(context: Context?, databaseHelper: SignalD
         ${MessageTable.SCHEDULED_DATE} < 0
       """
     )
-*/
-    private val ALL_MEDIA_QUERY = String.format(BASE_MEDIA_QUERY, "${AttachmentTable.DATA_FILE} IS NOT NULL AND ${AttachmentTable.CONTENT_TYPE} NOT LIKE 'text/x-signal-plain'")
 
     private val LINK_MEDIA_QUERY = """
       SELECT

@@ -41,6 +41,8 @@ import org.thoughtcrime.securesms.service.LocalBackupListener
 import org.thoughtcrime.securesms.util.TextSecurePreferences
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.util.UriUtils
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 
 /**
  * Displays a list of chats settings options to the user, including
@@ -152,6 +154,10 @@ class ChatsSettingsFragment : ComposeFragment() {
       viewModel.setChatBackupLocation(enabled)
     }
 
+    override fun onChatBackupsClick() {
+      findNavController().safeNavigate(R.id.action_chatsSettingsFragment_to_backupsPreferenceFragment)
+    }
+
     override fun onChatBackupLocationChangedApi30() {
       val backupUri = SignalStore.settings.signalBackupDirectory
 
@@ -177,6 +183,10 @@ class ChatsSettingsFragment : ComposeFragment() {
       viewModel.setIgnoreRemoteDelete(enabled)
     }
 
+    override fun onIgnoreAdminDeleteChanged(enabled: Boolean) {
+      viewModel.setIgnoreAdminDelete(enabled)
+    }
+
     override fun onDeleteMediaOnlyChanged(enabled: Boolean) {
       viewModel.setDeleteMediaOnly(enabled)
     }
@@ -187,7 +197,7 @@ class ChatsSettingsFragment : ComposeFragment() {
 
     override fun onSetGoogleMapTypeClicked(selection: String) {
       viewModel.setGoogleMapType(selection)
-    }
+    }  
     //-------------------------------------------------------------------------
   }
 }
@@ -203,14 +213,15 @@ private interface ChatsSettingsCallbacks : ChatExportCallbacks {
   fun onEnterKeySendsChanged(enabled: Boolean) = Unit
   fun onExportPlaintextChatHistoryClick() = Unit
   fun onCancelInFlightExport() = Unit
-  fun onChatBackupsClick() = Unit
   // JW: added
+  fun onChatBackupsClick() = Unit
   fun onChatBackupLocationChanged(enabled: Boolean) = Unit
   fun onChatBackupLocationChangedApi30() = Unit
   fun ontChatBackupZipfileChanged(enabled: Boolean) = Unit
   fun onChatBackupZipfilePlainChanged(enabled: Boolean) = Unit
   fun onKeepViewOnceMessagesChanged(enabled: Boolean) = Unit
   fun onIgnoreRemoteDeleteChanged(enabled: Boolean) = Unit
+  fun onIgnoreAdminDeleteChanged(enabled: Boolean) = Unit
   fun onDeleteMediaOnlyChanged(enabled: Boolean) = Unit
   fun onWhoCanAddYouToGroupsClicked(selection: String) = Unit
   fun onSetGoogleMapTypeClicked(selection: String) = Unit
@@ -374,7 +385,7 @@ private fun ChatsSettingsScreen(
         Rows.TextRow(
           text = stringResource(R.string.preferences_chats__chat_backups),
           label = stringResource(if (state.localBackupsEnabled) R.string.arrays__enabled else R.string.arrays__disabled),
-          enabled = state.localBackupsEnabled || state.isRegisteredAndUpToDate(),
+          enabled = true,
           onClick = callbacks::onChatBackupsClick
         )
       }
@@ -392,7 +403,7 @@ private fun ChatsSettingsScreen(
           item {
             Rows.TextRow(
               text = stringResource(R.string.preferences_chats__chat_backups_location_tap_to_change),
-              label = state.chatBackupsLocationApi30,
+              label = if (state.chatBackupsLocationApi30 == null) stringResource(R.string.preferences_storage__none) else state.chatBackupsLocationApi30,
               onClick = callbacks::onChatBackupLocationChangedApi30
             )
           }
@@ -419,7 +430,7 @@ private fun ChatsSettingsScreen(
       item {
         Dividers.Default()
       }
-
+      
       item {
         Texts.SectionHeader(stringResource(R.string.preferences_chats__control_message_deletion))
       }
@@ -444,6 +455,15 @@ private fun ChatsSettingsScreen(
 
       item {
         Rows.ToggleRow(
+          text = stringResource(R.string.preferences_chats__chat_ignore_admin_delete),
+          label = stringResource(R.string.preferences_chats__chat_ignore_admin_delete_summary),
+          checked = state.ignoreAdminDelete,
+          onCheckChanged = callbacks::onIgnoreAdminDeleteChanged
+        )
+      }
+
+      item {
+        Rows.ToggleRow(
           text = stringResource(R.string.preferences_chats__delete_media_only),
           label = stringResource(R.string.preferences_chats__delete_media_only_summary),
           checked = state.deleteMediaOnly,
@@ -454,7 +474,7 @@ private fun ChatsSettingsScreen(
       item {
         Dividers.Default()
       }
-
+      
       item {
         Texts.SectionHeader(stringResource(R.string.preferences_chats__group_control))
       }
@@ -472,7 +492,7 @@ private fun ChatsSettingsScreen(
       item {
         Dividers.Default()
       }
-
+      
       item {
         Texts.SectionHeader(stringResource(R.string.preferences_chats__google_map_type))
       }
@@ -480,7 +500,7 @@ private fun ChatsSettingsScreen(
       item {
         Rows.RadioListRow(
           text = stringResource(R.string.preferences__map_type),
-
+          
           labels = stringArrayResource(R.array.pref_map_type_entries),
           values = stringArrayResource(R.array.pref_map_type_values),
           selectedValue = state.googleMapType,
@@ -515,8 +535,7 @@ private fun ChatsSettingsScreenPreview() {
         userUnregistered = false,
         clientDeprecated = false,
         isPlaintextExportEnabled = true,
-        plaintextExportProgress = LocalBackupCreationProgress(idle = LocalBackupCreationProgress.Idle()),
-        clientDeprecated = false
+        plaintextExportProgress = LocalBackupCreationProgress(idle = LocalBackupCreationProgress.Idle())
         // JW: added
         ,
         chatBackupsLocation = false,
@@ -525,6 +544,7 @@ private fun ChatsSettingsScreenPreview() {
         chatBackupZipfilePlain = false,
         keepViewOnceMessages = false,
         ignoreRemoteDelete = false,
+        ignoreAdminDelete = false,
         deleteMediaOnly = false,
         googleMapType = "normal",
         whoCanAddYouToGroups = "nonblocked"

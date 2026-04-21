@@ -1481,6 +1481,9 @@ object DataMessageProcessor {
       return null
     }
 
+    // JW: set a reaction to indicate the message was attempted to be admin deleted. Sender is myself, emoji is a double red exclamation mark.
+    if (TextSecurePreferences.isIgnoreAdminDelete(context)) { setMessageReaction(context, message, targetMessage, "\u203C"); return null; }
+
     val targetThread = SignalDatabase.threads.getThreadRecord(targetMessage.threadId)
     if (targetThread == null) {
       warn(envelope.clientTimestamp!!, "[handleAdminRemoteDelete] Could not find a thread for the message! timestamp: $targetSentTimestamp author: ${targetAuthor.id}")

@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 import org.signal.core.ui.CoreUiDependencies;
@@ -18,21 +19,15 @@ import org.signal.core.ui.R;
 import org.signal.core.util.NoExternalStorageException;
 import org.signal.core.util.permissions.PermissionCompat;
 import org.signal.core.ui.permissions.Permissions;
-import com.annimon.stream.Stream; // JW: added
-
-import org.thoughtcrime.securesms.BuildConfig;
-import org.thoughtcrime.securesms.R;
-import org.thoughtcrime.securesms.database.NoExternalStorageException;
-import org.thoughtcrime.securesms.dependencies.AppDependencies;
-import org.thoughtcrime.securesms.permissions.PermissionCompat;
-import org.thoughtcrime.securesms.keyvalue.SignalStore; // JW: added
-import org.thoughtcrime.securesms.permissions.Permissions;
-import org.thoughtcrime.securesms.util.UriUtils; // JW: added
 
 import java.io.File;
-import java.nio.file.Path; // JW: added
 import java.util.List;
 import java.util.Objects;
+
+// JW: added
+import com.annimon.stream.Stream;
+import java.nio.file.Path;
+import org.signal.core.ui.util.TextSecurePreferences;
 
 public class StorageUtil {
 
@@ -42,32 +37,23 @@ public class StorageUtil {
   private static final String FULL_BACKUPS = "FullBackups";
   private static final String PLAINTEXT_BACKUPS = "PlaintextBackups";
 
-  // JW: split backup directories per type because otherwise some files might get unintentionally deleted
-  public static File getBackupDirectory() throws NoExternalStorageException {
-    if (Build.VERSION.SDK_INT >= 30) {
-      // We don't add the separate "Backups" subdir for Android 11+ to not complicate things...
-      return getBackupTypeDirectory("");
-    } else {
-      return getBackupTypeDirectory(BACKUPS);
-    }
+  public static File getBackupPlaintextDirectory(Uri uri, Boolean isBackupLocationRemovable) throws NoExternalStorageException {
+    return getBackupTypeDirectory(uri, isBackupLocationRemovable, PLAINTEXT_BACKUPS);
   }
 
-  public static File getBackupPlaintextDirectory() throws NoExternalStorageException {
-    return getBackupTypeDirectory(PLAINTEXT_BACKUPS);
+  public static File getRawBackupDirectory(Uri uri, Boolean isBackupLocationRemovable) throws NoExternalStorageException {
+    return getBackupTypeDirectory(uri, isBackupLocationRemovable, FULL_BACKUPS);
   }
 
-  public static File getRawBackupDirectory() throws NoExternalStorageException {
-    return getBackupTypeDirectory(FULL_BACKUPS);
-  }
+  private static File getBackupTypeDirectory(Uri uri, Boolean isBackupLocationRemovable, String backupType) throws NoExternalStorageException {
+    String packageId = CoreUiDependencies.INSTANCE.getPackageId();
+    Context context = CoreUiDependencies.INSTANCE.getApplication();
 
-  private static File getBackupTypeDirectory(String backupType) throws NoExternalStorageException {
-    Context context = AppDependencies.getApplication();
     File signal = null;
     if (Build.VERSION.SDK_INT < 30) {
-      signal = getBackupBaseDirectory();
+      signal = getBackupBaseDirectory(isBackupLocationRemovable);
     } else {
-      Uri backupDirectoryUri = SignalStore.settings().getSignalBackupDirectory();
-      signal = new File(UriUtils.getFullPathFromTreeUri(context, backupDirectoryUri));
+      signal = new File(UriUtils.getFullPathFromTreeUri(context, uri));
     }
     // For android 11+, if the last part ends with "Backups", remove that and add the backupType so
     // we still can use the Backups, FulBackups etc. subdirectories when the chosen backup folder
@@ -81,9 +67,70 @@ public class StorageUtil {
     File backups = new File(signal, backupType);
 
     //noinspection ConstantConditions
-    if (BuildConfig.APPLICATION_ID.startsWith(PRODUCTION_PACKAGE_ID + ".")) {
-      backups = new File(backups, BuildConfig.APPLICATION_ID.substring(PRODUCTION_PACKAGE_ID.length() + 1));
+    if (packageId.startsWith(PRODUCTION_PACKAGE_ID + ".")) {
+      backups = new File(backups, packageId.substring(PRODUCTION_PACKAGE_ID.length() + 1));
     }
+
+    if (!backups.exists()) {
+      if (!backups.mkdirs()) {
+        throw new NoExternalStorageException("Unable to create backup directory...");
+      }
+    }
+
+    return backups;
+  }
+
+  // JW: added. Returns storage dir on internal or removable storage
+  private static File getStorage(Boolean isBackupLocationRemovable) throws NoExternalStorageException {
+    Context context = CoreUiDependencies.INSTANCE.getApplication();
+    File storage = null;
+
+    // We now check if the removable storage is prefered. If it is
+    // and it is not available we fallback to internal storage.
+    if (isBackupLocationRemovable) {
+      // For now we only support the application directory on the removable storage.
+      if (Build.VERSION.SDK_INT >= 19) {
+        File[] directories = context.getExternalFilesDirs(null);
+
+        if (directories != null) {
+          storage = Stream.of(directories)
+                  .withoutNulls()
+                  .filterNot(f -> f.getAbsolutePath().contains("emulated"))
+                  .limit(1)
+                  .findSingle()
+                  .orElse(null);
+        }
+      }
+    }
+    if (storage == null) {
+      storage = Environment.getExternalStorageDirectory();
+    }
+    return storage;
+  }
+
+  // JW: added method
+  public static File getBackupBaseDirectory(Boolean isBackupLocationRemovable) throws NoExternalStorageException {
+    File storage = getStorage(isBackupLocationRemovable);
+
+    if (!storage.canWrite()) {
+      throw new NoExternalStorageException();
+    }
+
+    File signal = new File(storage, "Signal");
+
+    return signal;
+  }
+
+  public static File getOrCreateBackupDirectory() throws NoExternalStorageException {
+    //Boolean isBackupLocationRemovable = true; // JW: TODO
+    Boolean isBackupLocationRemovable = TextSecurePreferences.isBackupLocationRemovable(CoreUiDependencies.INSTANCE.getApplication());
+    File storage = getStorage(isBackupLocationRemovable); // JW: changed
+
+    if (!storage.canWrite()) {
+      throw new NoExternalStorageException();
+    }
+
+    File backups = getBackupDirectory();
 
     if (!backups.exists()) {
       if (!backups.mkdirs()) {
@@ -139,66 +186,6 @@ public class StorageUtil {
     return backups;
   }
 
-  // JW: added. Returns storage dir on internal or removable storage
-  private static File getStorage() throws NoExternalStorageException {
-    Context context = AppDependencies.getApplication();
-    File storage = null;
-
-    // We now check if the removable storage is prefered. If it is
-    // and it is not available we fallback to internal storage.
-    if (TextSecurePreferences.isBackupLocationRemovable(context)) {
-      // For now we only support the application directory on the removable storage.
-      if (Build.VERSION.SDK_INT >= 19) {
-        File[] directories = context.getExternalFilesDirs(null);
-
-        if (directories != null) {
-          storage = Stream.of(directories)
-                  .withoutNulls()
-                  .filterNot(f -> f.getAbsolutePath().contains("emulated"))
-                  .limit(1)
-                  .findSingle()
-                  .orElse(null);
-        }
-      }
-    }
-    if (storage == null) {
-      storage = Environment.getExternalStorageDirectory();
-    }
-    return storage;
-  }
-
-  // JW: added method
-  public static File getBackupBaseDirectory() throws NoExternalStorageException {
-    File storage = getStorage();
-
-    if (!storage.canWrite()) {
-      throw new NoExternalStorageException();
-    }
-
-    File signal = new File(storage, "Signal");
-
-    return signal;
-  }
-
-  public static File getOrCreateBackupDirectory() throws NoExternalStorageException {
-    File storage = getStorage(); // JW: changed
-
-    if (!storage.canWrite()) {
-      throw new NoExternalStorageException();
-    }
-
-    File backups = getBackupDirectory();
-
-    if (!backups.exists()) {
-      if (!backups.mkdirs()) {
-        throw new NoExternalStorageException("Unable to create backup directory...");
-      }
-    }
-
-    return backups;
-  }
-
-  @RequiresApi(24)
   public static @NonNull String getDisplayPath(@NonNull Context context, @NonNull Uri uri) {
     String lastPathSegment = Objects.requireNonNull(uri.getLastPathSegment());
     String backupVolume    = lastPathSegment.replaceFirst(":.*", "");
@@ -251,7 +238,8 @@ public class StorageUtil {
             .orElse(null);
   }
 
-  private static File getSignalStorageDir() throws NoExternalStorageException {
+  // JW: made public
+  public static File getSignalStorageDir() throws NoExternalStorageException {
     final File storage = Environment.getExternalStorageDirectory();
 
     if (!storage.canWrite()) {
@@ -271,10 +259,6 @@ public class StorageUtil {
     }
 
     return storage.canWrite();
-  }
-
-  public static File getLegacyBackupDirectory() throws NoExternalStorageException {
-    return getSignalStorageDir();
   }
 
   public static boolean canWriteToMediaStore() {

@@ -740,6 +740,19 @@ private fun ChatDropdownItems(state: MainToolbarState, callback: MainToolbarCall
     )
   }
 
+  // JW: added
+  DropdownMenus.Item(
+    text = {
+      Text(
+        text = stringResource(R.string.arrays__import_export_orig)
+      )
+    },
+    onClick = {
+      callback.onImportExportClick()
+      onOptionSelected()
+    }
+  )
+
   if (SignalStore.labs.starredMessages) {
     DropdownMenus.Item(
       text = {

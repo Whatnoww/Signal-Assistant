@@ -47,6 +47,7 @@ class ChatsSettingsViewModel @JvmOverloads constructor(
       chatBackupZipfilePlain = TextSecurePreferences.isPlainBackupInZipfile(AppDependencies.application),
       keepViewOnceMessages = TextSecurePreferences.isKeepViewOnceMessages(AppDependencies.application),
       ignoreRemoteDelete = TextSecurePreferences.isIgnoreRemoteDelete(AppDependencies.application),
+      ignoreAdminDelete = TextSecurePreferences.isIgnoreAdminDelete(AppDependencies.application),
       deleteMediaOnly = TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application),
       googleMapType = TextSecurePreferences.getGoogleMapType(AppDependencies.application),
       whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application)
@@ -184,6 +185,12 @@ class ChatsSettingsViewModel @JvmOverloads constructor(
   }
 
   // JW: added
+  fun setIgnoreAdminDelete(enabled: Boolean) {
+    TextSecurePreferences.setIgnoreAdminDelete(AppDependencies.application, enabled)
+    refresh()
+  }
+
+  // JW: added
   fun setDeleteMediaOnly(enabled: Boolean) {
     TextSecurePreferences.setDeleteMediaOnly(AppDependencies.application, enabled)
     refresh()
@@ -200,7 +207,7 @@ class ChatsSettingsViewModel @JvmOverloads constructor(
     TextSecurePreferences.setWhoCanAddYouToGroups(AppDependencies.application, adder)
     refresh()
   }
-
+  
   // JW: added
   private fun getState() = ChatsSettingsState(
     generateLinkPreviews = SignalStore.settings.isLinkPreviewsEnabled,
@@ -212,12 +219,15 @@ class ChatsSettingsViewModel @JvmOverloads constructor(
     folderCount = ChatFoldersRepository.getFolderCount(),
     userUnregistered = TextSecurePreferences.isUnauthorizedReceived(AppDependencies.application) || !SignalStore.account.isRegistered,
     clientDeprecated = SignalStore.misc.isClientDeprecated,
+    isPlaintextExportEnabled = RemoteConfig.localPlaintextExport,
+    chatExportState = ChatExportState.None,
     chatBackupsLocationApi30 = UriUtils.getFullPathFromTreeUri(AppDependencies.application, SignalStore.settings.signalBackupDirectory),
     chatBackupsLocation = TextSecurePreferences.isBackupLocationRemovable(AppDependencies.application),
     chatBackupZipfile = TextSecurePreferences.isRawBackupInZipfile(AppDependencies.application),
     chatBackupZipfilePlain = TextSecurePreferences.isPlainBackupInZipfile(AppDependencies.application),
     keepViewOnceMessages = TextSecurePreferences.isKeepViewOnceMessages(AppDependencies.application),
     ignoreRemoteDelete = TextSecurePreferences.isIgnoreRemoteDelete(AppDependencies.application),
+    ignoreAdminDelete = TextSecurePreferences.isIgnoreAdminDelete(AppDependencies.application),
     deleteMediaOnly = TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application),
     googleMapType = TextSecurePreferences.getGoogleMapType(AppDependencies.application),
     whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application)

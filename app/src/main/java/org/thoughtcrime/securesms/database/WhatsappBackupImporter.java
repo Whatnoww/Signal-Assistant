@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.signal.core.util.NoExternalStorageException;
+
 import static org.thoughtcrime.securesms.database.MessageTable.DATE_RECEIVED;
 import static org.thoughtcrime.securesms.database.MessageTable.DATE_SENT;
 import static org.thoughtcrime.securesms.database.MessageTable.TYPE;

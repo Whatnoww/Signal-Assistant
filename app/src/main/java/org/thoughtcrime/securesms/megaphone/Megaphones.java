@@ -124,7 +124,7 @@ public final class Megaphones {
       put(Event.BACKUP_SCHEDULE_PERMISSION, shouldShowBackupSchedulePermissionMegaphone(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER);
       put(Event.ONBOARDING, shouldShowOnboardingMegaphone(context) ? ALWAYS : NEVER);
       put(Event.TURN_OFF_CENSORSHIP_CIRCUMVENTION, shouldShowTurnOffCircumventionMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(7)) : NEVER);
-      //put(Event.REMOTE_MEGAPHONE, shouldShowRemoteMegaphone(records) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(1)) : NEVER); // JW
+      //put(Event.REMOTE_MEGAPHONE, shouldShowRemoteMegaphone(records) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(1)) : NEVER); // JW: nagware disabled
       put(Event.LINKED_DEVICE_INACTIVE, shouldShowLinkedDeviceInactiveMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)): NEVER);
 
       // Specifically putting backup reminders here, above PIN reminders
@@ -132,8 +132,8 @@ public final class Megaphones {
       put(Event.BACKUP_MEDIA_SIZE_UPSELL, shouldShowBackupMediaSizeUpsell() ? new BackupUpsellSchedule(records, TimeUnit.DAYS.toMillis(60), TimeUnit.DAYS.toMillis(120)) : NEVER);
       put(Event.BACKUP_MESSAGE_COUNT_UPSELL, shouldShowBackupMessageCountUpsell(context) ? new BackupUpsellSchedule(records, TimeUnit.DAYS.toMillis(60)) : NEVER);
       put(Event.BACKUPS_GENERIC_UPSELL, shouldShowGenericBackupsMegaphone(context) ? new BackupUpsellSchedule(records, TimeUnit.DAYS.toMillis(60)) : NEVER);
-      put(Event.VERIFY_BACKUP_KEY, new VerifyBackupKeyReminderSchedule());
-      put(Event.USE_NEW_ON_DEVICE_BACKUPS, shouldShowUseNewOnDeviceBackupsMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(14)) : NEVER);
+      //put(Event.VERIFY_BACKUP_KEY, new VerifyBackupKeyReminderSchedule()); // JW
+      //put(Event.USE_NEW_ON_DEVICE_BACKUPS, shouldShowUseNewOnDeviceBackupsMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(14)) : NEVER); // JW
 
       // The Great Wall of PIN Reminder -- megaphones below this may not be seen by users who never do reminders
       put(Event.PIN_REMINDER, new SignalPinReminderSchedule());
@@ -199,10 +199,10 @@ public final class Megaphones {
         return buildBackupMediaSizeUpsellMegaphone();
       case BACKUP_LOW_STORAGE_UPSELL:
         return buildBackupLowStorageUpsellMegaphone();
-      case VERIFY_BACKUP_KEY:
-        return buildVerifyBackupKeyMegaphone();
-      case USE_NEW_ON_DEVICE_BACKUPS:
-        return buildUseNewOnDeviceBackupsMegaphone();
+      //case VERIFY_BACKUP_KEY:
+      //  return buildVerifyBackupKeyMegaphone(); // JW
+      //case USE_NEW_ON_DEVICE_BACKUPS:
+      //  return buildUseNewOnDeviceBackupsMegaphone(); // JW
       default:
         throw new IllegalArgumentException("Event not handled!");
     }
