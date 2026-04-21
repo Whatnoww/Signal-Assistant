@@ -69,12 +69,6 @@ class AdvancedPrivacySettingsViewModel(
     refresh()
   }
 
-  // JW: added
-  fun setPushNotificationsViaFCM(enabled: Boolean) {
-    SignalStore.account.fcmEnabled = enabled
-    refresh()
-  }
-
   fun setAllowAutomaticVerification(enabled: Boolean) {
     SignalStore.settings.automaticVerificationEnabled = enabled
     refresh()
