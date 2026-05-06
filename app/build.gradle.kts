@@ -547,44 +547,6 @@ android {
   }
 }
 
-androidComponents {
-  beforeVariants { variant ->
-    variant.enable = variant.name in selectableVariants
-  }
-  onVariants(selector().all()) { variant: com.android.build.api.variant.ApplicationVariant ->
-    // Rename APK to include version name
-    val renameTask = tasks.register<RenameApkTask>("renameApk${variant.name.replaceFirstChar { it.uppercase() }}")
-    val renameRequest = variant.artifacts.use(renameTask)
-      .wiredWithDirectories(RenameApkTask::apkFolder, RenameApkTask::outFolder)
-      .toTransformMany(SingleArtifact.APK)
-    renameTask.configure {
-      transformationRequest.set(renameRequest)
-    }
-
-    // Include the test-only library on debug builds.
-    if (variant.buildType != "instrumentation") {
-      variant.packaging.jniLibs.excludes.add("**/libsignal_jni_testing.so")
-    }
-  // JW added
-  applicationVariants.all {
-    outputs
-      .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
-      .forEach { output ->
-        // JW: rewrote section
-        output.outputFileName = output.outputFileName.replace(".apk", "-$versionName.apk")
-
-        val abiName: String = output.getFilter("ABI") ?: "universal"
-        val postFix: Int = abiPostFix[abiName]!!
-
-        if (postFix >= maxHotfixVersions) {
-          throw AssertionError("maxHotfixVersions is too large")
-        }
-
-        output.versionCodeOverride = canonicalVersionCode * maxHotfixVersions + postFix
-      }
-  }
-  // End JW: added
-
   androidComponents {
     beforeVariants { variant ->
       variant.enable = variant.name in selectableVariants
