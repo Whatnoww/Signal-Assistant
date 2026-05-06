@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">รหัสยืนยันจะถูกส่งไปยังหมายเลขโทรศัพท์นี้ อาจมีค่าบริการจากผู้ให้บริการโทรศัพท์</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">แก้ไขหมายเลข</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">เปิดเมนู</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">ใช้พร็อกซี</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">เชื่อมโยงอุปกรณ์</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">ยาวเกินกำหนด (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">กุญแจกู้คืนใช้งานไม่ได้</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">กุญแจกู้คืนไม่ถูกต้อง</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">กำลังเตรียมการกู้คืน…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">เริ่มต้นใช้งาน Signal</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">สร้างบัญชีใหม่</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">กู้คืนจากข้อมูลสำรอง</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">กำลังเรียกดูข้อมูลสำรอง…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">กู้คืนจากข้อมูลสำรอง</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">คุณสำรองข้อมูลครั้งล่าสุดเมื่อวันที่ %1$s เวลา %2$s</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">โดยการกู้คืนไฟล์สื่อจะดำเนินการในพื้นหลัง หากเลือกไม่กู้คืนตอนนี้ คุณจะไม่สามารถกู้คืนได้อีกในภายหลัง</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">ไม่พบข้อมูลสำรอง</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">ไม่พบข้อมูลสำรองของบัญชีนี้</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">ไม่สามารถกู้คืนข้อมูลสำรอง</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">ไม่สามารถกู้คืนข้อมูลสำรองของคุณได้ในขณะนี้ โปรดลองอีกครั้ง</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">ลองอีกครั้ง</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">ไม่สามารถดำเนินการกู้คืนให้เสร็จสิ้นได้</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">เกิดข้อผิดพลาดขณะเชื่อมต่อกับเซิร์ฟเวอร์ โปรดตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">เกิดข้อผิดพลาดขณะกู้คืนข้อมูลสำรอง โปรดลองอีกครั้ง</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">ไม่สามารถกู้คืนข้อมูลสำรองนี้</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Signal เวอร์ชันนี้ไม่สามารถกู้คืนข้อมูลสำรองของคุณได้ โปรดอัปเดตเป็นเวอร์ชันล่าสุดแล้วลองอีกครั้ง</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">อัปเดต Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">ไว้ทีหลัง</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">ไม่สามารถกู้คืนข้อมูลสำรอง</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">เกิดข้อผิดพลาดขณะกู้คืนข้อมูลสำรอง ระบบไม่สามารถกู้ข้อมูลสำรองของคุณได้ โปรดติดต่อฝ่ายสนับสนุน</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">ติดต่อฝ่ายสนับสนุน</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">กำลังดาวน์โหลดข้อมูลสำรอง…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">กำลังกู้คืนข้อความ…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">ใกล้เสร็จสิ้น…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">กำลังกู้คืน…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s จาก %2$s (%3$s)</string>
 </resources>

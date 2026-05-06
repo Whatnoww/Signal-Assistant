@@ -27,6 +27,7 @@ import org.signal.core.util.bytes
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.compose.rememberStatusBarColorNestedScrollModifier
 import org.thoughtcrime.securesms.mms.SentMediaQuality
+import org.thoughtcrime.securesms.util.AttachmentUtil
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
 import org.thoughtcrime.securesms.webrtc.CallDataMode
 import kotlin.math.abs
@@ -166,6 +167,21 @@ private fun DataAndStorageSettingsScreen(
           selection = state.roamingAutoDownloadValues.toTypedArray(),
           noSelectionLabel = stringResource(R.string.preferences__none),
           onSelectionChanged = callbacks::onRoamingDataAutoDownloadSelectionChanged
+        )
+      }
+
+      item {
+        Rows.TextRow(
+          text = {
+            Text(
+              text = stringResource(
+                R.string.DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded,
+                AttachmentUtil.SMALL_ATTACHMENT_SIZE.toUnitString()
+              ),
+              style = MaterialTheme.typography.bodyMedium,
+              color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+          }
         )
       }
 

@@ -810,7 +810,7 @@ class RegistrationViewModel : ViewModel() {
         registrationCheckpoint = RegistrationCheckpoint.PIN_ENTERED
       )
     }
-    viewModelScope.launch {
+    viewModelScope.launch(context = coroutineExceptionHandler) {
       verifyCodeInternal(
         context = context,
         registrationLocked = true,

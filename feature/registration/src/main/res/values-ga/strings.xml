@@ -47,7 +47,13 @@
     <!-- Dialog body to confirm phone number -->
     <string name="RegistrationActivity_a_verification_code">Seolfar cód fíoraithe chuig an uimhir seo. Féadfaidh rátaí iompróra a bheith i bhfeidhm.</string>
     <!-- Dialog button to edit the number entered -->
-    <string name="RegistrationActivity_edit_number">Edit Number</string>
+    <string name="RegistrationActivity_edit_number">Cuir an uimhir in eagar</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Oscail an roghchlár</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Úsáid seachfhreastalaí</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Nasc an gléas</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Rófhada (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Eochair athshlánaithe neamhbhailí</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Eochair athshlánaithe mhícheart</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Aischur á ullmhú…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Nach bhfuil tú ar Signal fós?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Cruthaigh cuntas</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Aischuir ó chúltaca</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Sonraí cúltaca á bhfáil…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Aischuir cúltaca</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Rinneadh do chúltaca deiridh ar an %1$s ag %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Aischuirfear do mheáin sa chúlra. Má roghnaíonn tú gan aischur a dhéanamh anois, ní bheidh tú in ann é a dhéanamh níos déanaí.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">Níor aimsíodh cúltaca</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Níor aimsíodh cúltaca don chuntas seo.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Ní féidir an cúltaca a aischur</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Ní féidir do chúltaca a aischur díreach anois. Triail arís.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Triail arís</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Níorbh fhéidir an t-aischur a chur i gcrích</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Tharla earráid le linn ceangal leis an bhfreastalaí. Seiceáil do cheangal agus triail arís.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Tharla earráid agus do chúltaca á aischur. Triail arís.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Níorbh fhéidir an cúltaca seo a aischur</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Ní féidir leis an leagan seo de Signal do chúltaca a aischur. Nuashonraigh chuig an leagan is déanaí agus triail arís é.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Nuashonraigh Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Ní anois</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Ní féidir an cúltaca a aischur</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Tharla earráid agus do chúltaca á aischur. Níl do chúltaca in-athshlánaithe. Déan teagmháil leis an bhfoireann tacaíochta le cabhair a fháil.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Déan teagmháil leis an bhfoireann tacaíochta</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Cúltaca á íoslódáil…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Teachtaireachtaí á gcur ar ais…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Cur i gcrích ar bun…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Aischur ar bun…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s as %2$s (%3$s)</string>
 </resources>

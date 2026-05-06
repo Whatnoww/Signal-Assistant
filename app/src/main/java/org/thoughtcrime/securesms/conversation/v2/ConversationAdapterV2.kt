@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +23,7 @@ import org.signal.core.util.toOptional
 import org.thoughtcrime.securesms.BindableConversationItem
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.Unbindable
-import org.thoughtcrime.securesms.components.settings.conversation.ConversationSettingsActivity
+import org.thoughtcrime.securesms.components.settings.conversation.ConversationSettingsNavigator
 import org.thoughtcrime.securesms.conversation.ConversationAdapter.ItemClickListener
 import org.thoughtcrime.securesms.conversation.ConversationAdapterBridge
 import org.thoughtcrime.securesms.conversation.ConversationHeaderCallbacks
@@ -580,7 +581,7 @@ class ConversationAdapterV2(
 
         override fun onGroupSettingsClicked() {
           val recipient = conversationBanner.recipientInfo?.recipient ?: return
-          context.startActivity(ConversationSettingsActivity.forGroup(context, recipient.requireGroupId()))
+          ConversationSettingsNavigator.navigate(context as FragmentActivity, recipient)
         }
 
         override fun onShowGroupDescriptionClicked(groupName: String, description: String, linkifyWebLinks: Boolean) {

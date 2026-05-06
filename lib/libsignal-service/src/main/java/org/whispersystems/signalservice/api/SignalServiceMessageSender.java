@@ -177,6 +177,7 @@ public class SignalServiceMessageSender {
   private final SignalServiceAccountDataStore aciStore;
   private final SignalSessionLock             sessionLock;
   private final SignalServiceAddress          localAddress;
+  private final SignalProtocolAddress         localProtocolAddress;
   private final int                           localDeviceId;
   private final PNI                           localPni;
   private final Optional<EventListener>       eventListener;
@@ -214,6 +215,7 @@ public class SignalServiceMessageSender {
     this.sessionLock                   = sessionLock;
     this.localAddress                  = new SignalServiceAddress(credentialsProvider.getAci(), credentialsProvider.getE164());
     this.localDeviceId                 = credentialsProvider.getDeviceId();
+    this.localProtocolAddress          = new SignalProtocolAddress(localAddress.getIdentifier(), localDeviceId);
     this.localPni                      = credentialsProvider.getPni();
     this.attachmentApi                 = attachmentApi;
     this.messageApi                    = messageApi;
@@ -1056,10 +1058,6 @@ public class SignalServiceMessageSender {
       builder.groupV2(createGroupContent(message.getGroupContext().get()));
     }
 
-    if (message.isEndSession()) {
-      builder.flags(DataMessage.Flags.END_SESSION.getValue());
-    }
-
     if (message.isExpirationUpdate()) {
       builder.flags(DataMessage.Flags.EXPIRATION_TIMER_UPDATE.getValue());
     }
@@ -1522,7 +1520,7 @@ public class SignalServiceMessageSender {
 
     return container.syncMessage(syncMessage.sent(sentMessage.build()).build()).build();
   }
-  
+
   private SyncMessage.Sent.StoryMessageRecipient createStoryMessageRecipient(SignalServiceStoryMessageRecipient storyMessageRecipient) {
     return new SyncMessage.Sent.StoryMessageRecipient.Builder()
                                                      .distributionListIds(storyMessageRecipient.getDistributionListIds())
@@ -2039,6 +2037,11 @@ public class SignalServiceMessageSender {
           Log.d(TAG, "[sendMessage][" + timestamp + "] Sending a sent sync message to devices: " + messages.getDevices());
         } else if (content.getContent().isPresent() && content.getContent().get().senderKeyDistributionMessage != null) {
           Log.d(TAG, "[sendMessage][" + timestamp + "] Sending a SKDM to " + messages.getDestination() + " for devices: " + messages.getDevices() + (content.getContent().get().dataMessage != null ? " (it's piggy-backing on a DataMessage)" : ""));
+        }
+
+        if (messages.getDevices().isEmpty()) {
+          Log.w(TAG, "[sendMessage][" + timestamp + "] Skipping send - no devices with valid sessions (isMultiDevice=" + aciStore.isMultiDevice() + ").");
+          return SendMessageResult.success(recipient, messages.getDevices(), false, false, System.currentTimeMillis() - startTime, content.getContent());
         }
 
         if (cancelationSignal != null && cancelationSignal.isCanceled()) {
@@ -2887,7 +2890,7 @@ public class SignalServiceMessageSender {
 
           try {
             SignalProtocolAddress preKeyAddress  = new SignalProtocolAddress(recipient.getIdentifier(), preKey.getDeviceId());
-            SignalSessionBuilder  sessionBuilder = new SignalSessionBuilder(sessionLock, new SessionBuilder(aciStore, preKeyAddress));
+            SignalSessionBuilder  sessionBuilder = new SignalSessionBuilder(sessionLock, new SessionBuilder(aciStore, preKeyAddress, localProtocolAddress));
             sessionBuilder.process(preKey);
           } catch (org.signal.libsignal.protocol.UntrustedIdentityException e) {
             throw new UntrustedIdentityException("Untrusted identity key!", recipient.getIdentifier(), preKey.getIdentityKey());
@@ -2964,7 +2967,7 @@ public class SignalServiceMessageSender {
 
         try {
           SignalProtocolAddress preKeyAddress  = new SignalProtocolAddress(recipient.getIdentifier(), preKey.getDeviceId());
-          SignalSessionBuilder  sessionBuilder = new SignalSessionBuilder(sessionLock, new SessionBuilder(aciStore, preKeyAddress));
+          SignalSessionBuilder  sessionBuilder = new SignalSessionBuilder(sessionLock, new SessionBuilder(aciStore, preKeyAddress, localProtocolAddress));
           sessionBuilder.process(preKey);
         } catch (org.signal.libsignal.protocol.UntrustedIdentityException e) {
           Log.i(TAG, "[eagerPrefetch] Untrusted identity for recipient");
@@ -3019,7 +3022,7 @@ public class SignalServiceMessageSender {
         PreKeyBundle preKey = NetworkResultUtil.toPreKeysLegacy(keysApi.getPreKey(recipient, missingDeviceId));
 
         try {
-          SignalSessionBuilder sessionBuilder = new SignalSessionBuilder(sessionLock, new SessionBuilder(aciStore, new SignalProtocolAddress(recipient.getIdentifier(), missingDeviceId)));
+          SignalSessionBuilder sessionBuilder = new SignalSessionBuilder(sessionLock, new SessionBuilder(aciStore, new SignalProtocolAddress(recipient.getIdentifier(), missingDeviceId), localProtocolAddress));
           sessionBuilder.process(preKey);
         } catch (org.signal.libsignal.protocol.UntrustedIdentityException e) {
           throw new UntrustedIdentityException("Untrusted identity key!", recipient.getIdentifier(), preKey.getIdentityKey());

@@ -47,6 +47,7 @@ import org.signal.core.ui.logging.LoggingFragment
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.concurrent.addTo
 import org.signal.core.util.logging.Log
+import org.signal.core.util.requireDrawable
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.attachments.AttachmentSaver
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
@@ -70,7 +71,6 @@ import org.thoughtcrime.securesms.mediasend.v2.MediaSelectionActivity
 import org.thoughtcrime.securesms.mms.PartAuthority
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.sharing.v2.ShareActivity
-import org.thoughtcrime.securesms.util.ContextUtil
 import org.thoughtcrime.securesms.util.DateUtils
 import org.thoughtcrime.securesms.util.Debouncer
 import org.thoughtcrime.securesms.util.FullscreenHelper
@@ -489,7 +489,7 @@ class MediaPreviewV2Fragment :
     val builder = SpannableStringBuilder(text)
 
     val onSurfaceColor = ContextCompat.getColor(requireContext(), CoreUiR.color.signal_colorOnSurface)
-    val chevron = ContextUtil.requireDrawable(requireContext(), R.drawable.ic_chevron_end_24)
+    val chevron = requireContext().requireDrawable(R.drawable.ic_chevron_end_24)
     chevron.colorFilter = PorterDuffColorFilter(onSurfaceColor, PorterDuff.Mode.SRC_IN)
 
     SpanUtil.appendCenteredImageSpan(builder, chevron, 10, 10)

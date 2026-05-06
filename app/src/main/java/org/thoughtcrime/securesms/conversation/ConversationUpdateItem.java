@@ -221,13 +221,16 @@ public final class ConversationUpdateItem extends FrameLayout
     observeDisplayBody(lifecycleOwner, spannableMessage);
     observeDisplayBodyWithTimer(lifecycleOwner);
 
+    boolean donationRequest = conversationMessage.getMessageRecord().isReleaseChannelDonationRequest();
+
     present(conversationMessage, nextMessageRecord, conversationRecipient, isMessageRequestAccepted);
     presentTimer(updateDescription);
     presentBackground(shouldCollapse(messageRecord, previousMessageRecord),
                       shouldCollapse(messageRecord, nextMessageRecord),
-                      hasWallpaper);
+                      hasWallpaper,
+                      donationRequest);
 
-    presentActionButton(hasWallpaper, conversationMessage.getMessageRecord().isReleaseChannelDonationRequest());
+    presentActionButton(hasWallpaper, donationRequest);
     presentCollapsedHead(conversationMessage.getMessageRecord().getCollapsedState());
 
     updateSelectedState();
@@ -785,7 +788,7 @@ public final class ConversationUpdateItem extends FrameLayout
            (messageRecord.isGroupV2JoinRequest(toBlock.requireServiceId()) && previousMessageRecord.map(m -> m.isCollapsedGroupV2JoinUpdate(toBlock.requireServiceId())).orElse(false));
   }
 
-  private void presentBackground(boolean collapseAbove, boolean collapseBelow, boolean hasWallpaper) {
+  private void presentBackground(boolean collapseAbove, boolean collapseBelow, boolean hasWallpaper, boolean isDonationRequest) {
     int marginDefault    = getContext().getResources().getDimensionPixelOffset(R.dimen.conversation_update_vertical_margin);
     int marginCollapsed  = 0;
     int paddingDefault   = getContext().getResources().getDimensionPixelOffset(R.dimen.conversation_update_vertical_padding);
@@ -843,7 +846,11 @@ public final class ConversationUpdateItem extends FrameLayout
       ViewUtil.updateLayoutParams(background, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
       if (hasWallpaper) {
-        background.setBackgroundResource(R.drawable.conversation_update_wallpaper_background_singular);
+        if (isDonationRequest) {
+          background.setBackgroundResource(R.drawable.conversation_update_release_note_background);
+        } else {
+          background.setBackgroundResource(R.drawable.conversation_update_wallpaper_background_singular);
+        }
       } else {
         background.setBackground(null);
       }
@@ -852,8 +859,8 @@ public final class ConversationUpdateItem extends FrameLayout
 
   private void presentActionButton(boolean hasWallpaper, boolean isBoostRequest) {
     if (isBoostRequest) {
-      actionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getContext(), org.signal.core.ui.R.color.signal_colorSecondaryContainer)));
-      actionButton.setTextColor(ColorStateList.valueOf(ContextCompat.getColor(getContext(), org.signal.core.ui.R.color.signal_colorOnSecondaryContainer)));
+      actionButton.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(getContext(), R.color.release_notes_cta_background)));
+      actionButton.setTextColor(ColorStateList.valueOf(ContextCompat.getColor(getContext(), org.signal.core.ui.R.color.signal_colorOnSurface)));
     } else if (hasWallpaper) {
       actionButton.setBackgroundTintList(AppCompatResources.getColorStateList(getContext(), R.color.conversation_update_item_button_background_wallpaper));
       actionButton.setTextColor(AppCompatResources.getColorStateList(getContext(), R.color.conversation_update_item_button_text_color_wallpaper));

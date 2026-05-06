@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">Ein Verifizierungscode wird an diese Nummer gesendet. Je nach Tarif können Gebühren anfallen.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">Telefonnummer bearbeiten</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Menü öffnen</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Proxy verwenden</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Gerät koppeln</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Zu lang (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Wiederherstellungsschlüssel ungültig</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Wiederherstellungsschlüssel nicht korrekt</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Wiederherstellung wird vorbereitet…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Noch nicht bei Signal?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Erstelle ein Konto</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Aus Backup wiederherstellen</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Backup-Details abrufen…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Backup wiederherstellen</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Dein letztes Backup wurde am %1$s um %2$s durchgeführt.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Deine Medien werden im Hintergrund wiederhergestellt. Falls du jetzt nicht wiederherstellst, wirst du dies später nicht nachholen können.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">Backup nicht gefunden</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Für dieses Konto wurde kein Backup gefunden.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Backup kann nicht wiederhergestellt werden</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Dein Backup kann im Moment nicht wiederhergestellt werden. Bitte versuche es erneut.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Erneut versuchen</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Wiederherstellung konnte nicht abgeschlossen werden</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Beim Verbindungsaufbau zum Server ist ein Fehler aufgetreten. Bitte überprüfe deine Verbindung und versuche es erneut.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Beim Wiederherstellen deines Backups ist ein Fehler aufgetreten. Bitte versuche es erneut.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Dieses Backup konnte nicht wiederhergestellt werden</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Diese Signal-Version kann dein Backup nicht wiederherstellen. Aktualisiere auf die neueste Version und versuche es erneut.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Signal aktualisieren</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Jetzt nicht</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Backup kann nicht wiederhergestellt werden</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Beim Wiederherstellen deines Backups ist ein Fehler aufgetreten. Dein Backup lässt sich nicht wiederherstellen. Bitte kontaktiere den Support, falls du Hilfe benötigst.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Support kontaktieren</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Backup-Daten herunterladen …</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Nachrichten wiederherstellen …</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Wird abgeschlossen …</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Wiederherstellen …</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s von %2$s (%3$s)</string>
 </resources>

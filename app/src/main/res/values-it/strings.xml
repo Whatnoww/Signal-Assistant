@@ -715,11 +715,13 @@
     <!-- Text shown in conversation header when in a message request state and to carefully review the user -->
     <string name="ConversationFragment_review_carefully">Controlla con attenzione</string>
     <!-- Text shown in conversation header when in a message request state that the name is not verified -->
-    <string name="ConversationFragment_name_not_verified">Name not verified</string>
+    <string name="ConversationFragment_name_not_verified">Nome non verificato</string>
     <!-- Label for official chat pill shown in the Note to Self conversation header -->
-    <string name="ConversationFragment_official_chat">Official chat</string>
+    <string name="ConversationFragment_official_chat">Chat ufficiale</string>
     <!-- Description shown in the Signal release notes conversation header -->
-    <string name="ConversationFragment_release_notes_description">The only official chat from Signal. Keep up to date with news and release notes.</string>
+    <string name="ConversationFragment_release_notes_description">L\'unica, vera, chat ufficiale di Signal. Non perderti neanche una novità o le note degli aggiornamenti.</string>
+    <!-- Label shown in place of the input in the Signal release notes conversation -->
+    <string name="ConversationFragment_the_only_official_chat_from_signal">The only official chat from Signal</string>
     <!-- Plural for group member count shown in conversation header. %1$d is the number of members -->
     <plurals name="ConversationFragment_group_member_count">
         <item quantity="one">%1$d persona</item>
@@ -758,49 +760,49 @@
     <string name="SafetyTips_next_tip">Consiglio successivo</string>
 
     <!-- Summary tip 0 title: Don\'t respond to chats from Signal -->
-    <string name="SafetyTips_summary_tip0_title">Don\'t respond to chats from Signal</string>
+    <string name="SafetyTips_summary_tip0_title">Non rispondere ai messaggi ricevuti in chat da Signal</string>
     <!-- Summary tip 0 message -->
-    <string name="SafetyTips_summary_tip0_message">Signal will never message you for your registration code, PIN, or recovery key. Never respond to a chat pretending to be Signal.</string>
+    <string name="SafetyTips_summary_tip0_message">Signal non ti invierà mai dei messaggi per chiederti il codice di registrazione, il PIN o la chiave di ripristino. Non rispondere mai a una chat che cerca di impersonare il team di Signal.</string>
     <!-- Summary tip 1 title: Review names and photos -->
-    <string name="SafetyTips_summary_tip1_title">Review names and photos</string>
+    <string name="SafetyTips_summary_tip1_title">Controlla i nomi e le foto</string>
     <!-- Summary tip 1 message -->
-    <string name="SafetyTips_summary_tip1_message">Look out for the \"Name not verified\" notice. Everyone sets their own profile name in Signal.</string>
+    <string name="SafetyTips_summary_tip1_message">Fai attenzione all\'avviso \"Nome non verificato\". Chiunque può impostare il proprio nome profilo su Signal.</string>
     <!-- Summary tip 2 title: Look out for scams -->
-    <string name="SafetyTips_summary_tip2_title">Look out for scams</string>
+    <string name="SafetyTips_summary_tip2_title">Fai attenzione alle truffe</string>
     <!-- Summary tip 2 message -->
-    <string name="SafetyTips_summary_tip2_message">Avoid vague messages that try to get you to reply. Be aware of financial tips and suspicious web links.</string>
+    <string name="SafetyTips_summary_tip2_message">Non fidarti di messaggi generici che cercano di spingerti a rispondere subito. Fai anche attenzione a chi dispensa consigli finanziari e chi condivide link sospetti.</string>
 
     <!-- Detail tip 0 title -->
-    <string name="SafetyTips_detail_tip0_title">Don\'t respond to chats from Signal</string>
+    <string name="SafetyTips_detail_tip0_title">Non rispondere ai messaggi ricevuti in chat da Signal</string>
     <!-- Detail tip 0 message -->
-    <string name="SafetyTips_detail_tip0_message">Signal will never message you for your registration code, PIN, or recover key. Don\'t reply to chats pretending to be Signal or Signal Support. Bad actors set up fake chats to try to take over your account.</string>
+    <string name="SafetyTips_detail_tip0_message">Signal non ti invierà mai dei messaggi per chiederti il codice di registrazione, il PIN o la chiave di ripristino. Non rispondere mai a una chat che cerca di impersonare l\'assistenza Signal. I malintenzionati usano chat finte che sembrano credibili per prendere controllo del tuo account e dei tuoi dati.</string>
     <!-- Detail tip 1 title -->
-    <string name="SafetyTips_detail_tip1_title">Review names and photos</string>
+    <string name="SafetyTips_detail_tip1_title">Controlla i nomi e le foto</string>
     <!-- Detail tip 1 message -->
-    <string name="SafetyTips_detail_tip1_message">Look out for the \"Name not verified\" notice. Everyone sets their own profile name and photo in Signal. If you\'re unsure who a new request is from it\'s safer to ignore it.</string>
+    <string name="SafetyTips_detail_tip1_message">Fai attenzione all\'avviso \"Nome non verificato\". Chiunque può impostare il proprio nome e foto profilo su Signal. Se non hai la certezza di sapere l\'identità di chi ti sta contattando, meglio ignorare i suoi messaggi.</string>
     <!-- Detail tip 2 title -->
     <string name="SafetyTips_detail_tip2_title">Messaggi vaghi e ambigui</string>
     <!-- Detail tip 2 message -->
-    <string name="SafetyTips_detail_tip2_message">Spammers often start with a simple message like \"Hi\" to draw you in. If you respond they may engage you further.</string>
+    <string name="SafetyTips_detail_tip2_message">Le persone che inviano spam spesso e volentieri iniziano le chat con un semplice \"ciao\" o messaggi molto generici. Se rispondi, attirerai la loro attenzione e cercheranno di truffarti.</string>
     <!-- Detail tip 3 title -->
-    <string name="SafetyTips_detail_tip3_title">Messages with web links</string>
+    <string name="SafetyTips_detail_tip3_title">Messaggi con link a siti web</string>
     <!-- Detail tip 3 message -->
-    <string name="SafetyTips_detail_tip3_message">Be careful of messages from people you don\'t know that have links to websites. Never visit links from people you don\'t trust.</string>
+    <string name="SafetyTips_detail_tip3_message">Se ricevi un messaggio contenente un link a un sito da una persona che non conosci, probabilmente si tratta di spam. O peggio, di un tentativo di phishing: non aprire mai link del genere.</string>
     <!-- Detail tip 4 title -->
     <string name="SafetyTips_detail_tip4_title">Criptovalute e truffe economiche</string>
     <!-- Detail tip 4 message -->
-    <string name="SafetyTips_detail_tip4_message">If someone you don\'t know messages about cryptocurrency (like Bitcoin) or a financial opportunity, be careful—it\'s likely spam.</string>
+    <string name="SafetyTips_detail_tip4_message">Hai ricevuto l\'ennesimo messaggio su una criptovaluta che ti cambierà la vita? Chiunque ti prometta grossi guadagni, in breve tempo e con poco sforzo, vuole sicuramente truffarti.</string>
     <!-- Detail tip 5 title -->
-    <string name="SafetyTips_detail_tip5_title">Fake businesses</string>
+    <string name="SafetyTips_detail_tip5_title">Business finti</string>
     <!-- Detail tip 5 message -->
     <string name="SafetyTips_detail_tip5_message">Fai attenzione quando ricevi messaggi da qualche azienda o ente del governo. Se si parla di tasse, pensioni, pacchi in arrivo, messaggi dalle Poste, dal tuo fornitore di energia e acqua, potrebbe trattarsi di spam.</string>
 
     <!-- Bottom sheet text explaining that profile names are chosen by the account holder. Placeholder will be \'Profile names\' -->
     <string name="ProfileNameBottomSheet__profile_names_on_signal">%1$s su Signal vengono scelti da chi crea l\'account.</string>
     <!-- Bottom sheet text explaining that Signal can\'t verify names and photos -->
-    <string name="ProfileNameBottomSheet__signal_cant_verify">Signal can\'t verify names and photos</string>
+    <string name="ProfileNameBottomSheet__signal_cant_verify">Signal non può verificare nomi e foto dei profili</string>
     <!-- Bottom sheet text explaining that Signal will never contact you for registration code, PIN, or recovery key -->
-    <string name="ProfileNameBottomSheet__signal_will_never_contact">Signal will never contact you for your registration code, PIN, or recovery key</string>
+    <string name="ProfileNameBottomSheet__signal_will_never_contact">Signal non ti chiederà mai il codice di registrazione, il PIN o la chiave di ripristino</string>
     <!-- Bottom sheet text explaining that accounts can impersonate other people and to be cautious -->
     <string name="ProfileNameBottomSheet__be_cautious_of_accounts">Fai attenzione agli account che impersonano terze parti</string>
     <!-- Bottom sheet text explaining that personal information should not be shared with strangers -->
@@ -1821,6 +1823,8 @@
     </plurals>
     <string name="MediaOverviewActivity_Media_delete_progress_title">Cancellazione</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Eliminazione dei messaggi…</string>
+    <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Ordina per</string>
     <string name="MediaOverviewActivity_Newest">Più recenti</string>
     <string name="MediaOverviewActivity_Oldest">Più vecchi</string>
@@ -2245,9 +2249,9 @@
     <!-- Update message shown in chat after reporting it as spam -->
     <string name="MessageRecord_reported_as_spam">Segnalato come spam</string>
     <!-- Update message shown in chat after accept a message request, placeholder is the other person\'s display name -->
-    <string name="MessageRecord_you_accepted_s_message_request">You accepted %1$s\'s message request</string>
+    <string name="MessageRecord_you_accepted_s_message_request">Hai accettato la richiesta di messaggio di %1$s</string>
     <!-- Update message shown in a group chat after accepting a group message request -->
-    <string name="MessageRecord_you_accepted_the_group_request">You accepted the group request</string>
+    <string name="MessageRecord_you_accepted_the_group_request">Hai accettato la richiesta del gruppo</string>
     <!-- Update message shown in chat after you block a person -->
     <string name="MessageRecord_you_blocked_this_person">Hai bloccato questa persona</string>
     <!-- Update message shown in chat after you unblock a person -->
@@ -2271,7 +2275,7 @@
     <string name="MessageRequestBottomView_unblock">Sblocca</string>
     <!-- Text explaining a message request from someone you\'ve removed before -->
     <string name="MessageRequestBottomView_do_you_want_to_let_s_message_you_you_removed_them_before">Vuoi consentire a %1$s di inviarti messaggi e di visualizzare il tuo nome e la tua foto? Ti ricordiamo che in passato avevi rimosso questo utente.</string>
-    <string name="MessageRequestBottomView_do_you_want_to_let_s_message_you_they_wont_know_youve_seen_their_messages_until_you_accept">Let this person message you and share your name and photo with them? They won\'t know you\'ve seen their message until you accept.</string>
+    <string name="MessageRequestBottomView_do_you_want_to_let_s_message_you_they_wont_know_youve_seen_their_messages_until_you_accept">Consenti a questa persona di inviarti messaggi e ci autorizzi a condividere il tuo nome e la tua foto con questa persona? Non saprà che hai visto il suo messaggio finché non accetti.</string>
     <!-- Shown in message request flow. Describes what will happen if you unblock a Signal user -->
     <string name="MessageRequestBottomView_do_you_want_to_let_s_message_you_wont_receive_any_messages_until_you_unblock_them">Vuoi condividere il tuo nome e la tua foto con %1$s e permettere a questo utente di inviarti messaggi? Non riceverai messaggi da parte sua finché non sbloccherai il contatto.</string>
     <!-- Shown in message request flow. Describes what will happen if you unblock an SMS user -->
@@ -2333,15 +2337,15 @@
         <item quantity="other">%1$d altri</item>
     </plurals>
     <!-- Button label to report spam for a conversation when in a message request state -->
-    <string name="MessageRequestBottomView_report">Report</string>
+    <string name="MessageRequestBottomView_report">Segnala</string>
     <!-- Alert dialog title to accept a message request -->
     <string name="MessageRequestBottomView_accept_request">Accettare la richiesta?</string>
     <!-- Alert dialog body to review the message request carefully -->
     <string name="MessageRequestBottomView_review_requests_carefully">Controlla attentamente le richieste. I nomi dei profili sono scelti da chi crea l\'account e non sono verificati da noi.</string>
     <!-- Alert dialog body for accepting a message request. Contains bold substring placeholder -->
-    <string name="MessageRequestBottomView_accept_request_body">Only accept requests from people you trust. %1$s message you for a registration code, PIN, or recovery key.</string>
+    <string name="MessageRequestBottomView_accept_request_body">Accetta richieste solo dalle persone di cui ti fidi. %1$s ti invierà mai dei messaggi per chiederti il codice di registrazione, il PIN o la chiave di ripristino.</string>
     <!-- Bold substring used in accept request body: "Signal will never" -->
-    <string name="MessageRequestBottomView_signal_will_never">Signal will never</string>
+    <string name="MessageRequestBottomView_signal_will_never">Signal non</string>
     <!-- Alert dialog title to accept a message request to join a group -->
     <string name="MessageRequestBottomView_join_group">Unirsi al gruppo?</string>
     <!-- Alert dialog body to review the message request for a group carefully -->
@@ -3728,18 +3732,18 @@
     <!-- Update item alerting the user they hid this person and that they can message them to unhide them -->
     <string name="ConversationUpdateItem_hidden_contact_message_to_add_back">Hai rimosso questo utente: se mandi un messaggio, verrà aggiunto di nuovo al tuo elenco.</string>
     <!-- Update item button text shown for the accepted message request update message -->
-    <string name="ConversationUpdateItem_block_report">Block or Report…</string>
+    <string name="ConversationUpdateItem_block_report">Blocca o segnala…</string>
     <!-- Update item button text shown for a profile name change. -->
     <string name="ConversationUpdateItem_update">Aggiorna</string>
     <!-- Update item button text to show how many group updates there are. -->
     <plurals name="CollapsedEvent__group_update">
-        <item quantity="one">%1$d novità dai gruppi</item>
-        <item quantity="other">%1$d novità dai gruppi</item>
+        <item quantity="one">%1$d novità dal gruppo</item>
+        <item quantity="other">%1$d novità dal gruppo</item>
     </plurals>
     <!-- Update item button text to show how many group updates there are. -->
     <plurals name="CollapsedEvent__chat_update">
-        <item quantity="one">%1$d novità dalle chat</item>
-        <item quantity="other">%1$d novità dalle chat</item>
+        <item quantity="one">%1$d novità dalla chat</item>
+        <item quantity="other">%1$d novità dalla chat</item>
     </plurals>
     <!-- Update item button text to show how many disappearing message timer changes are. %2$s is what the timer was ultimately set to.-->
     <plurals name="CollapsedEvent__disappearing_timer">
@@ -6018,6 +6022,8 @@
     <!-- Category title for the quality of the media to be sent -->
     <string name="DataAndStorageSettingsFragment__sent_media_quality">Qualità media inviati</string>
     <string name="DataAndStorageSettingsFragment__sending_high_quality_media_will_use_more_data">L\'invio di media in alta qualità utilizzerà più dati.</string>
+    <!-- Disclaimer shown under the media auto-download settings. Placeholder is a formatted size like "100 KB". -->
+    <string name="DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded">Voice messages and stickers (under %1$s) are always auto-downloaded.</string>
     <!-- Setting option that can be selected to default media to be sent as high quality by default -->
     <string name="DataAndStorageSettingsFragment__high">Alta</string>
     <!-- Setting option that can be selected to default media to be sent as standard quality by default -->
@@ -6514,9 +6520,9 @@
     <!-- Dialog title shown when a donation requires verifying/confirmation outside of the app and the user hasn\'t done that yet -->
     <string name="ManageDonationsFragment__couldnt_confirm_donation">Impossibile confermare la donazione</string>
     <!-- Dialog message shown when a monthly donation requires verifying/confirmation outside of the app and the user hasn\'t done that yet, placeholder is money amount -->
-    <string name="ManageDonationsFragment__your_monthly_s_donation_couldnt_be_confirmed">Non è stato possibile confermare la tua donazione di %1$s al mese. Controlla la tua app di banking per approvare la transazione iDEAL.</string>
+    <string name="ManageDonationsFragment__your_monthly_s_donation_couldnt_be_confirmed_ideal_wero">Non è stato possibile confermare la tua donazione di %1$s al mese. Controlla la tua app di banking per approvare la transazione iDEAL | Wero.</string>
     <!-- Dialog message shown when a one-time donation requires verifying/confirmation outside of the app and the user hasn\'t done that yet, placeholder is money amount -->
-    <string name="ManageDonationsFragment__your_one_time_s_donation_couldnt_be_confirmed">Non è stato possibile confermare la tua donazione singola di %1$s. Controlla la tua app di banking per approvare la transazione iDEAL.</string>
+    <string name="ManageDonationsFragment__your_one_time_s_donation_couldnt_be_confirmed_ideal_wero">Non è stato possibile confermare la tua donazione singola di %1$s. Controlla la tua app di banking per approvare la transazione iDEAL | Wero.</string>
 
     <string name="Boost__enter_custom_amount">Inserisci un importo personalizzato</string>
     <!-- Error label when the amount is smaller than what we can accept -->
@@ -6645,7 +6651,7 @@
     <!-- Displayed as a dialog message when the user\'s profile could not be fetched, likely due to lack of internet -->
     <string name="DonationsErrors__your_donation_could_not_be_sent">Impossibile inviare la tua donazione per via di un errore di rete. Controlla la tua connessione e riprova.</string>
     <!-- Displayed as a dialog message when the user encounters an error during an iDEAL donation -->
-    <string name="DonationsErrors__your_ideal_couldnt_be_processed">Impossibile elaborare la tua donazione iDEAL. Prova un altro metodo di pagamento o contatta la tua banca per maggiori informazioni.</string>
+    <string name="DonationsErrors__your_ideal_wero_couldnt_be_processed">Impossibile elaborare la tua donazione iDEAL | Wero. Prova un altro metodo di pagamento o contatta la tua banca per maggiori informazioni.</string>
 
     <!-- Gift message view title -->
     <string name="GiftMessageView__donation_on_behalf_of_s">Donazione per conto di %1$s</string>
@@ -6873,8 +6879,6 @@
     <!-- Banner action when notification permission is disabled -->
     <string name="NotificationSettingsFragment__turn_on">Attiva</string>
 
-    <!-- Description shown for the Signal Release Notes channel -->
-    <string name="ReleaseNotes__signal_release_notes_and_news">Note di rilascio e notizie di Signal</string>
     <!-- Text description in Signal Release channel details explaining that it is the only chat from Signal -->
     <string name="ReleaseNotes__this_is_official_chat">Questa è l\'unica chat ufficiale con Signal</string>
     <!-- Text description in Signal Release channel details explaining what the channel is for -->
@@ -7570,7 +7574,7 @@
     <!-- Dialog body when a user tries to donate while they already have a pending one time donation. -->
     <string name="DonateToSignalFragment__your_payment_is_still_being_processed_onetime">La tua donazione è ancora in fase di elaborazione. Questo processo può richiedere qualche minuto in base alla tua connessione. Attendi il completamento di questa transazione prima di effettuare un\'altra donazione.</string>
     <!-- Dialog body when a user opens the manage donations main screen and they have a pending iDEAL donation -->
-    <string name="DonateToSignalFragment__your_ideal_payment_is_still_processing">La tua donazione iDEAL è ancora in fase di elaborazione. Controlla la tua app di banking per approvare la transazione in questione prima di farne un\'altra.</string>
+    <string name="DonateToSignalFragment__your_ideal_wero_payment_is_still_processing">La tua donazione iDEAL | Wero è ancora in fase di elaborazione. Controlla la tua app di banking per approvare la transazione in questione prima di farne un\'altra.</string>
     <!-- Dialog title shown when a user tries to donate an amount higher than is allowed for a given payment method. -->
     <string name="DonateToSignal__donation_amount_too_high">Importo della donazione troppo alto</string>
     <!-- Dialog body shown when a user tries to donate an amount higher than is allowed for a given payment method, place holder is the maximum -->
@@ -7600,11 +7604,13 @@
     <!-- Sheet summary when giving donating for a friend -->
     <string name="GatewaySelectorBottomSheet__donate_for_a_friend">Fai una donazione per un\'altra persona</string>
     <!-- Button label for paying with iDEAL -->
-    <string name="GatewaySelectorBottomSheet__ideal">iDEAL</string>
+    <string name="GatewaySelectorBottomSheet__ideal_wero">iDEAL | Wero</string>
 
     <!-- Dialog title for launching external intent -->
     <string name="ExternalNavigationHelper__leave_signal_to_confirm_payment">Uscire da Signal per confermare la donazione?</string>
     <string name="ExternalNavigationHelper__once_this_payment_is_confirmed">Dopo aver confermato, ritorna su Signal per completare l\'elaborazione della tua donazione.</string>
+    <!-- Dialog message shown when leaving Signal to complete a donation in an external app. Placeholder is the resolved app name (e.g. a banking app). -->
+    <string name="ExternalNavigationHelper__once_payment_confirmed_in_app">Adesso si aprirà l\'app di %1$s. Dopo aver confermato, ritorna su Signal per completare l\'elaborazione della tua donazione.</string>
 
     <!-- BankTransferMandateFragment -->
     <!-- Title of screen displaying the bank transfer mandate -->
@@ -7666,7 +7672,7 @@
     <!-- Default label for bank selection -->
     <string name="IdealTransferDetailsFragment__choose_your_bank">Scegli la tua banca</string>
     <!-- Dialog title shown when using iDEAL payment for setting up a monthly donation -->
-    <string name="IdealTransferDetailsFragment__confirm_your_donation_with_ideal">Conferma la tua donazione con iDEAL</string>
+    <string name="IdealTransferDetailsFragment__confirm_your_donation_with_ideal_wero">Conferma la tua donazione con iDEAL | Wero</string>
     <!-- Dialog warning shown when using iDEAL payment for setting up a monthly donation. Placeholder is donation amount.Z -->
     <string name="IdealTransferDetailsFragment__to_setup_your_recurring_donation">Per impostare la tua donazione ricorrente, tocca su Continua per confermare un addebito di 0,01€ sulla tua carta o sul tuo conto. Questa transazione sarà rimborsata automaticamente e ci consentirà di addebitarti la tua donazione di %1$s al mese.</string>
     <!-- Dialog button shown when using iDEAL payment for setting up a monthly donation to continue with the donation -->
@@ -7917,7 +7923,7 @@
     <!-- Displayed as a message in a dialog when deleting multiple items -->
     <string name="CallLogFragment__call_links_youve_created">Le persone che hanno ricevuto i link delle chiamate in questione non potranno più usarli.</string>
     <!-- Dialog message shown when trying to start a group call but the user is no longer a member -->
-    <string name="CallLogFragment__cant_start_call_no_longer_a_member">You\'re no longer a member of this group.</string>
+    <string name="CallLogFragment__cant_start_call_no_longer_a_member">Non fai più parte del gruppo.</string>
 
     <!-- New call activity -->
     <!-- Activity title in title bar -->

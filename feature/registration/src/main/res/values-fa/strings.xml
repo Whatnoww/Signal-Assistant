@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">کد تأییدی به این شماره ارسال خواهد شد. ممکن است شرکت مخابراتی هزینه‌هایی اعمال کند.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">ویرایش شماره</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">باز کردن منو</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">استفاده از پروکسی</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">پیوند دستگاه</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">بیش‌از حد طولانی (%2$d/%1$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">رمز بازیابی نامعتبر</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">رمز بازیابی نادرست</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">در حال آماده‌سازی بازیابی…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">هنوز در سیگنال نیستید؟</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">ایجاد حساب</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">بازیابی از پشتیبان</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">در حال دریافت جزئیات نسخه پشتیبان…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">بازیابی پشتیبان</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">آخرین پشتیبان‌گیری در %1$s در %2$s انجام شده است.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">رسانه شما در پس‍‌زمینه بازیابی خواهد شد. اگر انتخابتان این باشد که اکنون بازیابی نکنید، بعداً قادر به بازیابی نخواهید بود.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">نسخه پشتیبان یافت نشد</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">نسخه پشتیبانی برای این حساب یافت نشد.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">نسخه پشتیبان بازیابی نشد</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">نسخه پشتیبان شما اکنون قابل بازیابی نیست. لطفاً دوباره امتحان کنید.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">دوباره امتحان کنید</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">بازیابی انجام نشد</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">هنگام اتصال به سرور، خطایی رخ داد. لطفاً اتصال خود را بررسی و دوباره امتحان کنید.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">خطایی هنگام بازیابی نسخه پشتیبان شما رخ داد. لطفاً دوباره امتحان کنید.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">این نسخه پشتیبان بازیابی نشد</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">این نسخه از سیگنال نمی‌تواند نسخه پشتیبان شما را بازیابی کند. به آخرین نسخه به‌روزرسانی کنید و دوباره امتحان کنید.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">به‌روزرسانی سیگنال</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">حالا نه</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">نسخه پشتیبان بازیابی نشد</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">خطایی هنگام بازیابی نسخه پشتیبان شما رخ داد. نسخه پشتیبان شما قابل بازیابی نیست. لطفاً برای راهنمایی با پشتیبانی تماس بگیرید.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">ارتباط با پشتیبانی</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">در حال دانلود نسخه پشتیبان…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">در حال بازیابی پیام‌ها…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">در حال اتمام…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">در حال بازیابی…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">‏%1$s از %2$s (%3$s)</string>
 </resources>

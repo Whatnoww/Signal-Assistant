@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">دەلىللەش كودى بۇ نومۇرغا يوللىنىدۇ. ئۇچۇر ھەققى چىقىشى مۇمكىن.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">نومۇرنى تەھرىرلەش</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">تىزىملىكنى ئېچىش</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">ۋاكالەتچى ئىشلىتىش</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">ئۈسكىنە باغلا</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">بەك ئۇزۇن (%2$d/%1$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">ئىناۋەتسىز ئەسلىگە كەلتۈرۈش ئاچقۇچى</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">ناتوغرا ئەسلىگە كەلتۈرۈش ئاچقۇچى</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">ئەسلىگە كەلتۈرۈشكە تەييارلىنىۋاتىدۇ…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">تېخىغىچە Signal دا يوقمۇ؟</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">ھېسابات قۇرۇش</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">زاپاستىن ئەسلىگە كەلتۈرىدۇ</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">زاپاسلاش تەپسىلاتلىرىنى قوبۇللاش…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">زاپاسنى ئەسلىگە كەلتۈرۈش</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">ئاخىرقى قېتىملىق زاپاسلاش %1$s %2$s دە ئېلىپ بېرىلغان.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">مېدىيا ئارقا سۇپىدا ئەسلىگە كېلىدۇ. ئەگەر ھازىر ئەسلىگە كەلتۈرمەسلىكنى تاللىسىڭىز ، كېيىن ئەسلىگە كەلتۈرەلمەيسىز.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">زاپاسلاش تېپىلمىدى</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">بۇ ھېساباتتا ھېچقانداق زاپاس تېپىلمىدى.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">زاپاسلاشنى ئەسلىگە كەلتۈرەلمىدى</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">سىزنىڭ زاپاسلىشىڭىزنى ھازىرچە ئەسلىگە كەلتۈرگىلى بولمايدۇ. قايتا سىناڭ.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">قايتا سىناڭ</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">ئەسلىگە كەلتۈرۈشنى تاماملىيالمىدى</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">مۇلازىمەتكە ئۇلىنىۋاتقاندا بىر خاتالىق كۆرۈلدى. تور ئۇلىنىشىڭىزنى تەكشۈرۈپ قايتا سىناڭ.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">زاپىسىڭىزنى ئەسلىگە كەلتۈرۈۋاتقاندا بىر خاتالىق كۆرۈلدى. قايتا سىناڭ.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">بۇ زاپاسلاشنى ئەسلىگە كەلتۈرەلمىدى</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">سىگنالنىڭ بۇ نەشرى زاپاسلاشنى ئەسلىگە كەلتۈرەلمىدى. ئەڭ يېڭى نەشرىگە يېڭىلاپ قايتا سىناڭ.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Signal نى يېڭىلا</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">ھازىر ئەمەس</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">زاپاسلاشنى ئەسلىگە كەلتۈرەلمىدى</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">زاپىسىڭىزنى ئەسلىگە كەلتۈرۈۋاتقاندا بىر خاتالىق كۆرۈلدى. زاپىسىڭىزنى ئەسلىگە كەلتۈرگىلى بولمايدۇ. ياردەمچى خادىم بىلەن ئالاقىلىشىپ ياردەم سوراڭ.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">ياردەم خادىمى بىلەن ئالاقىلىشىش</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">زاپاس مەلۇماتنى چۈشۈرۈۋاتىدۇ…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">ئۇچۇرلارنى ئەسلىگە كەلتۈرىۋاتىدۇ…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">تاماملاۋاتىدۇ…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">ئەسلىگە كەلتۈرىۋاتىدۇ…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%2$s نىڭ %1$s چۈشۈپ بولدى (ئومۇمىي %3$s)</string>
 </resources>

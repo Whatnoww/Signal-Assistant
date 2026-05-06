@@ -127,12 +127,17 @@ public final class AvatarUtil {
    */
   @WorkerThread
   public static @NonNull IconCompat getIconCompatForShortcut(@NonNull Context context, @NonNull Recipient recipient) {
-    int size = AdaptiveBitmapMetrics.getInnerWidth();
+    int    size  = AdaptiveBitmapMetrics.getInnerWidth();
+    Bitmap inner;
+
     if (recipient.isSelf()) {
-      Drawable noteToSelfDrawable = getNoteToSelfDrawable(context, recipient.getAvatarColor(), size);
-      return IconCompat.createWithBitmap(DrawableUtil.toBitmap(noteToSelfDrawable, size, size));
+      inner = DrawableUtil.toBitmap(getNoteToSelfDrawable(context, recipient.getAvatarColor(), size), size, size);
+    } else {
+      inner = getBitmapForNotification(context, recipient, size);
     }
-    return IconCompat.createWithBitmap(getBitmapForNotification(context, recipient, size));
+
+    Bitmap wrapped = DrawableUtil.wrapBitmapForShortcutInfo(inner);
+    return IconCompat.createWithAdaptiveBitmap(wrapped);
   }
 
   @WorkerThread

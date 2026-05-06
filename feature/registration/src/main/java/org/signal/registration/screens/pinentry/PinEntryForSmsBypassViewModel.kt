@@ -16,17 +16,15 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import org.signal.core.models.MasterKey
+import org.signal.core.util.Hex
 import org.signal.core.util.logging.Log
 import org.signal.libsignal.net.RequestResult
-import org.signal.libsignal.protocol.util.Hex
 import org.signal.registration.NetworkController
 import org.signal.registration.RegistrationFlowEvent
 import org.signal.registration.RegistrationFlowState
 import org.signal.registration.RegistrationRepository
-import org.signal.registration.RegistrationRoute
 import org.signal.registration.screens.EventDrivenViewModel
 import org.signal.registration.screens.util.navigateBack
-import org.signal.registration.screens.util.navigateTo
 import org.signal.registration.util.SensitiveLog
 
 /**
@@ -152,7 +150,7 @@ class PinEntryForSmsBypassViewModel(
 
     return when (val result = repository.registerAccountWithRecoveryPassword(e164, recoveryPassword, registrationLock, skipDeviceTransfer = true)) {
       is RequestResult.Success -> {
-        parentEventEmitter.navigateTo(RegistrationRoute.FullyComplete)
+        parentEventEmitter(RegistrationFlowEvent.RegistrationComplete)
         repository.enqueueSvrResetGuessCountJob()
         state
       }

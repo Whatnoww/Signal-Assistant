@@ -70,9 +70,11 @@ include(":core:util-jvm")
 include(":core:models")
 include(":core:models-jvm")
 include(":core:ui")
+include(":core:serialization")
 
 // Lib modules
 include(":lib:libsignal-service")
+include(":lib:network")
 include(":lib:glide")
 include(":lib:photoview")
 include(":lib:sticky-header-grid")

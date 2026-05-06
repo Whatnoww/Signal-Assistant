@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">驗證碼將傳送至此號碼。電訊商可能收取費用。</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">修正電話號碼</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">開啟選單</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">使用代理伺服器</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">連結裝置</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">太長 (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">無效的恢復金鑰</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">恢復金鑰不正確</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">還原準備中…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">尚未加入 Signal 嗎？</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">建立帳戶</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">從備份還原</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">正在擷取備份詳細資訊…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">備份還原</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">你上次備份是在 %1$s 的 %2$s 進行的。</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">媒體將在背景還原。 若你選擇現在不還原，之後將無法還原。</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">找不到備份</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">未找到此帳戶的備份。</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">無法還原備份</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">現在無法還原你的備份。請重試。</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">再試一次</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">無法完成還原</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">連線至伺服器時發生錯誤。請檢查你的網路連線，然後再試一次。</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">備份還原時發生錯誤。請重試。</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">無法還原此備份</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">此版本的 Signal 無法還原備份。更新至最新版本，然後重試。</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">更新 Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">現在不要</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">無法還原備份</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">備份還原時發生錯誤。你的備份無法恢復。請聯絡支援團隊以提供協助。</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">聯絡支援團隊</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">正在下載備份…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">正在還原訊息…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">完成中…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">正在還原…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">共 %2$s 中的 %1$s ( %3$s )</string>
 </resources>

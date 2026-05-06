@@ -519,25 +519,24 @@ tasks.register("excludeNonTranslatables") {
 
 tasks.register("resolveStaticIps") {
   group = "Static Files"
-  description = "Fetches static IPs for core hosts and writes them to static-ips.gradle"
+  description = "Fetches static IPs for core hosts and writes them to static-ips.properties"
 
   val projectDirFile = projectDir
 
   doLast {
     val staticIpResolver = StaticIpResolver()
-    val tripleQuote = "\"\"\""
     val content = """
-      rootProject.extra["service_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("chat.signal.org")}$tripleQuote
-      rootProject.extra["storage_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("storage.signal.org")}$tripleQuote
-      rootProject.extra["cdn_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("cdn.signal.org")}$tripleQuote
-      rootProject.extra["cdn2_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("cdn2.signal.org")}$tripleQuote
-      rootProject.extra["cdn3_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("cdn3.signal.org")}$tripleQuote
-      rootProject.extra["sfu_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("sfu.voip.signal.org")}$tripleQuote
-      rootProject.extra["content_proxy_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("contentproxy.signal.org")}$tripleQuote
-      rootProject.extra["svr2_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("svr2.signal.org")}$tripleQuote
-      rootProject.extra["cdsi_ips"] = $tripleQuote${staticIpResolver.resolveToBuildConfig("cdsi.signal.org")}$tripleQuote
+      service_ips=${staticIpResolver.resolveToBuildConfig("chat.signal.org")}
+      storage_ips=${staticIpResolver.resolveToBuildConfig("storage.signal.org")}
+      cdn_ips=${staticIpResolver.resolveToBuildConfig("cdn.signal.org")}
+      cdn2_ips=${staticIpResolver.resolveToBuildConfig("cdn2.signal.org")}
+      cdn3_ips=${staticIpResolver.resolveToBuildConfig("cdn3.signal.org")}
+      sfu_ips=${staticIpResolver.resolveToBuildConfig("sfu.voip.signal.org")}
+      content_proxy_ips=${staticIpResolver.resolveToBuildConfig("contentproxy.signal.org")}
+      svr2_ips=${staticIpResolver.resolveToBuildConfig("svr2.signal.org")}
+      cdsi_ips=${staticIpResolver.resolveToBuildConfig("cdsi.signal.org")}
     """.trimIndent() + "\n"
-    File(projectDirFile, "static-ips.gradle.kts").writeText(content)
+    File(projectDirFile, "static-ips.properties").writeText(content)
   }
 }
 

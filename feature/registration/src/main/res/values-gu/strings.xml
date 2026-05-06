@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">આ નંબર પર એક વેરિફિકેશન કોડ મોકલવામાં આવશે. કેરિયર ચાર્જ લાગી શકે છે.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">નંબરમાં ફેરફાર કરો</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">મેનૂ ખોલો</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">પ્રોક્સીનો ઉપયોગ કરો</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">ડિવાઇસ લિંક કરો</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">ખૂબ લાંબી (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">અમાન્ય રિકવરી કી</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">ખોટી રિકવરી કી</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">રિસ્ટોર તૈયાર થાય છે…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">હજી સુધી Signal પર નથી?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">એકાઉન્ટ બનાવો</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">બેકઅપમાંથી રિસ્ટોર કરો</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">બેકઅપ વિગતો મેળવી રહ્યાં છીએ…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">બેકઅપ રિસ્ટોર કરો</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">તમારું છેલ્લું બેકઅપ %1$sના રોજ %2$s વાગ્યે લેવામાં આવ્યું હતું.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">તમારા મીડિયા બેકગ્રાઉન્ડમાં રિસ્ટોર થશે. જો તમે હમણાં રિસ્ટોર ન કરવાનું પસંદ કરો છો, તો તમે પછીથી રિસ્ટોર કરી શકશો નહીં.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">બેકઅપ મળ્યું નથી</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">આ એકાઉન્ટ માટે કોઈ બેકઅપ મળ્યું નથી.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">બેકઅપ રિસ્ટોર કરી શકતા નથી</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">તમારું બેકઅપ હમણાં રિસ્ટોર કરી શકાતું નથી. કૃપા કરીને ફરીથી પ્રયાસ કરો.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">ફરીથી પ્રયત્ન કરો</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">રિસ્ટોર પૂર્ણ કરી શક્યા નહીં</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">સર્વર સાથે કનેક્ટ કરતી વખતે ભૂલ આવી. કૃપા કરીને તમારું કનેક્શન તપાસો અને ફરી પ્રયાસ કરો.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">તમારા બેકઅપને રિસ્ટોર કરતી વખતે એક એરર આવી. કૃપા કરીને ફરીથી પ્રયાસ કરો.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">આ બેકઅપ રિસ્ટોર કરી શકાયું નથી</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Signalનું આ વર્ઝન તમારું બેકઅપ રિસ્ટોર કરી શકતું નથી. લેટેસ્ટ વર્ઝન પર અપડેટ કરો અને ફરી પ્રયાસ કરો.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Signalને અપડેટ કરો</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">અત્યારે નહીં</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">બેકઅપ રિસ્ટોર કરી શકતા નથી</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">તમારા બેકઅપને રિસ્ટોર કરતી વખતે એક એરર આવી. તમારું બેકઅપ પાછું મેળવી શકાતું નથી. મદદ માટે કૃપા કરીને સપોર્ટનો સંપર્ક કરો.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">સપોર્ટનો સંપર્ક કરો</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">બેકઅપ ડાઉનલોડ કરી રહ્યાં છીએ…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">મેસેજ રિસ્ટોર કરી રહ્યાં છીએ…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">સમાપ્ત થઈ રહ્યું છે…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">રિસ્ટોર થાય છે…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%2$sમાંથી %1$s (%3$s)</string>
 </resources>

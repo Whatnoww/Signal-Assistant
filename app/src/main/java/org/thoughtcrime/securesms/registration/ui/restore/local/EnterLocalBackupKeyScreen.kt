@@ -36,6 +36,7 @@ import org.signal.core.ui.compose.CircularProgressWrapper
 import org.signal.core.ui.compose.DayNightPreviews
 import org.signal.core.ui.compose.Previews
 import org.thoughtcrime.securesms.R
+import org.thoughtcrime.securesms.components.TemporaryScreenshotSecurity
 import org.thoughtcrime.securesms.fonts.MonoTypeface
 import org.thoughtcrime.securesms.registration.data.network.RegisterAccountResult
 import org.thoughtcrime.securesms.registration.ui.restore.AccountEntropyPoolVerification
@@ -59,6 +60,8 @@ fun EnterLocalBackupKeyScreen(
   onRegistrationErrorDismiss: () -> Unit = {},
   onBackupKeyHelp: () -> Unit = {}
 ) {
+  TemporaryScreenshotSecurity.bind()
+
   val visualTransform = remember { BackupKeyVisualTransformation(chunkSize = 4) }
   val keyboardController = LocalSoftwareKeyboardController.current
   val focusRequester = remember { FocusRequester() }

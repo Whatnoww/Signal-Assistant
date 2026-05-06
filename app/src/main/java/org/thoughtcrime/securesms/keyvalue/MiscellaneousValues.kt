@@ -50,6 +50,7 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
     private const val COMPLETED_COLLAPSED_EVENTS_MIGRATION = "misc.completed_collapsed_events_migration"
     private const val CAPTCHA_LAST_VIEWED_AT = "misc.captcha_last_viewed_at"
     private const val CALLING_ASSETS_VERSION = "misc.calling_assets_version"
+    private const val LAST_SYNC_MESSAGE_SEEN_TIME_MS = "misc.last_sync_message_seen_time"
   }
 
   public override fun onFirstEverAppLaunch() {
@@ -97,6 +98,8 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
   val isChangeNumberLocked: Boolean by booleanValue(CHANGE_NUMBER_LOCK, false)
 
   var preferredMainActivityAnchorIndex: Int by integerValue(PREFERRED_MAIN_ACTIVITY_ANCHOR_INDEX, -1)
+
+  var lastSyncMessageSeenTimeMs: Long by longValue(LAST_SYNC_MESSAGE_SEEN_TIME_MS, 0L)
 
   fun lockChangeNumber() {
     putBoolean(CHANGE_NUMBER_LOCK, true)

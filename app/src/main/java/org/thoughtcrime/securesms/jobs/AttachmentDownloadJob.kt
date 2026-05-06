@@ -38,6 +38,7 @@ import org.thoughtcrime.securesms.transport.RetryLaterException
 import org.thoughtcrime.securesms.util.AttachmentUtil
 import org.thoughtcrime.securesms.util.RemoteConfig
 import org.whispersystems.signalservice.api.crypto.AttachmentCipherInputStream.IntegrityCheck
+import org.whispersystems.signalservice.api.crypto.AttachmentCipherStreamUtil
 import org.whispersystems.signalservice.api.messages.AttachmentTransferProgress
 import org.whispersystems.signalservice.api.messages.SignalServiceAttachment
 import org.whispersystems.signalservice.api.messages.SignalServiceAttachmentPointer
@@ -46,6 +47,7 @@ import org.whispersystems.signalservice.api.push.exceptions.MissingConfiguration
 import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException
 import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException
 import org.whispersystems.signalservice.api.push.exceptions.RangeException
+import org.whispersystems.signalservice.internal.crypto.PaddingInputStream
 import java.io.File
 import java.io.IOException
 import java.util.Optional
@@ -140,14 +142,16 @@ class AttachmentDownloadJob private constructor(
     }
   }
 
-  constructor(messageId: Long, attachmentId: AttachmentId, forceDownload: Boolean) : this(
+  constructor(messageId: Long, attachmentId: AttachmentId, forceDownload: Boolean) : this(messageId, attachmentId, forceDownload, forceDownload, forceDownload)
+
+  constructor(messageId: Long, attachmentId: AttachmentId, forceDownload: Boolean, skipInCallConstraint: Boolean, isHighPriority: Boolean) : this(
     Parameters.Builder()
       .setQueue(constructQueueString(attachmentId))
       .addConstraint(NetworkConstraint.KEY)
-      .maybeApplyNotInCallConstraint(forceDownload)
+      .maybeApplyNotInCallConstraint(skipInCallConstraint)
       .setLifespan(TimeUnit.DAYS.toMillis(1))
       .setMaxAttempts(Parameters.UNLIMITED)
-      .setQueuePriority(if (forceDownload) Parameters.PRIORITY_HIGH else Parameters.PRIORITY_DEFAULT)
+      .setQueuePriority(if (isHighPriority) Parameters.PRIORITY_HIGH else Parameters.PRIORITY_DEFAULT)
       .build(),
     messageId,
     attachmentId,
@@ -314,12 +318,20 @@ class AttachmentDownloadJob private constructor(
         throw InvalidAttachmentException("Attachment has no integrity check!")
       }
 
+      if (attachment.size <= 0) {
+        Log.w(TAG, "[$attachmentId] Attachment has no declared size!")
+        throw InvalidAttachmentException("Attachment has no declared size!")
+      }
+
+      val expectedCiphertextSize = AttachmentCipherStreamUtil.getCiphertextLength(PaddingInputStream.getPaddedSize(attachment.size))
+      val downloadLimit: Long = minOf(expectedCiphertextSize, maxReceiveSize)
+
       val decryptingStream = AppDependencies
         .signalServiceMessageReceiver
         .retrieveAttachment(
           pointer,
           attachmentFile,
-          maxReceiveSize,
+          downloadLimit,
           IntegrityCheck.forEncryptedDigestAndPlaintextHash(attachment.remoteDigest, attachment.dataHash),
           progressListener
         )
@@ -470,8 +482,8 @@ class AttachmentDownloadJob private constructor(
   }
 }
 
-private fun Parameters.Builder.maybeApplyNotInCallConstraint(forceDownload: Boolean): Parameters.Builder {
-  if (forceDownload) {
+private fun Parameters.Builder.maybeApplyNotInCallConstraint(skipConstraint: Boolean): Parameters.Builder {
+  if (skipConstraint) {
     return this
   }
   return this.addConstraint(NotInCallConstraint.KEY)

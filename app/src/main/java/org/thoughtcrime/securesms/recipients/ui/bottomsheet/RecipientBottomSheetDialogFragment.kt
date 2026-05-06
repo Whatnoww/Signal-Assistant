@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import org.signal.core.ui.BottomSheetUtil
 import org.signal.core.ui.FixedRoundedCornerBottomSheetDialogFragment
 import org.signal.core.util.logging.Log
+import org.signal.core.util.requireDrawable
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.avatar.view.AvatarView
 import org.thoughtcrime.securesms.badges.BadgeImageView
@@ -42,7 +43,6 @@ import org.thoughtcrime.securesms.recipients.RecipientExporter
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.recipients.ui.about.AboutSheet
-import org.thoughtcrime.securesms.util.ContextUtil
 import org.thoughtcrime.securesms.util.WindowUtil
 import org.thoughtcrime.securesms.util.visible
 
@@ -258,7 +258,7 @@ class RecipientBottomSheetDialogFragment : FixedRoundedCornerBottomSheetDialogFr
 
       val buttonStripModel = ButtonStripPreference.Model(
         state = buttonStripState,
-        background = DSLSettingsIcon.from(ContextUtil.requireDrawable(requireContext(), R.drawable.selectable_recipient_bottom_sheet_icon_button)),
+        background = DSLSettingsIcon.from(requireContext().requireDrawable(R.drawable.selectable_recipient_bottom_sheet_icon_button)),
         enabled = !viewModel.isDeprecatedOrUnregistered,
         onMessageClick = {
           callback?.onMessageClicked()

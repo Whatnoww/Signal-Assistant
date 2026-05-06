@@ -321,7 +321,7 @@ public class ApplicationContext extends Application implements AppForegroundObse
    * This is so we can capture ANR's that happen on boot before the foreground event.
    */
   private void startAnrDetector() {
-    AnrDetector.start(TimeUnit.SECONDS.toMillis(5), RemoteConfig::internalUser, (dumps) -> {
+    AnrDetector.start(TimeUnit.SECONDS.toMillis(5), () -> RemoteConfig.internalUser() && SignalStore.internal().getAnrDetectionCrashes(), (dumps) -> {
       LogDatabase.getInstance(this).anrs().save(System.currentTimeMillis(), dumps);
       return Unit.INSTANCE;
     });

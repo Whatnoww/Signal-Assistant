@@ -44,7 +44,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.PaneExpansionAnchor
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldRole
@@ -61,6 +60,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.DialogFragment
@@ -73,7 +73,6 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
-import androidx.window.core.layout.WindowSizeClass
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
@@ -86,8 +85,8 @@ import kotlinx.coroutines.withContext
 import org.signal.core.ui.BottomSheetUtil
 import org.signal.core.ui.compose.Snackbars
 import org.signal.core.ui.compose.theme.SignalTheme
-import org.signal.core.ui.isSplitPane
 import org.signal.core.ui.permissions.Permissions
+import org.signal.core.ui.rememberIsSplitPane
 import org.signal.core.util.Util
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.getParcelableCompat
@@ -430,15 +429,15 @@ class MainActivity :
         )
       }
 
-      val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+      val isSplitPane = LocalResources.current.rememberIsSplitPane()
       val contentLayoutData = MainContentLayoutData.rememberContentLayoutData(mainToolbarState.mode)
 
       MainContainer {
-        val wrappedNavigator = rememberNavigator(windowSizeClass, contentLayoutData, maxWidth)
+        val wrappedNavigator = rememberNavigator(isSplitPane, contentLayoutData, maxWidth)
         val listPaneWidth = contentLayoutData.rememberDefaultPanePreferredWidth(maxWidth)
         val navigationType = NavigationType.rememberNavigationType()
 
-        val anchors = remember(contentLayoutData, mainToolbarState) {
+        val anchors = remember(contentLayoutData, mainToolbarState, listPaneWidth, navigationType) {
           val halfPartitionWidth = contentLayoutData.partitionWidth / 2
 
           val detailOffset = when {
@@ -466,7 +465,7 @@ class MainActivity :
           anchors.indexOf(paneExpansionState.currentAnchor)
         }
 
-        LaunchedEffect(windowSizeClass) {
+        LaunchedEffect(anchors) {
           val index = when {
             paneAnchorIndex < 0 -> 1
             paneAnchorIndex > anchors.lastIndex -> anchors.lastIndex
@@ -479,7 +478,7 @@ class MainActivity :
           }
         }
 
-        val chatNavGraphState = ChatNavGraphState.remember(windowSizeClass)
+        val chatNavGraphState = ChatNavGraphState.remember(isSplitPane)
         val mutableInteractionSource = remember { MutableInteractionSource() }
         MainNavigationDetailLocationEffect(mainNavigationViewModel, chatNavGraphState::writeGraphicsLayerToBitmap)
 
@@ -522,15 +521,14 @@ class MainActivity :
                 }.navigateToDetailLocation(location)
               }
 
-              is MainNavigationDetailLocation.Chats -> {
-                if (location is MainNavigationDetailLocation.Chats.Conversation) {
-                  chatNavGraphState.writeGraphicsLayerToBitmap()
-                }
+              is MainNavigationDetailLocation.Conversation -> {
+                chatNavGraphState.writeGraphicsLayerToBitmap()
                 chatsNavHostController.navigateToDetailLocation(location)
               }
 
+              is MainNavigationDetailLocation.Chats -> chatsNavHostController.navigateToDetailLocation(location)
+              is MainNavigationDetailLocation.CallLinkDetails -> callsNavHostController.navigateToDetailLocation(location)
               is MainNavigationDetailLocation.Calls -> callsNavHostController.navigateToDetailLocation(location)
-
               is MainNavigationDetailLocation.Stories -> storiesNavHostController.navigateToDetailLocation(location)
             }
           }
@@ -625,7 +623,7 @@ class MainActivity :
                   onDestinationSelected = mainNavigationCallback
                 )
 
-                if (!windowSizeClass.isSplitPane()) {
+                if (!LocalResources.current.rememberIsSplitPane()) {
                   Spacer(Modifier.navigationBarsPadding())
                 }
               }
@@ -641,7 +639,7 @@ class MainActivity :
             }
           },
           secondaryContent = {
-            val listContainerColor = if (windowSizeClass.isSplitPane()) {
+            val listContainerColor = if (isSplitPane) {
               SignalTheme.colors.colorSurface1
             } else {
               MaterialTheme.colorScheme.surface
@@ -782,12 +780,12 @@ class MainActivity :
   @OptIn(ExperimentalMaterial3AdaptiveApi::class)
   @Composable
   private fun rememberNavigator(
-    windowSizeClass: WindowSizeClass,
+    isSplitPane: Boolean,
     contentLayoutData: MainContentLayoutData,
     maxWidth: Dp
   ): AppScaffoldNavigator<Any> {
     val scaffoldNavigator = rememberThreePaneScaffoldNavigatorDelegate(
-      isSplitPane = windowSizeClass.isSplitPane(),
+      isSplitPane = isSplitPane,
       horizontalPartitionSpacerSize = contentLayoutData.partitionWidth,
       defaultPanePreferredWidth = contentLayoutData.rememberDefaultPanePreferredWidth(maxWidth)
     )
@@ -801,18 +799,18 @@ class MainActivity :
 
   @Composable
   private fun MainContainer(content: @Composable BoxWithConstraintsScope.() -> Unit) {
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val isSplitPane = LocalResources.current.rememberIsSplitPane()
 
     CompositionLocalProvider(LocalSnackbarStateConsumerRegistry provides mainNavigationViewModel.snackbarRegistry) {
       SignalTheme {
-        val backgroundColor = if (!windowSizeClass.isSplitPane()) {
+        val backgroundColor = if (!isSplitPane) {
           MaterialTheme.colorScheme.surface
         } else {
           SignalTheme.colors.colorSurface1
         }
 
         val modifier = when {
-          windowSizeClass.isSplitPane() -> {
+          isSplitPane -> {
             Modifier
               .systemBarsPadding()
               .displayCutoutPadding()
@@ -849,7 +847,7 @@ class MainActivity :
 
     val detailLocation = extras.getParcelableCompat(KEY_DETAIL_LOCATION, MainNavigationDetailLocation::class.java)
     if (detailLocation != null) {
-      mainNavigationViewModel.goTo(detailLocation)
+      goTo(detailLocation)
       return
     }
 
@@ -1035,7 +1033,7 @@ class MainActivity :
   private fun handleConversationIntent(intent: Intent) {
     if (ConversationIntents.isConversationIntent(intent)) {
       mainNavigationViewModel.goTo(MainNavigationListLocation.CHATS)
-      mainNavigationViewModel.goTo(MainNavigationDetailLocation.Chats.Conversation(ConversationIntents.readArgsFromBundle(intent.extras!!)))
+      mainNavigationViewModel.goTo(MainNavigationDetailLocation.Conversation(ConversationIntents.readArgsFromBundle(intent.extras!!)))
       intent.action = null
       setIntent(intent)
     }

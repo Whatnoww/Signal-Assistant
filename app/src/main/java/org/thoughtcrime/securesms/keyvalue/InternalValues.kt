@@ -36,6 +36,7 @@ class InternalValues internal constructor(store: KeyValueStore) : SignalStoreVal
     const val INCLUDE_DEBUGLOG_IN_BACKUP: String = "internal.include_debuglog_in_backup"
     const val IMPORTED_BACKUP_DEBUG_INFO: String = "internal.imported_backup_debug_info"
     const val USE_NEW_MEDIA_ACTIVITY: String = "internal.use_new_media_activity"
+    const val ANR_DETECTION_CRASH: String = "internal.anr_detection_crash"
   }
 
   public override fun onFirstEverAppLaunch() = Unit
@@ -183,6 +184,9 @@ class InternalValues internal constructor(store: KeyValueStore) : SignalStoreVal
 
   /** Any [BackupDebugInfo] that was imported during the last backup restore, if any. */
   var importedBackupDebugInfo: BackupDebugInfo? by protoValue(IMPORTED_BACKUP_DEBUG_INFO, BackupDebugInfo.ADAPTER).defaultForExternalUsers()
+
+  /** Enable ANR detector forcing a crash. */
+  var anrDetectionCrashes by booleanValue(ANR_DETECTION_CRASH, true).falseForExternalUsers()
 
   private fun <T> SignalStoreValueDelegate<T>.defaultForExternalUsers(): SignalStoreValueDelegate<T> {
     return this.withPrecondition { RemoteConfig.internalUser }

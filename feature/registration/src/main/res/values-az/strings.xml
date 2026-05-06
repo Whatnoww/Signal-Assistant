@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">Bu nömrəyə təsdiqləmə kodu göndəriləcək. Operator tarifləri tətbiq oluna bilər.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">Nömrəyə düzəliş et</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Menyunu aç</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Proksi istifadə et</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Cihazla əlaqə yarat</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -83,7 +89,7 @@
     <!-- Snackbar shown for generic/unknown errors -->
     <string name="VerificationCodeScreen__an_unexpected_error_occurred">Gözlənilməz bir xəta baş verdi. Yenidən cəhd edin.</string>
     <!-- Snackbar shown when we are unable to send an SMS to the user\'s number -->
-    <string name="VerificationCodeScreen__unable_to_send_sms">We are unable to send an SMS to your number. Please try again in several hours.</string>
+    <string name="VerificationCodeScreen__unable_to_send_sms">Nömrənizə SMS göndərə bilmədik. Bir neçə saat sonra yenidən cəhd edin.</string>
     <!-- Snackbar shown when the selected transport (SMS/voice) is unavailable -->
     <string name="VerificationCodeScreen__could_not_send_code_via_selected_method">Kodu seçilmiş metodla göndərmək mümkün olmadı. Başqa bir seçimlə cəhd edin.</string>
     <!-- Snackbar shown for registration errors -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Çox uzundur (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Etibarsız bərpa şifrəsi</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Səhv bərpa şifrəsi</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Bərpa etməyə hazırlaşır…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Hələ Signal-a keçməmisiniz?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Hesab yaradın</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Nüsxədən geri yükləyin</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Ehtiyat nüsxə təfərrüatları əldə edilir…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Nüsxəni geri yüklə</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Son ehtiyat nüsxəniz çıxarılıb: %1$s tarixi saat %2$s</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Media fayllarınız arxa fonda bərpa olunacaq. Əgər indi bərpa etməyi seçməsəniz, daha sonra bərpa edə bilməyəcəksiniz.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">Ehtiyat nüsxə tapılmadı</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Bu hesaba aid ehtiyat nüsxə tapılmadı.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Ehtiyat nüsxəni bərpa etmək mümkün deyil</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Ehtiyat nüsxəniz hazırda bərpa oluna bilmir. Yenidən cəhd edin.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Yenidən cəhd edin</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Bərpa əməliyyatını tamamlamaq mümkün olmadı</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Serverə qoşularkən xəta baş verdi. Bağlantınızı yoxlayıb, yenidən cəhd edin.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Ehtiyat nüsxəniz bərpa olunarkən xəta baş verdi. Yenidən cəhd edin.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Bu ehtiyat nüsxəni bərpa etmək mümkün olmadı</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Signal-ın bu versiyası ehtiyat nüsxənizi bərpa edə bilmir. Ən son versiyaya yeniləyib, təkrar cəhd edin.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Signal-ı yenilə</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">İndi yox</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Ehtiyat nüsxəni bərpa etmək mümkün deyil</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Ehtiyat nüsxəniz bərpa olunarkən xəta baş verdi. Ehtiyat nüsxəniz bərpa oluna bilən deyil. Kömək üçün dəstək xidməti ilə əlaqə saxlayın.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Dəstək xidməti ilə əlaqə saxlayın</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Ehtiyat nüsxə endirilir…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Mesajlar bərpa olunur…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Tamamlanır…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Bərpa olunur…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s / %2$s (%3$s)</string>
 </resources>

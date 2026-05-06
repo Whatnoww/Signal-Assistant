@@ -341,7 +341,7 @@ object MessageDecryptor {
 
       if (contentHint == ContentHint.IMPLICIT) {
         Log.w(TAG, "${logPrefix(envelope, senderServiceId)} The content hint is $contentHint, so no error message is needed.", true)
-        Result.Ignore(envelope, serverDeliveredTimestamp, followUpOperations)
+        return Result.Ignore(envelope, serverDeliveredTimestamp, followUpOperations)
       } else {
         Log.w(TAG, "${logPrefix(envelope, senderServiceId)} The content hint is $contentHint, so we need to insert an error right away.", true)
         return Result.DecryptionError(envelope, serverDeliveredTimestamp, protocolException.toErrorMetadata(), followUpOperations.toUnmodifiableList())

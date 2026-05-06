@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">S\'enviarà un codi de verificació a aquest número. El teu operador pot aplicar tarifes.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">Edita el número</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Obrir menú</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Usa un servidor intermediari</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Enllaça un dispositiu</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Massa llarg (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Clau de recuperació no vàlida</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Clau de recuperació incorrecta</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Preparant per restaurar…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Encara no tens compte a Signal?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Crea\'n un ara</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Restaura des d\'una còpia de seguretat</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Obtenint detalls de la còpia de seguretat…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Restaura la còpia de seguretat</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">La teva darrera còpia de seguretat es va fer el dia %1$s a les %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Els teus arxius es restauraran en segon pla. Si decideixes no restaurar-ho ara, no podràs restaurar-la més tard.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">No s\'ha trobat la còpia de seguretat</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">No s\'ha trobat cap còpia de seguretat per aquest compte.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">No es pot restaurar la còpia de seguretat</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Ara mateix no es pot restaurar la teva còpia de seguretat. Torna-ho a provar.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Torna a provar-ho</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">No s\'ha pogut completar la restauració</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Hi ha hagut un error en connectar-se al servidor. Comprova la teva connexió i torna-ho a provar.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Hi ha hagut un error en restaurar la teva còpia de seguretat. Torna-ho a provar.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">No s\'ha pogut restaurar aquesta còpia de seguretat</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Aquesta versió de Signal no pot restaurar la teva còpia de seguretat. Actualitza a la versió més recent i torna-ho a provar.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Actualitza el Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Ara no</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">No es pot restaurar la còpia de seguretat</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Hi ha hagut un error en restaurar la teva còpia de seguretat. La teva còpia de seguretat no és recuperable. Posa\'t en contacte amb el servei d\'assistència per obtenir ajuda.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Contacta amb el servei d\'assistència</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">S\'està descarregant la còpia de seguretat…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Restaurant els missatges…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Completant…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">S\'està restaurant…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s de %2$s (%3$s)</string>
 </resources>

@@ -322,7 +322,7 @@ class ChatItemArchiveExporter(
         }
 
         MessageTypes.isSessionSwitchoverType(record.type) -> {
-          builder.updateMessage = record.toRemoteSessionSwitchoverUpdate(record.dateSent) ?: continue
+          builder.updateMessage = record.toRemoteSessionSwitchoverUpdate(record.dateSent)?.takeIf { builder.authorIsAciContact(exportState) } ?: continue
           transformTimer.emit("sse")
         }
 

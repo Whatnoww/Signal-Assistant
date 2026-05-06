@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">Potvrdni kôd bit će poslan na ovaj broj. Mogu se primijeniti tarife operatera.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">Uredi broj</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Otvori izbornik</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Koristi proxy</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Poveži uređaj</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Predugo (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Nevažeći ključ za oporavak</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Netočan ključ za oporavak</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Priprema podataka za vraćanje…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Još nemate Signal?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Izradite račun</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Vraćanje iz sigurnosne kopije</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Učitavanje podataka o sigurnosnoj kopiji…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Vrati sigurnosnu kopiju</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Posljednje sigurnosno kopiranje obavljeno je %1$s u %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Medijski zapisi preuzimat će se u pozadini. Ako sada preskočite ovaj korak, kasnije više nećete moći vratiti svoje podatke iz sigurnosne kopije.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">Nije pronađena sigurnosna kopija</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Nije pronađena sigurnosna kopija za ovaj račun.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Nije moguće vratiti podatke iz sigurnosne kopije</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Vaša se sigurnosna kopija trenutačno ne može vratiti. Molimo pokušajte ponovno.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Pokušaj ponovno</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Nije bilo moguće dovršiti vraćanje podataka</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Došlo je do pogreške prilikom povezivanja s poslužiteljem. Provjerite mrežnu vezu i pokušajte ponovno.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Došlo je do pogreške prilikom vraćanja vaših podataka iz sigurnosne kopije. Molimo pokušajte ponovno.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Nije moguće vratiti podatke iz sigurnosne kopije</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Ova verzija Signala ne može vratiti vaše podatke iz sigurnosne kopije. Instalirajte najnoviju verziju aplikacije i pokušajte ponovno.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Ažuriraj Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Ne sada</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Nije moguće vratiti podatke iz sigurnosne kopije</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Došlo je do pogreške prilikom vraćanja vaših podataka iz sigurnosne kopije. Nije moguće oporaviti vašu sigurnosnu kopiju. Za dodatnu pomoć obratite se korisničkoj podršci.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Kontaktiraj podršku</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Preuzimanje sigurnosne kopije…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Vraćanje poruka…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Pričekajte…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Vraćanje…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s od %2$s (%3$s)</string>
 </resources>

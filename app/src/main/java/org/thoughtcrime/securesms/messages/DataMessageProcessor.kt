@@ -991,14 +991,16 @@ object DataMessageProcessor {
       SignalDatabase.runPostSuccessfulTransaction {
         if (insertResult.insertedAttachments != null) {
           val downloadJobs: List<AttachmentDownloadJob> = insertResult.insertedAttachments.mapNotNull { (attachment, attachmentId) ->
-            if (attachment.isSticker) {
-              if (attachment.transferState != AttachmentTable.TRANSFER_PROGRESS_DONE) {
-                AttachmentDownloadJob(messageId = insertResult.messageId, attachmentId = attachmentId, forceDownload = true)
-              } else {
-                null
-              }
+            if (attachment.transferState != AttachmentTable.TRANSFER_PROGRESS_DONE) {
+              AttachmentDownloadJob(
+                messageId = insertResult.messageId,
+                attachmentId = attachmentId,
+                forceDownload = false,
+                skipInCallConstraint = attachment.isSticker,
+                isHighPriority = attachment.isSticker
+              )
             } else {
-              AttachmentDownloadJob(messageId = insertResult.messageId, attachmentId = attachmentId, forceDownload = false)
+              null
             }
           }
           AppDependencies.jobManager.addAll(downloadJobs)
@@ -1638,7 +1640,7 @@ object DataMessageProcessor {
         warn(timestamp, "Sender is not in the group! Thread: ${quotedMessage.threadId} Sender: ${senderRecipient.id}")
         return false
       }
-    } else if (senderRecipient.id != threadRecipient.id) {
+    } else if (senderRecipient.id != threadRecipient.id && !senderRecipient.isSelf) {
       warn(timestamp, "Sender is not a part of the 1:1 thread! Thread: ${quotedMessage.threadId} Sender: ${senderRecipient.id}")
       return false
     }

@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">קוד אימות ישלח למספר זה. יתכן שיחולו תעריפי ספק.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">ערוך מספר</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">פתיחת תפריט</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">השתמש ביפוי כוח</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">קשר מכשיר</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">ארוך מדי (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">מפתח שחזור לא תקין</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">מפתח שחזור שגוי</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">שחזור בהכנה…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">עדיין לא ב-Signal?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">יצירת חשבון</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">שחזר מגיבוי</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">טוענים פרטי גיבוי…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">שחזר גיבוי</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">הגיבוי האחרון שלך התבצע ב–%1$s בשעה %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">המדיה שלך תשוחזר ברקע. אם לא תשחזר/י עכשיו, לא תהיה לך אפשרות לשחזר מאוחר יותר.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">גיבוי לא נמצא</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">לא נמצא גיבוי עבור חשבון זה.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">לא ניתן לשחזר גיבוי</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">לא ניתן לשחזר את הגיבוי שלך כרגע. נא לנסות שוב.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">ניסיון חוזר</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">לא ניתן היה לסיים את השחזור</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">אירעה שגיאה בעת התחברות לשרת. יש לבדוק את החיבור שלך ולנסות שוב.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">אירעה שגיאה בעת שחזור הגיבוי שלך. נא לנסות שוב.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">לא היה ניתן לשחזר את הגיבוי</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">הגרסה הזו של Signal לא יכולה לשחזר את הגיבוי שלך. כדאי לעדכן לגרסה האחרונה ולנסות שוב.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">עדכן את Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">לא עכשיו</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">לא ניתן לשחזר גיבוי</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">אירעה שגיאה בעת שחזור הגיבוי שלך. הגיבוי שלך אינו ניתן לשחזור. יש ליצור קשר עם התמיכה לקבלת עזרה.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">יצירת קשר עם התמיכה</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">מורידים גיבוי…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">משחזרים הודעות…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">בשלבי סיום…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">משחזרים…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s מתוך %2$s (%3$s)</string>
 </resources>

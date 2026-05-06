@@ -105,8 +105,7 @@ class LinkDeviceViewModel : ViewModel() {
 
   private fun loadDevices(initialLoad: Boolean = false) {
     _state.value = _state.value.copy(
-      deviceListLoading = true,
-      showFrontCamera = null
+      deviceListLoading = true
     )
 
     viewModelScope.launch(Dispatchers.IO) {
@@ -153,21 +152,11 @@ class LinkDeviceViewModel : ViewModel() {
     pollJob?.cancel()
   }
 
-  fun showFrontCamera() {
-    _state.update {
-      val frontCamera = it.showFrontCamera
-      it.copy(
-        showFrontCamera = if (frontCamera == null) true else !frontCamera
-      )
-    }
-  }
-
   fun markQrEducationSheetSeen() {
     SignalStore.uiHints.markHasSeenLinkDeviceQrEducationSheet()
     _state.update {
       it.copy(
-        seenQrEducationSheet = true,
-        showFrontCamera = null
+        seenQrEducationSheet = true
       )
     }
   }
@@ -182,16 +171,14 @@ class LinkDeviceViewModel : ViewModel() {
       _state.update {
         it.copy(
           qrCodeState = if (uri.supportsLinkAndSync()) QrCodeState.VALID_WITH_SYNC else QrCodeState.VALID_WITHOUT_SYNC,
-          linkUri = uri,
-          showFrontCamera = null
+          linkUri = uri
         )
       }
     } else {
       _state.update {
         it.copy(
           qrCodeState = QrCodeState.INVALID,
-          linkUri = uri,
-          showFrontCamera = null
+          linkUri = uri
         )
       }
     }

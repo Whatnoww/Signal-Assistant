@@ -49,8 +49,6 @@ class DefaultMessageNotifier(context: Application) : MessageNotifier {
 
   @Volatile private var visibleBubbleThread: ConversationId? = null
 
-  @Volatile private var lastDesktopActivityTimestamp: Long = -1
-
   @Volatile private var lastAudibleNotification: Long = -1
 
   @Volatile private var lastScheduledReminder: Long = 0
@@ -95,10 +93,6 @@ class DefaultMessageNotifier(context: Application) : MessageNotifier {
     setVisibleBubbleThread(null)
   }
 
-  override fun setLastDesktopActivityTimestamp(timestamp: Long) {
-    lastDesktopActivityTimestamp = timestamp
-  }
-
   override fun notifyMessageDeliveryFailed(context: Context, recipient: Recipient, conversationId: ConversationId) {
     NotificationFactory.notifyMessageDeliveryFailed(context, recipient, conversationId, visibleThread.get(), visibleBubbleThread)
   }
@@ -122,7 +116,7 @@ class DefaultMessageNotifier(context: Application) : MessageNotifier {
 
   @WorkerThread
   override fun updateNotification(context: Context, conversationId: ConversationId) {
-    if (System.currentTimeMillis() - lastDesktopActivityTimestamp < DESKTOP_ACTIVITY_PERIOD) {
+    if (System.currentTimeMillis() - SignalStore.misc.lastSyncMessageSeenTimeMs < DESKTOP_ACTIVITY_PERIOD) {
       Log.i(TAG, "Scheduling delayed notification...")
       executor.enqueue(context, conversationId)
     } else {

@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">Az ellenőrző kódot erre a számra küldjük. Szolgáltatói díjak lehetnek érvényben.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">Szám szerkesztése</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Menü megnyitása</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Proxy használata</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Eszköz társítása</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Túl hosszú (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Érvénytelen helyreállítási kulcs</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Helytelen helyreállítási kulcs</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Felkészülés a visszaállításra…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Még nem regisztráltál a Signalra?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Fiók létrehozása</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Visszaállítás biztonsági mentésből</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Biztonsági mentés részleteinek lekérése…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Biztonsági mentés visszaállítása</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Az utolsó biztonsági mentés dátuma: %1$s, %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">A médiafájlok visszaállítása a háttérben történik. Ha úgy döntesz, hogy most nem állítod vissza, később nem fogod tudni visszaállítani.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">A biztonsági mentés nem található</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Nem található biztonsági mentés ehhez a fiókhoz.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Nem lehet visszaállítani a biztonsági másolatot</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">A biztonsági másolatot jelenleg nem lehet visszaállítani. Próbáld újra!</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Próbáld újra</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Nem sikerült befejezni a visszaállítást</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Hiba történt a szerverhez való csatlakozás során. Kérjük, ellenőrizd a kapcsolatodat, és próbáld újra!</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Hiba történt a biztonsági mentés visszaállítása során. Próbáld újra!</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Nem sikerült visszaállítani ezt a biztonsági másolatot</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">A Signal ezen verziója nem tudja visszaállítani a biztonsági másolatot. Frissíts a legújabb verzióra, és próbáld újra!</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Signal frissítése</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Később</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Nem lehet visszaállítani a biztonsági másolatot</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Hiba történt a biztonsági mentés visszaállítása során. A biztonsági mentés nem állítható vissza. Kérjük, fordulj az ügyfélszolgálathoz segítségért!</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Segítségkérés</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Biztonsági mentés letöltése…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Üzenetek visszaállítása…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Befejezés…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Visszaállítás…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s/%2$s (%3$s)</string>
 </resources>

@@ -17,12 +17,12 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.RequestManager;
 
+import org.signal.core.util.ContextUtil;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.avatar.view.AvatarView;
 import org.thoughtcrime.securesms.badges.BadgeImageView;
 import org.thoughtcrime.securesms.database.model.StoryViewState;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.thoughtcrime.securesms.util.ContextUtil;
 import org.thoughtcrime.securesms.util.DrawableUtil;
 import org.thoughtcrime.securesms.util.ExpirationUtil;
 import org.thoughtcrime.securesms.util.ViewUtil;
@@ -119,7 +119,7 @@ public class ConversationTitleView extends ConstraintLayout {
     if (recipient != null && recipient.isBlocked()) {
       startDrawable = ContextUtil.requireDrawable(getContext(), R.drawable.symbol_block_16);
       startDrawable.setBounds(0, 0, ViewUtil.dpToPx(18), ViewUtil.dpToPx(18));
-    } else if (recipient != null && recipient.isMuted()) {
+    } else if (recipient != null && recipient.isMuted() && !recipient.isReleaseNotes()) {
       startDrawable = ContextUtil.requireDrawable(getContext(), R.drawable.ic_bell_disabled_16);
       startDrawable.setBounds(0, 0, ViewUtil.dpToPx(18), ViewUtil.dpToPx(18));
     }

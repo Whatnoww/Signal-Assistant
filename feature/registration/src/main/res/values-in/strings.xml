@@ -47,7 +47,13 @@
     <!-- Dialog body to confirm phone number -->
     <string name="RegistrationActivity_a_verification_code">Kode verifikasi akan dikirim ke nomor ini. Tarif operator mungkin berlaku.</string>
     <!-- Dialog button to edit the number entered -->
-    <string name="RegistrationActivity_edit_number">Sunting nomor</string>
+    <string name="RegistrationActivity_edit_number">Edit nomor</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Buka menu</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Gunakan proxy</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Tautkan perangkat</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -83,7 +89,7 @@
     <!-- Snackbar shown for generic/unknown errors -->
     <string name="VerificationCodeScreen__an_unexpected_error_occurred">Terjadi kesalahan tidak terduga. Silakan coba lagi.</string>
     <!-- Snackbar shown when we are unable to send an SMS to the user\'s number -->
-    <string name="VerificationCodeScreen__unable_to_send_sms">Kami tidak bisa mengirimkan SMS ke nomor Anda. Coba lagi dalam beberapa jam.</string>
+    <string name="VerificationCodeScreen__unable_to_send_sms">Kami tidak bisa mengirim SMS ke nomor Anda. Coba lagi dalam beberapa jam.</string>
     <!-- Snackbar shown when the selected transport (SMS/voice) is unavailable -->
     <string name="VerificationCodeScreen__could_not_send_code_via_selected_method">Tidak bisa mengirim kode melalui metode yang dipilih. Silakan coba opsi lain.</string>
     <!-- Snackbar shown for registration errors -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Terlalu panjang (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Kunci pemulihan tidak valid</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Kunci pemulihan salah</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Menyiapkan pemulihan…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Belum gabung di Signal?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Buat akun</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Pulihkan dari cadangan</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Mengambil detail cadangan…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Pulihkan cadangan</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Pencadangan terakhir Anda dibuat pada %1$s pukul %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Pemulihan media akan berlangsung di latar belakang. Jika memilih untuk tidak memulihkannya sekarang, Anda tidak akan bisa memulihkannya kelak.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">Cadangan tidak ditemukan</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Tidak ditemukan file cadangan untuk akun ini.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Tidak bisa memulihkan cadangan</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Cadangan tidak bisa dipulihkan saat ini. Silakan coba lagi.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Coba lagi</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Tidak dapat menyelesaikan pemulihan</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Terjadi kesalahan saat menghubungkan ke server. Harap periksa koneksi internet Anda dan coba lagi.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Terjadi kesalahan saat memulihkan cadangan Anda. Silakan coba lagi.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Tidak bisa memulihkan cadangan ini</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Signal versi ini tidak bisa memulihkan cadangan Anda. Perbarui ke versi terbaru, lalu coba lagi.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Perbarui Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Tidak sekarang</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Tidak bisa memulihkan cadangan</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Terjadi kesalahan saat memulihkan cadangan Anda. Data cadangan Anda tidak dapat dipulihkan. Hubungi tim dukungan untuk mendapatkan bantuan.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Hubungi tim dukungan</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Mengunduh cadangan…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Memulihkan pesan…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Menyelesaikan…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Memulihkan…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s dari %2$s (%3$s)</string>
 </resources>

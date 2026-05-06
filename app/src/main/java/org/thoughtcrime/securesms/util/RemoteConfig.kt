@@ -1267,7 +1267,7 @@ object RemoteConfig {
   @JvmStatic
   @get:JvmName("dredDuration")
   val dredDuration: Int by remoteInt(
-    key = "global.calling.dredDuration",
+    key = "android.calling.dredDuration",
     defaultValue = 0,
     hotSwappable = true
   )
@@ -1325,6 +1325,17 @@ object RemoteConfig {
     key = "android.localPlaintextExport.3",
     defaultValue = false,
     hotSwappable = false
+  )
+
+  /**
+   * Whether to use setExactAlarmAndAllowWhileIdle for exact alarms.
+   */
+  @JvmStatic
+  @get:JvmName("exactAlarm")
+  val exactAlarm: Boolean by remoteBoolean(
+    key = "android.exactAlarm",
+    defaultValue = false,
+    hotSwappable = true
   )
 
   // endregion

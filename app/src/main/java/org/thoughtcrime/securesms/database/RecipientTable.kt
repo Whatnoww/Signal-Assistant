@@ -731,9 +731,13 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     return RecipientReader(cursor)
   }
 
-  fun getRecipientsWithNotificationChannels(): RecipientReader {
-    val cursor = readableDatabase.query(TABLE_NAME, ID_PROJECTION, "$NOTIFICATION_CHANNEL NOT NULL", null, null, null, null)
-    return RecipientReader(cursor)
+  fun getRecipientsWithNotificationChannels(): List<RecipientNotificationData> {
+    return readableDatabase
+      .select(ID, NOTIFICATION_CHANNEL)
+      .from(TABLE_NAME)
+      .where("$NOTIFICATION_CHANNEL NOT NULL")
+      .run()
+      .readToList { RecipientNotificationData(RecipientId.from(it.requireLong(ID)), it.requireNonNullString(NOTIFICATION_CHANNEL)) }
   }
 
   fun getExistingRecords(ids: Collection<RecipientId>): Map<RecipientId, RecipientRecord> {
@@ -1013,6 +1017,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     val masterKey = GroupMasterKey(insert.proto.masterKey.toByteArray())
     val groupId = GroupId.v2(masterKey)
     val values = getValuesForStorageGroupV2(insert, true)
+    val verifiedNameHash: ByteArray? = insert.proto.verifiedNameHash.nullIfEmpty()?.toByteArray()
 
     val createdId = writableDatabase.withinTransaction {
       writableDatabase.insertOrThrow(TABLE_NAME, null, values)
@@ -1021,12 +1026,14 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
       groups.create(
         groupMasterKey = masterKey,
         groupState = DecryptedGroup(revision = GroupsV2StateProcessor.RESTORE_PLACEHOLDER_REVISION),
-        groupSendEndorsements = null
+        groupSendEndorsements = null,
+        verifiedNameHash = verifiedNameHash
       )
     }
 
     if (createdId == null) {
       Log.w(TAG, "Unable to create restore placeholder for $groupId, group already exists")
+      groups.setVerifiedGroupNameHash(groupId, verifiedNameHash)
     }
 
     groups.setShowAsStoryState(groupId, insert.proto.storySendMode.toShowAsStoryState())
@@ -1040,7 +1047,7 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     Log.i(TAG, "Scheduling request for latest group info for $groupId")
     AppDependencies.jobManager.add(RequestGroupV2InfoJob(groupId))
     threads.applyStorageSyncUpdate(recipient.id, insert)
-    recipient.live().refresh()
+    AppDependencies.databaseObserver.notifyRecipientChanged(recipient.id)
   }
 
   fun applyStorageSyncGroupV2Update(update: StorageRecordUpdate<SignalGroupV2Record>) {
@@ -1060,8 +1067,9 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     }
 
     groups.setShowAsStoryState(groupId, update.new.proto.storySendMode.toShowAsStoryState())
+    groups.setVerifiedGroupNameHash(groupId, update.new.proto.verifiedNameHash.nullIfEmpty()?.toByteArray())
     threads.applyStorageSyncUpdate(recipient.id, update.new)
-    recipient.live().refresh()
+    AppDependencies.databaseObserver.notifyRecipientChanged(recipient.id)
   }
 
   fun applyStorageSyncAccountUpdate(update: StorageRecordUpdate<SignalAccountRecord>) {
@@ -5023,4 +5031,6 @@ open class RecipientTable(context: Context, databaseHelper: SignalDatabase) : Da
     val expiringProfileKeyCredential: Pair<ProfileKey, ExpiringProfileKeyCredential>? = null,
     val clearUsername: Boolean = false
   )
+
+  data class RecipientNotificationData(val id: RecipientId, val channel: String)
 }

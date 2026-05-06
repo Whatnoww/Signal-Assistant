@@ -36,9 +36,9 @@ import org.signal.libsignal.zkgroup.profiles.ProfileKey
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.backup.v2.ImportResult
 import org.thoughtcrime.securesms.backup.v2.RestoreV2Event
+import org.thoughtcrime.securesms.backup.v2.local.ArchiveFileSystem
 import org.thoughtcrime.securesms.conversation.v2.registerForLifecycle
-import org.thoughtcrime.securesms.dependencies.AppDependencies
-import org.thoughtcrime.securesms.jobs.EnqueueRestoreLocalAttachmentsJob
+import org.thoughtcrime.securesms.jobs.RestoreLocalAttachmentJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.registration.ui.shared.RegistrationScreen
@@ -172,7 +172,8 @@ class QuickstartRestoreActivity : BaseActivity() {
 
         withContext(Dispatchers.Main) { restoreStatus = "Restoring attachments..." }
 
-        AppDependencies.jobManager.add(EnqueueRestoreLocalAttachmentsJob.create(Uri.fromFile(backupDir)))
+        val mediaNameToFileInfo = ArchiveFileSystem.fromFile(this@QuickstartRestoreActivity, signalBackupsDir).filesFileSystem.allFiles()
+        RestoreLocalAttachmentJob.enqueueRestoreLocalAttachmentsJobs(mediaNameToFileInfo)
 
         QuickstartInitializer.pendingBackupDir = null
 

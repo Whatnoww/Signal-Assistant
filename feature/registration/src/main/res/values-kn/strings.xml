@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">ದೃಢೀಕರಣ ಕೋಡ್ ಅನ್ನು ಈ ಸಂಖ್ಯೆಗೆ ಕಳುಹಿಸಲಾಗುತ್ತದೆ. ವಾಹಕ ದರಗಳು ಅನ್ವಯವಾಗಬಹುದು.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">ನಂಬರ್ ಎಡಿಟ್ ಮಾಡಿ</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">ಮೆನು ತೆರೆಯಿರಿ</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">ಪ್ರಾಕ್ಸಿ ಬಳಸಿ</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">ಸಾಧನ ಲಿಂಕ್ ಮಾಡಿ</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -83,7 +89,7 @@
     <!-- Snackbar shown for generic/unknown errors -->
     <string name="VerificationCodeScreen__an_unexpected_error_occurred">ಒಂದು ಅನಿರೀಕ್ಷಿತ ದೋಷ ಉಂಟಾಗಿದೆ. ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.</string>
     <!-- Snackbar shown when we are unable to send an SMS to the user\'s number -->
-    <string name="VerificationCodeScreen__unable_to_send_sms">We are unable to send an SMS to your number. Please try again in several hours.</string>
+    <string name="VerificationCodeScreen__unable_to_send_sms">ನಿಮ್ಮ ಸಂಖ್ಯೆಗೆ SMS ಕಳುಹಿಸಲು ನಮಗೆ ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ. ಕೆಲವು ಗಂಟೆಗಳ ನಂತರ ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.</string>
     <!-- Snackbar shown when the selected transport (SMS/voice) is unavailable -->
     <string name="VerificationCodeScreen__could_not_send_code_via_selected_method">ಆಯ್ಕೆ ಮಾಡಿದ ವಿಧಾನದ ಮೂಲಕ ಕೋಡ್ ಕಳುಹಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಇನ್ನೊಂದು ಆಯ್ಕೆಯನ್ನು ಪ್ರಯತ್ನಿಸಿ.</string>
     <!-- Snackbar shown for registration errors -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">ತುಂಬಾ ಉದ್ದವಾಗಿದೆ (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">ಅಮಾನ್ಯವಾದ ರಿಕವರಿ ಕೀ</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">ತಪ್ಪಾದ ರಿಕವರಿ ಕೀ</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">ರಿಸ್ಟೋರ್ ಅನ್ನು ಸಿದ್ಧಗೊಳಿಸಲಾಗುತ್ತಿದೆ…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">ಇನ್ನೂ Signal ನಲ್ಲಿ ಇಲ್ಲವೇ?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">ಖಾತೆಯನ್ನು ರಚಿಸಿ</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">ಬ್ಯಾಕಪ್‌ನಿಂದ ರಿಸ್ಟೋರ್ ಮಾಡಿ</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">ಬ್ಯಾಕಪ್ ವಿವರಗಳನ್ನು ಪಡೆಯಲಾಗುತ್ತಿದೆ…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">ಬ್ಯಾಕಪ್ ರಿಸ್ಟೋರ್ ಮಾಡಿ</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">ನಿಮ್ಮ ಕೊನೆಯ ಬ್ಯಾಕಪ್ ಅನ್ನು %1$s ರಂದು %2$s ಕ್ಕೆ ಮಾಡಲಾಗಿದೆ.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">ನಿಮ್ಮ ಮೀಡಿಯಾ ಹಿನ್ನೆಲೆಯಲ್ಲಿ ರಿಸ್ಟೋರ್ ಆಗುತ್ತದೆ. ನೀವು ಈಗ ರಿಸ್ಟೋರ್ ಮಾಡದಿರುವುದನ್ನು ಆಯ್ಕೆ ಮಾಡಿಕೊಂಡಲ್ಲಿ, ನಂತರದಲ್ಲಿ ನಿಮಗೆ ರಿಸ್ಟೋರ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುವುದಿಲ್ಲ.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">ಬ್ಯಾಕಪ್ ಕಂಡುಬಂದಿಲ್ಲ</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">ಈ ಖಾತೆಗೆ ಯಾವುದೇ ಬ್ಯಾಕಪ್ ಕಂಡುಬಂದಿಲ್ಲ.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">ಬ್ಯಾಕಪ್ ಅನ್ನು ರೀಸ್ಟೋರ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">ನಿಮ್ಮ ಬ್ಯಾಕಪ್ ಅನ್ನು ಈಗಲೇ ರೀಸ್ಟೋರ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ. ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">ರಿಸ್ಟೋರ್ ಮಾಡುವುದನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">ಸರ್ವರ್‌ಗೆ ಕನೆಕ್ಟ್ ಮಾಡುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ. ನಿಮ್ಮ ಕನೆಕ್ಷನ್ ಅನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಪುನಃ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">ನಿಮ್ಮ ಬ್ಯಾಕಪ್ ಅನ್ನು ರಿಸ್ಟೋರ್ ಮಾಡುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ. ಮತ್ತೊಮ್ಮೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">ಈ ಬ್ಯಾಕಪ್ ಅನ್ನು ರಿಸ್ಟೋರ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Signal ನ ಈ ಆವೃತ್ತಿಯು ನಿಮ್ಮ ಬ್ಯಾಕಪ್ ಅನ್ನು ರಿಸ್ಟೋರ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ. ಇತ್ತೀಚಿನ ಆವೃತ್ತಿಗೆ ಅಪ್‌ಡೇಟ್ ಮಾಡಿ ಹಾಗೂ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Signal ಅನ್ನು ನವೀಕರಿಸಿ</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">ಈಗಲ್ಲ</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">ಬ್ಯಾಕಪ್ ಅನ್ನು ರೀಸ್ಟೋರ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">ನಿಮ್ಮ ಬ್ಯಾಕಪ್ ಅನ್ನು ರಿಸ್ಟೋರ್ ಮಾಡುವಾಗ ದೋಷ ಉಂಟಾಗಿದೆ. ನಿಮ್ಮ ಬ್ಯಾಕಪ್ ಅನ್ನು ರಿಕವರ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ. ಸಹಾಯಕ್ಕಾಗಿ ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">ಬೆಂಬಲವನ್ನು ಸಂಪರ್ಕಿಸಿ</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">ಬ್ಯಾಕಪ್ ಅನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">ಮೆಸೇಜ್‌ಗಳನ್ನು ರಿಸ್ಟೋರ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">ಪೂರ್ಣಗೊಳಿಸಲಾಗುತ್ತಿದೆ…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">ರಿಸ್ಟೋರ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%2$s ರಲ್ಲಿ %1$s (%3$s)</string>
 </resources>

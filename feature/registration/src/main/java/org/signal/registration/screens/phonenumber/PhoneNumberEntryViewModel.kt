@@ -31,6 +31,7 @@ import org.signal.registration.RegistrationFlowState
 import org.signal.registration.RegistrationRepository
 import org.signal.registration.RegistrationRoute
 import org.signal.registration.screens.EventDrivenViewModel
+import org.signal.registration.screens.countrycode.Country
 import org.signal.registration.screens.countrycode.CountryUtils
 import org.signal.registration.screens.localbackuprestore.LocalBackupRestoreResult
 import org.signal.registration.screens.phonenumber.PhoneNumberEntryState.OneTimeEvent
@@ -103,13 +104,19 @@ class PhoneNumberEntryViewModel(
         stateEmitter(state.copy(showDialog = false))
       }
       is PhoneNumberEntryScreenEvents.PhoneNumberSubmitted -> {
-        var localState = state.copy(showSpinner = true)
+        var localState = state.copy(showSpinner = true, showDialog = false)
         stateEmitter(localState)
         localState = applyPhoneNumberSubmitted(localState, parentEventEmitter)
-        stateEmitter(localState.copy(showSpinner = false))
+        stateEmitter(localState.copy(showSpinner = false, showDialog = false))
       }
       is PhoneNumberEntryScreenEvents.CountryPicker -> {
-        state.also { parentEventEmitter.navigateTo(RegistrationRoute.CountryCodePicker) }
+        state.also {
+          parentEventEmitter.navigateTo(
+            RegistrationRoute.CountryCodePicker(
+              Country(state.countryEmoji, state.countryName, state.countryCode.toIntOrNull() ?: 0, state.regionCode).takeIf { state.countryName.isNotEmpty() }
+            )
+          )
+        }
       }
       is PhoneNumberEntryScreenEvents.CaptchaCompleted -> {
         stateEmitter(applyCaptchaCompleted(state, event.token, parentEventEmitter))
@@ -210,7 +217,7 @@ class PhoneNumberEntryViewModel(
 
       when (state.pendingRestoreOption) {
         PendingRestoreOption.LocalBackup -> parentEventEmitter.navigateTo(RegistrationRoute.LocalBackupRestore(isPreRegistration = true))
-        PendingRestoreOption.RemoteBackup -> parentEventEmitter.navigateTo(RegistrationRoute.EnterAepScreen)
+        PendingRestoreOption.RemoteBackup -> parentEventEmitter.navigateTo(RegistrationRoute.EnterAepForRemoteBackupPreRegistration(e164))
       }
 
       return state
@@ -239,14 +246,10 @@ class PhoneNumberEntryViewModel(
         is RequestResult.NonSuccess -> {
           when (val error = registerResult.error) {
             is NetworkController.RegisterAccountError.SessionNotFoundOrNotVerified -> {
-              Log.w(TAG, "[Register] Got told that our session could not be found when registering with RRP. We should never get into this state. Resetting.")
-              parentEventEmitter(RegistrationFlowEvent.ResetState)
-              return state
+              error("[Register] Got told that our session could not be found when registering with RRP. We should never get into this state.")
             }
             is NetworkController.RegisterAccountError.DeviceTransferPossible -> {
-              Log.w(TAG, "[Register] Got told a device transfer is possible. We should never get into this state. Resetting.")
-              parentEventEmitter(RegistrationFlowEvent.ResetState)
-              return state
+              error("[Register] Got told a device transfer is possible. We should never get into this state.")
             }
             is NetworkController.RegisterAccountError.RegistrationLock -> {
               Log.w(TAG, "[Register] Reglocked. This implies that the user still had reglock enabled despite the pre-existing data not thinking it was.")
@@ -306,7 +309,7 @@ class PhoneNumberEntryViewModel(
       return applySessionBasedRegistration(state, e164, parentEventEmitter)
     }
 
-    parentEventEmitter(RegistrationFlowEvent.AepSubmittedViaLocalBackupRestore(aep))
+    parentEventEmitter(RegistrationFlowEvent.UserSuppliedAepSubmitted(aep))
 
     Log.i(TAG, "[LocalRestore] Attempting registration with RRP derived from restored AEP.")
 

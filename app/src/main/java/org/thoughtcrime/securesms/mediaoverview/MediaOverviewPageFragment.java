@@ -439,7 +439,7 @@ public final class MediaOverviewPageFragment extends LoggingFragment
       );
       return;
     }
-    MediaActions.handleDeleteMedia(requireContext(), Collections.singleton(mediaRecord));
+    MediaActions.handleDeleteMedia(this, Collections.singleton(mediaRecord));
   }
 
   private void handleDeleteSelectedMedia() {
@@ -451,7 +451,7 @@ public final class MediaOverviewPageFragment extends LoggingFragment
       return;
     }
 
-    MediaActions.handleDeleteMedia(requireContext(), getListAdapter().getSelectedMedia());
+    MediaActions.handleDeleteMedia(this, getListAdapter().getSelectedMedia());
     exitMultiSelect();
   }
 

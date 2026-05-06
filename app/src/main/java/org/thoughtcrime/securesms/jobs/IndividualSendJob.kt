@@ -283,7 +283,6 @@ class IndividualSendJob private constructor(parameters: Parameters, private val 
         .withPreviews(previews)
         .withGiftBadge(giftBadge)
         .asExpirationUpdate(message.isExpirationUpdate)
-        .asEndSessionMessage(message.isEndSession)
         .withPayment(payment)
         .withBodyRanges(bodyRanges)
         .withPollCreate(pollCreate)

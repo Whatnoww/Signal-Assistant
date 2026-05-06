@@ -370,6 +370,14 @@ class InternalSettingsFragment : DSLSettingsFragment(R.string.preferences__inter
         }
       )
 
+      switchPref(
+        title = DSLSettingsText.from("Enable ANR-induced crashing"),
+        isChecked = SignalStore.internal.anrDetectionCrashes,
+        onClick = {
+          SignalStore.internal.anrDetectionCrashes = !SignalStore.internal.anrDetectionCrashes
+        }
+      )
+
       dividerPref()
 
       sectionHeaderPref(DSLSettingsText.from("Logging"))

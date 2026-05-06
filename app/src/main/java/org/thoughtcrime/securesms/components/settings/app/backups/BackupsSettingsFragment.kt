@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -507,6 +508,7 @@ private fun ActiveBackupsRow(
           style = MaterialTheme.typography.bodyLarge
         )
 
+        val locale = LocalLocale.current.platformLocale
         when (val type = backupState.messageBackupsType) {
           is MessageBackupsType.Paid -> {
             val body = if (backupState is BackupState.Canceled) {
@@ -514,13 +516,13 @@ private fun ActiveBackupsRow(
             } else if (type.pricePerMonth.amount == BigDecimal.ZERO) {
               stringResource(
                 R.string.BackupsSettingsFragment_renews_s,
-                DateUtils.formatDateWithYear(Locale.getDefault(), backupState.renewalTime.inWholeMilliseconds)
+                DateUtils.formatDateWithYear(locale, backupState.renewalTime.inWholeMilliseconds)
               )
             } else {
               stringResource(
                 R.string.BackupsSettingsFragment_s_month_renews_s,
                 FiatMoneyUtil.format(LocalContext.current.resources, type.pricePerMonth),
-                DateUtils.formatDateWithYear(Locale.getDefault(), backupState.renewalTime.inWholeMilliseconds)
+                DateUtils.formatDateWithYear(locale, backupState.renewalTime.inWholeMilliseconds)
               )
             }
 

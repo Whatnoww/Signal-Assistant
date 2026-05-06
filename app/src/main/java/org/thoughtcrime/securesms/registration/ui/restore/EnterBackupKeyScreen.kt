@@ -57,6 +57,7 @@ import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.horizontalGutters
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.backup.v2.ui.BackupsIconColors
+import org.thoughtcrime.securesms.components.TemporaryScreenshotSecurity
 import org.thoughtcrime.securesms.fonts.MonoTypeface
 import org.thoughtcrime.securesms.registration.ui.shared.RegistrationScreen
 
@@ -78,6 +79,8 @@ fun EnterBackupKeyScreen(
   onSkip: () -> Unit = {},
   dialogContent: @Composable () -> Unit
 ) {
+  TemporaryScreenshotSecurity.bind()
+
   val coroutineScope = rememberCoroutineScope()
   val sheetState = rememberModalBottomSheetState(
     skipPartiallyExpanded = true

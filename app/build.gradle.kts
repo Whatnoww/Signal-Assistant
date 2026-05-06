@@ -1,7 +1,10 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.android.build.api.dsl.ManagedVirtualDevice
+import com.android.build.api.artifact.ArtifactTransformationRequest
+import com.android.build.api.artifact.SingleArtifact
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -11,7 +14,6 @@ import java.io.FileInputStream
 
 plugins {
   alias(libs.plugins.android.application)
-  alias(libs.plugins.jetbrains.kotlin.android)
   alias(libs.plugins.ktlint)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlinx.serialization)
@@ -23,10 +25,11 @@ plugins {
   id("licenses")
 }
 
-apply(from = "static-ips.gradle.kts")
+val staticIps = Properties().apply { file("static-ips.properties").reader().use { load(it) } }
+staticIps.stringPropertyNames().forEach { rootProject.extra[it] = staticIps.getProperty(it) }
 
-val canonicalVersionCode = 1682
-val canonicalVersionName = "8.8.2"
+val canonicalVersionCode = 1685
+val canonicalVersionName = "8.10.0"
 val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 
@@ -42,11 +45,11 @@ val abiPostFix: Map<String, Int> = mapOf(
 // We don't want versions to ever end in 0 so that they don't conflict with nightly versions
 val possibleHotfixVersions = (0 until maxHotfixVersions).toList().filter { it % 10 != 0 }
 
-val debugKeystorePropertiesProvider = providers.of(PropertiesFileValueSource::class.java) {
+val debugKeystorePropertiesProvider: Provider<Properties> = providers.of(PropertiesFileValueSource::class.java) {
   parameters.file.set(rootProject.layout.projectDirectory.file("keystore.debug.properties"))
 }
 
-val languagesProvider = providers.of(LanguageListValueSource::class.java) {
+val languagesProvider: Provider<List<String>> = providers.of(LanguageListValueSource::class.java) {
   parameters.resDir.set(layout.projectDirectory.dir("src/main/res"))
 }
 
@@ -91,6 +94,21 @@ val selectableVariants = listOf(
   "githubProdRelease"
 )
 
+// Wire 5.x iterates Android source sets and expects matching Kotlin source sets.
+// AGP 9.0's built-in Kotlin doesn't create all source sets automatically.
+val kotlinExt = extensions.getByName("kotlin") as KotlinAndroidProjectExtension
+android.sourceSets.all {
+  kotlinExt.sourceSets.findByName(name) ?: kotlinExt.sourceSets.create(name)
+}
+// AGP 9.0's built-in Kotlin doesn't pick up extra java.srcDir entries from Android
+// source sets, so add the testShared dir directly to test/androidTest Kotlin
+// compile tasks.
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
+  if (name.contains("UnitTest") || name.contains("AndroidTest")) {
+    source("$projectDir/src/testShared")
+  }
+}
+
 wire {
   kotlin {
     javaInterop = true
@@ -104,8 +122,6 @@ wire {
     srcDir("${project.rootDir}/lib/libsignal-service/src/main/protowire")
     srcDir("${project.rootDir}/lib/archive/src/main/protowire")
   }
-  // Handled by libsignal
-  prune("signalservice.DecryptionErrorMessage")
 }
 
 ktlint {
@@ -127,7 +143,7 @@ android {
   namespace = "org.thoughtcrime.securesms"
 
   buildToolsVersion = libs.versions.buildTools.get()
-  compileSdkVersion = libs.versions.compileSdk.get()
+  compileSdkVersion(libs.versions.compileSdk.get())
   ndkVersion = libs.versions.ndk.get()
 
   flavorDimensions += listOf("distribution", "environment")
@@ -135,13 +151,7 @@ android {
 
   android.bundle.language.enableSplit = false
 
-  kotlinOptions {
-    jvmTarget = libs.versions.kotlinJvmTarget.get()
-    freeCompilerArgs = listOf("-Xjvm-default=all")
-    suppressWarnings = true
-  }
-
-  debugKeystorePropertiesProvider.orNull?.let { properties ->
+  debugKeystorePropertiesProvider.get().takeIf { it.isNotEmpty() }?.let { properties ->
     signingConfigs.getByName("debug").apply {
       storeFile = file("${project.rootDir}/${properties.getProperty("storeFile")}")
       storePassword = properties.getProperty("storePassword")
@@ -158,8 +168,8 @@ android {
     }
 
     managedDevices {
-      devices {
-        create<ManagedVirtualDevice>("pixel3api30") {
+      localDevices {
+        create("pixel3api30") {
           device = "Pixel 3"
           apiLevel = 30
           systemImageSource = "google-atd"
@@ -214,10 +224,6 @@ android {
     buildConfig = true
     viewBinding = true
     compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = "1.5.4"
   }
 
   defaultConfig {
@@ -315,7 +321,7 @@ android {
       isDefault = true
       isMinifyEnabled = false
       proguardFiles(
-        getDefaultProguardFile("proguard-android.txt"),
+        getDefaultProguardFile("proguard-android-optimize.txt"),
         "proguard/proguard-firebase-messaging.pro",
         "proguard/proguard-google-play-services.pro",
         "proguard/proguard-jackson.pro",
@@ -332,6 +338,7 @@ android {
         "proguard/proguard-retrolambda.pro",
         "proguard/proguard-okhttp.pro",
         "proguard/proguard-ez-vcard.pro",
+        "proguard/proguard-dnsjava.pro",
         "proguard/proguard.cfg"
       )
       testProguardFiles(
@@ -517,6 +524,47 @@ android {
     lintConfig = rootProject.file("lint.xml")
   }
 
+  val releaseDir = "$projectDir/src/release/java"
+  val debugDir = "$projectDir/src/debug/java"
+
+  android.buildTypes.configureEach {
+    val path = if (name == "release") releaseDir else debugDir
+    sourceSets.named(name) {
+      java.srcDir(path)
+    }
+  }
+
+  sourceSets {
+    getByName("mocked") {
+      java.srcDir("$projectDir/src/benchmarkShared/java")
+      manifest.srcFile("$projectDir/src/benchmarkShared/AndroidManifest.xml")
+    }
+
+    getByName("benchmark") {
+      java.srcDir("$projectDir/src/benchmarkShared/java")
+      manifest.srcFile("$projectDir/src/benchmarkShared/AndroidManifest.xml")
+    }
+  }
+}
+
+androidComponents {
+  beforeVariants { variant ->
+    variant.enable = variant.name in selectableVariants
+  }
+  onVariants(selector().all()) { variant: com.android.build.api.variant.ApplicationVariant ->
+    // Rename APK to include version name
+    val renameTask = tasks.register<RenameApkTask>("renameApk${variant.name.replaceFirstChar { it.uppercase() }}")
+    val renameRequest = variant.artifacts.use(renameTask)
+      .wiredWithDirectories(RenameApkTask::apkFolder, RenameApkTask::outFolder)
+      .toTransformMany(SingleArtifact.APK)
+    renameTask.configure {
+      transformationRequest.set(renameRequest)
+    }
+
+    // Include the test-only library on debug builds.
+    if (variant.buildType != "instrumentation") {
+      variant.packaging.jniLibs.excludes.add("**/libsignal_jni_testing.so")
+    }
   // JW added
   applicationVariants.all {
     outputs
@@ -554,83 +602,51 @@ android {
         variant.packaging.jniLibs.useLegacyPackaging.set(true)
       //}
 
-      // Version overrides
-      if (variant.name.contains("nightly", ignoreCase = true)) {
-        var tag = getNightlyTagForCurrentCommit()
-        if (!tag.isNullOrEmpty()) {
-          if (tag.startsWith("v")) {
-            tag = tag.substring(1)
-          }
+    // Version overrides
+    if (variant.name.contains("nightly", ignoreCase = true)) {
+      var tag = getNightlyTagForCurrentCommit()
+      if (!tag.isNullOrEmpty()) {
+        if (tag.startsWith("v")) {
+          tag = tag.substring(1)
+        }
 
-          // We add a multiple of maxHotfixVersions to nightlies to ensure we're always at least that many versions ahead
-          val nightlyBuffer = (5 * maxHotfixVersions)
-          val nightlyVersionCode = (canonicalVersionCode * maxHotfixVersions) + (getNightlyBuildNumber(tag) * 10) + nightlyBuffer
+        // We add a multiple of maxHotfixVersions to nightlies to ensure we're always at least that many versions ahead
+        val nightlyBuffer = (5 * maxHotfixVersions)
+        val nightlyVersionCode = (canonicalVersionCode * maxHotfixVersions) + (getNightlyBuildNumber(tag) * 10) + nightlyBuffer
 
-          variant.outputs.forEach { output ->
-            output.versionName.set("$tag | ${getLastCommitDateTimeUtc()}")
-            output.versionCode.set(nightlyVersionCode)
-          }
+        variant.outputs.forEach { output ->
+          output.versionName.set("$tag | ${getLastCommitDateTimeUtc()}")
+          output.versionCode.set(nightlyVersionCode)
         }
       }
-    }
-
-    onVariants(selector().withBuildType("quickstart")) { variant ->
-      val environment = variant.flavorName?.let { name ->
-        when {
-          name.contains("staging", ignoreCase = true) -> "staging"
-          name.contains("prod", ignoreCase = true) -> "prod"
-          else -> "prod"
-        }
-      } ?: "prod"
-
-      val taskProvider = tasks.register<CopyQuickstartCredentialsTask>("copyQuickstartCredentials${variant.name.capitalize()}") {
-        if (quickstartCredentialsDir != null) {
-          inputDir.set(File(quickstartCredentialsDir))
-        }
-        filePrefix.set("${environment}_")
-      }
-      variant.sources.assets?.addGeneratedSourceDirectory(taskProvider) { it.outputDir }
-    }
-
-    onVariants(selector().withBuildType("benchmark")) { variant ->
-      val taskProvider = tasks.register<CopyBenchmarkBackupTask>("copyBenchmarkBackup${variant.name.capitalize()}") {
-        if (benchmarkBackupFile != null) {
-          inputFile.set(File(benchmarkBackupFile))
-        }
-      }
-      variant.sources.assets?.addGeneratedSourceDirectory(taskProvider) { it.outputDir }
     }
   }
 
-  val releaseDir = "$projectDir/src/release/java"
-  val debugDir = "$projectDir/src/debug/java"
+  onVariants(selector().withBuildType("quickstart")) { variant ->
+    val environment = variant.flavorName?.let { name ->
+      when {
+        name.contains("staging", ignoreCase = true) -> "staging"
+        name.contains("prod", ignoreCase = true) -> "prod"
+        else -> "prod"
+      }
+    } ?: "prod"
 
-  android.buildTypes.configureEach {
-    val path = if (name == "release") releaseDir else debugDir
-    sourceSets.named(name) {
-      java.srcDir(path)
+    val taskProvider = tasks.register<CopyQuickstartCredentialsTask>("copyQuickstartCredentials${variant.name.capitalize()}") {
+      if (quickstartCredentialsDir != null) {
+        inputDir.set(File(quickstartCredentialsDir))
+      }
+      filePrefix.set("${environment}_")
     }
+    variant.sources.assets?.addGeneratedSourceDirectory(taskProvider) { it.outputDir }
   }
 
-  sourceSets {
-    getByName("mocked") {
-      java.srcDir("$projectDir/src/benchmarkShared/java")
-      manifest.srcFile("$projectDir/src/benchmarkShared/AndroidManifest.xml")
-    }
-
-    getByName("benchmark") {
-      java.srcDir("$projectDir/src/benchmarkShared/java")
-      manifest.srcFile("$projectDir/src/benchmarkShared/AndroidManifest.xml")
-    }
-  }
-
-  applicationVariants.configureEach {
-    outputs.configureEach {
-      if (this is com.android.build.gradle.internal.api.BaseVariantOutputImpl) {
-        //val fileVersionName = versionName.substringBefore(" |") // JW
-        //outputFileName = outputFileName.replace(".apk", "-$fileVersionName.apk")
+  onVariants(selector().withBuildType("benchmark")) { variant ->
+    val taskProvider = tasks.register<CopyBenchmarkBackupTask>("copyBenchmarkBackup${variant.name.capitalize()}") {
+      if (benchmarkBackupFile != null) {
+        inputFile.set(File(benchmarkBackupFile))
       }
     }
+    variant.sources.assets?.addGeneratedSourceDirectory(taskProvider) { it.outputDir }
   }
 }
 
@@ -648,6 +664,14 @@ baselineProfile {
   dexLayoutOptimization = false
 }
 
+kotlin {
+  compilerOptions {
+    jvmTarget = JvmTarget.fromTarget(libs.versions.kotlinJvmTarget.get())
+    freeCompilerArgs.addAll("-Xjvm-default=all")
+    suppressWarnings = true
+  }
+}
+
 dependencies {
   lintChecks(project(":lintchecks"))
   ktlintRuleset(libs.ktlint.twitter.compose)
@@ -655,6 +679,7 @@ dependencies {
 
   implementation(project(":lib:archive"))
   implementation(project(":lib:libsignal-service"))
+  implementation(project(":lib:network"))
   implementation(project(":lib:paging"))
   implementation(project(":core:util"))
   implementation(project(":lib:glide"))
@@ -677,11 +702,7 @@ dependencies {
 
   implementation("net.lingala.zip4j:zip4j:2.11.6") // JW: added
   implementation(libs.androidx.fragment.ktx)
-  implementation(libs.androidx.appcompat) {
-    version {
-      strictly("1.6.1")
-    }
-  }
+  implementation(libs.androidx.appcompat)
   implementation(libs.androidx.window.window)
   implementation(libs.androidx.window.java)
   implementation(libs.androidx.recyclerview)
@@ -737,7 +758,6 @@ dependencies {
   implementation(libs.mobilecoin)
   implementation(libs.signal.ringrtc)
   implementation(libs.leolin.shortcutbadger)
-  implementation(libs.emilsjolander.stickylistheaders)
   implementation(libs.glide.glide)
   implementation(libs.roundedimageview)
   implementation(libs.materialish.progress)
@@ -747,9 +767,6 @@ dependencies {
   implementation(libs.google.flexbox)
   implementation(libs.subsampling.scale.image.view) {
     exclude(group = "com.android.support", module = "support-annotations")
-  }
-  implementation(libs.android.tooltips) {
-    exclude(group = "com.android.support", module = "appcompat-v7")
   }
   implementation(libs.lottie)
   implementation(libs.lottie.compose)
@@ -805,6 +822,7 @@ dependencies {
   }
   testImplementation(testLibs.conscrypt.openjdk.uber)
   testImplementation(testLibs.mockk)
+  testImplementation(testFixtures(project(":core:ui")))
   testImplementation(testFixtures(project(":lib:libsignal-service")))
   testImplementation(testLibs.espresso.core)
   testImplementation(testLibs.kotlinx.coroutines.test)
@@ -933,7 +951,7 @@ abstract class LanguageListValueSource : ValueSource<List<String>, LanguageListV
   }
 }
 
-abstract class PropertiesFileValueSource : ValueSource<Properties?, PropertiesFileValueSource.Params> {
+abstract class PropertiesFileValueSource : ValueSource<Properties, PropertiesFileValueSource.Params> {
   interface Params : ValueSourceParameters {
     @get:InputFile
     @get:Optional
@@ -941,9 +959,9 @@ abstract class PropertiesFileValueSource : ValueSource<Properties?, PropertiesFi
     val file: RegularFileProperty
   }
 
-  override fun obtain(): Properties? {
+  override fun obtain(): Properties {
     val f: File = parameters.file.asFile.get()
-    if (!f.exists()) return null
+    if (!f.exists()) return Properties()
 
     return Properties().apply {
       f.inputStream().use { load(it) }
@@ -1011,5 +1029,32 @@ abstract class CopyBenchmarkBackupTask : DefaultTask() {
     val backupFile = inputFile.get().asFile
     logger.lifecycle("Using benchmark backup: ${backupFile.absolutePath} (${backupFile.length() / 1024}KB)")
     backupFile.copyTo(dest.resolve("backup.binproto"), overwrite = true)
+  }
+}
+
+abstract class RenameApkTask : DefaultTask() {
+  @get:InputFiles
+  abstract val apkFolder: DirectoryProperty
+
+  @get:OutputDirectory
+  abstract val outFolder: DirectoryProperty
+
+  @get:Internal
+  abstract val transformationRequest: Property<ArtifactTransformationRequest<RenameApkTask>>
+
+  @TaskAction
+  fun rename() {
+    transformationRequest.get().submit(this) { artifact ->
+      val originalFile = File(artifact.outputFile)
+      val versionName = artifact.versionName?.substringBefore(" |")
+      val newName = if (!versionName.isNullOrEmpty()) {
+        originalFile.name.replace(".apk", "-$versionName.apk")
+      } else {
+        originalFile.name
+      }
+      val newFile = File(outFolder.get().asFile, newName)
+      originalFile.copyTo(newFile, overwrite = true)
+      newFile
+    }
   }
 }

@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -75,7 +76,6 @@ import org.thoughtcrime.securesms.util.CommunicationActions
 import org.thoughtcrime.securesms.util.DateUtils
 import org.thoughtcrime.securesms.util.SupportEmailUtil
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
-import java.util.Locale
 
 private const val PLACEHOLDER = "__ICON_PLACEHOLDER__"
 
@@ -149,16 +149,16 @@ class LinkDeviceFragment : ComposeFragment() {
           Unit
         }
         is LinkDeviceSettingsState.OneTimeEvent.ToastLinked -> {
-          Toast.makeText(context, context.getString(R.string.LinkDeviceFragment__s_linked, event.name), Toast.LENGTH_LONG).show()
+          Toast.makeText(requireContext(), getString(R.string.LinkDeviceFragment__s_linked, event.name), Toast.LENGTH_LONG).show()
         }
         is LinkDeviceSettingsState.OneTimeEvent.ToastUnlinked -> {
-          Toast.makeText(context, context.getString(R.string.LinkDeviceFragment__s_unlinked, event.name), Toast.LENGTH_LONG).show()
+          Toast.makeText(requireContext(), getString(R.string.LinkDeviceFragment__s_unlinked, event.name), Toast.LENGTH_LONG).show()
         }
         LinkDeviceSettingsState.OneTimeEvent.SnackbarLinkCancelled -> {
-          Snackbar.make(requireView(), context.getString(R.string.LinkDeviceFragment__linking_cancelled), Snackbar.LENGTH_LONG).show()
+          Snackbar.make(requireView(), getString(R.string.LinkDeviceFragment__linking_cancelled), Snackbar.LENGTH_LONG).show()
         }
         LinkDeviceSettingsState.OneTimeEvent.ToastNetworkFailed -> {
-          Toast.makeText(context, context.getString(R.string.DeviceListActivity_network_failed), Toast.LENGTH_LONG).show()
+          Toast.makeText(requireContext(), getString(R.string.DeviceListActivity_network_failed), Toast.LENGTH_LONG).show()
         }
         LinkDeviceSettingsState.OneTimeEvent.LaunchQrCodeScanner -> {
           navController.navigateToQrScannerIfAuthed()
@@ -352,7 +352,8 @@ fun DeviceListScreen(
         )
       }
       is DialogState.DeviceUnlinked -> {
-        val createdAt = DateUtils.getDateTimeString(LocalContext.current, Locale.getDefault(), state.dialogState.deviceCreatedAt)
+        val locale = LocalLocale.current.platformLocale
+        val createdAt = DateUtils.getDateTimeString(LocalContext.current, locale, state.dialogState.deviceCreatedAt)
         Dialogs.SimpleMessageDialog(
           title = stringResource(id = R.string.LinkDeviceFragment__device_unlinked),
           message = stringResource(id = R.string.LinkDeviceFragment__the_device_that_was, createdAt),
@@ -494,8 +495,8 @@ fun DeviceListScreen(
 @Composable
 fun DeviceRow(device: Device, isInternalUser: Boolean, setDeviceToRemove: (Device) -> Unit, onEditDevice: (Device) -> Unit) {
   val titleString = if (device.name.isNullOrEmpty()) stringResource(R.string.DeviceListItem_unnamed_device) else device.name
-  val linkedDate = device.createdMillis?.let { DateUtils.getDayPrecisionTimeSpanString(LocalContext.current, Locale.getDefault(), device.createdMillis) }
-  val lastActive = DateUtils.getDayPrecisionTimeSpanString(LocalContext.current, Locale.getDefault(), device.lastSeenMillis)
+  val linkedDate = device.createdMillis?.let { DateUtils.getDayPrecisionTimeSpanString(LocalContext.current, LocalLocale.current.platformLocale, device.createdMillis) }
+  val lastActive = DateUtils.getDayPrecisionTimeSpanString(LocalContext.current, LocalLocale.current.platformLocale, device.lastSeenMillis)
   val menuController = remember { DropdownMenus.MenuController() }
   Row(
     modifier = Modifier

@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">Patvirtinimo kodas bus išsiųstas šiuo numeriu. Gali būti taikomi operatoriaus mokesčiai.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">Taisyti numerį</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Atidaryti meniu</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Naudoti įgaliotąjį serverį</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Susieti įrenginį</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Per ilgas (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Negaliojantis atkūrimo raktas</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Neteisingas atkūrimo raktas</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Ruošiamasi atkurti…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Dar nesinaudojate „Signal“?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Susikurkite paskyrą</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Atkurti iš atsarginės kopijos</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Gaunama informacija apie atsarginę kopiją…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Atkurti atsarginę kopiją</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Paskutinė atsarginė kopija buvo sukurta %1$s, %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Jūsų įrašai bus atkuriami fone. Jei pasirinksite neatkurti dabar, vėliau to padaryti nebegalėsite.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">Atsarginė kopija nerasta</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Šios paskyros atsarginė kopija nerasta.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Nepavyko atkurti atsarginės kopijos</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Šiuo metu negalima atkurti jūsų atsarginės kopijos. Bandykite dar kartą.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Bandykite dar kartą</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Nepavyko užbaigti atkūrimo</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Jungiantis prie serverio įvyko klaida. Patikrinkite ryšį ir bandykite dar kartą.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Atkuriant atsarginę kopiją įvyko klaida. Bandykite dar kartą.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Nepavyko atkurti atsarginės kopijos</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Ši „Signal“ versija negali atkurti jūsų atsarginės kopijos. Atnaujinkite į naujausią versiją ir bandykite dar kartą.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Atnaujinti Signal</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Ne dabar</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Nepavyko atkurti atsarginės kopijos</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Atkuriant atsarginę kopiją įvyko klaida. Jūsų atsarginės kopijos atkurti negalima. Dėl pagalbos kreipkitės į aptarnavimo komandą.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Susisiekti su aptarnavimo komanda</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Atsisiunčiama atsarginė kopija…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Atkuriamos žinutės…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Užbaigiama…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Atkuriama…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s iš %2$s (%3$s)</string>
 </resources>

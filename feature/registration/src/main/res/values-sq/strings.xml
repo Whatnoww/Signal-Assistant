@@ -48,6 +48,12 @@
     <string name="RegistrationActivity_a_verification_code">Një kod verifikimi do të dërgohet në këtë numër. Mund të zbatohen tarifat e operatorit celular.</string>
     <!-- Dialog button to edit the number entered -->
     <string name="RegistrationActivity_edit_number">Modifiko numrin</string>
+    <!-- Accessibility label for opening the screen specific dropdown menu. -->
+    <string name="RegistrationActivity_open_menu">Hap menunë</string>
+    <!-- Menu option to use a proxy -->
+    <string name="RegistrationActivity_use_proxy">Përdor ndërmjetës</string>
+    <!-- Menu option to link this as a device -->
+    <string name="RegistrationActivity_link_device">Lidhe pajisjen</string>
 
     <!-- CountryCodePickerScreen -->
     <!-- Title of the country code selection screen -->
@@ -83,7 +89,7 @@
     <!-- Snackbar shown for generic/unknown errors -->
     <string name="VerificationCodeScreen__an_unexpected_error_occurred">Ka ndodhur një gabim i papritur. Të lutem, provo sërish.</string>
     <!-- Snackbar shown when we are unable to send an SMS to the user\'s number -->
-    <string name="VerificationCodeScreen__unable_to_send_sms">We are unable to send an SMS to your number. Please try again in several hours.</string>
+    <string name="VerificationCodeScreen__unable_to_send_sms">Nuk mund të dërgojmë SMS në numrin tënd. Të lutem, provo përsëri pas disa orësh.</string>
     <!-- Snackbar shown when the selected transport (SMS/voice) is unavailable -->
     <string name="VerificationCodeScreen__could_not_send_code_via_selected_method">Nuk mund të dërgohej kodi nëpërmjet metodës së zgjedhur. Të lutem, provo një opsion tjetër.</string>
     <!-- Snackbar shown for registration errors -->
@@ -191,6 +197,8 @@
     <string name="EnterAepScreen__too_long">Shumë e gjatë (%1$d/%2$d)</string>
     <!-- Error text when key is invalid -->
     <string name="EnterAepScreen__invalid_recovery_key">Kodi i pavlefshëm rikthimi</string>
+    <!-- Error text when key is correct format but does not match account -->
+    <string name="EnterAepScreen__incorrect_recovery_key">Kodi i rikthimit është i pasaktë</string>
     <!-- Text shown while preparing the restore -->
     <string name="LocalBackupRestoreScreen__preparing_restore">Po përgatitet rikthimi…</string>
     <!-- Title shown while restore is in progress -->
@@ -213,4 +221,56 @@
     <string name="WelcomeScreen__not_on_signal_yet">Akoma nuk ke Signal?</string>
     <!-- Button to create a new Signal account -->
     <string name="WelcomeScreen__create_account">Krijo llogari</string>
+
+    <!-- RemoteRestoreScreen -->
+    <!-- Title for the remote backup restore screen -->
+    <string name="RemoteRestoreScreen__restore_from_backup">Riktheni prej kopjeruajtje</string>
+    <!-- Shown while fetching backup details from server -->
+    <string name="RemoteRestoreScreen__fetching_backup_details">Duke marrë detajet e kopjeruajtjes…</string>
+    <!-- Button to start restoring the backup -->
+    <string name="RemoteRestoreScreen__restore_backup">Riktheje kopjeruajtjen</string>
+    <!-- Subtitle showing when the last backup was made, with date and time placeholders -->
+    <string name="RemoteRestoreScreen__your_last_backup_was_made_on_s_at_s">Kopjeruajtja jote e fundit është bërë më %1$s në %2$s.</string>
+    <!-- Description telling the user their media will restore in the background -->
+    <string name="RemoteRestoreScreen__your_media_will_restore_in_the_background">Media do të rikthehet në sfond. Nëse zgjedh të mos e rikthesh tani, nuk do të jesh në gjendje ta rikthesh më vonë.</string>
+    <!-- Title for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__backup_not_found">Kopjeruajtja nuk u gjet</string>
+    <!-- Body for the backup not found dialog -->
+    <string name="RemoteRestoreScreen__no_backup_was_found">Nuk u gjet asnjë kopjeruajtje për këtë llogari.</string>
+    <!-- Title for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_backup">Kopjeruajtja nuk mund të rikthehej</string>
+    <!-- Body for the restore failed dialog -->
+    <string name="RemoteRestoreScreen__your_backup_cant_be_restored_right_now">Kopjeruajtja nuk mund të rikthehet për momentin. Të lutem, provo sërish.</string>
+    <!-- Button to try again -->
+    <string name="RemoteRestoreScreen__try_again">Provo sërish</string>
+    <!-- Title for the network error dialog -->
+    <string name="RemoteRestoreScreen__couldnt_finish_restore">Rikthimi nuk mund të përfundohej</string>
+    <!-- Body for the network error dialog -->
+    <string name="RemoteRestoreScreen__error_connecting">Ndodhi një gabim gjatë lidhjes me serverin. Kontrollo lidhjen e rrjetit dhe riprovo.</string>
+    <!-- Body for the general restore failure dialog -->
+    <string name="RemoteRestoreScreen__error_occurred">Ndodhi një gabim gjatë rikthimit të kopjeruajtjes. Të lutem, provo sërish.</string>
+    <!-- Title for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__couldnt_restore_this_backup">Kjo kopjeruajtje nuk mund të rikthehej</string>
+    <!-- Body for the invalid backup version dialog -->
+    <string name="RemoteRestoreScreen__update_latest">Ky version i Signal nuk mund ta rikthejë kopjeruajtjen. Përditëso në versionin më të fundit dhe provo sërish.</string>
+    <!-- Button to update Signal -->
+    <string name="RemoteRestoreScreen__update_signal">Përditësoni Signal-in</string>
+    <!-- Button to dismiss update dialog -->
+    <string name="RemoteRestoreScreen__not_now">Jo tani</string>
+    <!-- Title for unrecoverable backup failure dialog -->
+    <string name="RemoteRestoreScreen__cant_restore_this_backup">Kopjeruajtja nuk mund të rikthehej</string>
+    <!-- Body for unrecoverable backup failure dialog prompting user to contact support -->
+    <string name="RemoteRestoreScreen__your_backup_is_not_recoverable">Ndodhi një gabim gjatë rikthimit të kopjeruajtjes. Kopjeruajtja nuk rikuperohet. Të lutem, kontakto ndihmën për mbështetje.</string>
+    <!-- Button to contact support -->
+    <string name="RemoteRestoreScreen__contact_support">Kontakto ndihmën</string>
+    <!-- Shown while downloading the backup from the server -->
+    <string name="RemoteRestoreScreen__downloading_backup">Kopjeruajtja po shkarkohet…</string>
+    <!-- Shown while restoring messages from the downloaded backup -->
+    <string name="RemoteRestoreScreen__restoring_messages">Po rikthehen mesazhet…</string>
+    <!-- Shown while finalizing the restore -->
+    <string name="RemoteRestoreScreen__finishing_restore">Duke përfunduar…</string>
+    <!-- Shown as a generic restoring message -->
+    <string name="RemoteRestoreScreen__restoring">Po kthehet…</string>
+    <!-- Byte progress text, e.g. "1.2 MB of 10 MB (12.34%)" -->
+    <string name="RemoteRestoreScreen__s_of_s_s">%1$s nga %2$s (%3$s)</string>
 </resources>

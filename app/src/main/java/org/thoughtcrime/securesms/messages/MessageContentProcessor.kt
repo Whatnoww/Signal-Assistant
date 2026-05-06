@@ -470,6 +470,7 @@ open class MessageContentProcessor(private val context: Context) {
 
       content.syncMessage != null -> {
         SignalStore.account.isMultiDevice = true
+        SignalStore.misc.lastSyncMessageSeenTimeMs = System.currentTimeMillis()
 
         SyncMessageProcessor.process(
           context,

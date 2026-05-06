@@ -19,7 +19,7 @@ val localProperties: Properties? = if (localPropertiesFile.exists()) {
 
 android {
   namespace = "org.thoughtcrime.video.app"
-  compileSdkVersion = libs.versions.compileSdk.get()
+  compileSdkVersion(libs.versions.compileSdk.get())
 
   defaultConfig {
     applicationId = "org.thoughtcrime.video.app"
@@ -49,14 +49,8 @@ android {
     sourceCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
     targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
   }
-  kotlinOptions {
-    jvmTarget = libs.versions.kotlinJvmTarget.get()
-  }
   buildFeatures {
     compose = true
-  }
-  composeOptions {
-    kotlinCompilerExtensionVersion = "1.5.4"
   }
   packaging {
     resources {
