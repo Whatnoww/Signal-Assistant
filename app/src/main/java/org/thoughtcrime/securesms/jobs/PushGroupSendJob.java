@@ -459,8 +459,8 @@ public final class PushGroupSendJob extends PushSendJob {
     skippedRecipients.addAll(skipped);
     skippedRecipients.addAll(unregisteredRecipients);
     skippedRecipients.addAll(invalidPreKeyRecipients);
-
-    if (networkFailures.size() > 0 || identityMismatches.size() > 0 || proofRequired != null || unregisteredRecipients.size() > 0) {
+// Whatnoww changed: Identity mismatches seem to be here. removing  || identityMismatches.size() > 0
+    if (networkFailures.size() > 0 || proofRequired != null || unregisteredRecipients.size() > 0) {
       Log.w(TAG, String.format(Locale.US, "Failed to send to some recipients. Network: %d, Identity: %d, ProofRequired: %s, Unregistered: %d",
                                networkFailures.size(), identityMismatches.size(), proofRequired != null, unregisteredRecipients.size()));
     }
@@ -490,8 +490,8 @@ public final class PushGroupSendJob extends PushSendJob {
         throw proofRequired;
       }
     }
-
-    if (existingNetworkFailures.isEmpty() && existingIdentityMismatches.isEmpty()) {
+// Whatnoww changed: I am removing this from the line below  && existingIdentityMismatches.isEmpty()
+    if (existingNetworkFailures.isEmpty()) {
       database.markAsSent(messageId, true);
 
       markAttachmentsUploaded(messageId, message);
@@ -516,7 +516,8 @@ public final class PushGroupSendJob extends PushSendJob {
       if (message.getStoryType().isStory()) {
         AppDependencies.getExpireStoriesManager().scheduleIfNecessary();
       }
-    } else if (!existingIdentityMismatches.isEmpty()) {
+      // Whatnoww changed: I am removing the conditions to mark the message as failed
+    } /*else if (!existingIdentityMismatches.isEmpty()) {
       Log.w(TAG, "Failing because there were " + existingIdentityMismatches.size() + " identity mismatches.");
       database.markAsSentFailed(messageId);
       notifyMediaMessageDeliveryFailed(context, messageId);
@@ -526,7 +527,7 @@ public final class PushGroupSendJob extends PushSendJob {
                                                                         .collect(Collectors.toSet());
 
       RetrieveProfileJob.enqueue(mismatchRecipientIds, true);
-    } else if (!networkFailures.isEmpty()) {
+    } */else if (!networkFailures.isEmpty()) {
       long retryAfter = results.stream()
                                .filter(r -> r.getRateLimitFailure() != null)
                                .map(r -> {
