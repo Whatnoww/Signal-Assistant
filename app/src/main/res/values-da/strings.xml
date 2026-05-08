@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Sletter</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Sletter beskeder …</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d af %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Sortér efter</string>
     <string name="MediaOverviewActivity_Newest">Nyeste</string>
     <string name="MediaOverviewActivity_Oldest">Ældste</string>

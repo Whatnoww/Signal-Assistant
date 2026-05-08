@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Poistetaan</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Viestejä poistetaan…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d / %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Järjestä</string>
     <string name="MediaOverviewActivity_Newest">Uusin</string>
     <string name="MediaOverviewActivity_Oldest">Vanhin</string>

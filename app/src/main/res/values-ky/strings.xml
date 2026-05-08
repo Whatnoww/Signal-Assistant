@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Өчүрүлүүдө</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Билдирүүлөр өчүрүлүүдө…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%2$d ичинен %1$d</string>
     <string name="MediaOverviewActivity_Sort_by">Кантип иргелет:</string>
     <string name="MediaOverviewActivity_Newest">Жаңысынан баштап</string>
     <string name="MediaOverviewActivity_Oldest">Эскисинен баштап</string>

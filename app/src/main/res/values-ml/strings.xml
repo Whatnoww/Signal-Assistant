@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">ഇല്ലാതാക്കുന്നു</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">സന്ദേശങ്ങൾ ഇല്ലാതാക്കുന്നു…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%2$d ൽ %1$d</string>
     <string name="MediaOverviewActivity_Sort_by">ഇങ്ങനെ അടുക്കുക</string>
     <string name="MediaOverviewActivity_Newest">ഏറ്റവും പുതിയത്</string>
     <string name="MediaOverviewActivity_Oldest">ഏറ്റവും പഴയത്</string>

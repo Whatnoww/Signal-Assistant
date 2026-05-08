@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">తొలగిపోతున్నాయ్</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">సందేశాలను తొలగిస్తోంది …</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d ఆఫ్ %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">ఆమరిక</string>
     <string name="MediaOverviewActivity_Newest">సరికొత్త</string>
     <string name="MediaOverviewActivity_Oldest">పాతది</string>

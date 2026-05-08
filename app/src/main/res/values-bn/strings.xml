@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">মোছা হচ্ছে…</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">বার্তা সমূহ মোছা হচ্ছে…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d এর %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">ক্রমানুসার</string>
     <string name="MediaOverviewActivity_Newest">নতুন</string>
     <string name="MediaOverviewActivity_Oldest">পুরাতন</string>

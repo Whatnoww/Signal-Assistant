@@ -54,6 +54,7 @@ import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.recipients.ui.RecipientLookupFailureMessage
 import org.thoughtcrime.securesms.recipients.ui.RecipientPicker
+import org.thoughtcrime.securesms.recipients.ui.RecipientPicker.DisplayMode
 import org.thoughtcrime.securesms.recipients.ui.RecipientPickerCallbacks
 import org.thoughtcrime.securesms.recipients.ui.RecipientPickerScaffold
 import org.thoughtcrime.securesms.recipients.ui.RecipientSelection
@@ -311,6 +312,7 @@ private fun NewConversationRecipientPicker(
     searchQuery = uiState.searchQuery,
     isRefreshing = uiState.isRefreshingContacts,
     shouldResetContactsList = uiState.shouldResetContactsList,
+    displayModes = setOf(DisplayMode.PUSH, DisplayMode.ACTIVE_GROUPS, DisplayMode.INACTIVE_GROUPS, DisplayMode.SELF),
     callbacks = remember(callbacks) {
       RecipientPickerCallbacks(
         listActions = callbacks,

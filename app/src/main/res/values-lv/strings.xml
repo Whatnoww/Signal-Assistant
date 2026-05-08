@@ -1877,7 +1877,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Dzēš</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Dzēš ziņas…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d no %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Kārtot pēc</string>
     <string name="MediaOverviewActivity_Newest">jaunākais</string>
     <string name="MediaOverviewActivity_Oldest">vecākais</string>

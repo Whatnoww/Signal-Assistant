@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">डिलीट किया जा रहा है</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">मैसेज डिलीट किए जा रहे हैं…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d में से %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">इस तरह सॉर्ट करें</string>
     <string name="MediaOverviewActivity_Newest">सबसे नया</string>
     <string name="MediaOverviewActivity_Oldest">सबसे पुराना</string>

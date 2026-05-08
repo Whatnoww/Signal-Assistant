@@ -203,6 +203,7 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
     hasPendingOneTimeDonation = SignalStore.inAppPayments.getPendingOneTimeDonation() != null,
     hevcEncoding = SignalStore.internal.hevcEncoding,
     forceSplitPane = SignalStore.internal.forceSplitPane,
+    forceSinglePane = SignalStore.internal.forceSinglePane,
     useNewMediaActivity = SignalStore.internal.useNewMediaActivity,
     disableInternalUser = RemoteConfig.internalUserDisabled
   )
@@ -222,6 +223,11 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
 
   fun setForceSplitPane(forceSplitPane: Boolean) {
     SignalStore.internal.forceSplitPane = forceSplitPane
+    refresh()
+  }
+
+  fun setForceSinglePane(forceSinglePane: Boolean) {
+    SignalStore.internal.forceSinglePane = forceSinglePane
     refresh()
   }
 

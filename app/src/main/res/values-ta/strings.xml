@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">நீக்கப்படுகிறது</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">செய்திகள் நீக்கப்படுகிறது…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%2$d இன் %1$d</string>
     <string name="MediaOverviewActivity_Sort_by">மூலம் வரிசைப்படுத்து</string>
     <string name="MediaOverviewActivity_Newest">புதியது</string>
     <string name="MediaOverviewActivity_Oldest">பழையது</string>

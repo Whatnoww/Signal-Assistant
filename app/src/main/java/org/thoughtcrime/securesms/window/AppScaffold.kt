@@ -49,9 +49,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
@@ -61,6 +63,7 @@ import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.getWindowBreakpoint
 import org.signal.core.ui.isWidthExpanded
 import org.signal.core.ui.rememberIsSplitPane
+import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.main.MainFloatingActionButtonsCallback
 import org.thoughtcrime.securesms.main.MainNavigationBar
 import org.thoughtcrime.securesms.main.MainNavigationRail
@@ -132,8 +135,14 @@ fun AppScaffold(
   contentWindowInsets: WindowInsets = WindowInsets.systemBars,
   animatorFactory: AppScaffoldAnimationStateFactory = AppScaffoldAnimationStateFactory.Default
 ) {
-  val useSimpleScaffold = navigator.scaffoldDirective.maxHorizontalPartitions == 1 && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
-  if (useSimpleScaffold) {
+  val isForceSinglePane = if (LocalInspectionMode.current) {
+    false
+  } else {
+    SignalStore.internal.forceSinglePane
+  }
+
+  val useSimpleScaffold = isForceSinglePane || (navigator.scaffoldDirective.maxHorizontalPartitions == 1 && Build.VERSION.SDK_INT < 33)
+  if (useSimpleScaffold && LocalLayoutDirection.current != LayoutDirection.Rtl) {
     SinglePaneAppScaffold(
       navigator = navigator,
       modifier = modifier,
@@ -142,7 +151,8 @@ fun AppScaffold(
       secondaryContent = secondaryContent,
       bottomNavContent = bottomNavContent,
       snackbarHost = snackbarHost,
-      contentWindowInsets = contentWindowInsets
+      contentWindowInsets = contentWindowInsets,
+      animatorFactory = animatorFactory
     )
   } else {
     AdaptiveAppScaffold(
@@ -307,10 +317,14 @@ private fun SinglePaneAppScaffold(
   secondaryContent: @Composable () -> Unit,
   bottomNavContent: @Composable () -> Unit = {},
   snackbarHost: @Composable () -> Unit = {},
-  contentWindowInsets: WindowInsets = WindowInsets.systemBars
+  contentWindowInsets: WindowInsets = WindowInsets.systemBars,
+  animatorFactory: AppScaffoldAnimationStateFactory = AppScaffoldAnimationStateFactory.Default
 ) {
   val showDetail = navigator.scaffoldValue.primary == PaneAdaptedValue.Expanded
   val coroutineScope = rememberCoroutineScope()
+  val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+  val directionMultiplier = if (isRtl) -1 else 1
+  val skipSlide = AppScaffoldNavigator.NavigationState.ENTER !in animatorFactory.enabledStates
 
   BackHandler(enabled = navigator.canNavigateBack()) {
     coroutineScope.launch { navigator.navigateBack() }
@@ -326,12 +340,12 @@ private fun SinglePaneAppScaffold(
     AnimatedContent(
       targetState = showDetail,
       transitionSpec = {
-        val transform = if (targetState) {
-          slideInHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> fullWidth } togetherWith
-            slideOutHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> -fullWidth }
-        } else {
-          slideInHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> -fullWidth } togetherWith
-            slideOutHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> fullWidth }
+        val transform = when {
+          skipSlide -> EnterTransition.None togetherWith ExitTransition.None
+          targetState -> slideInHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> fullWidth * directionMultiplier } togetherWith
+            slideOutHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> -fullWidth * directionMultiplier }
+          else -> slideInHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> -fullWidth * directionMultiplier } togetherWith
+            slideOutHorizontally(animationSpec = AppScaffoldAnimationDefaults.tween()) { fullWidth -> fullWidth * directionMultiplier }
         }
         transform using SizeTransform(clip = false) { _, _ -> snap() }
       },

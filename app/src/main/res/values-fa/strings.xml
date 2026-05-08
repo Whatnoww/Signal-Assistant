@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">در حال حذف</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">حذف پیام‌ها…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d از %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">مرتب‌سازی بر اساس</string>
     <string name="MediaOverviewActivity_Newest">جدیدترین</string>
     <string name="MediaOverviewActivity_Oldest">قدیمی‌ترین</string>

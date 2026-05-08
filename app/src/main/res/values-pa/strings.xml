@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">ਮਿਟਾਇਆ ਜਾ ਰਿਹਾ ਹੈ</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">ਸੁਨੇਹਿਆਂ ਨੂੰ ਮਿਟਾਇਆ ਜਾ ਰਿਹਾ ਹੈ…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%2$d ਵਿੱਚੋਂ %1$d</string>
     <string name="MediaOverviewActivity_Sort_by">ਇੰਝ ਕ੍ਰਮ ਵਿੱਚ ਲਗਾਓ</string>
     <string name="MediaOverviewActivity_Newest">ਨਵੀਨਤਮ</string>
     <string name="MediaOverviewActivity_Oldest">ਸਭ ਤੋਂ ਪੁਰਾਣਾ</string>

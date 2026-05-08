@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">იშლება</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">ვშლით შეტყობინებებს…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d %2$d-დან</string>
     <string name="MediaOverviewActivity_Sort_by">დახარისხება</string>
     <string name="MediaOverviewActivity_Newest">ყველაზე ახალი</string>
     <string name="MediaOverviewActivity_Oldest">ყველაზე ძველი</string>

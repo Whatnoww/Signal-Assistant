@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Po fshihet</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Po fshihen mesazhet…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d nga %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Renditi sipas</string>
     <string name="MediaOverviewActivity_Newest">Më të rejave</string>
     <string name="MediaOverviewActivity_Oldest">Më të vjetrave</string>

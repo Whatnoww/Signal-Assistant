@@ -1930,7 +1930,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Brišem</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Izbris sporočil …</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d od %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Razvrščanje</string>
     <string name="MediaOverviewActivity_Newest">Najnovejše</string>
     <string name="MediaOverviewActivity_Oldest">Najstarejše</string>

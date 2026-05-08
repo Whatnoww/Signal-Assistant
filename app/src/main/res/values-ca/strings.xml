@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Se suprimeix</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Se suprimeixen missatges…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d de %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Ordena per</string>
     <string name="MediaOverviewActivity_Newest">El més nou</string>
     <string name="MediaOverviewActivity_Oldest">El més antic</string>

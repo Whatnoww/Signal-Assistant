@@ -1877,7 +1877,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">Se șterge</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">Se șterg mesajele…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d din %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">Sortează după</string>
     <string name="MediaOverviewActivity_Newest">Noi</string>
     <string name="MediaOverviewActivity_Oldest">Vechi</string>

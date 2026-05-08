@@ -1771,7 +1771,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">正在刪除</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">刪除訊息中…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">第 %1$d 個，共 %2$d 個</string>
     <string name="MediaOverviewActivity_Sort_by">排列方式</string>
     <string name="MediaOverviewActivity_Newest">最新到最舊</string>
     <string name="MediaOverviewActivity_Oldest">最舊到最新</string>

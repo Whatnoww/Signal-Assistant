@@ -1771,7 +1771,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">កំពុងលុប</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">កំពុងលុបសារ…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d នៃ %2$d</string>
     <string name="MediaOverviewActivity_Sort_by">តម្រៀបតាម</string>
     <string name="MediaOverviewActivity_Newest">ថ្មីបំផុត</string>
     <string name="MediaOverviewActivity_Oldest">ចាស់បំផុត</string>

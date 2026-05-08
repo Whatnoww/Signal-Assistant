@@ -1824,7 +1824,7 @@
     <string name="MediaOverviewActivity_Media_delete_progress_title">ಅಳಿಸಲಾಗುತ್ತಿದೆ</string>
     <string name="MediaOverviewActivity_Media_delete_progress_message">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತಿದೆ…</string>
     <!-- Format string showing current vs. total items being deleted, e.g. "12 of 207" -->
-    <string name="MediaOverviewActivity_Media_delete_progress_count">%1$d of %2$d</string>
+    <string name="MediaOverviewActivity_Media_delete_progress_count">%2$d ನಲ್ಲಿ %1$d</string>
     <string name="MediaOverviewActivity_Sort_by">ಇವುಗಳಂತೆ ವಿಂಗಡಿಸು</string>
     <string name="MediaOverviewActivity_Newest">ಹೊಸತು</string>
     <string name="MediaOverviewActivity_Oldest">ಹಳೆಯದು</string>

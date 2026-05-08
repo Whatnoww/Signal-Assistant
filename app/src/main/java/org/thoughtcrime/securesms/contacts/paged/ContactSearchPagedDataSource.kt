@@ -244,14 +244,8 @@ class ContactSearchPagedDataSource(
     return contactSearchPagedDataSourceRepository.querySignalContactLetterHeaders(
       query = query,
       includeSelfMode = section.includeSelfMode,
-      includePush = when (section.transportType) {
-        ContactSearchConfiguration.TransportType.PUSH, ContactSearchConfiguration.TransportType.ALL -> true
-        else -> false
-      },
-      includeSms = when (section.transportType) {
-        ContactSearchConfiguration.TransportType.SMS, ContactSearchConfiguration.TransportType.ALL -> true
-        else -> false
-      }
+      includePush = true,
+      includeSms = false
     )
   }
 
