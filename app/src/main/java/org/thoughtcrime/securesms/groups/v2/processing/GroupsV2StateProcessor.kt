@@ -1006,7 +1006,7 @@ class GroupsV2StateProcessor private constructor(
         } catch (e: MmsException) {
           Log.w(TAG, "Failed to insert outgoing update message!", e)
         }
-      } else if (extraCheck) { // JW: don't store messages from blocked contacts but only if non-linked device
+      } else if (extraCheck) { // JW: don't store messages from blocked contacts, but only if non-linked device.
         try {
           val updates = updateDescription.groupChangeUpdate!!.updates
 

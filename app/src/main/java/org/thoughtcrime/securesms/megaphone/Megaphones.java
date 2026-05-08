@@ -121,7 +121,7 @@ public final class Megaphones {
       put(Event.NEW_LINKED_DEVICE, shouldShowNewLinkedDeviceMegaphone() ? ALWAYS: NEVER);
       put(Event.NOTIFICATIONS, shouldShowNotificationsMegaphone(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(30)) : NEVER);
       put(Event.GRANT_FULL_SCREEN_INTENT, shouldShowGrantFullScreenIntentPermission(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER);
-      put(Event.BACKUP_SCHEDULE_PERMISSION, shouldShowBackupSchedulePermissionMegaphone(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER);
+      //put(Event.BACKUP_SCHEDULE_PERMISSION, shouldShowBackupSchedulePermissionMegaphone(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER);
       put(Event.ONBOARDING, shouldShowOnboardingMegaphone(context) ? ALWAYS : NEVER);
       put(Event.TURN_OFF_CENSORSHIP_CIRCUMVENTION, shouldShowTurnOffCircumventionMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(7)) : NEVER);
       //put(Event.REMOTE_MEGAPHONE, shouldShowRemoteMegaphone(records) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(1)) : NEVER); // JW: nagware disabled
@@ -181,8 +181,8 @@ public final class Megaphones {
         return buildLinkedDeviceInactiveMegaphone(context);
       //case REMOTE_MEGAPHONE:
       //  return buildRemoteMegaphone(context); // JW
-      case BACKUP_SCHEDULE_PERMISSION:
-        return buildBackupPermissionMegaphone(context);
+      //case BACKUP_SCHEDULE_PERMISSION:
+      //  return buildBackupPermissionMegaphone(context); // JW: old style backup is OK.
       case SET_UP_YOUR_USERNAME:
         return buildSetUpYourUsernameMegaphone(context);
       case GRANT_FULL_SCREEN_INTENT:

@@ -57,9 +57,8 @@ public class BackupUtil {
   }
 
   public static boolean isUserSelectionRequired(@NonNull Context context) {
-    // JW: changed
     //return Build.VERSION.SDK_INT >= 29 && !Permissions.hasAll(context, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    return Build.VERSION.SDK_INT >= 29;
+    return Build.VERSION.SDK_INT >= 29; // JW: changed permissions
   }
 
   public static boolean canUserAccessBackupDirectory(@NonNull Context context) {

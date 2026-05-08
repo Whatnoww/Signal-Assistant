@@ -11,6 +11,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Properties
 import java.io.FileInputStream
+import com.android.build.OutputFile // JW
+import com.android.build.api.variant.FilterConfiguration.FilterType.* // JW
 
 plugins {
   alias(libs.plugins.android.application)
@@ -33,14 +35,8 @@ val canonicalVersionName = "8.10.1"
 val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 
-// JW: re-added
-val abiPostFix: Map<String, Int> = mapOf(
-  "universal" to 0,
-  "armeabi-v7a" to 1,
-  "arm64-v8a" to 2,
-  "x86" to 3,
-  "x86_64" to 4
-)
+// JW: added
+val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 2, "x86" to 3, "x86_64" to 4)
 
 // We don't want versions to ever end in 0 so that they don't conflict with nightly versions
 val possibleHotfixVersions = (0 until maxHotfixVersions).toList().filter { it % 10 != 0 }
@@ -303,6 +299,7 @@ android {
     }
     resourceConfigurations += listOf()
 
+    // JW: add splits
     splits {
       abi {
         isEnable = !project.hasProperty("generateBaselineProfile")
@@ -504,17 +501,6 @@ android {
       buildConfigField("String", "BUILD_ENVIRONMENT_TYPE", "\"Staging\"")
       buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"pk_test_sngOd8FnXNkpce9nPXawKrJD00kIDngZkD\"")
     }
-
-    create("backup") {
-      initWith(getByName("staging"))
-
-      dimension = "environment"
-
-      applicationIdSuffix = ".backup"
-
-      buildConfigField("boolean", "MANAGES_APP_UPDATES", "true")
-      buildConfigField("String", "BUILD_ENVIRONMENT_TYPE", "\"Backup\"")
-    }
   }
 
   lint {
@@ -550,22 +536,47 @@ android {
   }
 }
 
-  androidComponents {
-    beforeVariants { variant ->
-      variant.enable = variant.name in selectableVariants
-    }
-    onVariants(selector().all()) { variant: com.android.build.api.variant.ApplicationVariant ->
-      // Include the test-only library on debug builds.
-      if (variant.buildType != "instrumentation") {
-        variant.packaging.jniLibs.excludes.add("**/libsignal_jni_testing.so")
-      }
+androidComponents {
+  beforeVariants { variant ->
+    variant.enable = variant.name in selectableVariants
+  }
 
-      // Starting with minSdk 23, Android leaves native libraries uncompressed, which is fine for the Play Store, but not for our self-distributed APKs.
-      // This reverts it to the legacy behavior, compressing the native libraries, and drastically reducing the APK file size.
-      // JW: Always use it
-      //if (variant.name.contains("website", ignoreCase = true) || variant.name.contains("github", ignoreCase = true)) {
-        variant.packaging.jniLibs.useLegacyPackaging.set(true)
-      //}
+  // JW added
+  onVariants(selector().all()) { variant: com.android.build.api.variant.ApplicationVariant ->
+    variant.outputs.forEach { output ->
+      val baseAbiCode = abiCodes[output.filters.find { it.filterType == ABI }?.identifier]
+      val postFix: Int
+      if (baseAbiCode != null) {
+        postFix = baseAbiCode
+      } else {
+        postFix = 0
+      }
+      output.versionCode.set(canonicalVersionCode * maxHotfixVersions + postFix)
+    }
+  }
+  // End JW: added
+
+  onVariants(selector().all()) { variant: com.android.build.api.variant.ApplicationVariant ->
+    // Rename APK to include version name
+    val renameTask = tasks.register<RenameApkTask>("renameApk${variant.name.replaceFirstChar { it.uppercase() }}")
+    val renameRequest = variant.artifacts.use(renameTask)
+      .wiredWithDirectories(RenameApkTask::apkFolder, RenameApkTask::outFolder)
+      .toTransformMany(SingleArtifact.APK)
+    renameTask.configure {
+      transformationRequest.set(renameRequest)
+    }
+
+    // Include the test-only library on debug builds.
+    if (variant.buildType != "instrumentation") {
+      variant.packaging.jniLibs.excludes.add("**/libsignal_jni_testing.so")
+    }
+
+    // Starting with minSdk 23, Android leaves native libraries uncompressed, which is fine for the Play Store, but not for our self-distributed APKs.
+    // This reverts it to the legacy behavior, compressing the native libraries, and drastically reducing the APK file size.
+    // JW: Always use this
+    //if (variant.name.contains("website", ignoreCase = true) || variant.name.contains("github", ignoreCase = true)) {
+      variant.packaging.jniLibs.useLegacyPackaging.set(true)
+    //}
 
     // Version overrides
     if (variant.name.contains("nightly", ignoreCase = true)) {
