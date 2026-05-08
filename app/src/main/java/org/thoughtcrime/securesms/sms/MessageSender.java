@@ -247,7 +247,7 @@ public class MessageSender {
       threadTable.update(allocatedThreadId, true, true);
 
       AppDependencies.getMessageNotifier().updateNotification(AppDependencies.getApplication());
-      //Whatnoww added - Mark everything as read after sending which hopefully bypasses safety number changes that currently block Signal Assistant from responding quite often.
+      //Whatnoww added - Mark everything as read which should clear some notifications.
       var messageIds = SignalDatabase.threads().setAllThreadsRead();
       MarkReadReceiver.process(messageIds);
 
