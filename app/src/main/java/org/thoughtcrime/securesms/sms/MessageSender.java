@@ -231,6 +231,7 @@ public class MessageSender {
       InsertResult insertResult      = database.insertMessageOutbox(applyUniversalExpireTimerIfNecessary(context, recipient, message, allocatedThreadId), allocatedThreadId, sendType != SendType.SIGNAL, insertListener);
       long         messageId         = insertResult.getMessageId();
 
+
       if (message.getThreadRecipient().isGroup()) {
         if (message.getAttachments().isEmpty() && message.getLinkPreviews().isEmpty() && message.getSharedContacts().isEmpty()) {
           SignalLocalMetrics.GroupMessageSend.onInsertedIntoDatabase(messageId, metricId);
@@ -246,6 +247,9 @@ public class MessageSender {
       threadTable.update(allocatedThreadId, true, true);
 
       AppDependencies.getMessageNotifier().updateNotification(AppDependencies.getApplication());
+      //Whatnoww added - Mark everything as read after sending which hopefully bypasses safety number changes that currently block Signal Assistant from responding quite often.
+      var messageIds = SignalDatabase.threads().setAllThreadsRead();
+      MarkReadReceiver.process(messageIds);
 
       return allocatedThreadId;
     } catch (MmsException e) {
