@@ -246,7 +246,6 @@ public class MessageSender {
       threadTable.update(allocatedThreadId, true, true);
 
       AppDependencies.getMessageNotifier().updateNotification(AppDependencies.getApplication());
-      MarkReadReceiver.process(messageIds);
 
       return allocatedThreadId;
     } catch (MmsException e) {
