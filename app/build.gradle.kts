@@ -12,7 +12,6 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Properties
-import java.io.FileInputStream
 import com.android.build.OutputFile // JW
 import com.android.build.api.variant.FilterConfiguration.FilterType.* // JW
 
@@ -39,7 +38,7 @@ val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 
 // JW: added
-val abiCodes = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 2, "x86" to 3, "x86_64" to 4)
+val abiCodes: Map<String, Int> = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x86" to 2, "x86" to 3, "x86_64" to 4)
 
 // We don't want versions to ever end in 0 so that they don't conflict with nightly versions
 val possibleHotfixVersions = (0 until maxHotfixVersions).toList().filter { it % 10 != 0 }
@@ -324,17 +323,16 @@ android {
     buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"pk_live_6cmGZopuTsV8novGgJJW9JpC00vLIgtQ1D\"")
     buildConfigField("boolean", "TRACING_ENABLED", "false")
     buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true") // JW
-    buildConfigField("boolean", "USE_STRING_ID", "false")
     //Whatnoww added config field
     buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
     buildConfigField("String", "RESPONSE_XML", "\"$responseXml\"")
+
 
     ndk {
       abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
     }
     resourceConfigurations += listOf()
 
-    // JW: add splits
     splits {
       abi {
         isEnable = !project.hasProperty("generateBaselineProfile")
@@ -572,7 +570,6 @@ androidComponents {
       (variant as? com.android.build.api.variant.HasUnitTestBuilder)?.enableUnitTest = true
     }
   }
-
   // JW added
   onVariants(selector().all()) { variant: com.android.build.api.variant.ApplicationVariant ->
     variant.outputs.forEach { output ->
@@ -981,7 +978,6 @@ fun getLastCommitDateTimeUtc(): String {
 */
 }
 
-// JW: rewrote function
 fun getMapsKey(): String {
   val mapKey = file("${project.rootDir}/maps.key")
 

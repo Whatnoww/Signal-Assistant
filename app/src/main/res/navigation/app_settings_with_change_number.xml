@@ -490,7 +490,7 @@
         android:name="org.thoughtcrime.securesms.components.settings.app.chats.ChatsSettingsFragment"
         android:label="chats_settings_fragment"
         tools:layout="@layout/dsl_settings_fragment">
-        <!-- JW: added -->
+       <!-- JW: added -->
         <action
             android:id="@+id/action_chatsSettingsFragment_to_backupsPreferenceFragment"
             app:destination="@id/backupsPreferenceFragment"

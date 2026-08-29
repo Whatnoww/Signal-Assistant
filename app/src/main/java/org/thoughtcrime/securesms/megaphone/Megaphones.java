@@ -122,11 +122,11 @@ public final class Megaphones {
       put(Event.NEW_LINKED_DEVICE, shouldShowNewLinkedDeviceMegaphone() ? ALWAYS : NEVER);
       put(Event.NOTIFICATIONS, shouldShowNotificationsMegaphone(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(30)) : NEVER);
       put(Event.GRANT_FULL_SCREEN_INTENT, shouldShowGrantFullScreenIntentPermission(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER);
-      //put(Event.BACKUP_SCHEDULE_PERMISSION, shouldShowBackupSchedulePermissionMegaphone(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER);
+      //put(Event.BACKUP_SCHEDULE_PERMISSION, shouldShowBackupSchedulePermissionMegaphone(context) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER); // JW
       put(Event.ONBOARDING, shouldShowOnboardingMegaphone(context) ? ALWAYS : NEVER);
       put(Event.TURN_OFF_CENSORSHIP_CIRCUMVENTION, shouldShowTurnOffCircumventionMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(7)) : NEVER);
-      //put(Event.REMOTE_MEGAPHONE, shouldShowRemoteMegaphone(records) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(1)) : NEVER); // JW: nagware disabled
-      put(Event.LINKED_DEVICE_INACTIVE, shouldShowLinkedDeviceInactiveMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)): NEVER);
+      //put(Event.REMOTE_MEGAPHONE, shouldShowRemoteMegaphone(records) ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(1)) : NEVER); // JW
+      put(Event.LINKED_DEVICE_INACTIVE, shouldShowLinkedDeviceInactiveMegaphone() ? RecurringSchedule.every(TimeUnit.DAYS.toMillis(3)) : NEVER);
 
       // Specifically putting backup reminders here, above PIN reminders
       put(Event.BACKUP_LOW_STORAGE_UPSELL, shouldShowBackupLowStorageUpsell(context) ? new BackupUpsellSchedule(records, TimeUnit.DAYS.toMillis(60), TimeUnit.DAYS.toMillis(120)) : NEVER);
@@ -184,7 +184,7 @@ public final class Megaphones {
       //case REMOTE_MEGAPHONE:
       //  return buildRemoteMegaphone(context); // JW
       //case BACKUP_SCHEDULE_PERMISSION:
-      //  return buildBackupPermissionMegaphone(context); // JW: old style backup is OK.
+      //  return buildBackupPermissionMegaphone(context); // JW
       case SET_UP_YOUR_USERNAME:
         return buildSetUpYourUsernameMegaphone(context);
       case GRANT_FULL_SCREEN_INTENT:
@@ -205,6 +205,8 @@ public final class Megaphones {
       //  return buildVerifyBackupKeyMegaphone(); // JW
       //case USE_NEW_ON_DEVICE_BACKUPS:
       //  return buildUseNewOnDeviceBackupsMegaphone(); // JW
+      case INACTIVE_PRIMARY:
+        return buildInactivePrimaryMegaphone();
       default:
         throw new IllegalArgumentException("Event not handled!");
     }

@@ -196,7 +196,11 @@ class ChatsSettingsFragment : ComposeFragment() {
 
     override fun onSetGoogleMapTypeClicked(selection: String) {
       viewModel.setGoogleMapType(selection)
-    }  
+    }
+
+    override fun onGenerateLinkPreviewImagesChanged(enabled: Boolean) {
+      viewModel.setGenerateLinkPreviewImagesChanged(enabled)
+    }
     //-------------------------------------------------------------------------
   }
 }
@@ -224,6 +228,7 @@ private interface ChatsSettingsCallbacks : ChatExportCallbacks {
   fun onDeleteMediaOnlyChanged(enabled: Boolean) = Unit
   fun onWhoCanAddYouToGroupsClicked(selection: String) = Unit
   fun onSetGoogleMapTypeClicked(selection: String) = Unit
+  fun onGenerateLinkPreviewImagesChanged(enabled: Boolean) = Unit
 
   object Empty : ChatsSettingsCallbacks, ChatExportCallbacks by ChatExportCallbacks.Empty
 }
@@ -264,6 +269,17 @@ private fun ChatsSettingsScreen(
           enabled = state.isRegisteredAndUpToDate(),
           checked = state.generateLinkPreviews,
           onCheckChanged = callbacks::onGenerateLinkPreviewsChanged
+        )
+      }
+
+      // JW: added
+      item {
+        Rows.ToggleRow(
+          text = stringResource(R.string.preferences_chats__send_link_preview_images),
+          label = stringResource(R.string.preferences_chats__send_link_preview_images_summary),
+          enabled = state.isRegisteredAndUpToDate(),
+          checked = state.generateLinkPreviewImages,
+          onCheckChanged = callbacks::onGenerateLinkPreviewImagesChanged
         )
       }
 
@@ -545,7 +561,8 @@ private fun ChatsSettingsScreenPreview() {
         ignoreAdminDelete = false,
         deleteMediaOnly = false,
         googleMapType = "normal",
-        whoCanAddYouToGroups = "nonblocked"
+        whoCanAddYouToGroups = "nonblocked",
+        generateLinkPreviewImages = true
       ),
       callbacks = ChatsSettingsCallbacks.Empty
     )

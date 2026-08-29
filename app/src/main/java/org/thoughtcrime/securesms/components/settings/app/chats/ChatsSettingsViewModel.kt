@@ -50,7 +50,8 @@ class ChatsSettingsViewModel @JvmOverloads constructor(
       ignoreAdminDelete = TextSecurePreferences.isIgnoreAdminDelete(AppDependencies.application),
       deleteMediaOnly = TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application),
       googleMapType = TextSecurePreferences.getGoogleMapType(AppDependencies.application),
-      whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application)
+      whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application),
+      generateLinkPreviewImages = TextSecurePreferences.sendLinkPreviewImages(AppDependencies.application)
     )
   )
 
@@ -208,6 +209,11 @@ class ChatsSettingsViewModel @JvmOverloads constructor(
     refresh()
   }
 
+  fun setGenerateLinkPreviewImagesChanged(enabled: Boolean) {
+    TextSecurePreferences.setSendLinkPreview_Images(AppDependencies.application, enabled)
+    refresh()
+  }
+
   // JW: added
   private fun getState() = ChatsSettingsState(
     generateLinkPreviews = SignalStore.settings.isLinkPreviewsEnabled,
@@ -230,6 +236,7 @@ class ChatsSettingsViewModel @JvmOverloads constructor(
     ignoreAdminDelete = TextSecurePreferences.isIgnoreAdminDelete(AppDependencies.application),
     deleteMediaOnly = TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application),
     googleMapType = TextSecurePreferences.getGoogleMapType(AppDependencies.application),
-    whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application)
+    whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application),
+    generateLinkPreviewImages = TextSecurePreferences.sendLinkPreviewImages(AppDependencies.application)
   )
 }

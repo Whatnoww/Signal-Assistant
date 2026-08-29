@@ -91,7 +91,6 @@ import org.thoughtcrime.securesms.mms.QuoteModel
 import org.thoughtcrime.securesms.notifications.v2.ConversationId
 import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.fromMessageRecord // JW
 import org.thoughtcrime.securesms.polls.Poll
-import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.fromMessageRecord // JW
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.Recipient.HiddenState
 import org.thoughtcrime.securesms.recipients.RecipientId
@@ -1467,7 +1466,8 @@ object DataMessageProcessor {
     val targetAuthor = Recipient.externalPush(targetAuthorServiceId)
 
     val targetMessage: MessageRecord? = SignalDatabase.messages.getMessageFor(targetSentTimestamp, targetAuthor.id)
-    if (targetMessage == null) {
+    //if (targetMessage == null) {
+    if (targetMessage == null && !TextSecurePreferences.isIgnoreAdminDelete(context)) { // JW: if a message is admin deleted before it arrives, prevent a remote delete
       warn(envelope.clientTimestamp!!, "[handleAdminRemoteDelete] Could not find matching message! timestamp: $targetSentTimestamp")
       if (earlyMessageCacheEntry != null) {
         AppDependencies.earlyMessageCache.store(targetAuthor.id, targetSentTimestamp, earlyMessageCacheEntry)
@@ -1479,7 +1479,7 @@ object DataMessageProcessor {
     // JW: set a reaction to indicate the message was attempted to be admin deleted. Sender is myself, emoji is a double red exclamation mark.
     if (TextSecurePreferences.isIgnoreAdminDelete(context)) { setMessageReaction(context, message, targetMessage, "\u203C"); return null; }
 
-    val targetThreadRecipientId = SignalDatabase.threads.getRecipientIdForThreadId(targetMessage.threadId)
+    val targetThreadRecipientId = SignalDatabase.threads.getRecipientIdForThreadId(targetMessage!!.threadId) // JW: Kotlin issue
     if (targetThreadRecipientId == null) {
       warn(envelope.clientTimestamp!!, "[handleAdminRemoteDelete] Could not find a thread for the message! timestamp: $targetSentTimestamp author: ${targetAuthor.id}")
       return null

@@ -208,6 +208,17 @@ public final class PlacePickerActivity extends AppCompatActivity {
     moveMapToInitialIfPossible();
   }
 
+  // JW: get the maptype
+  public int getGoogleMapType() {
+    switch (TextSecurePreferences.getGoogleMapType(getApplicationContext())) {
+      case "hybrid":    return GoogleMap.MAP_TYPE_HYBRID;
+      case "satellite": return GoogleMap.MAP_TYPE_SATELLITE;
+      case "terrain":   return GoogleMap.MAP_TYPE_TERRAIN;
+      case "none":      return GoogleMap.MAP_TYPE_NONE;
+      default:          return GoogleMap.MAP_TYPE_NORMAL;
+    }
+  }
+
   private void setMap(GoogleMap googleMap) {
     this.googleMap = googleMap;
     // JW: set maptype

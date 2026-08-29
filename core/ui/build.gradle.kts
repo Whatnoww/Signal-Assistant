@@ -43,6 +43,8 @@ dependencies {
 
   implementation("com.annimon:stream:1.1.8") // JW
 
+  implementation("com.annimon:stream:1.1.8") // JW
+
   // JUnit is used by test fixtures
   testFixturesImplementation(testLibs.junit.junit)
 }

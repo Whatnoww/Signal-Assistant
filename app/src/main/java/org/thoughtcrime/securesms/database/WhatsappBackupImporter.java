@@ -11,7 +11,6 @@ import net.zetetic.database.sqlcipher.SQLiteStatement;
 
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.attachments.Attachment;
-import org.thoughtcrime.securesms.attachments.AttachmentId;
 import org.thoughtcrime.securesms.database.model.GroupRecord;
 import org.thoughtcrime.securesms.database.whatsapp.WaDbOpenHelper;
 import org.thoughtcrime.securesms.mms.MmsException;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.signal.core.util.NoExternalStorageException;
+import org.signal.core.models.database.AttachmentId;
 
 import static org.thoughtcrime.securesms.database.MessageTable.DATE_RECEIVED;
 import static org.thoughtcrime.securesms.database.MessageTable.DATE_SENT;

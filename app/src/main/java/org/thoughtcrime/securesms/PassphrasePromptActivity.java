@@ -49,6 +49,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.signal.core.util.ThreadUtil;
+import org.signal.core.util.ServiceUtil; // JW
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.components.AnimatingToggle;
 import org.thoughtcrime.securesms.crypto.InvalidPassphraseException;

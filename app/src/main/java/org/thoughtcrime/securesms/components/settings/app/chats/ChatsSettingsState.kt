@@ -28,7 +28,8 @@ data class ChatsSettingsState(
   val ignoreAdminDelete: Boolean,
   val deleteMediaOnly: Boolean,
   val googleMapType: String,
-  val whoCanAddYouToGroups: String
+  val whoCanAddYouToGroups: String,
+  val generateLinkPreviewImages: Boolean
 ) {
   fun isRegisteredAndUpToDate(): Boolean {
     return !userUnregistered && !clientDeprecated

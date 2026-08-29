@@ -29,15 +29,17 @@ import org.signal.core.util.logging.Log;
 import org.signal.core.util.NoExternalStorageException;
 import org.signal.core.ui.util.StorageUtil;
 
-import org.thoughtcrime.securesms.crypto.AttachmentSecret;
-import org.thoughtcrime.securesms.crypto.AttachmentSecretProvider;
 import org.thoughtcrime.securesms.backup.BackupPassphrase;
+import org.thoughtcrime.securesms.crypto.AppAttachmentSecretStore;
 import org.thoughtcrime.securesms.crypto.DatabaseSecret;
 import org.thoughtcrime.securesms.crypto.DatabaseSecretProvider;
-import org.thoughtcrime.securesms.crypto.KeyStoreHelper;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.util.FileUtilsJW;
-import org.thoughtcrime.securesms.util.JsonUtils;
+
+import org.signal.core.util.crypto.AttachmentSecret;
+import org.signal.core.util.crypto.AttachmentSecretProvider;
+import org.signal.core.util.crypto.KeyStoreHelper;
+import org.signal.core.util.JsonUtils;
 import org.thoughtcrime.securesms.util.TextSecurePreferences;
 
 import java.io.BufferedReader;
@@ -67,7 +69,7 @@ public class EncryptedBackupExporter {
 
   public static void exportToSd(Context context) throws NoExternalStorageException, IOException {
     verifyExternalStorageForExport(context);
-    AttachmentSecretProvider asp = AttachmentSecretProvider.getInstance(context);
+    AttachmentSecretProvider asp = AttachmentSecretProvider.getInstance(context, AppAttachmentSecretStore.INSTANCE);
     DatabaseSecret dbs = DatabaseSecretProvider.getOrCreateDatabaseSecret(context);
     AttachmentSecret ats = asp.getOrCreateAttachmentSecret();
     byte[] lgs = getOrCreateLogSecret(context);

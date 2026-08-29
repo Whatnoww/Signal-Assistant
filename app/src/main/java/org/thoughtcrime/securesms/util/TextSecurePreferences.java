@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.hardware.Camera.CameraInfo;
 import android.net.Uri;
 import android.provider.Settings;
 
@@ -88,7 +87,6 @@ public class TextSecurePreferences {
 
   public  static final String SYSTEM_EMOJI_PREF                = "pref_system_emoji";
   private static final String MULTI_DEVICE_PROVISIONED_PREF    = "pref_multi_device";
-  public  static final String DIRECT_CAPTURE_CAMERA_ID         = "pref_direct_capture_camera_id";
   public  static final String ALWAYS_RELAY_CALLS_PREF          = "pref_turn_only";
   public  static final String READ_RECEIPTS_PREF               = "pref_read_receipts";
   public  static final String INCOGNITO_KEYBOARD_PREF          = "pref_incognito_keyboard";
@@ -181,6 +179,8 @@ public class TextSecurePreferences {
   public static final String DELETE_MEDIA_ONLY = "pref_delete_media_only";
   // who can add you to groups
   public static final String WHO_CAN_ADD_YOU_TO_GROUPS = "pref_who_can_add_you_to_groups";
+  // If we send link preview images
+  public static final String SEND_LINK_PREVIEW_IMAGES = "pref_send_link_preview_images";
   //---------------------------------------------------------------------------
 
   private static final String[] booleanPreferencesToBackup = {SCREEN_SECURITY_PREF,
@@ -205,7 +205,8 @@ public class TextSecurePreferences {
                                                               KEEP_VIEW_ONCE_MESSAGES,
                                                               IGNORE_REMOTE_DELETE,
                                                               IGNORE_ADMIN_DELETE,
-                                                              DELETE_MEDIA_ONLY};
+                                                              DELETE_MEDIA_ONLY,
+                                                              SEND_LINK_PREVIEW_IMAGES};
 
   private static final String[] stringPreferencesToBackup = {LED_COLOR_PREF,
                                                              LED_BLINK_PREF,
@@ -217,6 +218,7 @@ public class TextSecurePreferences {
                                                              // JW: added String options
                                                              GOOGLE_MAP_TYPE,
                                                              WHO_CAN_ADD_YOU_TO_GROUPS};
+
 
   private static final String[] stringSetPreferencesToBackup = {MEDIA_DOWNLOAD_MOBILE_PREF,
                                                                 MEDIA_DOWNLOAD_WIFI_PREF,
@@ -470,15 +472,6 @@ public class TextSecurePreferences {
 
   public static boolean isTurnOnly(Context context) {
     return getBooleanPreference(context, ALWAYS_RELAY_CALLS_PREF, false);
-  }
-
-  public static void setDirectCaptureCameraId(Context context, int value) {
-    setIntegerPrefrence(context, DIRECT_CAPTURE_CAMERA_ID, value);
-  }
-
-  @SuppressWarnings("deprecation")
-  public static int getDirectCaptureCameraId(Context context) {
-    return getIntegerPreference(context, DIRECT_CAPTURE_CAMERA_ID, CameraInfo.CAMERA_FACING_FRONT);
   }
 
   @Deprecated
@@ -1044,6 +1037,14 @@ public class TextSecurePreferences {
 
   public static void setWhoCanAddYouToGroups(Context context, String value) {
     setStringPreference(context, WHO_CAN_ADD_YOU_TO_GROUPS, value);
+  }
+
+  public static boolean sendLinkPreviewImages(Context context) {
+    return getBooleanPreference(context, SEND_LINK_PREVIEW_IMAGES, true);
+  }
+
+  public static void setSendLinkPreview_Images(Context context, boolean value) {
+    setBooleanPreference(context, SEND_LINK_PREVIEW_IMAGES, value);
   }
   // End added methods block
   //---------------------------------------------------------------------------
