@@ -12,11 +12,11 @@ import org.signal.archive.proto.AccountData
 import org.signal.archive.proto.ChatStyle
 import org.signal.archive.proto.Frame
 import org.signal.archive.stream.BackupFrameEmitter
+import org.signal.core.models.database.AttachmentId
 import org.signal.core.util.UuidUtil
 import org.signal.core.util.logging.Log
 import org.signal.core.util.toByteArray
-import org.signal.libsignal.zkgroup.backups.BackupLevel
-import org.thoughtcrime.securesms.attachments.AttachmentId
+import org.signal.mediasend.SentMediaQuality
 import org.thoughtcrime.securesms.backup.v2.ExportState
 import org.thoughtcrime.securesms.backup.v2.ImportState
 import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
@@ -126,7 +126,7 @@ object AccountDataArchiveProcessor {
             hasCompletedUsernameOnboarding = signalStore.uiHintValues.hasCompletedUsernameOnboarding(),
             customChatColors = db.chatColorsTable.getSavedChatColors().toRemoteChatColors().also { colors -> exportState.customChatColorIds.addAll(colors.map { it.id }) },
             optimizeOnDeviceStorage = signalStore.backupValues.optimizeStorage && signalStore.backupValues.backupTier == MessageBackupTier.PAID,
-            backupTier = signalStore.backupValues.backupTier.toRemoteBackupTier(),
+            backupTier = signalStore.backupValues.backupTier?.toBackupLevel(),
             defaultSentMediaQuality = signalStore.settingsValues.sentMediaQuality.toRemoteSentMediaQuality(),
             autoDownloadSettings = AccountData.AutoDownloadSettings(
               images = getRemoteAutoDownloadOption("image", mobileAutoDownload, wifiAutoDownload),
@@ -156,8 +156,7 @@ object AccountDataArchiveProcessor {
             navigationBarSize = signalStore.settingsValues.useCompactNavigationBar.toRemoteNavigationBarSize()
           ).takeUnless { Environment.IS_INSTRUMENTATION && SignalStore.backup.importedEmptyAndroidSettings },
           bioText = selfRecord.about ?: "",
-          bioEmoji = selfRecord.aboutEmoji ?: "",
-          keyTransparencyData = selfRecord.keyTransparencyData?.toByteString()
+          bioEmoji = selfRecord.aboutEmoji ?: ""
         )
       )
     )
@@ -251,7 +250,7 @@ object AccountDataArchiveProcessor {
       SignalStore.account.usernameLink = null
     }
 
-    SignalDatabase.recipients.setKeyTransparencyData(Recipient.self().aci.get(), accountData.keyTransparencyData?.toByteArray())
+    SignalDatabase.recipients.clearSelfKeyTransparencyData()
 
     SignalDatabase.runPostSuccessfulTransaction { ProfileUtil.handleSelfProfileKeyChange() }
 
@@ -276,8 +275,8 @@ object AccountDataArchiveProcessor {
     SignalStore.story.isFeatureDisabled = settings.storiesDisabled
     SignalStore.story.userHasSeenGroupStoryEducationSheet = settings.hasSeenGroupStoryEducationSheet
     SignalStore.story.viewedReceiptsEnabled = settings.storyViewReceiptsEnabled ?: settings.readReceipts
-    SignalStore.backup.optimizeStorage = settings.optimizeOnDeviceStorage
-    SignalStore.backup.backupTier = settings.backupTier?.toLocalBackupTier()
+    SignalStore.backup.optimizeStorage = !importState.backupMode.isLinkAndSync && settings.optimizeOnDeviceStorage
+    SignalStore.backup.backupTier = MessageBackupTier.fromBackupLevel(settings.backupTier)
     SignalStore.settings.sentMediaQuality = settings.defaultSentMediaQuality.toLocalSentMediaQuality()
     SignalStore.settings.setTheme(settings.appTheme.toLocalTheme())
     SignalStore.settings.setCallDataMode(settings.callsUseLessDataSetting.toLocalCallDataMode())
@@ -456,35 +455,19 @@ object AccountDataArchiveProcessor {
       }
   }
 
-  private fun MessageBackupTier?.toRemoteBackupTier(): Long? {
+  private fun SentMediaQuality.toRemoteSentMediaQuality(): AccountData.SentMediaQuality {
     return when (this) {
-      MessageBackupTier.FREE -> BackupLevel.FREE.value.toLong()
-      MessageBackupTier.PAID -> BackupLevel.PAID.value.toLong()
-      null -> null
+      SentMediaQuality.STANDARD -> AccountData.SentMediaQuality.STANDARD
+      SentMediaQuality.HIGH -> AccountData.SentMediaQuality.HIGH
     }
   }
 
-  private fun Long?.toLocalBackupTier(): MessageBackupTier? {
+  private fun AccountData.SentMediaQuality?.toLocalSentMediaQuality(): SentMediaQuality {
     return when (this) {
-      BackupLevel.FREE.value.toLong() -> MessageBackupTier.FREE
-      BackupLevel.PAID.value.toLong() -> MessageBackupTier.PAID
-      else -> null
-    }
-  }
-
-  private fun org.thoughtcrime.securesms.mms.SentMediaQuality.toRemoteSentMediaQuality(): AccountData.SentMediaQuality {
-    return when (this) {
-      org.thoughtcrime.securesms.mms.SentMediaQuality.STANDARD -> AccountData.SentMediaQuality.STANDARD
-      org.thoughtcrime.securesms.mms.SentMediaQuality.HIGH -> AccountData.SentMediaQuality.HIGH
-    }
-  }
-
-  private fun AccountData.SentMediaQuality?.toLocalSentMediaQuality(): org.thoughtcrime.securesms.mms.SentMediaQuality {
-    return when (this) {
-      AccountData.SentMediaQuality.HIGH -> org.thoughtcrime.securesms.mms.SentMediaQuality.HIGH
-      AccountData.SentMediaQuality.STANDARD -> org.thoughtcrime.securesms.mms.SentMediaQuality.STANDARD
-      AccountData.SentMediaQuality.UNKNOWN_QUALITY -> org.thoughtcrime.securesms.mms.SentMediaQuality.STANDARD
-      null -> org.thoughtcrime.securesms.mms.SentMediaQuality.STANDARD
+      AccountData.SentMediaQuality.HIGH -> SentMediaQuality.HIGH
+      AccountData.SentMediaQuality.STANDARD -> SentMediaQuality.STANDARD
+      AccountData.SentMediaQuality.UNKNOWN_QUALITY -> SentMediaQuality.STANDARD
+      null -> SentMediaQuality.STANDARD
     }
   }
 

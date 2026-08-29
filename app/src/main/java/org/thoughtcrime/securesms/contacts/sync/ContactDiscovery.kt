@@ -136,6 +136,11 @@ object ContactDiscovery {
       return
     }
 
+    if (!Recipient.isSelfSet) {
+      Log.w(TAG, "[syncRecipientInfoWithSystemContacts] No self recipient yet, skipping.")
+      return
+    }
+
     syncRecipientsWithSystemContacts(
       context = context,
       rewrites = emptyMap(),
@@ -323,7 +328,7 @@ object ContactDiscovery {
     val protocolAddress = Recipient.resolved(id).requireServiceId().toProtocolAddress(SignalServiceAddress.DEFAULT_DEVICE_ID)
 
     return AppDependencies.protocolStore.aci().containsSession(protocolAddress) ||
-      AppDependencies.protocolStore.pni().containsSession(protocolAddress)
+      AppDependencies.protocolStore.pniOrNull()?.containsSession(protocolAddress) == true
   }
 
   class RefreshResult(

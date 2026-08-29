@@ -23,7 +23,7 @@ import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.whispersystems.signalservice.api.groupsv2.NoCredentialForRedemptionTimeException;
-import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException;
+import org.signal.network.exceptions.PushNetworkException;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -118,7 +118,7 @@ public final class GroupV2UpdateSelfProfileKeyJob extends BaseJob {
 
       for (GroupId.V2 id : SignalDatabase.groups().getAllGroupV2Ids()) {
         Optional<GroupRecord> group = SignalDatabase.groups().getGroup(id);
-        if (!group.isPresent()) {
+        if (!group.isPresent() || !group.get().getHasV2GroupProperties()) {
           Log.w(TAG, "Group " + group + " no longer exists?");
           continue;
         }
@@ -187,6 +187,11 @@ public final class GroupV2UpdateSelfProfileKeyJob extends BaseJob {
 
     if (!group.get().isActive()) {
       Log.i(TAG, "Group is not active, skipping update.");
+      return;
+    }
+
+    if (!group.get().getHasV2GroupProperties()) {
+      Log.i(TAG, "Group is missing properties, likely deleted.");
       return;
     }
 

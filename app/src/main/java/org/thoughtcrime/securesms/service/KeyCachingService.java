@@ -18,12 +18,14 @@ package org.thoughtcrime.securesms.service;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.ForegroundServiceStartNotAllowedException;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 
@@ -46,9 +48,9 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.migrations.ApplicationMigrations;
 import org.thoughtcrime.securesms.notifications.NotificationChannels;
-import org.thoughtcrime.securesms.util.AppForegroundObserver;
+import org.signal.core.util.AppForegroundObserver;
 import org.thoughtcrime.securesms.util.DynamicLanguage;
-import org.thoughtcrime.securesms.util.ServiceUtil;
+import org.signal.core.util.ServiceUtil;
 
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -285,7 +287,16 @@ public class KeyCachingService extends Service {
     builder.setContentIntent(buildLaunchIntent());
 
     stopForeground(true);
-    startForeground(SERVICE_RUNNING_ID, builder.build());
+
+    try {
+      startForeground(SERVICE_RUNNING_ID, builder.build());
+    } catch (Exception e) {
+      if (Build.VERSION.SDK_INT >= 31 && e instanceof ForegroundServiceStartNotAllowedException) {
+        Log.w(TAG, "Not allowed to start foreground service.", e);
+      } else {
+        throw e;
+      }
+    }
   }
 
   private void broadcastNewSecret() {

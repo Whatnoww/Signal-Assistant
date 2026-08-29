@@ -12,7 +12,6 @@ import android.os.Bundle
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
@@ -77,7 +76,6 @@ class NewConversationActivity : PassphraseRequiredActivity() {
   }
 
   override fun onCreate(savedInstanceState: Bundle?, ready: Boolean) {
-    enableEdgeToEdge()
     super.onCreate(savedInstanceState, ready)
 
     val navigateBack = onBackPressedDispatcher::onBackPressed
@@ -394,7 +392,7 @@ private fun UserMessagesHost(
     is UserMessage.Prompt.ConfirmBlockRecipient -> {
       val lifecycle = LocalLifecycleOwner.current.lifecycle
       LaunchedEffect(userMessage.recipient) {
-        BlockUnblockDialog.showBlockFor(context, lifecycle, userMessage.recipient) {
+        BlockUnblockDialog.showBlockFor(context, userMessage.recipient) {
           onBlockConfirmed(userMessage.recipient)
         }
       }

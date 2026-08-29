@@ -61,6 +61,7 @@ class MainScreenViewModel(
   private fun loadRegistrationData() {
     viewModelScope.launch {
       val existingData = storageController.getPreExistingRegistrationData()
+      val storedProfile = if (existingData != null) storageController.getStoredProfileData() else null
       _state.value = _state.value.copy(
         existingRegistrationState = if (existingData != null) {
           MainScreenState.ExistingRegistrationState(
@@ -73,12 +74,31 @@ class MainScreenViewModel(
             pinsOptedOut = RegistrationPreferences.pinsOptedOut,
             temporaryMasterKey = RegistrationPreferences.temporaryMasterKey?.let {
               Base64.encodeWithPadding(it.serialize())
-            }
+            },
+            restoreDecision = RegistrationPreferences.restoreDecision?.name
           )
         } else {
           null
         },
+        profileState = storedProfile?.let {
+          MainScreenState.ProfileState(
+            givenName = it.givenName,
+            familyName = it.familyName,
+            avatarSizeBytes = it.avatar?.size,
+            discoverableByPhoneNumber = it.discoverableByPhoneNumber
+          )
+        },
         pendingFlowState = loadPendingFlowState(),
+        linkedDeviceState = if (RegistrationPreferences.linkedDeviceId > 0) {
+          MainScreenState.LinkedDeviceState(
+            deviceId = RegistrationPreferences.linkedDeviceId,
+            linkAndSyncOffered = RegistrationPreferences.ephemeralBackupKey != null,
+            linkAndSyncFrameCount = RegistrationPreferences.linkAndSyncFrameCount,
+            linkAndSyncDownloadedBytes = RegistrationPreferences.linkAndSyncDownloadedBytes
+          )
+        } else {
+          null
+        },
         registrationExpired = false
       )
 

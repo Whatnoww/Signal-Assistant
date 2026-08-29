@@ -34,7 +34,7 @@ import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.recipients.RecipientUtil;
 import org.thoughtcrime.securesms.ringrtc.CallState;
-import org.thoughtcrime.securesms.ringrtc.Camera;
+import org.thoughtcrime.securesms.ringrtc.OutgoingVideoSourceRouter;
 import org.thoughtcrime.securesms.ringrtc.CameraState;
 import org.thoughtcrime.securesms.ringrtc.RemotePeer;
 import org.thoughtcrime.securesms.service.webrtc.WebRtcData.CallMetadata;
@@ -43,7 +43,7 @@ import org.thoughtcrime.securesms.service.webrtc.WebRtcData.ReceivedOfferMetadat
 import org.thoughtcrime.securesms.service.webrtc.state.WebRtcEphemeralState;
 import org.thoughtcrime.securesms.service.webrtc.state.WebRtcServiceState;
 import org.thoughtcrime.securesms.service.webrtc.state.WebRtcServiceStateBuilder;
-import org.thoughtcrime.securesms.util.AppForegroundObserver;
+import org.signal.core.util.AppForegroundObserver;
 import org.thoughtcrime.securesms.util.NetworkUtil;
 import org.thoughtcrime.securesms.util.TelephonyUtil;
 import org.thoughtcrime.securesms.webrtc.audio.SignalAudioManager;
@@ -365,6 +365,11 @@ public abstract class WebRtcActionProcessor {
     return currentState;
   }
 
+  protected @NonNull WebRtcServiceState handleAudioReadyForAccept(@NonNull WebRtcServiceState currentState) {
+    Log.i(tag, "handleAudioReadyForAccept not processed");
+    return currentState;
+  }
+
   protected @NonNull WebRtcServiceState handleReceivedOfferWhileActive(@NonNull WebRtcServiceState currentState, @NonNull RemotePeer remotePeer) {
     Log.i(tag, "handleReceivedOfferWhileActive not processed");
     return currentState;
@@ -411,6 +416,16 @@ public abstract class WebRtcActionProcessor {
 
   protected  @NonNull WebRtcServiceState handleScreenSharingEnable(@NonNull WebRtcServiceState currentState, boolean enable) {
     Log.i(tag, "handleScreenSharingEnable not processed");
+    return currentState;
+  }
+
+  protected @NonNull WebRtcServiceState handleSetLocalScreenShare(@NonNull WebRtcServiceState currentState, boolean enable, @Nullable android.content.Intent mediaProjectionData) {
+    Log.i(tag, "handleSetLocalScreenShare not processed");
+    return currentState;
+  }
+
+  protected @NonNull WebRtcServiceState handleScreenSharingServiceReady(@NonNull WebRtcServiceState currentState) {
+    Log.i(tag, "handleScreenSharingServiceReady not processed");
     return currentState;
   }
 
@@ -638,9 +653,9 @@ public abstract class WebRtcActionProcessor {
   }
 
   protected @NonNull WebRtcServiceState handleOrientationChanged(@NonNull WebRtcServiceState currentState, boolean isLandscapeEnabled, int orientationDegrees) {
-    Camera camera = currentState.getVideoState().getCamera();
-    if (camera != null) {
-      camera.setOrientation(orientationDegrees);
+    OutgoingVideoSourceRouter router = currentState.getVideoState().getRouter();
+    if (router != null) {
+      router.setOrientation(orientationDegrees);
     }
 
     int sinkRotationDegrees  = isLandscapeEnabled ? BroadcastVideoSink.DEVICE_ROTATION_IGNORE : orientationDegrees;

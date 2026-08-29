@@ -5,11 +5,16 @@
 
 package org.signal.registration.screens.remotebackuprestore
 
-import org.signal.registration.util.DebugLoggableModel
-
-sealed class RemoteBackupRestoreScreenEvents : DebugLoggableModel() {
+sealed class RemoteBackupRestoreScreenEvents {
   data object BackupRestoreBackup : RemoteBackupRestoreScreenEvents()
+
   data object Retry : RemoteBackupRestoreScreenEvents()
+
   data object Cancel : RemoteBackupRestoreScreenEvents()
+
   data object DismissError : RemoteBackupRestoreScreenEvents()
+
+  data object ContactSupport : RemoteBackupRestoreScreenEvents()
+
+  data object DismissContactSupport : RemoteBackupRestoreScreenEvents()
 }

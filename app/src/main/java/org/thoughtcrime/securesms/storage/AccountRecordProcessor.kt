@@ -5,6 +5,7 @@ import okio.ByteString
 import org.signal.core.util.isNotEmpty
 import org.signal.core.util.logging.Log
 import org.signal.core.util.nullIfEmpty
+import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.storage.StorageSyncHelper.applyAccountStorageSyncUpdates
 import org.whispersystems.signalservice.api.storage.IAPSubscriptionId
@@ -107,11 +108,14 @@ class AccountRecordProcessor(
 
     val unknownFields = remote.serializedUnknowns
 
+    val unpublishedRotation = SignalStore.account.notSyncedRotatedSelfProfileKey
+    val keepLocalProfileKey = unpublishedRotation != null && local.proto.profileKey.toByteArray().contentEquals(unpublishedRotation)
+
     val merged = SignalAccountRecord.newBuilder(unknownFields).apply {
       givenName = mergedGivenName
       familyName = mergedFamilyName
-      avatarUrlPath = remote.proto.avatarUrlPath.nullIfEmpty() ?: local.proto.avatarUrlPath
-      profileKey = remote.proto.profileKey.nullIfEmpty() ?: local.proto.profileKey
+      avatarUrlPath = if (keepLocalProfileKey) local.proto.avatarUrlPath else remote.proto.avatarUrlPath.nullIfEmpty() ?: local.proto.avatarUrlPath
+      profileKey = if (keepLocalProfileKey) local.proto.profileKey else remote.proto.profileKey.nullIfEmpty() ?: local.proto.profileKey
       noteToSelfArchived = remote.proto.noteToSelfArchived
       noteToSelfMarkedUnread = remote.proto.noteToSelfMarkedUnread
       readReceipts = remote.proto.readReceipts
@@ -137,9 +141,15 @@ class AccountRecordProcessor(
       username = remote.proto.username
       usernameLink = remote.proto.usernameLink
       notificationProfileManualOverride = remote.proto.notificationProfileManualOverride
-      backupTier = local.proto.backupTier ?: remote.proto.backupTier
+      backupTier = if (SignalStore.account.isPrimaryDevice) local.proto.backupTier ?: remote.proto.backupTier else remote.proto.backupTier
+      avatarColor = if (SignalStore.account.isPrimaryDevice) local.proto.avatarColor else remote.proto.avatarColor
       automaticKeyVerificationDisabled = remote.proto.automaticKeyVerificationDisabled
       hasSeenAdminDeleteEducationDialog = remote.proto.hasSeenAdminDeleteEducationDialog
+      releaseNotesChatArchived = remote.proto.releaseNotesChatArchived ?: local.proto.releaseNotesChatArchived
+      releaseNotesChatMutedUntilTimestamp = remote.proto.releaseNotesChatMutedUntilTimestamp ?: local.proto.releaseNotesChatMutedUntilTimestamp
+      releaseNotesChatBlocked = remote.proto.releaseNotesChatBlocked ?: local.proto.releaseNotesChatBlocked
+      releaseNotesChatMarkedUnread = remote.proto.releaseNotesChatMarkedUnread ?: local.proto.releaseNotesChatMarkedUnread
+      releaseNotesChatBlockedAt = remote.proto.releaseNotesChatBlockedAt ?: local.proto.releaseNotesChatBlockedAt
 
       safeSetPayments(payments?.enabled == true, payments?.entropy?.toByteArray())
       safeSetSubscriber(donationSubscriberId, donationSubscriberCurrencyCode)

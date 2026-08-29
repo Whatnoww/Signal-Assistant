@@ -1,0 +1,52 @@
+/*
+ * Copyright 2026 Signal Messenger, LLC
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+package org.signal.registration.screens.addusername
+
+import org.signal.core.util.censor
+import org.signal.libsignal.net.RequestResult
+import org.signal.libsignal.usernames.Username
+import org.signal.network.service.UsernameService.ReserveUsernameError
+
+sealed class AddUsernameScreenEvents {
+  /** The user edited the username field. */
+  data class UsernameChanged(val value: String) : AddUsernameScreenEvents() {
+    override fun toString(): String = "UsernameChanged(value=${value.censor()})"
+  }
+
+  /** Internal: the user paused typing long enough for the entered nickname to be validated and reserved. */
+  data class NicknameSettled(val value: String) : AddUsernameScreenEvents() {
+    override fun toString(): String = "NicknameSettled(value=${value.censor()})"
+  }
+
+  /** Internal: a reservation attempt for [nickname] finished with [result]. */
+  data class ReservationCompleted(val nickname: String, val result: RequestResult<Username, ReserveUsernameError>) : AddUsernameScreenEvents() {
+    override fun toString(): String = "ReservationCompleted(nickname=${nickname.censor()}, result=${result.javaClass.simpleName})"
+  }
+
+  /** The user tapped the "learn more" link under the username field. */
+  data object LearnMoreClicked : AddUsernameScreenEvents()
+
+  /** The user opted out of choosing a username. */
+  data object SkipClicked : AddUsernameScreenEvents()
+
+  /** The user submitted the entered username. */
+  data object NextClicked : AddUsernameScreenEvents()
+
+  /** The user dismissed the network error dialog. */
+  data object NetworkErrorDialogDismissed : AddUsernameScreenEvents()
+
+  /** The user dismissed the unknown error dialog. */
+  data object UnknownErrorDialogDismissed : AddUsernameScreenEvents()
+
+  /** The user dismissed the username-unavailable dialog. */
+  data object UsernameUnavailableDialogDismissed : AddUsernameScreenEvents()
+
+  /** The user dismissed the rate-limited dialog. */
+  data object RateLimitedDialogDismissed : AddUsernameScreenEvents()
+
+  /** The user dismissed the reservation-lapsed dialog. */
+  data object ReservationLapsedDialogDismissed : AddUsernameScreenEvents()
+}

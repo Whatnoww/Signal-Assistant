@@ -12,15 +12,22 @@ import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import assertk.assertions.prop
+import io.mockk.coVerify
+import io.mockk.mockk
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.signal.registration.PendingRestoreOption
 import org.signal.registration.RegistrationFlowEvent
+import org.signal.registration.RegistrationFlowState
+import org.signal.registration.RegistrationRepository
 import org.signal.registration.RegistrationRoute
+import org.signal.registration.RestoreDecision
 
 class ArchiveRestoreSelectionViewModelTest {
 
+  private lateinit var mockRepository: RegistrationRepository
   private lateinit var emittedParentEvents: MutableList<RegistrationFlowEvent>
   private lateinit var parentEventEmitter: (RegistrationFlowEvent) -> Unit
   private lateinit var emittedStates: MutableList<ArchiveRestoreSelectionState>
@@ -28,6 +35,7 @@ class ArchiveRestoreSelectionViewModelTest {
 
   @Before
   fun setup() {
+    mockRepository = mockk(relaxed = true)
     emittedParentEvents = mutableListOf()
     parentEventEmitter = { event -> emittedParentEvents.add(event) }
     emittedStates = mutableListOf()
@@ -40,11 +48,13 @@ class ArchiveRestoreSelectionViewModelTest {
       ArchiveRestoreOption.LocalBackup,
       ArchiveRestoreOption.DeviceTransfer
     ),
-    isPreRegistration: Boolean = false
+    registeredState: RegisteredState = RegisteredState.RegisteredAndPinUnknown
   ): ArchiveRestoreSelectionViewModel {
     return ArchiveRestoreSelectionViewModel(
       restoreOptions = restoreOptions,
-      isPreRegistration = isPreRegistration,
+      registeredState = registeredState,
+      repository = mockRepository,
+      parentState = MutableStateFlow(RegistrationFlowState()),
       parentEventEmitter = parentEventEmitter
     )
   }
@@ -53,7 +63,7 @@ class ArchiveRestoreSelectionViewModelTest {
 
   @Test
   fun `SignalSecureBackup pre-registration emits PendingRestoreOptionSelected and navigates to PhoneNumberEntry`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = true)
+    val viewModel = createViewModel(registeredState = RegisteredState.NotRegistered)
     val initialState = ArchiveRestoreSelectionState()
 
     viewModel.applyEvent(
@@ -75,7 +85,7 @@ class ArchiveRestoreSelectionViewModelTest {
 
   @Test
   fun `SignalSecureBackup post-registration navigates to EnterAepForRemoteBackupPostRegistration`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = false)
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinUnknown)
     val initialState = ArchiveRestoreSelectionState()
 
     viewModel.applyEvent(
@@ -93,7 +103,7 @@ class ArchiveRestoreSelectionViewModelTest {
 
   @Test
   fun `LocalBackup pre-registration emits PendingRestoreOptionSelected and navigates to PhoneNumberEntry`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = true)
+    val viewModel = createViewModel(registeredState = RegisteredState.NotRegistered)
     val initialState = ArchiveRestoreSelectionState()
 
     viewModel.applyEvent(
@@ -115,7 +125,7 @@ class ArchiveRestoreSelectionViewModelTest {
 
   @Test
   fun `LocalBackup post-registration navigates to LocalBackupRestore`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = false)
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinUnknown)
     val initialState = ArchiveRestoreSelectionState()
 
     viewModel.applyEvent(
@@ -132,8 +142,8 @@ class ArchiveRestoreSelectionViewModelTest {
   }
 
   @Test
-  fun `DeviceTransfer is not implemented and emits no events`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = false)
+  fun `DeviceTransfer navigates to DeviceTransferInstructions`() = runTest {
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinUnknown)
     val initialState = ArchiveRestoreSelectionState()
 
     viewModel.applyEvent(
@@ -142,12 +152,16 @@ class ArchiveRestoreSelectionViewModelTest {
       stateEmitter
     )
 
-    assertThat(emittedParentEvents).hasSize(0)
+    assertThat(emittedParentEvents).hasSize(1)
+    assertThat(emittedParentEvents.first())
+      .isInstanceOf<RegistrationFlowEvent.NavigateToScreen>()
+      .prop(RegistrationFlowEvent.NavigateToScreen::route)
+      .isEqualTo(RegistrationRoute.DeviceTransferInstructions)
   }
 
   @Test
   fun `None option sets showSkipWarningDialog to true`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = false)
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinUnknown)
     val initialState = ArchiveRestoreSelectionState()
 
     viewModel.applyEvent(
@@ -160,28 +174,32 @@ class ArchiveRestoreSelectionViewModelTest {
     assertThat(emittedStates.last().showSkipWarningDialog).isTrue()
   }
 
-  // ==================== Skip Tests ====================
-
-  @Test
-  fun `Skip sets showSkipWarningDialog to true`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = false)
-    val initialState = ArchiveRestoreSelectionState()
-
-    viewModel.applyEvent(initialState, ArchiveRestoreSelectionScreenEvents.Skip, stateEmitter)
-
-    assertThat(emittedStates).hasSize(1)
-    assertThat(emittedStates.last().showSkipWarningDialog).isTrue()
-  }
-
   // ==================== ConfirmSkip Tests ====================
 
   @Test
-  fun `ConfirmSkip navigates to PinCreate and clears dialog`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = false)
+  fun `ConfirmSkip pre-registration navigates to PhoneNumberEntry and clears dialog without recording a skip`() = runTest {
+    val viewModel = createViewModel(registeredState = RegisteredState.NotRegistered)
     val initialState = ArchiveRestoreSelectionState(showSkipWarningDialog = true)
 
     viewModel.applyEvent(initialState, ArchiveRestoreSelectionScreenEvents.ConfirmSkip, stateEmitter)
 
+    coVerify(exactly = 0) { mockRepository.setRestoreDecision(any()) }
+    assertThat(emittedParentEvents).hasSize(1)
+    assertThat(emittedParentEvents.first())
+      .isInstanceOf<RegistrationFlowEvent.NavigateToScreen>()
+      .prop(RegistrationFlowEvent.NavigateToScreen::route)
+      .isEqualTo(RegistrationRoute.PhoneNumberEntry)
+    assertThat(emittedStates.last().showSkipWarningDialog).isFalse()
+  }
+
+  @Test
+  fun `ConfirmSkip post-registration when not storage capable navigates to PinCreate and clears dialog`() = runTest {
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinUnknown)
+    val initialState = ArchiveRestoreSelectionState(showSkipWarningDialog = true, storageCapable = false)
+
+    viewModel.applyEvent(initialState, ArchiveRestoreSelectionScreenEvents.ConfirmSkip, stateEmitter)
+
+    coVerify { mockRepository.setRestoreDecision(RestoreDecision.SKIPPED) }
     assertThat(emittedParentEvents).hasSize(1)
     assertThat(emittedParentEvents.first())
       .isInstanceOf<RegistrationFlowEvent.NavigateToScreen>()
@@ -190,11 +208,40 @@ class ArchiveRestoreSelectionViewModelTest {
     assertThat(emittedStates.last().showSkipWarningDialog).isFalse()
   }
 
+  @Test
+  fun `ConfirmSkip post-registration when storage capable navigates to PinEntryForSvrRestore and clears dialog`() = runTest {
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinUnknown)
+    val initialState = ArchiveRestoreSelectionState(showSkipWarningDialog = true, storageCapable = true)
+
+    viewModel.applyEvent(initialState, ArchiveRestoreSelectionScreenEvents.ConfirmSkip, stateEmitter)
+
+    coVerify { mockRepository.setRestoreDecision(RestoreDecision.SKIPPED) }
+    assertThat(emittedParentEvents).hasSize(1)
+    assertThat(emittedParentEvents.first())
+      .isInstanceOf<RegistrationFlowEvent.NavigateToScreen>()
+      .prop(RegistrationFlowEvent.NavigateToScreen::route)
+      .isEqualTo(RegistrationRoute.PinEntryForSvrRestore)
+    assertThat(emittedStates.last().showSkipWarningDialog).isFalse()
+  }
+
+  @Test
+  fun `ConfirmSkip post-registration when PIN is known records skip and completes registration`() = runTest {
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinKnown)
+    val initialState = ArchiveRestoreSelectionState(showSkipWarningDialog = true)
+
+    viewModel.applyEvent(initialState, ArchiveRestoreSelectionScreenEvents.ConfirmSkip, stateEmitter)
+
+    coVerify { mockRepository.setRestoreDecision(RestoreDecision.SKIPPED) }
+    assertThat(emittedParentEvents).hasSize(1)
+    assertThat(emittedParentEvents.first()).isEqualTo(RegistrationFlowEvent.RegistrationComplete)
+    assertThat(emittedStates.last().showSkipWarningDialog).isFalse()
+  }
+
   // ==================== DismissSkipWarning Tests ====================
 
   @Test
   fun `DismissSkipWarning sets showSkipWarningDialog to false`() = runTest {
-    val viewModel = createViewModel(isPreRegistration = false)
+    val viewModel = createViewModel(registeredState = RegisteredState.RegisteredAndPinUnknown)
     val initialState = ArchiveRestoreSelectionState(showSkipWarningDialog = true)
 
     viewModel.applyEvent(
@@ -217,21 +264,14 @@ class ArchiveRestoreSelectionViewModelTest {
     assertThat(viewModel.state.value.restoreOptions).isEqualTo(options)
   }
 
-  @Test
-  fun `showSkipButton is false when None is in options`() = runTest {
-    val viewModel = createViewModel(
-      restoreOptions = listOf(ArchiveRestoreOption.SignalSecureBackup, ArchiveRestoreOption.None)
-    )
-
-    assertThat(viewModel.state.value.showSkipButton).isFalse()
-  }
+  // ==================== ParentStateChanged Tests ====================
 
   @Test
-  fun `showSkipButton is true when None is not in options`() = runTest {
-    val viewModel = createViewModel(
-      restoreOptions = listOf(ArchiveRestoreOption.SignalSecureBackup, ArchiveRestoreOption.LocalBackup)
-    )
+  fun `ParentStateChanged copies storageCapable from parent`() = runTest {
+    val viewModel = createViewModel()
 
-    assertThat(viewModel.state.value.showSkipButton).isTrue()
+    viewModel.applyEvent(ArchiveRestoreSelectionState(), ArchiveRestoreSelectionScreenEvents.ParentStateChanged(RegistrationFlowState(storageCapable = true)), stateEmitter)
+
+    assertThat(emittedStates.last().storageCapable).isTrue()
   }
 }

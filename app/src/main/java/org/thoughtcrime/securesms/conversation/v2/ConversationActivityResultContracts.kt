@@ -25,14 +25,11 @@ import org.thoughtcrime.securesms.contactshare.Contact
 import org.thoughtcrime.securesms.contactshare.ContactShareEditActivity
 import org.thoughtcrime.securesms.conversation.MessageSendType
 import org.thoughtcrime.securesms.conversation.colors.ChatColors
-import org.thoughtcrime.securesms.conversation.v2.ConversationActivityResultContracts.Callbacks
 import org.thoughtcrime.securesms.giph.ui.GiphyActivity
 import org.thoughtcrime.securesms.maps.PlacePickerActivity
 import org.thoughtcrime.securesms.mediasend.MediaSendActivityResult
-import org.thoughtcrime.securesms.mediasend.camerax.CameraXRemoteConfig
-import org.thoughtcrime.securesms.mediasend.v2.MediaSelectionActivity
+import org.thoughtcrime.securesms.mediasend.MediaSendLauncher
 import org.thoughtcrime.securesms.recipients.RecipientId
-import org.signal.core.ui.R as CoreUiR
 
 /**
  * This encapsulates the logic for interacting with other activities used throughout a conversation. The gist
@@ -76,22 +73,8 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
   }
 
   fun launchCamera(recipientId: RecipientId, isReply: Boolean) {
-    if (CameraXRemoteConfig.isSupported()) {
-      cameraLauncher.launch(MediaSelectionInput(emptyList(), recipientId, null, isReply))
-      fragment.requireActivity().overridePendingTransition(R.anim.camera_slide_from_bottom, R.anim.stationary)
-    } else {
-      Permissions.with(fragment)
-        .request(Manifest.permission.CAMERA)
-        .ifNecessary()
-        .withRationaleDialog(fragment.getString(R.string.CameraXFragment_allow_access_camera), fragment.getString(R.string.CameraXFragment_to_capture_photos_and_video_allow_camera), CoreUiR.drawable.symbol_camera_24)
-        .withPermanentDenialDialog(fragment.getString(R.string.CameraXFragment_signal_needs_camera_access_capture_photos), null, R.string.CameraXFragment_allow_access_camera, R.string.CameraXFragment_to_capture_photos_videos, fragment.parentFragmentManager)
-        .onAllGranted {
-          cameraLauncher.launch(MediaSelectionInput(emptyList(), recipientId, null, isReply))
-          fragment.requireActivity().overridePendingTransition(R.anim.camera_slide_from_bottom, R.anim.stationary)
-        }
-        .onAnyDenied { Toast.makeText(fragment.requireContext(), R.string.CameraXFragment_signal_needs_camera_access_capture_photos, Toast.LENGTH_LONG).show() }
-        .execute()
-    }
+    cameraLauncher.launch(MediaSelectionInput(emptyList(), recipientId, null, isReply))
+    fragment.requireActivity().overridePendingTransition(R.anim.camera_slide_from_bottom, R.anim.stationary)
   }
 
   fun launchMediaEditor(mediaList: List<Media>, recipientId: RecipientId, text: CharSequence?) {
@@ -138,45 +121,33 @@ class ConversationActivityResultContracts(private val fragment: Fragment, privat
   private object MediaSelection : ActivityResultContract<MediaSelectionInput, MediaSendActivityResult?>() {
     override fun createIntent(context: Context, input: MediaSelectionInput): Intent {
       val (media, recipientId, text) = input
-      return MediaSelectionActivity.editor(context, MessageSendType.SignalMessageSendType, media, recipientId, text)
+      return MediaSendLauncher.editor(context, media, recipientId, text)
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): MediaSendActivityResult? {
-      return if (resultCode == Activity.RESULT_OK) {
-        intent?.let { MediaSendActivityResult.fromData(intent) }
-      } else {
-        null
-      }
+      return MediaSendLauncher.parseResult(resultCode, intent)
     }
   }
 
   private object MediaCapture : ActivityResultContract<MediaSelectionInput, MediaSendActivityResult?>() {
     override fun createIntent(context: Context, input: MediaSelectionInput): Intent {
       val (_, recipientId, _, isReply) = input
-      return MediaSelectionActivity.camera(context, MessageSendType.SignalMessageSendType, recipientId, isReply)
+      return MediaSendLauncher.camera(context, recipientId, isReply)
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): MediaSendActivityResult? {
-      return if (resultCode == Activity.RESULT_OK) {
-        intent?.let { MediaSendActivityResult.fromData(intent) }
-      } else {
-        null
-      }
+      return MediaSendLauncher.parseResult(resultCode, intent)
     }
   }
 
   private object MediaGallery : ActivityResultContract<MediaSelectionInput, MediaSendActivityResult?>() {
     override fun createIntent(context: Context, input: MediaSelectionInput): Intent {
       val (media, recipientId, text, isReply) = input
-      return MediaSelectionActivity.gallery(context, MessageSendType.SignalMessageSendType, media, recipientId, text, isReply)
+      return MediaSendLauncher.gallery(context, media, recipientId, text, isReply)
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): MediaSendActivityResult? {
-      return if (resultCode == Activity.RESULT_OK) {
-        intent?.let { MediaSendActivityResult.fromData(intent) }
-      } else {
-        null
-      }
+      return MediaSendLauncher.parseResult(resultCode, intent)
     }
   }
 

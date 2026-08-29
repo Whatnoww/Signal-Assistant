@@ -9,7 +9,12 @@ import androidx.annotation.Nullable;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.signal.core.ui.permissions.Permissions;
+import org.signal.core.ui.util.StorageUtil;
+import org.signal.core.util.NoExternalStorageException;
 import org.signal.core.util.Stopwatch;
+import org.signal.core.util.UnableToStartException;
+import org.signal.core.util.crypto.AttachmentSecretProvider;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.backup.BackupEvent;
@@ -17,18 +22,15 @@ import org.thoughtcrime.securesms.backup.BackupFileIOError;
 import org.thoughtcrime.securesms.backup.BackupPassphrase;
 import org.thoughtcrime.securesms.backup.BackupVerifier;
 import org.thoughtcrime.securesms.backup.FullBackupExporter;
-import org.thoughtcrime.securesms.crypto.AttachmentSecretProvider;
-import org.signal.core.util.NoExternalStorageException;
+import org.thoughtcrime.securesms.crypto.AppAttachmentSecretStore;
 import org.thoughtcrime.securesms.database.SignalDatabase;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.jobmanager.Job;
 import org.thoughtcrime.securesms.jobmanager.JobManager;
 import org.thoughtcrime.securesms.notifications.NotificationChannels;
-import org.signal.core.ui.permissions.Permissions;
 import org.thoughtcrime.securesms.service.GenericForegroundService;
 import org.thoughtcrime.securesms.service.NotificationController;
 import org.thoughtcrime.securesms.util.BackupUtil;
-import org.signal.core.ui.util.StorageUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -116,7 +118,7 @@ public final class LocalBackupJob extends BaseJob {
     try (NotificationController notification = GenericForegroundService.startForegroundTask(context,
                                                                      context.getString(R.string.LocalBackupJob_creating_signal_backup),
                                                                      NotificationChannels.getInstance().BACKUPS,
-                                                                     R.drawable.ic_signal_backup))
+                                                                     org.signal.core.ui.R.drawable.ic_signal_backup))
     {
       updater.setNotification(notification);
       EventBus.getDefault().register(updater);
@@ -143,7 +145,7 @@ public final class LocalBackupJob extends BaseJob {
       try {
         Stopwatch   stopwatch     = new Stopwatch("backup-export");
         BackupEvent finishedEvent = FullBackupExporter.export(context,
-                                                              AttachmentSecretProvider.getInstance(context).getOrCreateAttachmentSecret(),
+                                                              AttachmentSecretProvider.getInstance(context, AppAttachmentSecretStore.INSTANCE).getOrCreateAttachmentSecret(),
                                                               SignalDatabase.getBackupDatabase(),
                                                               tempFile,
                                                               backupPassword,

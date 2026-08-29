@@ -26,9 +26,9 @@ import java.util.UUID
 class BufferedSignalServiceAccountDataStore(selfServiceId: ServiceId) : SignalServiceAccountDataStore {
 
   private val identityStore: BufferedIdentityKeyStore = if (selfServiceId == SignalStore.account.pni) {
-    BufferedIdentityKeyStore(selfServiceId, SignalStore.account.pniIdentityKey, SignalStore.account.pniRegistrationId)
+    BufferedIdentityKeyStore(SignalStore.account.pniIdentityKey, SignalStore.account.pniRegistrationId)
   } else {
-    BufferedIdentityKeyStore(selfServiceId, SignalStore.account.aciIdentityKey, SignalStore.account.registrationId)
+    BufferedIdentityKeyStore(SignalStore.account.aciIdentityKey, SignalStore.account.registrationId)
   }
 
   private val oneTimePreKeyStore: BufferedOneTimePreKeyStore = BufferedOneTimePreKeyStore(selfServiceId)
@@ -198,6 +198,10 @@ class BufferedSignalServiceAccountDataStore(selfServiceId: ServiceId) : SignalSe
   }
 
   override fun isMultiDevice(): Boolean {
+    error("Should not happen during the intended usage pattern of this class")
+  }
+
+  override fun setMultiDevice(isMultiDevice: Boolean) {
     error("Should not happen during the intended usage pattern of this class")
   }
 

@@ -1,5 +1,7 @@
 package org.thoughtcrime.securesms.service.webrtc.state;
 
+import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -15,8 +17,8 @@ import org.thoughtcrime.securesms.events.GroupCallSpeechEvent;
 import org.thoughtcrime.securesms.events.WebRtcViewModel;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
-import org.thoughtcrime.securesms.ringrtc.Camera;
 import org.thoughtcrime.securesms.ringrtc.CameraState;
+import org.thoughtcrime.securesms.ringrtc.OutgoingVideoSourceRouter;
 import org.thoughtcrime.securesms.ringrtc.RemotePeer;
 import org.thoughtcrime.securesms.service.webrtc.CallLinkDisconnectReason;
 import org.thoughtcrime.securesms.service.webrtc.WebRtcActionProcessor;
@@ -158,6 +160,16 @@ public class WebRtcServiceStateBuilder {
       toBuild.setMicrophoneEnabled(false);
       return this;
     }
+
+    public @NonNull LocalDeviceStateBuilder isScreenSharing(boolean isScreenSharing) {
+      toBuild.setScreenSharing(isScreenSharing);
+      return this;
+    }
+
+    public @NonNull LocalDeviceStateBuilder setMediaProjectionIntent(@Nullable Intent mediaProjectionIntent) {
+      toBuild.setMediaProjectionIntent(mediaProjectionIntent);
+      return this;
+    }
   }
 
   public class CallSetupStateBuilder {
@@ -191,6 +203,16 @@ public class WebRtcServiceStateBuilder {
 
     public @NonNull CallSetupStateBuilder acceptWithVideo(boolean acceptWithVideo) {
       toBuild.setAcceptWithVideo(acceptWithVideo);
+      return this;
+    }
+
+    public @NonNull CallSetupStateBuilder accepted(boolean accepted) {
+      toBuild.setAccepted(accepted);
+      return this;
+    }
+
+    public @NonNull CallSetupStateBuilder waitForAudio(boolean waitForAudio) {
+      toBuild.setWaitForAudio(waitForAudio);
       return this;
     }
 
@@ -263,8 +285,8 @@ public class WebRtcServiceStateBuilder {
       return this;
     }
 
-    public @NonNull VideoStateBuilder camera(@Nullable Camera camera) {
-      toBuild.camera = camera;
+    public @NonNull VideoStateBuilder router(@Nullable OutgoingVideoSourceRouter router) {
+      toBuild.router = router;
       return this;
     }
   }

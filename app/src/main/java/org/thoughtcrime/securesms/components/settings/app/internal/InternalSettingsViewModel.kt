@@ -1,10 +1,14 @@
 package org.thoughtcrime.securesms.components.settings.app.internal
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.reactivex.rxjava3.core.Observable
 import org.signal.ringrtc.CallManager
+import org.thoughtcrime.securesms.components.settings.DividerPreference
+import org.thoughtcrime.securesms.components.settings.PreferenceModel
+import org.thoughtcrime.securesms.components.settings.SectionHeaderPreference
 import org.thoughtcrime.securesms.database.model.RemoteMegaphoneRecord
 import org.thoughtcrime.securesms.jobs.StoryOnboardingDownloadJob
 import org.thoughtcrime.securesms.keyvalue.InternalValues
@@ -12,7 +16,10 @@ import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.stories.Stories
 import org.thoughtcrime.securesms.util.RemoteConfig
+import org.thoughtcrime.securesms.util.adapter.mapping.MappingModel
+import org.thoughtcrime.securesms.util.adapter.mapping.MappingModelList
 import org.thoughtcrime.securesms.util.livedata.Store
+import java.util.Locale
 
 class InternalSettingsViewModel(private val repository: InternalSettingsRepository) : ViewModel() {
   private val preferenceDataStore = SignalStore.getPreferenceDataStore()
@@ -70,11 +77,6 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
     refresh()
   }
 
-  fun setForceWebsocketMode(enabled: Boolean) {
-    preferenceDataStore.putBoolean(InternalValues.FORCE_WEBSOCKET_MODE, enabled)
-    refresh()
-  }
-
   fun resetPnpInitializedState() {
     SignalStore.misc.hasPniInitializedDevices = false
     refresh()
@@ -105,8 +107,8 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
     refresh()
   }
 
-  fun setInternalCallingDisableTelecom(enabled: Boolean) {
-    preferenceDataStore.putBoolean(InternalValues.CALLING_DISABLE_TELECOM, enabled)
+  fun setInternalCallingUseTelecom(enabled: Boolean) {
+    preferenceDataStore.putBoolean(InternalValues.CALLING_USE_TELECOM, enabled)
     refresh()
   }
 
@@ -140,18 +142,43 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
     refresh()
   }
 
+  fun setInternalCallingSetVideoConfig(enabled: Boolean) {
+    preferenceDataStore.putBoolean(InternalValues.CALLING_SET_VIDEO_CONFIG, enabled)
+    refresh()
+  }
+
+  fun setInternalCallingUseHardwareVp9Encode(enabled: Boolean) {
+    preferenceDataStore.putBoolean(InternalValues.CALLING_USE_HARDWARE_VP9_ENCODE, enabled)
+    refresh()
+  }
+
+  fun setInternalCallingUseHardwareVp9Decode(enabled: Boolean) {
+    preferenceDataStore.putBoolean(InternalValues.CALLING_USE_HARDWARE_VP9_DECODE, enabled)
+    refresh()
+  }
+
+  fun setInternalCallingUseSoftwareVp9Encode(enabled: Boolean) {
+    preferenceDataStore.putBoolean(InternalValues.CALLING_USE_SOFTWARE_VP9_ENCODE, enabled)
+    refresh()
+  }
+
+  fun setInternalCallingUseSoftwareVp9Decode(enabled: Boolean) {
+    preferenceDataStore.putBoolean(InternalValues.CALLING_USE_SOFTWARE_VP9_DECODE, enabled)
+    refresh()
+  }
+
+  fun setInternalCallingEnableSvc(enabled: Boolean) {
+    preferenceDataStore.putBoolean(InternalValues.CALLING_ENABLE_SVC, enabled)
+    refresh()
+  }
+
+  fun setInternalCallingStatsIntervalSecs(intervalSecs: Int) {
+    preferenceDataStore.putInt(InternalValues.CALLING_STATS_INTERVAL_SECS, intervalSecs)
+    refresh()
+  }
+
   fun setUseConversationItemV2Media(enabled: Boolean) {
     SignalStore.internal.useConversationItemV2Media = enabled
-    refresh()
-  }
-
-  fun setUseNewMediaActivity(enabled: Boolean) {
-    SignalStore.internal.useNewMediaActivity = enabled
-    refresh()
-  }
-
-  fun setHevcEncoding(enabled: Boolean) {
-    SignalStore.internal.hevcEncoding = enabled
     refresh()
   }
 
@@ -172,7 +199,47 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
   }
 
   fun refresh() {
-    store.update { getState().copy(emojiVersion = it.emojiVersion) }
+    store.update { getState().copy(emojiVersion = it.emojiVersion, searchQuery = it.searchQuery) }
+  }
+
+  fun setSearchQuery(query: String) {
+    store.update {
+      if (it.searchQuery == query) {
+        it
+      } else {
+        it.copy(searchQuery = query)
+      }
+    }
+  }
+
+  fun filterPreferences(context: Context, items: MappingModelList, query: String): MappingModelList {
+    val normalizedQuery = query.trim().lowercase(Locale.getDefault())
+    if (normalizedQuery.isBlank()) {
+      return items
+    }
+
+    val groups = buildSearchGroups(items)
+    val filtered = MappingModelList()
+
+    groups.forEach { group ->
+      val headerMatches = group.header?.searchableText(context)?.contains(normalizedQuery) == true
+      val matchingItems = if (headerMatches) {
+        group.items
+      } else {
+        group.items.filter { it.searchableText(context)?.contains(normalizedQuery) == true }
+      }
+
+      if (headerMatches || matchingItems.isNotEmpty()) {
+        if (filtered.isNotEmpty() && group.divider != null) {
+          filtered.add(group.divider)
+        }
+
+        group.header?.let { filtered.add(it) }
+        filtered.addAll(matchingItems)
+      }
+    }
+
+    return filtered
   }
 
   private fun getState() = InternalSettingsState(
@@ -182,16 +249,22 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
     gv2forceInvites = SignalStore.internal.gv2ForceInvites,
     gv2ignoreP2PChanges = SignalStore.internal.gv2IgnoreP2PChanges,
     allowCensorshipSetting = SignalStore.internal.allowChangingCensorshipSetting,
-    forceWebsocketMode = SignalStore.internal.isWebsocketModeForced,
     callingServer = SignalStore.internal.groupCallingServer,
     callingDataMode = SignalStore.internal.callingDataMode,
-    callingDisableTelecom = SignalStore.internal.callingDisableTelecom,
+    callingUseTelecom = SignalStore.internal.callingUseTelecom,
     callingSetAudioConfig = SignalStore.internal.callingSetAudioConfig,
     callingUseOboeAdm = SignalStore.internal.callingUseOboeAdm,
     callingUseSoftwareAec = SignalStore.internal.callingUseSoftwareAec,
     callingUseSoftwareNs = SignalStore.internal.callingUseSoftwareNs,
     callingUseInputLowLatency = SignalStore.internal.callingUseInputLowLatency,
     callingUseInputVoiceComm = SignalStore.internal.callingUseInputVoiceComm,
+    callingSetVideoConfig = SignalStore.internal.callingSetVideoConfig,
+    callingUseHardwareVp9Encode = SignalStore.internal.callingUseHardwareVp9Encode,
+    callingUseHardwareVp9Decode = SignalStore.internal.callingUseHardwareVp9Decode,
+    callingUseSoftwareVp9Encode = SignalStore.internal.callingUseSoftwareVp9Encode,
+    callingUseSoftwareVp9Decode = SignalStore.internal.callingUseSoftwareVp9Decode,
+    callingEnableSvc = SignalStore.internal.callingEnableSvc,
+    callingStatsIntervalSecs = SignalStore.internal.callingStatsIntervalSecs,
     useBuiltInEmojiSet = SignalStore.internal.forceBuiltInEmoji,
     emojiVersion = null,
     removeSenderKeyMinimium = SignalStore.internal.removeSenderKeyMinimum,
@@ -201,10 +274,8 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
     pnpInitialized = SignalStore.misc.hasPniInitializedDevices,
     useConversationItemV2ForMedia = SignalStore.internal.useConversationItemV2Media,
     hasPendingOneTimeDonation = SignalStore.inAppPayments.getPendingOneTimeDonation() != null,
-    hevcEncoding = SignalStore.internal.hevcEncoding,
     forceSplitPane = SignalStore.internal.forceSplitPane,
     forceSinglePane = SignalStore.internal.forceSinglePane,
-    useNewMediaActivity = SignalStore.internal.useNewMediaActivity,
     disableInternalUser = RemoteConfig.internalUserDisabled
   )
 
@@ -230,6 +301,57 @@ class InternalSettingsViewModel(private val repository: InternalSettingsReposito
     SignalStore.internal.forceSinglePane = forceSinglePane
     refresh()
   }
+
+  private fun buildSearchGroups(items: MappingModelList): List<SearchGroup> {
+    val groups = mutableListOf<SearchGroup>()
+    var divider: DividerPreference? = null
+    var header: SectionHeaderPreference? = null
+    var groupItems = mutableListOf<MappingModel<*>>()
+
+    fun flush() {
+      if (header != null || groupItems.isNotEmpty()) {
+        groups.add(SearchGroup(divider, header, groupItems))
+      }
+
+      divider = null
+      header = null
+      groupItems = mutableListOf()
+    }
+
+    items.forEach { item ->
+      when (item) {
+        is DividerPreference -> {
+          flush()
+          divider = item
+        }
+        is SectionHeaderPreference -> {
+          flush()
+          header = item
+        }
+        else -> groupItems.add(item)
+      }
+    }
+
+    flush()
+
+    return groups
+  }
+
+  private fun MappingModel<*>.searchableText(context: Context): String? {
+    return if (this is PreferenceModel<*>) {
+      listOfNotNull(title, summary)
+        .joinToString(separator = " ") { it.resolve(context).toString() }
+        .lowercase(Locale.getDefault())
+    } else {
+      null
+    }
+  }
+
+  private data class SearchGroup(
+    val divider: DividerPreference?,
+    val header: SectionHeaderPreference?,
+    val items: List<MappingModel<*>>
+  )
 
   class Factory(private val repository: InternalSettingsRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

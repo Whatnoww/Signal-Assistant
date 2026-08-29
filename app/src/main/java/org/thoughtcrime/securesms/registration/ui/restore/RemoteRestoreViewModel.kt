@@ -7,6 +7,7 @@ package org.thoughtcrime.securesms.registration.ui.restore
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,17 +18,18 @@ import kotlinx.coroutines.withContext
 import org.signal.core.util.ByteSize
 import org.signal.core.util.bytes
 import org.signal.core.util.logging.Log
+import org.signal.network.NetworkResult
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
 import org.thoughtcrime.securesms.backup.v2.RemoteRestoreResult
 import org.thoughtcrime.securesms.backup.v2.RestoreTimestampResult
 import org.thoughtcrime.securesms.backup.v2.RestoreV2Event
 import org.thoughtcrime.securesms.database.model.databaseprotos.RestoreDecisionState
+import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.keyvalue.Completed
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.keyvalue.Skipped
 import org.thoughtcrime.securesms.registration.data.QuickRegistrationRepository
-import org.whispersystems.signalservice.api.NetworkResult
 import org.whispersystems.signalservice.api.provisioning.RestoreMethod
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -61,13 +63,13 @@ class RemoteRestoreViewModel(isOnlyRestoreOption: Boolean) : ViewModel() {
 
       if (result is RestoreTimestampResult.VerificationFailure && SignalStore.account.restoredAccountEntropyPool) {
         Log.w(TAG, "Resetting backup id reservation due to zk verification failure with restored AEP")
-        result = when (val triggerResult = BackupRepository.triggerBackupIdReservationForRestore()) {
-          is NetworkResult.Success -> {
+        result = when (val triggerResult = AppDependencies.archiveService.triggerBackupIdReservation(includeMedia = false)) {
+          is Either.Right -> {
             Log.i(TAG, "Reset successful, trying to restore timestamp")
             BackupRepository.restoreBackupFileTimestamp()
           }
-          else -> {
-            Log.w(TAG, "Reset unsuccessful, failing", triggerResult.getCause())
+          is Either.Left -> {
+            Log.w(TAG, "Reset unsuccessful, failing", triggerResult.value.cause)
             result
           }
         }
@@ -118,7 +120,7 @@ class RemoteRestoreViewModel(isOnlyRestoreOption: Boolean) : ViewModel() {
         QuickRegistrationRepository.setRestoreMethodForOldDevice(RestoreMethod.REMOTE_BACKUP)
 
         when (val result = BackupRepository.restoreRemoteBackup()) {
-          RemoteRestoreResult.Success -> {
+          is RemoteRestoreResult.Success -> {
             Log.i(TAG, "Restore successful", true)
             SignalStore.registration.restoreDecisionState = RestoreDecisionState.Completed
 

@@ -32,6 +32,8 @@ import org.signal.libsignal.protocol.logging.SignalProtocolLoggerProvider
 import org.signal.libsignal.zkgroup.VerificationFailedException
 import org.signal.libsignal.zkgroup.groups.GroupMasterKey
 import org.signal.libsignal.zkgroup.groups.GroupSecretParams
+import org.signal.network.NetworkResult
+import org.signal.network.exceptions.NonSuccessfulResponseCodeException
 import org.signal.storageservice.storage.protos.groups.local.DecryptedGroup
 import org.signal.storageservice.storage.protos.groups.local.DecryptedGroupChange
 import org.signal.storageservice.storage.protos.groups.local.DecryptedMember
@@ -66,7 +68,6 @@ import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.storage.StorageSyncHelper
 import org.thoughtcrime.securesms.testutil.MockAppDependenciesRule
 import org.thoughtcrime.securesms.testutil.SystemOutLogger
-import org.whispersystems.signalservice.api.NetworkResult
 import org.whispersystems.signalservice.api.groupsv2.DecryptedGroupResponse
 import org.whispersystems.signalservice.api.groupsv2.DecryptedGroupUtil
 import org.whispersystems.signalservice.api.groupsv2.GroupsV2Api
@@ -74,7 +75,6 @@ import org.whispersystems.signalservice.api.groupsv2.GroupsV2Operations
 import org.whispersystems.signalservice.api.groupsv2.NotAbleToApplyGroupV2ChangeException
 import org.whispersystems.signalservice.api.groupsv2.ReceivedGroupSendEndorsements
 import org.whispersystems.signalservice.api.push.ServiceIds
-import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException
 import org.whispersystems.signalservice.internal.push.exceptions.NotInGroupException
 import java.io.IOException
 import java.util.Optional
@@ -141,6 +141,8 @@ class GroupsV2StateProcessorTest {
 
     mockkObject(ProfileAndMessageHelper)
     every { ProfileAndMessageHelper.create(any(), any(), any()) } returns profileAndMessageHelper
+
+    every { recipientTable.isProfileSharing(groupId) } answers { false }
 
     every { groupsV2Operations.forGroup(secretParams) } answers { callOriginal() }
 
@@ -586,6 +588,42 @@ class GroupsV2StateProcessorTest {
       }
 
     verify { groupTable.create(masterKey, result.latestServer!!, null) }
+  }
+
+  @Test
+  fun `when local state is a join-via-link placeholder containing only self, then fetch full first state including other members`() {
+    given {
+      localState(
+        revision = 1,
+        members = listOf(member(selfAci)),
+        isPlaceholderGroup = true
+      )
+      changeSet {
+        changeLog(2) {
+          fullSnapshot(
+            title = "Breaking Signal for Science",
+            members = listOf(member(otherAci), member(selfAci, joinedAt = 2))
+          )
+        }
+      }
+      apiCallParameters(requestedRevision = 2, includeFirst = true)
+      joinedAtRevision = 2
+      expectTableUpdate = true
+    }
+
+    val result = processor.updateLocalGroupToRevision(
+      targetRevision = GroupsV2StateProcessor.LATEST,
+      timestamp = 0
+    )
+
+    assertThat(result.updateStatus, "local should update to server")
+      .isEqualTo(GroupUpdateResult.UpdateStatus.GROUP_UPDATED)
+    assertThat(result.latestServer)
+      .isNotNull()
+      .transform { it.members }
+      .contains(member(otherAci))
+
+    verify { groupTable.update(masterKey, result.latestServer!!, null) }
   }
 
   @Test
@@ -1461,5 +1499,26 @@ class GroupsV2StateProcessorTest {
     assertThat(result.updateStatus).isEqualTo(GroupUpdateResult.UpdateStatus.GROUP_UPDATED)
     verify { groupTable.create(masterKey, result.latestServer!!, null, null) }
     verify(exactly = 0) { recipientTable.rotateStorageId(any()) }
+  }
+
+  @Test
+  fun `when group already has profile sharing enabled, then setProfileSharing does not re-derive it from membership`() {
+    val joinedAtRevision = 1
+    val newLocalState = DecryptedGroup(
+      revision = joinedAtRevision,
+      members = listOf(member(otherAci), member(selfAci, joinedAt = joinedAtRevision))
+    )
+    val addedByOtherChange = DecryptedGroupChange(
+      revision = joinedAtRevision,
+      editorServiceIdBytes = otherAci.toByteString()
+    )
+    val groupStateDiff = GroupStateDiff(previousGroupState = null, changedGroupState = newLocalState, change = addedByOtherChange)
+
+    every { recipientTable.isProfileSharing(groupId) } answers { true }
+
+    profileAndMessageHelper.setProfileSharing(groupStateDiff, newLocalState, needsAvatarFetch = true)
+
+    verify { recipientTable.isProfileSharing(groupId) }
+    verify(exactly = 0) { recipientTable.setProfileSharing(any(), any()) }
   }
 }

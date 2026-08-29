@@ -12,18 +12,20 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button; // JW
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,12 +35,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 
+import org.signal.core.util.bitmaps.BitmapUtil;
 import org.signal.core.util.concurrent.ListenableFuture;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.components.location.SignalMapView;
-import org.thoughtcrime.securesms.providers.BlobProvider;
-import org.thoughtcrime.securesms.util.BitmapUtil;
+import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme;
 import org.thoughtcrime.securesms.util.DynamicTheme;
 import org.thoughtcrime.securesms.util.MediaUtil;
@@ -76,6 +78,7 @@ public final class PlacePickerActivity extends AppCompatActivity {
   private LatLng                   currentLocation = new LatLng(0, 0);
   private AddressLookup            addressLookup;
   private GoogleMap                googleMap;
+  private Insets                   systemBarInsets;
   // JW: added buttons
   private Button                   btnMapTypeNormal;
   private Button                   btnMapTypeSatellite;
@@ -92,9 +95,10 @@ public final class PlacePickerActivity extends AppCompatActivity {
   @SuppressLint("MissingInflatedId")
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
+    EdgeToEdge.enable(this);
     super.onCreate(savedInstanceState);
     dynamicTheme.onCreate(this);
-    
+
     setContentView(R.layout.activity_place_picker);
 
     bottomSheet      = findViewById(R.id.bottom_sheet);
@@ -104,6 +108,13 @@ public final class PlacePickerActivity extends AppCompatActivity {
     btnMapTypeNormal    = findViewById(R.id.btnMapTypeNormal);
     btnMapTypeSatellite = findViewById(R.id.btnMapTypeSatellite);
     btnMapTypeTerrain   = findViewById(R.id.btnMapTypeTerrain);
+
+    ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (view, insets) -> {
+      systemBarInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      bottomSheet.setPadding(systemBarInsets.left, 0, systemBarInsets.right, systemBarInsets.bottom);
+      applyMapPadding();
+      return insets;
+    });
 
     ViewCompat.setBackgroundTintList(fab, ColorStateList.valueOf(getIntent().getIntExtra(KEY_CHAT_COLOR, Color.RED)));
     fab.setOnClickListener(v -> finishWithAddress());
@@ -209,7 +220,14 @@ public final class PlacePickerActivity extends AppCompatActivity {
       btnMapTypeTerrain.setVisibility(View.GONE);
     }
 
+    applyMapPadding();
     moveMapToInitialIfPossible();
+  }
+
+  private void applyMapPadding() {
+    if (googleMap != null && systemBarInsets != null) {
+      googleMap.setPadding(systemBarInsets.left, systemBarInsets.top, systemBarInsets.right, systemBarInsets.bottom);
+    }
   }
 
   // JW: get the maptype
@@ -251,7 +269,7 @@ public final class PlacePickerActivity extends AppCompatActivity {
       public void onSuccess(Bitmap result) {
         dismissibleDialog.dismiss();
         byte[] blob = BitmapUtil.toByteArray(result);
-        Uri uri = BlobProvider.getInstance()
+        Uri uri = AppDependencies.getBlobs()
                               .forData(blob)
                               .withMimeType(MediaUtil.IMAGE_JPEG)
                               .createForSingleSessionInMemory();
@@ -270,10 +288,7 @@ public final class PlacePickerActivity extends AppCompatActivity {
   }
 
   private void enableMyLocationButtonIfHaveThePermission(GoogleMap googleMap) {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-        checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)   == PackageManager.PERMISSION_GRANTED ||
-        checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-    {
+    if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
       googleMap.setMyLocationEnabled(true);
     }
   }
@@ -286,9 +301,13 @@ public final class PlacePickerActivity extends AppCompatActivity {
     addressLookup.execute(target);
   }
 
+  @SuppressLint("MissingPermission")
   @Override
   protected void onPause() {
     super.onPause();
+    if (googleMap != null && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+      googleMap.setMyLocationEnabled(false);
+    }
     if (addressLookup != null) {
       addressLookup.cancel(true);
     }

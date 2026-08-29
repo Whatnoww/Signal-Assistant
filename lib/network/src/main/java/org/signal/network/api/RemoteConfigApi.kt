@@ -5,15 +5,16 @@
 
 package org.signal.network.api
 
-import org.whispersystems.signalservice.api.NetworkResult
-import org.whispersystems.signalservice.api.remoteconfig.RemoteConfigResponse
+import com.fasterxml.jackson.annotation.JsonProperty
+import org.signal.network.NetworkResult
+import org.signal.network.util.JsonUtil
+import org.signal.network.websocket.WebSocketRequestMessage
+import org.signal.network.websocket.WebsocketResponse
+import org.signal.network.websocket.get
+import org.whispersystems.signalservice.api.fromWebSocketRequest
 import org.whispersystems.signalservice.api.remoteconfig.RemoteConfigResult
 import org.whispersystems.signalservice.api.websocket.SignalWebSocket
-import org.whispersystems.signalservice.internal.get
 import org.whispersystems.signalservice.internal.push.PushServiceSocket
-import org.whispersystems.signalservice.internal.util.JsonUtil
-import org.whispersystems.signalservice.internal.websocket.WebSocketRequestMessage
-import org.whispersystems.signalservice.internal.websocket.WebsocketResponse
 import java.util.Locale
 
 /**
@@ -35,16 +36,6 @@ class RemoteConfigApi(val authWebSocket: SignalWebSocket.AuthenticatedWebSocket,
     val headers = if (eTag.isNotEmpty()) mapOf("If-None-Match" to eTag) else mapOf()
     val request = WebSocketRequestMessage.get("/v2/config", headers = headers)
     return NetworkResult.fromWebSocketRequest(signalWebSocket = authWebSocket, request = request, webSocketResponseConverter = RemoteConfigResultWebSocketResponseConverter())
-      .fallback(predicate = { it is NetworkResult.StatusCodeError && it.code != 304 }) {
-        NetworkResult.fromFetch {
-          val response = pushServiceSocket.getRemoteConfig()
-          val transformed = response.config.map { it.key to (it.value.lowercase(Locale.getDefault()).toBooleanStrictOrNull() ?: it.value) }.toMap()
-          RemoteConfigResult(
-            config = transformed,
-            serverEpochTimeMilliseconds = response.serverEpochTime
-          )
-        }
-      }
   }
 
   /**
@@ -70,3 +61,9 @@ class RemoteConfigApi(val authWebSocket: SignalWebSocket.AuthenticatedWebSocket,
     }
   }
 }
+
+private data class RemoteConfigResponse(
+  @JsonProperty
+  val config: Map<String, String> = emptyMap(),
+  var serverEpochTime: Long = 0
+)

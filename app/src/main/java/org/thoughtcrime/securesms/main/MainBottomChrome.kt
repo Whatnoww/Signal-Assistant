@@ -20,7 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
-import org.signal.core.ui.compose.AllDevicePreviews
+import org.signal.core.ui.compose.BreakpointPreviews
 import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.Snackbars
 import org.signal.core.ui.compose.showSnackbar
@@ -72,6 +72,7 @@ fun MainBottomChrome(
     modifier = modifier
       .fillMaxWidth()
       .animateContentSize()
+      .then(if (navigationType == NavigationType.RAIL) Modifier.navigationBarsPadding() else Modifier)
   ) {
     if (state.mainToolbarMode == MainToolbarMode.FULL && navigationType != NavigationType.RAIL) {
       Box(
@@ -97,7 +98,7 @@ fun MainBottomChrome(
       return@Column
     }
 
-    val snackBarModifier = if (state.mainToolbarMode == MainToolbarMode.BASIC) {
+    val snackBarModifier = if (state.mainToolbarMode == MainToolbarMode.BASIC && navigationType != NavigationType.RAIL) {
       Modifier.navigationBarsPadding()
     } else {
       Modifier
@@ -144,7 +145,7 @@ fun MainSnackbar(
   }
 }
 
-@AllDevicePreviews
+@BreakpointPreviews
 @Composable
 fun MainBottomChromePreview() {
   Previews.Preview {

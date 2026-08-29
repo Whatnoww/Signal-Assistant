@@ -17,14 +17,15 @@ import org.thoughtcrime.securesms.database.model.ProfileAvatarFileDetails;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.jobmanager.JsonJobData;
 import org.thoughtcrime.securesms.jobmanager.Job;
+import org.thoughtcrime.securesms.jobmanager.impl.DataRestoreConstraint;
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.profiles.AvatarHelper;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.whispersystems.signalservice.api.SignalServiceMessageReceiver;
-import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException;
-import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException;
+import org.signal.network.exceptions.NonSuccessfulResponseCodeException;
+import org.signal.network.exceptions.PushNetworkException;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +78,7 @@ public class RetrieveProfileAvatarJob extends BaseJob {
     this(new Job.Parameters.Builder().setGlobalPriority(priority)
                                      .setQueue("RetrieveProfileAvatarJob::" + recipient.getId().toQueueKey())
                                      .addConstraint(NetworkConstraint.KEY)
+                                     .addConstraint(DataRestoreConstraint.KEY)
                                      .setLifespan(TimeUnit.HOURS.toMillis(1))
                                      .build(),
          recipient,

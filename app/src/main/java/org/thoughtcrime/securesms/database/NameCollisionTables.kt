@@ -220,7 +220,7 @@ class NameCollisionTables(
             .run()
         }
 
-        pruneCollisions()
+        pruneCollision(collisionId)
       }
     }
 
@@ -285,6 +285,15 @@ class NameCollisionTables(
       arrayOf(toId.serialize(), fromId.serialize())
     )
     Log.d(TAG, "Remapped $fromId to $toId")
+  }
+
+  override fun onDeletedRecipient(recipientId: RecipientId) {
+    val deleted = writableDatabase
+      .delete(NameCollisionMembershipTable.TABLE_NAME)
+      .where("${NameCollisionMembershipTable.RECIPIENT_ID} = ?", recipientId)
+      .run()
+
+    Log.d(TAG, "Deleted recipient: $deleted")
   }
 
   private fun handleNameCollisions(
@@ -473,6 +482,32 @@ class NameCollisionTables(
     )
   }
 
+  /**
+   * Removes the given collision if it has fewer than two members.
+   *
+   * Unlike [pruneCollisions], this is scoped to a single collision so it can be used on hot paths
+   * (e.g. opening a conversation) without scanning the entire [NameCollisionTable] while holding the
+   * write lock. Callers that may have modified the membership of more than one collision should
+   * continue to use [pruneCollisions].
+   */
+  private fun pruneCollision(collisionId: Long) {
+    check(writableDatabase.inTransaction())
+
+    writableDatabase.execSQL(
+      """
+      DELETE FROM ${NameCollisionTable.TABLE_NAME}
+      WHERE $ID = ? AND $ID NOT IN (
+          SELECT ${NameCollisionMembershipTable.COLLISION_ID}
+          FROM ${NameCollisionMembershipTable.TABLE_NAME}
+          WHERE ${NameCollisionMembershipTable.COLLISION_ID} = ?
+          GROUP BY ${NameCollisionMembershipTable.COLLISION_ID}
+          HAVING COUNT(*) >= 2
+      )
+      """.trimIndent(),
+      arrayOf(collisionId, collisionId)
+    )
+  }
+
   private fun getDuplicatedGroupRecipients(groupId: V2, toCheck: Set<RecipientId>): List<ReviewRecipient> {
     if (toCheck.isEmpty()) {
       return emptyList()
@@ -486,6 +521,9 @@ class NameCollisionTables(
 
     val results = mutableListOf<ReviewRecipient>()
 
+    val cachedDisplayNames = HashMap<RecipientId, String>(members.size + changed.size)
+    val displayName = { recipient: Recipient -> cachedDisplayNames.getOrPut(recipient.id) { recipient.getDisplayName(context) } }
+
     for (reviewRecipient in changed) {
       if (results.contains(reviewRecipient)) {
         continue
@@ -493,8 +531,10 @@ class NameCollisionTables(
 
       members.remove(reviewRecipient.recipient)
 
+      val changedDisplayName = displayName(reviewRecipient.recipient)
+
       for (member in members) {
-        if (member.getDisplayName(context) == reviewRecipient.recipient.getDisplayName(context)) {
+        if (displayName(member) == changedDisplayName) {
           results.add(reviewRecipient)
           results.add(ReviewRecipient(member))
         }

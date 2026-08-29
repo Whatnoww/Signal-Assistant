@@ -17,11 +17,18 @@ plugins {
 
 android {
   buildToolsVersion = libs.versions.buildTools.get()
-  compileSdkVersion(libs.versions.compileSdk.get())
+
+  compileSdk {
+    version = release(libs.versions.compileSdk.get().toInt())
+  }
 
   defaultConfig {
     minSdk = libs.versions.minSdk.get().toInt()
     vectorDrawables.useSupportLibrary = true
+  }
+
+  testOptions {
+    targetSdk = libs.versions.targetSdk.get().toInt()
   }
 
   compileOptions {
@@ -31,6 +38,7 @@ android {
   }
 
   lint {
+    targetSdk = libs.versions.targetSdk.get().toInt()
     disable += "InvalidVectorPath"
     lintConfig = rootProject.file("lint.xml")
   }

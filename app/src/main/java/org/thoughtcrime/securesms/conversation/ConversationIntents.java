@@ -18,7 +18,7 @@ import org.thoughtcrime.securesms.database.ThreadTable;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.stickers.StickerLocator;
-import org.whispersystems.signalservice.api.util.Preconditions;
+import org.signal.network.util.Preconditions;
 
 import java.util.ArrayList;
 import java.util.Collection;

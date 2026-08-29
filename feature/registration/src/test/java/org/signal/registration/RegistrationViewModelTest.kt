@@ -26,6 +26,8 @@ import org.junit.Before
 import org.junit.Test
 import org.signal.core.models.AccountEntropyPool
 import org.signal.core.models.MasterKey
+import org.signal.network.api.RegistrationApiV2.SessionMetadata
+import org.signal.network.api.RegistrationApiV2.SvrCredentials
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RegistrationViewModelTest {
@@ -184,6 +186,52 @@ class RegistrationViewModelTest {
     assertThat(viewModel.state.value.isRestoringNavigationState).isEqualTo(false)
   }
 
+  @Test
+  fun `start fresh clears in-progress data and starts fresh from Welcome`() = runTest(testDispatcher) {
+    val preExisting = mockk<PreExistingRegistrationData>(relaxed = true)
+    val savedState = RegistrationFlowState(
+      backStack = listOf(
+        RegistrationRoute.Welcome,
+        RegistrationRoute.Permissions(nextRoute = RegistrationRoute.PhoneNumberEntry),
+        RegistrationRoute.PhoneNumberEntry,
+        RegistrationRoute.VerificationCodeEntry
+      ),
+      sessionMetadata = createSessionMetadata("stale-session")
+    )
+    coEvery { mockRepository.restoreFlowState() } returns savedState
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns preExisting
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle(), startFresh = true)
+    advanceUntilIdle()
+
+    val state = viewModel.state.value
+    assertThat(state.backStack).isEqualTo(listOf(RegistrationRoute.Welcome))
+    assertThat(state.sessionMetadata).isNull()
+    assertThat(state.preExistingRegistrationData).isEqualTo(preExisting)
+    assertThat(state.isRestoringNavigationState).isEqualTo(false)
+
+    coVerify { mockRepository.clearInProgressRegistrationData() }
+    coVerify(exactly = 0) { mockRepository.restoreFlowState() }
+  }
+
+  @Test
+  fun `start fresh does not clear again once reset has been performed`() = runTest(testDispatcher) {
+    val savedState = RegistrationFlowState(
+      backStack = listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry),
+      sessionMetadata = null
+    )
+    coEvery { mockRepository.restoreFlowState() } returns savedState
+
+    val savedStateHandle = SavedStateHandle(mapOf("start_fresh_reset_performed" to true))
+    val viewModel = RegistrationViewModel(mockRepository, savedStateHandle, startFresh = true)
+    advanceUntilIdle()
+
+    assertThat(viewModel.state.value.backStack).isEqualTo(savedState.backStack)
+
+    coVerify(exactly = 0) { mockRepository.clearInProgressRegistrationData() }
+    coVerify { mockRepository.restoreFlowState() }
+  }
+
   // ==================== Persistence Side-Effect Tests ====================
 
   @Test
@@ -201,7 +249,7 @@ class RegistrationViewModelTest {
   }
 
   @Test
-  fun `onEvent NavigateToScreen FullyComplete clears flow state`() = runTest(testDispatcher) {
+  fun `onEvent NavigateToScreen FullyComplete clears in-progress registration data`() = runTest(testDispatcher) {
     coEvery { mockRepository.restoreFlowState() } returns null
     coEvery { mockRepository.getPreExistingRegistrationData() } returns null
 
@@ -211,7 +259,7 @@ class RegistrationViewModelTest {
     viewModel.onEvent(RegistrationFlowEvent.NavigateToScreen(RegistrationRoute.FullyComplete))
     advanceUntilIdle()
 
-    coVerify { mockRepository.clearFlowState() }
+    coVerify { mockRepository.clearInProgressRegistrationData() }
   }
 
   @Test
@@ -236,7 +284,7 @@ class RegistrationViewModelTest {
     val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
     advanceUntilIdle()
 
-    viewModel.onEvent(RegistrationFlowEvent.Registered(AccountEntropyPool.generate()))
+    viewModel.onEvent(RegistrationFlowEvent.Registered(AccountEntropyPool.generate(), storageCapable = false))
     advanceUntilIdle()
 
     coVerify(exactly = 0) { mockRepository.saveFlowState(any()) }
@@ -257,7 +305,7 @@ class RegistrationViewModelTest {
   }
 
   @Test
-  fun `onEvent RegistrationComplete commits final data and clears flow state`() = runTest(testDispatcher) {
+  fun `onEvent RegistrationComplete commits final data and clears in-progress registration data`() = runTest(testDispatcher) {
     coEvery { mockRepository.restoreFlowState() } returns null
     coEvery { mockRepository.getPreExistingRegistrationData() } returns null
 
@@ -268,7 +316,7 @@ class RegistrationViewModelTest {
     advanceUntilIdle()
 
     coVerify { mockRepository.commitFinalRegistrationData() }
-    coVerify { mockRepository.clearFlowState() }
+    coVerify { mockRepository.clearInProgressRegistrationData() }
   }
 
   // ==================== applyEvent Tests (Navigation & State Reducers) ====================
@@ -308,6 +356,274 @@ class RegistrationViewModelTest {
     val result = viewModel.applyEvent(initialState, RegistrationFlowEvent.NavigateBack)
 
     assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.Welcome))
+  }
+
+  @Test
+  fun `applyEvent NavigateBack from recovery key entry clears pendingRestoreOption`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry, RegistrationRoute.EnterAepForRemoteBackupPreRegistration("+15551234567")),
+      pendingRestoreOption = PendingRestoreOption.RemoteBackup
+    )
+
+    val result = viewModel.applyEvent(initialState, RegistrationFlowEvent.NavigateBack)
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry))
+    assertThat(result.pendingRestoreOption).isNull()
+  }
+
+  @Test
+  fun `applyEvent NavigateBack from phone number entry clears pendingRestoreOption`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry),
+      pendingRestoreOption = PendingRestoreOption.LocalBackup
+    )
+
+    val result = viewModel.applyEvent(initialState, RegistrationFlowEvent.NavigateBack)
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.Welcome))
+    assertThat(result.pendingRestoreOption).isNull()
+  }
+
+  @Test
+  fun `applyEvent NavigateBack from local backup restore keeps pendingRestoreOption`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry, RegistrationRoute.LocalBackupRestore(isPreRegistration = true)),
+      pendingRestoreOption = PendingRestoreOption.LocalBackup
+    )
+
+    val result = viewModel.applyEvent(initialState, RegistrationFlowEvent.NavigateBack)
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry))
+    assertThat(result.pendingRestoreOption).isEqualTo(PendingRestoreOption.LocalBackup)
+  }
+
+  @Test
+  fun `applyEvent NavigateToScreen Welcome clears backStack`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(
+        RegistrationRoute.Welcome,
+        RegistrationRoute.PhoneNumberEntry,
+        RegistrationRoute.PinEntryForRegistrationLock(
+          timeRemaining = 1000L,
+          svrCredentials = SvrCredentials(username = "user", password = "pass")
+        ),
+        RegistrationRoute.AccountLocked(timeRemainingMs = 1000L)
+      )
+    )
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.NavigateToScreen(RegistrationRoute.Welcome)
+    )
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.Welcome))
+  }
+
+  @Test
+  fun `applyEvent NavigateToScreen PinCreate clears backStack`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(
+        RegistrationRoute.Welcome,
+        RegistrationRoute.Permissions(nextRoute = RegistrationRoute.PhoneNumberEntry),
+        RegistrationRoute.PhoneNumberEntry,
+        RegistrationRoute.VerificationCodeEntry
+      )
+    )
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.NavigateToScreen(RegistrationRoute.PinCreate)
+    )
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.PinCreate))
+  }
+
+  @Test
+  fun `applyEvent NavigateToScreen PinEntryForSvrRestore clears backStack`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(
+        RegistrationRoute.Welcome,
+        RegistrationRoute.PhoneNumberEntry,
+        RegistrationRoute.VerificationCodeEntry
+      )
+    )
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.NavigateToScreen(RegistrationRoute.PinEntryForSvrRestore)
+    )
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.PinEntryForSvrRestore))
+  }
+
+  @Test
+  fun `applyEvent NavigateToScreen RemoteRestore clears backStack`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(
+        RegistrationRoute.Welcome,
+        RegistrationRoute.PhoneNumberEntry,
+        RegistrationRoute.VerificationCodeEntry
+      )
+    )
+
+    val remoteRestore = RegistrationRoute.RemoteRestore(AccountEntropyPool.generate())
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.NavigateToScreen(remoteRestore)
+    )
+
+    assertThat(result.backStack).isEqualTo(listOf(remoteRestore))
+  }
+
+  @Test
+  fun `applyEvent NavigateToScreen post-registration ArchiveRestoreSelection clears backStack`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(
+        RegistrationRoute.Welcome,
+        RegistrationRoute.PhoneNumberEntry,
+        RegistrationRoute.VerificationCodeEntry
+      )
+    )
+
+    val postRegisterSelection = RegistrationRoute.ArchiveRestoreSelection.forPostRegisterWithPinKnown()
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.NavigateToScreen(postRegisterSelection)
+    )
+
+    assertThat(result.backStack).isEqualTo(listOf(postRegisterSelection))
+  }
+
+  @Test
+  fun `applyEvent NavigateToScreen pre-registration ArchiveRestoreSelection appends to backStack`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(backStack = listOf(RegistrationRoute.Welcome))
+
+    val preRegisterSelection = RegistrationRoute.ArchiveRestoreSelection.forManualRestore()
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.NavigateToScreen(preRegisterSelection)
+    )
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.Welcome, preRegisterSelection))
+  }
+
+  @Test
+  fun `applyEvent NavigateToScreen with popCurrent replaces the current screen`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry, RegistrationRoute.LinkAccount())
+    )
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.NavigateToScreen(RegistrationRoute.Permissions(nextRoute = RegistrationRoute.PhoneNumberEntry), popCurrent = true)
+    )
+
+    assertThat(result.backStack).isEqualTo(
+      listOf(
+        RegistrationRoute.Welcome,
+        RegistrationRoute.PhoneNumberEntry,
+        RegistrationRoute.Permissions(nextRoute = RegistrationRoute.PhoneNumberEntry)
+      )
+    )
+  }
+
+  @Test
+  fun `applyEvent NavigateBackToScreen pops back to the target screen`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry, RegistrationRoute.LinkAccount())
+    )
+
+    val result = viewModel.applyEvent(initialState, RegistrationFlowEvent.NavigateBackToScreen(RegistrationRoute.PhoneNumberEntry))
+
+    assertThat(result.backStack).isEqualTo(listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry))
+  }
+
+  @Test
+  fun `applyEvent NavigateBackToScreen replaces the current screen when the route is not on the back stack`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      backStack = listOf(RegistrationRoute.Welcome, RegistrationRoute.LinkAccount())
+    )
+
+    val result = viewModel.applyEvent(initialState, RegistrationFlowEvent.NavigateBackToScreen(RegistrationRoute.PhoneNumberEntry))
+
+    assertThat(result.backStack).isEqualTo(
+      listOf(RegistrationRoute.Welcome, RegistrationRoute.PhoneNumberEntry)
+    )
   }
 
   @Test
@@ -353,6 +669,45 @@ class RegistrationViewModelTest {
   }
 
   @Test
+  fun `applyEvent VerificationCodeRequested updates both request windows`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val result = viewModel.applyEvent(
+      RegistrationFlowState(),
+      RegistrationFlowEvent.VerificationCodeRequested("+15551234567", nextSmsAllowedTimestamp = 12_345L, nextCallAllowedTimestamp = 23_456L)
+    )
+
+    assertThat(result.lastSmsVerificationCodeRequest).isEqualTo(VerificationCodeRequest("+15551234567", 12_345L))
+    assertThat(result.lastCallVerificationCodeRequest).isEqualTo(VerificationCodeRequest("+15551234567", 23_456L))
+  }
+
+  @Test
+  fun `applyEvent VerificationCodeRequested keeps the existing window when a timestamp is absent`() = runTest(testDispatcher) {
+    coEvery { mockRepository.restoreFlowState() } returns null
+    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
+
+    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
+    advanceUntilIdle()
+
+    val initialState = RegistrationFlowState(
+      lastSmsVerificationCodeRequest = VerificationCodeRequest("+15551234567", 12_345L),
+      lastCallVerificationCodeRequest = VerificationCodeRequest("+15551234567", 23_456L)
+    )
+
+    val result = viewModel.applyEvent(
+      initialState,
+      RegistrationFlowEvent.VerificationCodeRequested("+15551234567", nextSmsAllowedTimestamp = 99_999L, nextCallAllowedTimestamp = null)
+    )
+
+    assertThat(result.lastSmsVerificationCodeRequest).isEqualTo(VerificationCodeRequest("+15551234567", 99_999L))
+    assertThat(result.lastCallVerificationCodeRequest).isEqualTo(VerificationCodeRequest("+15551234567", 23_456L))
+  }
+
+  @Test
   fun `applyEvent E164Chosen updates sessionE164`() = runTest(testDispatcher) {
     coEvery { mockRepository.restoreFlowState() } returns null
     coEvery { mockRepository.getPreExistingRegistrationData() } returns null
@@ -380,10 +735,11 @@ class RegistrationViewModelTest {
 
     val result = viewModel.applyEvent(
       RegistrationFlowState(),
-      RegistrationFlowEvent.Registered(aep)
+      RegistrationFlowEvent.Registered(aep, storageCapable = true)
     )
 
     assertThat(result.accountEntropyPool).isEqualTo(aep)
+    assertThat(result.storageCapable).isTrue()
   }
 
   @Test
@@ -465,11 +821,12 @@ class RegistrationViewModelTest {
     val aep = AccountEntropyPool.generate()
 
     val result = viewModel.applyEvent(
-      RegistrationFlowState(),
+      RegistrationFlowState(unverifiedRestoredAep = aep),
       RegistrationFlowEvent.UserSuppliedAepVerified(aep)
     )
 
     assertThat(result.accountEntropyPool).isEqualTo(aep)
+    assertThat(result.unverifiedRestoredAep).isNull()
     coVerify { mockRepository.saveVerifiedUserSuppliedAep(aep) }
   }
 
@@ -487,23 +844,6 @@ class RegistrationViewModelTest {
 
     assertThat(result.backStack.last()).isEqualTo(RegistrationRoute.FullyComplete)
     coVerify { mockRepository.commitFinalRegistrationData() }
-  }
-
-  // ==================== getRequiredPermissions Tests ====================
-
-  @Test
-  fun `getRequiredPermissions always includes contacts and phone state`() = runTest(testDispatcher) {
-    coEvery { mockRepository.restoreFlowState() } returns null
-    coEvery { mockRepository.getPreExistingRegistrationData() } returns null
-
-    val viewModel = RegistrationViewModel(mockRepository, SavedStateHandle())
-    advanceUntilIdle()
-
-    val permissions = viewModel.getRequiredPermissions()
-
-    assertThat(permissions.contains(android.Manifest.permission.READ_CONTACTS)).isTrue()
-    assertThat(permissions.contains(android.Manifest.permission.WRITE_CONTACTS)).isTrue()
-    assertThat(permissions.contains(android.Manifest.permission.READ_PHONE_STATE)).isTrue()
   }
 
   // ==================== preExistingRegistrationData Load Test ====================
@@ -549,8 +889,8 @@ class RegistrationViewModelTest {
 
   // ==================== Helpers ====================
 
-  private fun createSessionMetadata(id: String = "test-session"): NetworkController.SessionMetadata {
-    return NetworkController.SessionMetadata(
+  private fun createSessionMetadata(id: String = "test-session"): SessionMetadata {
+    return SessionMetadata(
       id = id,
       nextSms = 1000L,
       nextCall = 2000L,

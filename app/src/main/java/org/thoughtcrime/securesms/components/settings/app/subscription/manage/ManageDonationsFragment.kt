@@ -7,14 +7,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.signal.core.util.dp
 import org.signal.core.util.money.FiatMoney
 import org.signal.donations.InAppPaymentType
@@ -29,7 +24,6 @@ import org.thoughtcrime.securesms.components.settings.app.AppSettingsActivity
 import org.thoughtcrime.securesms.components.settings.app.subscription.DonationSerializationHelper.toFiatMoney
 import org.thoughtcrime.securesms.components.settings.app.subscription.completed.InAppPaymentsBottomSheetDelegate
 import org.thoughtcrime.securesms.components.settings.app.subscription.donate.CheckoutFlowActivity
-import org.thoughtcrime.securesms.components.settings.app.subscription.thanks.ThanksForYourSupportBottomSheetDialogFragment
 import org.thoughtcrime.securesms.components.settings.app.subscription.ui.NetworkFailure
 import org.thoughtcrime.securesms.components.settings.configure
 import org.thoughtcrime.securesms.components.settings.models.IndeterminateLoadingCircle
@@ -80,6 +74,8 @@ class ManageDonationsFragment :
 
   private val viewModel: ManageDonationsViewModel by viewModels()
 
+  override val listScrollsBehindToolbar: Boolean = true
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     viewLifecycleOwner.lifecycle.addObserver(InAppPaymentsBottomSheetDelegate(childFragmentManager, viewLifecycleOwner))
     super.onViewCreated(view, savedInstanceState)
@@ -89,14 +85,6 @@ class ManageDonationsFragment :
 
     if (savedInstanceState == null && args.directToCheckoutType != InAppPaymentType.UNKNOWN) {
       launcher.launch(args.directToCheckoutType)
-    }
-
-    lifecycleScope.launch {
-      repeatOnLifecycle(Lifecycle.State.RESUMED) {
-        viewModel.displayThanksBottomSheetPulse.collectLatest {
-          ThanksForYourSupportBottomSheetDialogFragment.create(it).show(parentFragmentManager, ThanksForYourSupportBottomSheetDialogFragment.SHEET_TAG)
-        }
-      }
     }
   }
 
@@ -152,14 +140,14 @@ class ManageDonationsFragment :
 
   override fun getMaterial3OnScrollHelper(toolbar: Toolbar?): Material3OnScrollHelper {
     return object : Material3OnScrollHelper(activity = requireActivity(), views = listOf(toolbar!!), lifecycleOwner = viewLifecycleOwner) {
-      override val activeColorSet: ColorSet = ColorSet(R.color.transparent, CoreUiR.color.signal_colorBackground)
-      override val inactiveColorSet: ColorSet = ColorSet(R.color.transparent, CoreUiR.color.signal_colorBackground)
+      override val activeColorSet: ColorSet = ColorSet(R.color.transparent)
+      override val inactiveColorSet: ColorSet = ColorSet(R.color.transparent)
     }
   }
 
   private fun getConfiguration(state: ManageDonationsState): DSLConfiguration {
     return configure {
-      space(36.dp)
+      space(12.dp)
 
       customPref(
         BadgePreview.BadgeModel.SubscriptionModel(

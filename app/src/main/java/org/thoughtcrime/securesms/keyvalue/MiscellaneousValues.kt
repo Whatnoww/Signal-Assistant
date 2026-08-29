@@ -32,6 +32,7 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
     private const val LAST_SERVER_TIME_OFFSET_UPDATE = "misc.last_server_time_offset_update"
     private const val NEEDS_USERNAME_RESTORE = "misc.needs_username_restore"
     private const val LAST_FORCED_PREKEY_REFRESH = "misc.last_forced_prekey_refresh"
+    private const val FORCE_PNI_SIGNED_PREKEY_ROTATION = "misc.force_pni_signed_prekey_rotation"
     private const val LAST_CDS_FOREGROUND_SYNC = "misc.last_cds_foreground_sync"
     private const val LINKED_DEVICE_LAST_ACTIVE_CHECK_TIME = "misc.linked_device.last_active_check_time"
     private const val LEAST_ACTIVE_LINKED_DEVICE = "misc.linked_device.least_active"
@@ -44,6 +45,7 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
     private const val STARTED_QUOTE_THUMBNAIL_MIGRATION = "misc.started_quote_thumbnail_migration"
     private const val PREFERRED_MAIN_ACTIVITY_ANCHOR_INDEX = "misc.preferred_main_activity_anchor_index"
     private const val LAST_KEY_TRANSPARENCY_TIME = "misc.last_key_transparency_time"
+    private const val NEXT_KEY_TRANSPARENCY_TIME = "misc.next_key_transparency_time"
     private const val HAS_KEY_TRANSPARENCY_FAILURE = "misc.has_key_transparency_failure"
     private const val HAS_SEEN_KEY_TRANSPARENCY_FAILURE = "misc.has_seen_key_transparency_failure"
     private const val CAMERA_FACING_FRONT = "misc.camera_facing_front"
@@ -51,6 +53,9 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
     private const val CAPTCHA_LAST_VIEWED_AT = "misc.captcha_last_viewed_at"
     private const val CALLING_ASSETS_VERSION = "misc.calling_assets_version"
     private const val LAST_SYNC_MESSAGE_SEEN_TIME_MS = "misc.last_sync_message_seen_time"
+    private const val LAST_APPLIED_PNI_CHANGE_SERVER_TIMESTAMP = "misc.last_applied_pni_change_server_timestamp"
+    private const val LAST_MISSING_PLAY_SERVICES_FCM_VERIFICATION_TIME = "misc.last_missing_play_services_fcm_verification_time"
+    private const val LAST_PROCESSED_SHARE_DATA_TIMESTAMP = "misc.last_processed_share_data_timestamp"
   }
 
   public override fun onFirstEverAppLaunch() {
@@ -74,6 +79,17 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
    * Get the last time we successfully completed a forced prekey refresh.
    */
   var lastForcedPreKeyRefresh by longValue(LAST_FORCED_PREKEY_REFRESH, 0)
+
+  /**
+   * Bypasses the timeout in [org.thoughtcrime.securesms.jobs.PreKeysSyncJob] since otherwise we can hit a race.
+   */
+  var forcePniSignedPreKeyRotation by booleanValue(FORCE_PNI_SIGNED_PREKEY_ROTATION, false)
+
+  /**
+   * Envelope serverTimestamp of the most recently applied PniChangeNumber sync. Used to reject
+   * stale replays — a sync with serverTimestamp <= this value is treated as a replay and ignored.
+   */
+  var lastAppliedPniChangeServerTimestamp by longValue(LAST_APPLIED_PNI_CHANGE_SERVER_TIMESTAMP, 0L)
 
   /**
    * The last time we completed a routine profile refresh.
@@ -301,6 +317,11 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
   var lastKeyTransparencyTime: Long by longValue(LAST_KEY_TRANSPARENCY_TIME, 0)
 
   /**
+   * The next time we should run key transparency self check
+   */
+  var nextKeyTransparencyTime: Long by longValue(NEXT_KEY_TRANSPARENCY_TIME, 0)
+
+  /**
    * Whether you are unable to run key transparency on yourself
    */
   var hasKeyTransparencyFailure: Boolean by booleanValue(HAS_KEY_TRANSPARENCY_FAILURE, false)
@@ -328,4 +349,19 @@ class MiscellaneousValues internal constructor(store: KeyValueStore) : SignalSto
    * if new assets need to be fetched.
    */
   var callingAssetsVersion: Int by integerValue(CALLING_ASSETS_VERSION, 0)
+
+  /**
+   * The last time we tried to get an FCM token for a user reporting missing Play Services.
+   */
+  var lastMissingPlayServicesFcmVerificationTime: Long by longValue(LAST_MISSING_PLAY_SERVICES_FCM_VERIFICATION_TIME, 0)
+
+  /**
+   * High-water mark of the most recently consumed share payload, as set by
+   * [org.thoughtcrime.securesms.conversation.ConversationArgs.shareDataTimestamp]. Any share whose timestamp is at or
+   * below this has already been handed off to the conversation and must never be replayed.
+   *
+   * This has to outlive the navigation entry carrying the payload, which is persisted and can be restored long after
+   * the activity that consumed it is gone.
+   */
+  var lastProcessedShareDataTimestamp: Long by longValue(LAST_PROCESSED_SHARE_DATA_TIMESTAMP, -1)
 }

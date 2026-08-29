@@ -4,7 +4,7 @@
   ~ SPDX-License-Identifier: AGPL-3.0-only
   -->
 <!-- smartling.instruction_comments_enabled = on -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <!-- Removed by excludeNonTranslatables <string name="app_name" translatable="false">Signal</string> -->
 
   <!-- Removed by excludeNonTranslatables <string name="install_url" translatable="false">https://signal.org/install</string> -->
@@ -22,6 +22,8 @@
   <!-- Removed by excludeNonTranslatables <string name="export_account_data_url" translatable="false">https://support.signal.org/hc/articles/5538911756954</string> -->
   <!-- Removed by excludeNonTranslatables <string name="pending_transfer_url" translatable="false">https://support.signal.org/hc/articles/360031949872#pending</string> -->
   <!-- Removed by excludeNonTranslatables <string name="donate_faq_url" translatable="false">https://support.signal.org/hc/articles/360031949872#donate</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="inactive_primary_support" translatable="false">https://support.signal.org/hc/articles/9021007554074</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="recovery_key_phishing_support_url" translatable="false">https://support.signal.org/hc/articles/9932566320410</string> -->
 
     <!-- First placeholder is productId, second placeholder is app package -->
     <string name="backup_subscription_management_url">https://play.google.com/store/account/subscriptions?sku=%1$s&amp;package=%2$s</string>
@@ -169,6 +171,8 @@
     <string name="BlockedUsersActivity__block_user">要封鎖使用者嗎？</string>
     <string name="BlockedUserActivity__s_will_not_be_able_to">\"%1$s\" 將無法給你打電話或向你傳送訊息。</string>
     <string name="BlockedUsersActivity__block">封鎖</string>
+    <!-- Subtitle shown under a blocked user. Placeholder is the time they were blocked-->
+    <string name="BlockedUsersActivity__blocked_on_s">已於 %1$s封鎖</string>
 
     <!-- CreditCardFragment -->
     <!-- Title of fragment -->
@@ -269,76 +273,7 @@
     <!-- Unknown people row info dialog action to close the dialog -->
     <string name="CallInfoView__got_it">我知道了</string>
 
-    <!-- CameraFragment -->
-    <!-- Toasted when user device does not support video recording -->
-    <string name="CameraFragment__video_recording_is_not_supported_on_your_device">你的裝置不支援錄製影片</string>
 
-    <!-- CameraXFragment -->
-    <string name="CameraXFragment_tap_for_photo_hold_for_video">輕觸一下拍照，長按錄製影片</string>
-    <!-- Accessibility content description to describe the capture button when taking an image/video -->
-    <string name="CameraXFragment_capture_description">擷取</string>
-    <string name="CameraXFragment_change_camera_description">切換相機</string>
-    <string name="CameraXFragment_open_gallery_description">開啟相簿</string>
-    <!-- Button text asking for access to camera permissions -->
-    <string name="CameraXFragment_allow_access">允許存取</string>
-    <!-- Dialog title asking users for camera and microphone permission -->
-    <string name="CameraXFragment_allow_access_camera_microphone">允許存取你的相機及麥克風</string>
-    <!-- Dialog title asking users for camera permission -->
-    <string name="CameraXFragment_allow_access_camera">允許存取你的相機</string>
-    <!-- Dialog title asking users for microphone permission -->
-    <string name="CameraXFragment_allow_access_microphone">允許連接你的麥克風</string>
-    <!-- Text explaining why Signal needs camera access in order to take photos -->
-    <string name="CameraXFragment_to_capture_photos_allow_camera">要拍攝相片，請允許 Signal 存取相機。</string>
-    <!-- Text explaining why Signal needs camera access in order to take photos and videos -->
-    <string name="CameraXFragment_to_capture_photos_and_video_allow_camera">請授予 Signal 使用相機的權限，才能拍攝照片和影片</string>
-    <!-- Text explaining why Signal needs camera and microphone access in order to take photos and videos -->
-    <string name="CameraXFragment_to_capture_photos_and_video_allow_camera_microphone">要拍照及錄影，請允許 Signal 存取相機及麥克風。</string>
-    <!-- Text explaining why Signal needs microphone access to take videos -->
-    <string name="CameraXFragment_to_capture_videos_with_sound">要錄製有聲影片，請允許 Signal 存取你的麥克風。</string>
-    <!-- Text explaining why Signal needs camera access to scan QR codes -->
-    <string name="CameraXFragment_to_scan_qr_code_allow_camera">要掃描二維碼，請允許 Signal 存取相機。</string>
-    <!-- Toast dialog explaining why Signal needs camera permissions when capturing photos -->
-    <string name="CameraXFragment_signal_needs_camera_access_capture_photos">Signal 需要相機存取權限以拍攝相片</string>
-    <!-- Toast dialog explaining why Signal needs camera permissions when scanning QR codes -->
-    <string name="CameraXFragment_signal_needs_camera_access_scan_qr_code">Signal 需要相機存取權限以掃描二維碼</string>
-    <!-- Toast dialog explaining why Signal needs microphone permissions -->
-    <string name="CameraXFragment_signal_needs_microphone_access_video">Signal 需要麥克風存取權限以錄製影片</string>
-    <!-- Dialog description that explains the steps needed to give camera permission -->
-    <string name="CameraXFragment_to_capture_photos">要在 Signal 拍攝相片：</string>
-    <!-- Dialog description that explains the steps needed to give camera and microphone permission -->
-    <string name="CameraXFragment_to_capture_photos_videos">要在 Signal 拍照及錄影：</string>
-    <!-- Dialog description that explains the steps needed to give microphone permission -->
-    <string name="CameraXFragment_to_capture_videos">要錄製有聲影片：</string>
-    <!-- Dialog description that explains the steps needed to give Signal camera permissions -->
-    <string name="CameraXFragment_to_scan_qr_codes">要掃描二維碼：</string>
-    <!-- Error message shown when we try to take a photo, but fail -->
-    <string name="CameraXFragment_photo_capture_failed">無法擷取相片。請重試。</string>
-    <!-- Error message shown when we try to take a photo, but fail when trying to process it (convert it into something the user can see). -->
-    <string name="CameraXFragment_photo_processing_failed">無法處理相片。請重試。</string>
-    <!-- Accessibility label for the switch camera button -->
-    <string name="CameraXFragment_switch_camera">切換鏡頭</string>
-    <!-- Accessibility label for flash button when flash is off -->
-    <string name="CameraXFragment_flash_off">關閉閃光燈</string>
-    <!-- Accessibility label for flash button when flash is on -->
-    <string name="CameraXFragment_flash_on">開啟閃光燈</string>
-    <!-- Accessibility label for flash button when flash is set to auto -->
-    <string name="CameraXFragment_flash_auto">閃光燈自動模式</string>
-    <!-- Accessibility label for the send button in media selection -->
-    <string name="CameraXFragment_send">傳送</string>
-
-    <!-- CameraContacts -->
-    <string name="CameraContacts_recent_contacts">最近的聯絡人</string>
-    <string name="CameraContacts_signal_contacts">Signal 聯絡人</string>
-    <string name="CameraContacts_signal_groups">Signal 群組</string>
-    <!-- A warning shown in a toast when  -->
-    <plurals name="CameraContacts_you_can_share_with_a_maximum_of_n_conversations">
-        <item quantity="other">你可以分享最多 %1$d 個聊天。</item>
-    </plurals>
-    <string name="CameraContacts_select_signal_recipients">選擇 Signal 收件人</string>
-    <string name="CameraContacts_no_signal_contacts">沒有 Signal 聯絡人</string>
-    <string name="CameraContacts_you_can_only_use_the_camera_button">你只能使用相機按鈕將照片傳送到 Signal 聯絡人。 </string>
-    <string name="CameraContacts_cant_find_who_youre_looking_for">找不到你要找的人？</string>
-    <string name="CameraContacts_invite_a_contact_to_join_signal">邀請一個聯絡人來使用 Signal</string>
     <string name="CameraContacts__menu_search">搜尋</string>
 
     <!-- Censorship Circumvention Megaphone -->
@@ -358,6 +293,16 @@
     <string name="ClientDeprecatedActivity_dont_update">不更新</string>
     <string name="ClientDeprecatedActivity_warning">警告</string>
     <string name="ClientDeprecatedActivity_your_version_of_signal_has_expired_you_can_view_your_message_history">你的Signal版本已過期。你可以查看訊息歷史記錄，但是只有在更新後才能傳送或接收訊息。</string>
+
+    <!-- ClockSkewActivity -->
+    <!-- Title of the full-screen dialog shown when the device clock is too far off from the real time -->
+    <string name="ClockSkewActivity__title">日期不正確</string>
+    <!-- Body text explaining that the device clock is wrong and needs to be fixed -->
+    <string name="ClockSkewActivity__date_inaccurate_description">你的裝置日期不正確。\n請調整你的時鐘，然後再試一次。</string>
+    <!-- Shows the user the current, inaccurate date and time reported by their device. Placeholder is the formatted date, time, and time zone. -->
+    <string name="ClockSkewActivity__time_prefix">你的裝置日期和時間為：\n%1$s</string>
+    <!-- Button that opens the system date and time settings -->
+    <string name="ClockSkewActivity__adjust_date_button">調整日期</string>
 
     <!-- CommunicationActions -->
     <string name="CommunicationActions_no_browser_found">找不到網路瀏覽器。</string>
@@ -453,6 +398,8 @@
     <!-- Conversation message shown when someone deletes their own message. Placeholder is the name of the person. -->
     <string name="ConversationItem_s_deleted_this_message">%1$s已刪除此訊息</string>
     <string name="ConversationItem_you_deleted_this_message">你已刪除此訊息</string>
+    <!-- Tappable text shown on a locally-deleted message tombstone, prompting the user to promote it to a delete-for-everyone -->
+    <string name="ConversationItem_delete_for_everyone_question">要為所有人刪除嗎？</string>
     <!-- Conversation message when a message has been deleted by an admin. The placeholder is the admin\'s name. -->
     <string name="ConversationItem_admin_s_deleted_this_message">管理員%1$s已刪除此訊息</string>
     <!-- Dialog error message shown when user can\'t download a message from someone else due to a permanent failure (e.g., unable to decrypt), placeholder is other\'s name -->
@@ -481,7 +428,6 @@
     <!-- Accessibility text associated with image button to send an edited message. -->
     <string name="ConversationActivity_send_edit">發送已編輯訊息</string>
     <string name="ConversationActivity_compose_message">撰寫訊息</string>
-    <string name="ConversationActivity_sorry_there_was_an_error_setting_your_attachment">抱歉，無法成功設定你指定的附檔。</string>
     <!-- Toast shown when user is unable to find the recipient when sending a message -->
     <string name="ConversationActivity_recipient_is_not_a_valid_sms_or_email_address_exclamation">收件人並不是一個有效的簡訊或電子郵件地址！</string>
     <string name="ConversationActivity_message_is_empty_exclamation">訊息內容是空的！</string>
@@ -537,7 +483,6 @@
     <string name="ConversationActivity_signal_needs_the_camera_permission_to_take_photos_or_video">Signal 需要相機的權限來拍攝照片或是影片 ，但是現在系統設定為總是拒絕 Signal。請到 Signal 的應用程式設定中，點選「權限」，並啟用相機的權限。</string>
     <string name="ConversationActivity_signal_needs_camera_permissions_to_take_photos_or_video">Signal 需要使用相機的權限來拍攝照片和影片</string>
     <string name="ConversationActivity_enable_the_microphone_permission_to_capture_videos_with_sound">開啟麥克風權限以擷取帶有音效的影片。</string>
-    <string name="ConversationActivity_signal_needs_the_recording_permissions_to_capture_video">Signal需要麥克風權限才能錄製影片，但已被拒絕。 請繼續進行應用程式設定，選擇“權限”，然後啟用“麥克風”和“相機”。</string>
     <string name="ConversationActivity_signal_needs_recording_permissions_to_capture_video">Signal 需要麥克風權限以錄製影片。</string>
 
     <string name="ConversationActivity_quoted_contact_message">%1$s %2$s</string>
@@ -635,7 +580,7 @@
     <string name="ConversationFragment_delete">刪除</string>
     <!-- Dialog button for deleting one or more note-to-self messages on all linked devices. -->
     <string name="ConversationFragment_delete_everywhere">從所有裝置中刪除</string>
-    <string name="ConversationFragment_this_message_will_be_deleted_for_everyone_in_the_conversation">如果聊天中的每個人都使用最新版本的Signal，則該訊息將被刪除。 他們將能夠看到你刪除了一則訊息。</string>
+    <string name="ConversationFragment_this_message_will_be_deleted_for_everyone_in_the_conversation">此訊息將從聊天內所有人的裝置上刪除。他們將會看見你刪除了一則訊息。</string>
     <string name="ConversationFragment_quoted_message_not_found">無法找到原始訊息</string>
     <string name="ConversationFragment_quoted_message_no_longer_available">原始訊息已不存在</string>
     <string name="ConversationFragment_failed_to_open_message">開啟訊息失敗</string>
@@ -670,6 +615,8 @@
     <string name="ConversationFragment__update_build">更新 Signal</string>
     <!-- Action shown to allow a user to re-register as they are no longer registered -->
     <string name="ConversationFragment__reregister_signal">重新註冊 Signal</string>
+    <!-- Action shown in the conversation input area to allow a user to re-link this device as it is no longer linked -->
+    <string name="ConversationFragment__relink_signal">重新連結</string>
     <!-- Label for a button displayed in the conversation toolbar to return to the previous screen. -->
     <string name="ConversationFragment__content_description_back_button">導向返回。</string>
     <!-- Label for a button displayed in the conversation toolbar to open the main screen of the app. -->
@@ -707,7 +654,7 @@
     <!-- Description shown in the Signal release notes conversation header -->
     <string name="ConversationFragment_release_notes_description">Signal 官方及唯一版本的聊天。隨時了解最新消息和發行版本備註。</string>
     <!-- Label shown in place of the input in the Signal release notes conversation -->
-    <string name="ConversationFragment_the_only_official_chat_from_signal">The only official chat from Signal</string>
+    <string name="ConversationFragment_the_only_official_chat_from_signal">Signal 唯一的官方聊天室</string>
     <!-- Plural for group member count shown in conversation header. %1$d is the number of members -->
     <plurals name="ConversationFragment_group_member_count">
         <item quantity="other">%1$d 位成員</item>
@@ -718,6 +665,12 @@
     <string name="ConversationFragment_group_names">群組名稱</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">下載相片失敗。請再試一次。</string>
+    <!-- Title of the dialog shown when re-requesting an expired attachment from your primary device fails -->
+    <string name="ConversationFragment_attachment_backfill_failed_title">無法下載媒體</string>
+    <!-- Body of the dialog shown when your phone didn\'t respond to a request to re-send an expired attachment -->
+    <string name="ConversationFragment_attachment_backfill_timeout">檢查此裝置和手機的網絡連線。開啟手機上的 Signal，然後嘗試再次下載。</string>
+    <!-- Body of the dialog shown when your phone no longer has the attachment you tried to download -->
+    <string name="ConversationFragment_attachment_backfill_not_found">無法在你的手機上取得此媒體，也無法下載。</string>
     <!-- Dialog for how to long to keep a messaged pinned for -->
     <string name="ConversationFragment__keep_pinned">釘選時長…</string>
     <!-- Dialog option to keep message pin for 24 hours -->
@@ -804,14 +757,23 @@
     <!-- Notice on chat list when no unread chats are available, centered on display -->
     <string name="ConversationListFragment__no_unread_chats">沒有未讀聊天訊息</string>
     <plurals name="ConversationListFragment_delete_selected_conversations">
-        <item quantity="other">要刪除已選取的聊天嗎？</item>
+        <item quantity="other">要刪除訊息紀錄嗎？</item>
     </plurals>
+    <!-- Dialog message shown when deleting chats, none of which are groups -->
     <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations">
-        <item quantity="other">這將永久刪除共 %1$d 個選取的聊天。</item>
+        <item quantity="other">這些聊天內的全部訊息將被刪除。</item>
     </plurals>
-    <!-- Dialog message shown when deleting one to many conversations from the chat list and the user has a linked device -->
+    <!-- Dialog message shown when deleting chats, with at least one group -->
+    <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_group">
+        <item quantity="other">這些聊天內的全部訊息將被刪除。你仍會是尚未退出的任何群組的成員。</item>
+    </plurals>
+    <!-- Dialog message shown when deleting chats, none of which are groups, and the user has a linked device -->
     <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_linked_device">
-        <item quantity="other">這將從你所有裝置中永久刪除共 %1$d 則已選的聊天。</item>
+        <item quantity="other">這些聊天內的全部訊息將自你所有裝置中刪除。</item>
+    </plurals>
+    <!-- Dialog message shown when deleting chats with at least one group, and the user has a linked device -->
+    <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_linked_device_group">
+        <item quantity="other">這些聊天內的全部訊息將自你所有裝置中刪除。你仍會是尚未退出的任何群組的成員。</item>
     </plurals>
     <string name="ConversationListFragment_deleting">正在刪除</string>
     <plurals name="ConversationListFragment_deleting_selected_conversations">
@@ -1008,7 +970,6 @@
     <string name="CustomDefaultPreference_none">無</string>
 
     <!-- AvatarSelectionBottomSheetDialogFragment -->
-    <string name="AvatarSelectionBottomSheetDialogFragment__taking_a_photo_requires_the_camera_permission">拍照需要相機權限。</string>
     <string name="AvatarSelectionBottomSheetDialogFragment__viewing_your_gallery_requires_the_storage_permission">查看你的照片庫需要儲存權限。</string>
 
     <!-- DateUtils -->
@@ -1080,13 +1041,13 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">在桌面電腦或 iPad 上使用此 Signal 帳戶。</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">在其他裝置上使用此 Signal 帳戶。</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">連結新的裝置</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
     <string name="LinkDeviceFragment__messages_and_chat_info_are_protected">%1$s所有裝置上的訊息和聊天資訊均受端對端加密的保護</string>
     <!-- Bottom sheet title explaining how Signal works on a linked device -->
-    <string name="LinkDeviceFragment__signal_on_desktop_ipad">在桌面電腦或 iPad 上的 Signal</string>
+    <string name="LinkDeviceFragment__signal_on_desktop_ipad">在已連結裝置上的 Signal</string>
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">所有在已連結裝置上的訊息均為私密</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
@@ -1152,6 +1113,8 @@
     <string name="LinkDeviceFragment__edit_name">編輯名稱</string>
     <!-- Toast shown when the process of linking a device has been cancelled -->
     <string name="LinkDeviceFragment__linking_cancelled">連結已取消</string>
+    <!-- Snackbar shown when the user tries to link a new device but has already reached the maximum number of linked devices. Placeholder is the maximum count. -->
+    <string name="LinkDeviceFragment__you_can_only_have_d_linked_devices">你最多只能有 %1$d 個已連結裝置。</string>
     <!-- Message shown in progress dialog telling users to avoid closing the app while messages are being synced -->
     <string name="LinkDeviceFragment__do_not_close">請勿關閉應用程式</string>
     <!-- Dialog title shown when a device is unlinked -->
@@ -1198,6 +1161,8 @@
     <string name="AddLinkDeviceFragment__this_qr_code_not_valid">這個 QR 碼無效。請確定您正在掃描要連接的裝置上顯示的QR碼。</string>
     <!-- Button in dialog to retry linking a device with a qr code -->
     <string name="AddLinkDeviceFragment__retry">重試</string>
+    <!-- Text shown in a dialog when the device being linked is too out-of-date to be linked to this account -->
+    <string name="AddLinkDeviceFragment__the_device_you_are_trying_to_link_is_out_of_date">嘗試連結的裝置已過時。請升級並重試。</string>
 
     <!-- LinkDeviceSyncBottomSheet -->
     <!-- Option in bottom sheet to transfer message history -->
@@ -1257,10 +1222,6 @@
         <item quantity="other">%1$d 個待處理的成員要求。</item>
     </plurals>
     <string name="PendingGroupJoinRequestsReminder_view">檢視</string>
-
-    <!-- GcmRefreshJob -->
-    <string name="GcmRefreshJob_Permanent_Signal_communication_failure">Signal 持續發生傳輸異常！</string>
-    <string name="GcmRefreshJob_Signal_was_unable_to_register_with_Google_Play_Services">Signal 無法順利與 Google Play Services 註冊，Signal 訊息與通話已經停用，請嘗試在設定 &gt; 進階中重新註冊。</string>
 
 
     <!-- GiphyActivity -->
@@ -1473,6 +1434,12 @@
     <string name="AddGroupDetailsFragment__remove">移除</string>
     <string name="AddGroupDetailsFragment__sms_contact">短訊聯絡人</string>
     <string name="AddGroupDetailsFragment__remove_s_from_this_group">從此群組移除%1$s嗎？</string>
+    <!-- Title of the dialog shown when tapping an existing group while creating a new group, confirming the user wants to leave and discard their in-progress group -->
+    <string name="AddGroupDetailsFragment__discard_group">要捨棄群組嗎？</string>
+    <!-- Body of the dialog shown when tapping an existing group while creating a new group. Placeholder is the name of the group being navigated to. -->
+    <string name="AddGroupDetailsFragment__if_you_continue_to_the_group_s_your_changes_wont_be_saved">若你繼續前往「%1$s」群組，你的變更將不會被儲存。</string>
+    <!-- Label for the button that confirms discarding the in-progress group and navigating to an existing group -->
+    <string name="AddGroupDetailsFragment__discard">放棄</string>
     <!-- Info message shown in the middle of the screen, displayed when adding group details to an MMS Group -->
     <string name="AddGroupDetailsFragment__youve_selected_a_contact_that_doesnt_support">你選取的聯絡人無法使用 Signal 群組，因此本群組將採用多媒體訊息模式。只有你能查看自訂多媒體訊息的群組名稱及相片。</string>
     <!-- Info message shown in the middle of the screen, displayed when adding group details to an MMS Group after SMS Phase 0 -->
@@ -1562,12 +1529,6 @@
     <string name="RestoreActivity__no_longer_registered_title">此裝置已取消註冊</string>
     <!-- Dialog message -->
     <string name="RestoreActivity__no_longer_registered_message">通常是因為你已在另一部裝置上註冊了你的 Signal 帳戶。</string>
-
-    <!-- GroupMentionSettingDialog -->
-    <string name="GroupMentionSettingDialog_notify_me_for_mentions">通知我提及。</string>
-    <string name="GroupMentionSettingDialog_receive_notifications_when_youre_mentioned_in_muted_chats">在靜音聊天中提及你時收到通知嗎？</string>
-    <string name="GroupMentionSettingDialog_always_notify_me">總是通知我</string>
-    <string name="GroupMentionSettingDialog_dont_notify_me">不要通知我</string>
 
     <!-- ManageProfileFragment -->
     <!-- Explanation text about usernames etc displayed underneath buttons to view and edit username etc -->
@@ -1859,9 +1820,6 @@
 
     <!-- MediaPickerActivity -->
     <string name="MediaPickerActivity__menu_open_camera">開啟相機</string>
-
-    <!-- MediaSendActivity -->
-    <string name="MediaSendActivity_camera_unavailable">相機無法使用。</string>
 
     <!-- MediaRepository -->
     <string name="MediaRepository_all_media">全部媒體</string>
@@ -2617,6 +2575,10 @@
     <string name="CallOverflowPopupWindow__lower_hand">放下</string>
     <!-- A negative button for a dialog confirming the user wants to lower their hand (withdraw a raised hand) -->
     <string name="CallOverflowPopupWindow__cancel">取消</string>
+    <!-- A clickable button to share your screen in a call -->
+    <string name="CallOverflowPopupWindow__share_screen">分享畫面</string>
+    <!-- A clickable button to stop sharing your screen in a call -->
+    <string name="CallOverflowPopupWindow__stop_screen_share">停止分享</string>
     <!-- A button to take you to a list of participants with raised hands -->
     <string name="CallOverflowPopupWindow__view">檢視</string>
 
@@ -2731,6 +2693,8 @@
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">滑動即可查看螢幕畫面共享</string>
+    <!-- Hint shown to teach the user they can swipe between the grid view and the active speaker view -->
+    <string name="CallToastPopupWindow__swipe_to_view_speaker">輕掃以檢視揚聲器</string>
 
     <!-- ProxyBottomSheetFragment -->
     <string name="ProxyBottomSheetFragment_proxy_server">代理伺服器</string>
@@ -2825,13 +2789,6 @@
     <!--    A clickable piece of text that will pre-fill a request for support email in the user\'s email app.-->
     <string name="RegistrationActivity_support_bottom_sheet_cta_contact_support_substring">聯絡支援</string>
 
-    <!-- RegistrationLockV2Dialog -->
-    <string name="RegistrationLockV2Dialog_turn_on_registration_lock">開啟註冊鎖？</string>
-    <string name="RegistrationLockV2Dialog_turn_off_registration_lock">關閉註冊鎖？</string>
-    <string name="RegistrationLockV2Dialog_if_you_forget_your_signal_pin_when_registering_again">如果你再次註冊 Signal 時忘記了你的 Signal PIN 碼，你的帳號將會被暫時鎖定 7 天。</string>
-    <string name="RegistrationLockV2Dialog_turn_on">開啟</string>
-    <string name="RegistrationLockV2Dialog_turn_off">關閉</string>
-
     <!-- RevealableMessageView -->
     <string name="RevealableMessageView_view_photo">查看照片</string>
     <string name="RevealableMessageView_view_video">觀賞影片</string>
@@ -2846,6 +2803,8 @@
 
     <!-- Search -->
     <string name="SearchFragment_no_results">沒有找到「%1$s」的結果</string>
+    <!-- Text shown when no search results are found.   -->
+    <string name="SearchFragment_no_results_empty">未找到結果</string>
 
     <!-- ShakeToReport -->
   <!-- Removed by excludeNonTranslatables <string name="ShakeToReport_shake_detected" translatable="false">Shake detected</string> -->
@@ -3007,6 +2966,10 @@
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_info" translatable="false">Info</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_warning" translatable="false">Warn</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_error" translatable="false">Error</string> -->
+    <!-- Title of dialog shown when debug log prefix generation is unusually slow -->
+  <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_slow_log_title" translatable="false">Slow log generation</string> -->
+    <!-- Body of dialog shown when debug log prefix generation is unusually slow. %1$d is duration in seconds. -->
+  <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_slow_log_message" translatable="false">Generating the debug log header took %1$d seconds. We should figure out what\&apos;s slowing things down.</string> -->
 
     <!-- SupportEmailUtil -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_support_email" translatable="false">support@signal.org</string> -->
@@ -3019,6 +2982,7 @@
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_locale" translatable="false">Locale:</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_challenge_received" translatable="false">Challenge Received:</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_registered" translatable="false">Registered:</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_backups" translatable="false">Backups:</string> -->
 
     <!-- ThreadRecord -->
     <string name="ThreadRecord_group_updated">群組已更新</string>
@@ -3189,7 +3153,7 @@
     <!-- Title for a dialog where a user chooses how long they\'d like to mute notifications for -->
     <string name="MuteDialog_mute_notifications">靜音通知</string>
     <!-- Dialog option that, when pressed, will open a time picker to let the user choose how long they\'d like to mute notifications for -->
-    <string name="MuteDialog__mute_until">保持靜音直至…</string>
+    <string name="MuteDialog__mute_until">直到…</string>
 
     <!-- MuteUntilTimePickerBottomSheet -->
     <!-- Title for a dialog where a user chooses how long they\'d like to mute notifications for -->
@@ -3297,6 +3261,8 @@
     <string name="NotificationChannel_calls">通話</string>
     <!-- Notification channel name for notifications involving failures of some sort (eg donations, message sends, etc.) -->
     <string name="NotificationChannel_failures">失敗</string>
+    <!-- Notification channel name for internal-only app issue notifications. Only ever shown to internal users. -->
+    <string name="NotificationChannel_internal_issues">內部問題</string>
     <string name="NotificationChannel_backups">備份</string>
     <string name="NotificationChannel_locked_status">鎖定狀態</string>
     <string name="NotificationChannel_app_updates">應用程式更新</string>
@@ -3358,11 +3324,11 @@
     <!-- Dialog title shown when attempting to save media that has been offloaded from the device by the storage optimization feature. -->
     <string name="AttachmentSaver__cant_save_media">無法儲存媒體</string>
     <!-- Dialog message explaining that media cannot be saved because it has been offloaded from the device by the storage optimization feature. -->
-    <string name="AttachmentSaver__media_offloaded_message">由於裝置開啟了「最佳化裝置儲存空間」功能，此媒體已從裝置中卸載。你可以逐一下載項目，或關閉「最佳化裝置儲存空間」功能，將所有媒體下載至你的裝置。</string>
+    <string name="AttachmentSaver__media_offloaded_message">由於裝置開啟了「最佳化 Signal 儲存空間」功能，此媒體已從裝置中卸載。你可以逐一下載項目，或關閉「最佳化 Signal 儲存空間」功能，將所有媒體下載至你的裝置。</string>
     <!-- Dialog title shown when attempting to save multiple media items, some of which have been offloaded from the device by the storage optimization feature. -->
     <string name="AttachmentSaver__cant_save_all_items">無法儲存全部項目</string>
     <!-- Dialog message explaining that some selected media cannot be saved because it has been offloaded from the device by the storage optimization feature. -->
-    <string name="AttachmentSaver__some_media_offloaded_message">由於裝置開啟了「最佳化裝置儲存空間」功能，你所選的部分媒體已從裝置中卸載。你可以逐一儲存項目，或關閉「最佳化裝置儲存空間」功能，將所有媒體下載至你的裝置。</string>
+    <string name="AttachmentSaver__some_media_offloaded_message">由於裝置開啟了「最佳化 Signal 儲存空間」功能，你所選的部分媒體已從裝置中卸載。你可以逐一儲存項目，或關閉「最佳化 Signal 儲存空間」功能，將所有媒體下載至你的裝置。</string>
     <!-- Button label in the offloaded media dialog that navigates to the storage settings screen. -->
     <string name="AttachmentSaver__view_storage_settings">檢視儲存空間設定</string>
 
@@ -3420,12 +3386,20 @@
     <string name="TransferControlView__processing">正在處理…</string>
     <!-- Status update label used while the device is transmitting data over the network. Will take the form of "1.0 MB/2.0 MB" -->
     <string name="TransferControlView__download_progress_s_s">%1$s/%2$s</string>
+    <!-- Accessibility description for the button that starts downloading an attachment -->
+    <string name="TransferControlView__download">下載</string>
+    <!-- Accessibility description for the button that starts uploading an attachment -->
+    <string name="TransferControlView__upload">上傳</string>
 
     <!-- UnauthorizedReminder -->
     <!-- Message shown in a reminder banner when the user\'s device is no longer registered -->
     <string name="UnauthorizedReminder_this_is_likely_because_you_registered_your_phone_number_with_Signal_on_a_different_device">此裝置已不再註冊。通常是因為你已在另一部裝置上使用你的電話號碼註冊 Signal。</string>
     <!-- Action in reminder banner that will take user to re-register -->
     <string name="UnauthorizedReminder_reregister_action">重新註冊裝置</string>
+    <!-- Message shown in a reminder banner when this linked device is no longer linked to a primary device -->
+    <string name="UnauthorizedReminder_this_device_is_no_longer_linked_relink_to_continue_messaging">此裝置已解除連結。請將 Signal 與你的電話重新連結，以便繼續收發訊息。</string>
+    <!-- Action in reminder banner that will take the user to re-link this device -->
+    <string name="UnauthorizedReminder_relink_action">重新連結裝置</string>
 
     <!-- Push notification when the app is forcibly logged out by the server. -->
     <string name="LoggedOutNotification_you_have_been_logged_out">你已登出此裝置的 Signal 應用程式。</string>
@@ -3886,11 +3860,11 @@
     <!-- Bottom sheet title when encryption is auto-verified -->
     <string name="EncryptionVerifiedSheet__title_success">系統已對此聊天進行自動加密驗證</string>
     <!-- Bottom sheet body when encryption is auto-verified -->
-    <string name="EncryptionVerifiedSheet__body_success">對於透過電話號碼建立聯繫的聯絡人，Signal 會透過稱為「金鑰透明度」的程序，自動確認聯絡對象是否安全。為了增加安全性，透過比較上一個畫面的數字或掃瞄對方裝置上的二維碼來手動驗證端對端加密。</string>
+    <string name="EncryptionVerifiedSheet__body_success">對於透過電話號碼建立聯繫的人，Signal 會透過稱為「金鑰透明度」的程序，自動確認聯絡對象是否安全。為了增加安全性，透過比較上一個畫面的數字或掃瞄對方裝置上的二維碼來手動驗證端對端加密。</string>
     <!-- Bottom sheet title when encryption is no longer auto-verified -->
-    <string name="EncryptionVerifiedSheet__title_no_longer_unavailable">自動驗證功能已不適用於此聊天</string>
+    <string name="EncryptionVerifiedSheet__title_no_longer_unavailable">自動驗證功能不適用於此聊天</string>
     <!-- Bottom sheet body when encryption is no longer auto-verified. Placeholder is the name of the person. -->
-    <string name="EncryptionVerifiedSheet__body_no_longer_unavailable">Signal 無法再自動驗證此聊天的加密。這很可能是因為 %1$s 已變更電話號碼。透過比較上一個畫面的數字，或掃瞄對方裝置上的二維碼來手動驗證端對端加密。</string>
+    <string name="EncryptionVerifiedSheet__body_no_longer_unavailable">Signal 無法自動驗證此聊天的加密。這可能是因為 %1$s 已變更電話號碼，或是調整了電話號碼的隱私設定。透過比較上一個畫面的數字，或掃瞄對方裝置上的二維碼來手動驗證端對端加密。</string>
     <!-- Bottom sheet title when encryption cannot be auto-verified -->
     <string name="EncryptionVerifiedSheet__title_unavailable">自動驗證功能不適用於此聊天</string>
     <!-- Bottom sheet body when encryption cannot be auto-verified -->
@@ -3982,6 +3956,10 @@
   <!-- Removed by excludeNonTranslatables <string name="HelpFragment__debug_log" translatable="false">Debug Log:</string> -->
     <string name="HelpFragment__could_not_upload_logs">無法上傳記錄檔</string>
     <string name="HelpFragment__please_be_as_descriptive_as_possible">請盡可能描述一下，以幫助我們理解該問題。</string>
+    <!-- Error shown under the "tell us what\'s going on" field when the entered description is shorter than the required minimum length. The placeholder is the minimum number of characters. -->
+    <plurals name="HelpFragment__must_be_at_least_n_characters">
+        <item quantity="other">必須至少為 %1$d 個字元</item>
+    </plurals>
     <string-array name="HelpFragment__categories_6">
         <item>請選擇一個選項</item>
         <item>系統運作異常</item>
@@ -4004,15 +3982,6 @@
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recents">最近使用</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__this_message">這個訊息</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recently_used">最近使用的</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__smileys_and_people">笑臉 &amp; 人們</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__nature">自然</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__food">食物</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__activities">活動</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__places">地方</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__objects">物品</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__symbols">符號</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__flags">旗幟</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__emoticons">表情符號</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__no_results_found">未找到結果</string>
 
     <!-- GifQuickSearchOption -->
@@ -4030,10 +3999,10 @@
     <string name="arrays__use_default">使用預設</string>
     <string name="arrays__use_custom">使用自訂</string>
 
-    <string name="arrays__mute_for_one_hour">靜音 1 小時</string>
-    <string name="arrays__mute_for_eight_hours">靜音 8 小時</string>
-    <string name="arrays__mute_for_one_day">靜音 1 天</string>
-    <string name="arrays__mute_for_seven_days">靜音 7 天</string>
+    <string name="arrays__mute_for_one_hour">1 小時</string>
+    <string name="arrays__mute_for_eight_hours">8 小時</string>
+    <string name="arrays__mute_for_one_day">1 天</string>
+    <string name="arrays__mute_for_seven_days">1 週</string>
     <string name="arrays__always">永遠</string>
 
     <string name="arrays__settings_default">預設設定</string>
@@ -4087,6 +4056,10 @@
     <!-- Legacy preference menu item to choose the interval of inactivity before lockout -->
     <string name="preferences__inactivity_timeout_interval">不活躍時間間隔</string>
     <string name="preferences__notifications">通知</string>
+    <!-- Preference item menu to enable notifications -->
+    <string name="preferences__enable_notifications">啟動通知</string>
+    <!-- Preference header for call notifications -->
+    <string name="preferences__call_notifications">來電通知</string>
     <string name="preferences__led_color">LED 色彩</string>
     <string name="preferences__led_color_unknown">未知</string>
     <string name="preferences__pref_led_blink_title">LED 閃爍模式</string>
@@ -4174,12 +4147,10 @@
     <string name="preferences__system_default">系統預設</string>
     <string name="preferences__language">語言選項</string>
     <string name="preferences__signal_messages_and_calls">Signal 訊息與通話</string>
-    <string name="preferences__advanced_pin_settings">進階 PIN 碼設定</string>
     <!-- Title of toolbar for the advanced pin settings screen -->
     <string name="preferences__advanced_pin_settings_title">進階 PIN 碼設定</string>
     <string name="preferences__free_private_messages_and_calls">免費加密訊息與通話至 Signal 使用者</string>
     <string name="preferences__submit_debug_log">送出偵錯日誌</string>
-    <string name="preferences__delete_account">刪除帳號</string>
     <string name="preferences__support_wifi_calling">\"WiFi 呼叫\"相容模式</string>
     <string name="preferences__enable_if_your_device_supports_sms_mms_delivery_over_wifi">如果您的裝置使用 WiFi 傳送簡訊或多媒體訊息，請啟用此選項 (僅當\"WiFi 語音呼叫\"在您的裝置上啟用的時候才可用)</string>
     <string name="preferences__incognito_keyboard">隱私鍵盤</string>
@@ -4241,9 +4212,19 @@
     <string name="preferences_data_and_storage__never">永不</string>
     <string name="preferences_data_and_storage__wifi_and_mobile_data">WiFi 與行動網路</string>
     <string name="preferences_data_and_storage__mobile_data_only">僅限行動網路</string>
-    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">使用較少的數據可能改善不良網路上的通話</string>
+    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">使用較少的數據可能會改善不良網路上的通話。</string>
     <string name="preferences_notifications__in_chat_sounds">聊天音效</string>
     <string name="preferences_notifications__show">顯示</string>
+    <!-- Preference item to set notification settings when chats are muted -->
+    <string name="preferences_notifications__while_muted">靜音時</string>
+    <!-- Option in settings to turn on reaction notifications -->
+    <string name="preferences_notifications__reaction">心情回應通知</string>
+    <!-- Body option in settings to turn on reaction notifications    -->
+    <string name="preferences_notifications__notify_reaction">顯示你所發訊息的心情回應通知</string>
+    <!-- Option in settings to turn on unread reminders -->
+    <string name="preferences_notifications__unread">未讀提示</string>
+    <!-- Body option to turn on unread reminders -->
+    <string name="preferences_notifications__notify_unread">當靜音聊天中有未讀訊息時偶爾通知</string>
     <string name="preferences_notifications__ringtone">鈴聲</string>
     <string name="preferences_chats__message_text_size">訊息字體大小</string>
     <!-- Option in settings that will provide a shortcut to notification system settings to control the priority of Signal notifications -->
@@ -4767,8 +4748,6 @@
     <string name="RegistrationLockFragment__enter_the_pin_you_created">輸入你為帳戶建立的 PIN 碼。 這與你的簡訊驗證碼不同。</string>
     <!-- Info text shown above a pin entry text box describing what pin they should be entering. -->
     <string name="RegistrationLockFragment__enter_the_pin_you_created_for_your_account">輸入你為帳戶建立的 PIN 碼。</string>
-    <!-- Button label to prompt the user to switch between an alphanumeric and numeric-only keyboards -->
-    <string name="RegistrationLockFragment__switch_keyboard">切換鍵盤</string>
     <string name="RegistrationLockFragment__incorrect_pin_try_again">不正確的PIN碼。請再試一次。</string>
     <string name="RegistrationLockFragment__forgot_pin">忘記 PIN 碼？</string>
     <string name="RegistrationLockFragment__incorrect_pin">錯誤的 PIN 碼</string>
@@ -4841,8 +4820,6 @@
     <!-- Text label button to skip restoring -->
     <string name="registration_activity__skip_restore">跳過還原</string>
     <string name="preferences_chats__chat_backups">聊天備份</string>
-    <string name="preferences_chats__transfer_account">轉移帳號</string>
-    <string name="preferences_chats__transfer_account_to_a_new_android_device">將帳號轉移到新的Android裝置</string>
     <!-- Title for dialog to enter in the backup passphrase -->
     <string name="RegistrationActivity_enter_backup_passphrase">輸入備份密碼</string>
     <string name="RegistrationActivity_restore">還原</string>
@@ -4930,19 +4907,9 @@
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">螢幕鎖定閒置逾時</string>
     <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
     <string name="preferences_app_protection__to_use_screen_lock">若要使用螢幕鎖定，請在此裝置上設定 PIN 碼、圖案或密碼。</string>
-    <string name="preferences_app_protection__signal_pin">Signal PIN 碼</string>
-    <string name="preferences_app_protection__create_a_pin">建立 PIN 碼</string>
-    <string name="preferences_app_protection__change_your_pin">變更你的 PIN 碼</string>
-    <string name="preferences_app_protection__pin_reminders">PIN 碼提示器</string>
-    <string name="preferences_app_protection__turn_off">關閉</string>
-    <string name="preferences_app_protection__confirm_pin">確認 PIN 碼</string>
-    <string name="preferences_app_protection__confirm_your_signal_pin">確認你的 Signal PIN 碼</string>
-    <string name="preferences_app_protection__make_sure_you_memorize_or_securely_store_your_pin">確保你記住或安全地儲存了PIN碼，因為它無法回復。 如果你忘記了PIN碼，則在重新註冊Signal帳號時可能會遺失資料。</string>
-    <string name="preferences_app_protection__incorrect_pin_try_again">PIN 碼不正確。請再試一次。</string>
     <string name="preferences_app_protection__failed_to_enable_registration_lock">無法啟用註冊鎖。</string>
     <string name="preferences_app_protection__failed_to_disable_registration_lock">無法停用註冊鎖。</string>
     <string name="AppProtectionPreferenceFragment_none">無</string>
-    <string name="preferences_app_protection__registration_lock">註冊鎖定</string>
     <string name="RegistrationActivity_you_must_enter_your_registration_lock_PIN">你必須輸入你的註冊鎖定 PIN 碼</string>
     <string name="RegistrationActivity_your_pin_has_at_least_d_digits_or_characters">你的PIN碼至少要%1$d個字元或字母</string>
     <string name="RegistrationActivity_too_many_attempts">您已重複嘗試太多次</string>
@@ -4990,22 +4957,34 @@
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">刪除帳戶</string>
 
-    <!-- Option in settings that will take use to re-register if they are no longer registered -->
-    <string name="preferences_account_reregister">重新註冊帳戶</string>
-    <!-- Option in settings that will take user to our website or playstore to update their expired build -->
-    <string name="preferences_account_update_signal">更新 Signal</string>
-    <!-- Option in settings shown when user is no longer registered or expired client that will WIPE ALL THEIR DATA -->
-    <string name="preferences_account_delete_all_data">刪除所有資料</string>
-    <!-- Title for confirmation dialog confirming user wants to delete all their data -->
-    <string name="preferences_account_delete_all_data_confirmation_title">刪除所有資料？</string>
-    <!-- Message in confirmation dialog to delete all data explaining how it works, and that the app will be closed after deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_message">這將會重設應用程式並刪除所有訊息。完成處理後，應用程式將會關閉。</string>
-    <!-- Confirmation action to proceed with application data deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_proceed">繼續</string>
-    <!-- Confirmation action to cancel application data deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_cancel">取消</string>
     <!-- Error message shown when we fail to delete the data for some unknown reason -->
     <string name="preferences_account_delete_all_data_failed">刪除資料失敗</string>
+
+    <!-- LinkedDeviceAccountSettingsFragment -->
+    <!-- Title of an informational card shown on the account settings screen of a linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_is_a_linked_device">這是已連結裝置</string>
+    <!-- Body of an informational card explaining that account settings must be managed from the primary device -->
+    <string name="LinkedDeviceAccountSettingsFragment__to_manage_your_account_settings">若要管理你的帳戶設定，請在主要裝置上開啟 Signal。</string>
+    <!-- Title of a settings row that deletes all Signal data from this linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__delete_app_data">刪除應用程式資料</string>
+    <!-- Subtitle of the delete app data row explaining what it does -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_will_remove_all_data">這將移除此裝置上 Signal 應用程式中的所有資料。</string>
+    <!-- Title of the confirmation dialog shown when deleting app data from a linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__delete_app_data_question">要刪除應用程式資料嗎？</string>
+    <!-- Message of the confirmation dialog explaining that only this device\'s data is deleted, not the account -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_will_delete_all_data_and_messages">這將刪除此裝置上 Signal 應用程式中的所有資料和訊息。你的 Signal 帳戶和主要裝置或其他已連結裝置上的資料將不會被刪除。完成處理後，應用程式將會關閉。</string>
+
+    <!-- LinkedDeviceAccountLearnMoreBottomSheet -->
+    <!-- Emphasized lead-in phrase shown in bold at the start of the learn more sheet body. Must appear verbatim within LinkedDeviceAccountLearnMoreBottomSheet__linked_devices_let_you_access. -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__linked_devices">已連結的裝置</string>
+    <!-- Body text of the linked devices learn more sheet. The leading \"Linked Devices\" is shown in bold. -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__linked_devices_let_you_access">「已連結裝置」讓你在任何其他裝置上安全地存取你的 Signal 帳戶和訊息。</string>
+    <!-- Bullet point describing what devices can be linked -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__you_can_link_a_desktop">你可以連結桌面電腦、平板電腦或其他手機</string>
+    <!-- Bullet point describing that the primary device manages linked devices -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__your_primary_device_manages">你的主要裝置負責管理已連結的裝置，最多可連結 5 個裝置。</string>
+    <!-- Bullet point describing that some settings are only available on the primary device -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__some_account_settings">部分帳戶設定僅能在主要裝置上進行管理，包括帳戶設定和備份。</string>
 
     <!-- TransferOrRestoreFragment -->
     <string name="TransferOrRestoreFragment__transfer_or_restore_account">轉移或還原帳戶</string>
@@ -5492,18 +5471,6 @@
     <!-- GroupDescriptionDialog -->
     <string name="GroupDescriptionDialog__group_description">群組描述</string>
 
-    <!-- QualitySelectorBottomSheetDialog -->
-    <!-- Label for our standard quality media conversion. -->
-    <string name="QualitySelectorBottomSheetDialog__standard">標準</string>
-    <!-- Description for our standard quality media conversion. -->
-    <string name="QualitySelectorBottomSheetDialog__faster_less_data">更快，更少數據</string>
-    <!-- Label for our high quality media conversion. This has better quality than standard. -->
-    <string name="QualitySelectorBottomSheetDialog__high">高</string>
-    <!-- Label for our high quality media conversion. This has better quality than standard. -->
-    <string name="QualitySelectorBottomSheetDialog__slower_more_data">較慢，數據更多</string>
-    <!-- Title heading for our media conversion quality selector. -->
-    <string name="QualitySelectorBottomSheetDialog__media_quality">媒體檔品質</string>
-
     <!-- AppSettingsFragment -->
     <!-- String alerting user that something is wrong with their backups subscription -->
     <string name="AppSettingsFragment__renew_your_signal_backups_subscription">為你的「Signal 安全備份」定期贊助續期</string>
@@ -5521,14 +5488,6 @@
     <string name="AppSettingsFragment__copied_backups_subscriber_id_to_clipboard">備份訂戶識別碼已複製至剪貼簿</string>
     <!-- String displayed in a toast when a subscriber id is not present for a given type -->
     <string name="AppSettingsFragment__no_subscriber_id_set">未設定訂戶識別碼</string>
-
-    <!-- AccountSettingsFragment -->
-    <string name="AccountSettingsFragment__account">帳號</string>
-    <string name="AccountSettingsFragment__youll_be_asked_less_frequently">詢問您的次數將會隨著時間減少</string>
-    <string name="AccountSettingsFragment__require_your_signal_pin">要求你的 Signal PIN 碼才能在 Signal 再次註冊你的電話號碼</string>
-    <string name="AccountSettingsFragment__change_phone_number">變更電話號碼</string>
-    <!-- Account setting that allows user to request and export their signal account data -->
-    <string name="AccountSettingsFragment__request_account_data">你的帳戶資料</string>
 
     <!-- ExportAccountDataFragment -->
     <!-- Part of requesting account data flow, this is the section title for requesting that account data -->
@@ -5578,6 +5537,29 @@
     <string name="ChangeNumber__your_phone_number_has_changed_to_s">你的電話號碼已被變更為 %1$s</string>
     <!-- Confirmation button to dismiss number changed dialog -->
     <string name="ChangeNumber__okay">好的</string>
+
+    <!-- ChangeNumberPostRegistrationWaitSheet: title of the sheet shown when the user tries to change number too soon after registering -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__title">無法變更號碼</string>
+    <!-- ChangeNumberPostRegistrationWaitSheet: explanation body shown above the wait-time line -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__body">由於你剛註冊此帳戶，目前無法變更電話號碼。稍候片刻有助保護你的帳戶安全。</string>
+    <!-- ChangeNumberPostRegistrationWaitSheet: remaining-wait line when wait is one hour or more, %1$d is the number of hours, rounded up -->
+    <plurals name="ChangeNumberPostRegistrationWaitSheet__try_again_in_hours">
+        <item quantity="other">請於 %1$d 小時後重試。</item>
+    </plurals>
+    <!-- ChangeNumberPostRegistrationWaitSheet: remaining-wait line when wait is under one hour, %1$d is the number of minutes, rounded up -->
+    <plurals name="ChangeNumberPostRegistrationWaitSheet__try_again_in_minutes">
+        <item quantity="other">請於 %1$d 分鐘後重試。</item>
+    </plurals>
+    <!-- ChangeNumberPostRegistrationWaitSheet: dismiss button -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__ok">確定</string>
+    <!-- ChangeNumberEnterCodeFragment: rate-limit dialog message when retry-after is one hour or more, %1$d is hours rounded up -->
+    <plurals name="ChangeNumberEnterCodeFragment__too_many_attempts_try_again_in_hours">
+        <item quantity="other">你已嘗試多次。請於 %1$d 小時後再試。</item>
+    </plurals>
+    <!-- ChangeNumberEnterCodeFragment: rate-limit dialog message when retry-after is under one hour, %1$d is minutes rounded up -->
+    <plurals name="ChangeNumberEnterCodeFragment__too_many_attempts_try_again_in_minutes">
+        <item quantity="other">你已嘗試多次。請於 %1$d 分鐘後再試。</item>
+    </plurals>
 
     <!-- ChangeNumberEnterPhoneNumberFragment -->
     <string name="ChangeNumberEnterPhoneNumberFragment__change_number">更改號碼</string>
@@ -5792,14 +5774,48 @@
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">訊息</string>
     <string name="NotificationsSettingsFragment__calls">通話</string>
-    <string name="NotificationsSettingsFragment__notify_when">發生以下事件時通知你</string>
+    <!-- Notification header for sounds -->
+    <string name="NotificationsSettingsFragment__sounds">音效</string>
     <string name="NotificationsSettingsFragment__contact_joins_signal">聯絡人加入 Signal</string>
+    <!-- Notification body to get notified when someone joins Signal -->
+    <string name="NotificationsSettingsFragment__notify_contact">當手機通訊錄中的聯絡人加入 Signal 時顯示通知</string>
+    <!-- Option to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset">重設通知設定</string>
+    <!-- Option body to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset_notifications">將通知設定重設為預設值，包括聊天的自訂設定</string>
+    <!-- Dialog to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset_body">要為所有聊天的通知設定重設為預設值嗎？</string>
+    <!-- Confirmation button to reset dialog -->
+    <string name="NotificationsSettingsFragment__reset_confirm">重設</string>
     <!-- Notification preference header -->
     <string name="NotificationsSettingsFragment__notification_profiles">通知描述</string>
     <!-- Notification preference option header -->
     <string name="NotificationsSettingsFragment__profiles">描述</string>
     <!-- Notification preference summary text -->
     <string name="NotificationsSettingsFragment__create_a_profile_to_receive_notifications_only_from_people_and_groups_you_choose">建立描述以僅接收來自你選擇的人和群組的通知。</string>
+
+    <!-- Header to describe screen that shows while muted settings -->
+    <string name="MutedNotificationsFragment__while">靜音時</string>
+    <!-- Title for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls">通話</string>
+    <!-- Description for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls_body_global">當靜音聊天中開始通話時響鈴或發送通知。</string>
+    <!-- Title for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions">提及</string>
+    <!-- Description for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions_body_global">當靜音聊天中有人提及你時發送通知。</string>
+    <!-- Title for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies">回覆</string>
+    <!-- Description for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies_body_global">當靜音聊天中有人回覆你的訊息時發送通知。</string>
+    <!-- Description for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls_body">當此聊天設為靜音時，若開始通話，系統會響鈴或發送通知。</string>
+    <!-- Description for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions_body">當此聊天設為靜音時，若你被提及，系統會發送通知。</string>
+    <!-- Description for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies_body">當此聊天設為靜音時，若有人回覆你的訊息，系統會發送通知。</string>
+    <!-- Description for toggle row to control unread reminders while muted -->
+    <string name="MutedNotificationsFragment__unread_body">Occasionally notify when there are unread messages while this chat is muted.</string>
 
     <!-- NotificationProfilesFragment -->
     <!-- Title for notification profiles screen that shows all existing profiles; Title with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -5862,6 +5878,8 @@
     <string name="HelpSettingsFragment__support_center">支援中心</string>
     <string name="HelpSettingsFragment__contact_us">與我們聯繫</string>
     <string name="HelpSettingsFragment__version">版本</string>
+    <!-- Displayed when copying help screen text to the clipboard -->
+    <string name="HelpSettingsFragment__copied_to_clipboard">已複製到剪貼簿</string>
     <string name="HelpSettingsFragment__debug_log">除錯紀錄</string>
     <!--    Header for the screen that displays the licenses of the open-source software dependencies of the Signal app-->
     <string name="HelpSettingsFragment__licenses">許可證</string>
@@ -5877,12 +5895,14 @@
     <string name="DataAndStorageSettingsFragment__sent_media_quality">已傳送媒體檔品質</string>
     <string name="DataAndStorageSettingsFragment__sending_high_quality_media_will_use_more_data">傳送高畫質的媒體檔將會使用較多數據。</string>
     <!-- Disclaimer shown under the media auto-download settings. Placeholder is a formatted size like "100 KB". -->
-    <string name="DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded">Voice messages and stickers (under %1$s) are always auto-downloaded.</string>
-    <!-- Setting option that can be selected to default media to be sent as high quality by default -->
-    <string name="DataAndStorageSettingsFragment__high">高</string>
-    <!-- Setting option that can be selected to default media to be sent as standard quality by default -->
-    <string name="DataAndStorageSettingsFragment__standard">標準</string>
+    <string name="DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded">語音訊息及貼圖（小於 %1$s）每次都會自動下載。</string>
     <string name="DataAndStorageSettingsFragment__calls">通話</string>
+    <!-- Title of a toggle that keeps Signal connected in the background via a persistent foreground service instead of using FCM push messages -->
+    <string name="DataAndStorageSettingsFragment__stay_connected_in_background">在背景中保持連線</string>
+    <!-- Body of a confirmation dialog shown when a user tries to enable the "Stay connected in background" setting -->
+    <string name="DataAndStorageSettingsFragment__staying_connected_while_in_the_background_will_likely_result_in_increased_battery_usage">在背景中保持連線可能會導致電池消耗增加。對於大部份裝置來說，這並非必要。請只在你遇到通知問題時才啟用此功能。</string>
+    <!-- Button label that enables the "Stay connected in background" setting from a confirmation dialog -->
+    <string name="DataAndStorageSettingsFragment__enable">啟用</string>
 
     <!-- ChatColorSelectionFragment -->
     <!-- Text shown on a circle button to indicate the app will automatically select a color for conversation bubbles for this chat. -->
@@ -6021,6 +6041,8 @@
     <string name="ConversationSettingsFragment__end_group">解散群組</string>
     <!-- Banner shown at the top of group settings when the group has been ended -->
     <string name="ConversationSettingsFragment__this_group_was_ended">此群組已解散。</string>
+    <!-- Subhead under a legacy group\'s name, joining the member count and the "Legacy Group" label. %1$s is the member count, %2$s is the label -->
+    <string name="ConversationSettingsFragment__s_dot_s">%1$s · %2$s</string>
     <!-- Archive chat option in group conversation settings screen -->
     <string name="ConversationSettingsFragment__archive_chat">封存聊天</string>
     <!-- Delete chat option in group conversation settings screen -->
@@ -6140,13 +6162,15 @@
     <!-- AvatarPickerFragment -->
     <string name="AvatarPickerFragment__avatar_preview">頭像預覽</string>
     <string name="AvatarPickerFragment__camera">相機</string>
-    <string name="AvatarPickerFragment__take_a_picture">拍照</string>
-    <string name="AvatarPickerFragment__choose_a_photo">選取照片</string>
     <string name="AvatarPickerFragment__photo">照片</string>
     <!-- Button label during avatar selection/creation that when tapped lets you generate an avatar from typed in text. -->
     <string name="AvatarPickerFragment__text">文字</string>
     <string name="AvatarPickerFragment__save">儲存</string>
     <string name="AvatarPickerFragment__clear_avatar">清除頭像</string>
+    <!-- Content description for the edit icon displayed over the currently selected avatar. -->
+    <string name="AvatarPickerFragment__edit_avatar">Edit avatar</string>
+    <!-- Accessibility label describing the menu shown when long pressing one of your saved avatars. -->
+    <string name="AvatarPickerFragment__avatar_options">Avatar options</string>
     <string name="AvatarPickerRepository__failed_to_save_avatar">儲存頭像失敗</string>
 
     <!-- TextAvatarCreationFragment -->
@@ -6198,51 +6222,11 @@
     <!-- Positive dialog action when sending a story via an add to group story button -->
     <string name="MediaReviewFragment__add_to_story">新增至限時動態</string>
     <string name="MediaReviewFragment__add_a_message">新增訊息</string>
-    <!-- Hint text inside of a compose box that is shown when the user is adding media while quoting a message. -->
-    <string name="MediaReviewFragment__add_a_reply">新增回覆</string>
     <string name="MediaReviewFragment__send_to">傳送給</string>
-    <string name="MediaReviewFragment__view_once_message">一次性多媒體內容</string>
-    <string name="MediaReviewFragment__one_or_more_items_were_too_large">一件或多件項目容量太大</string>
-    <string name="MediaReviewFragment__one_or_more_items_were_invalid">一項或多項無效</string>
-    <string name="MediaReviewFragment__too_many_items_selected">選擇的項目太多</string>
-    <!-- Small notification presented to the user when they set their video to view-once mode -->
-    <string name="MediaReviewFragment__video_set_to_view_once">影片設定為閱後即毀</string>
-    <!-- Small notification presented to the user when they set their photo to view-once mode -->
-    <string name="MediaReviewFragment__photo_set_to_view_once">相片設定為閱後即毁</string>
-    <!-- Small notification presented to the user when they set their video to be sent in high visual quality. -->
-    <string name="MediaReviewFragment__video_set_to_high_quality">影片設定為高品質</string>
-    <!-- Small notification presented to the user when they set their video to be sent in standard (lower than high) visual quality. -->
-    <string name="MediaReviewFragment__video_set_to_standard_quality">影片設定為標準品質</string>
-    <!-- Small notification presented to the user when they set their still image to be sent in high visual quality. -->
-    <string name="MediaReviewFragment__photo_set_to_high_quality">相片設定為高品質</string>
-    <!-- Small notification presented to the user when they set their still image to be sent in standard (lower than high) visual quality. -->
-    <string name="MediaReviewFragment__photo_set_to_standard_quality">相片設定為標準品質</string>
-    <!-- Accessibility label describing the add media button on the Media review screen -->
-    <string name="MediaReviewFragment__add_media_accessibility_label">新增媒體</string>
-    <!-- Accessibility label describing the brush and pen button on the Media review screen -->
-    <string name="MediaReviewFragment__brush_pen_accessibility_label">筆刷和筆</string>
-    <!-- Accessibility label describing the crop and rotate button on the Media review screen -->
-    <string name="MediaReviewFragment__crop_rotate_accessibility_label">裁剪和旋轉</string>
-    <!-- Accessibility label describing the change media quality button on the Media review screen -->
-    <string name="MediaReviewFragment__change_media_quality_accessibility_label">更改媒體品質</string>
-    <!-- Accessibility label describing the save media button on the Media review screen -->
-    <string name="MediaReviewFragment__save_media_accessibility_label">儲存媒體</string>
-    <!-- Accessibility label describing the toggle emoji keyboard button on the Media review screen -->
-    <string name="MediaReviewFragment__emoji_toggle_accessibility_label">切換表情符號鍵盤</string>
     <!-- Accessibility label describing the toggle view once button on the Media review screen -->
     <string name="MediaReviewFragment__view_once_toggle_accessibility_label">切換「閱後即焚」狀態</string>
-    <!-- Accessibility label describing the send media button on the Media review screen -->
-    <string name="MediaReviewFragment__send_media_accessibility_label">傳送媒體</string>
     <!-- Accessibility label describing the finish adding a message button on the Media review screen dialog -->
     <string name="MediaReviewFragment__finish_adding_a_message_accessibility_label">完成新增訊息</string>
-    <!-- Small notification presented to the user when they set multiple media items to be sent in high visual quality. -->
-    <plurals name="MediaReviewFragment__items_set_to_high_quality">
-        <item quantity="other">%1$d 個項目設定為高品質</item>
-    </plurals>
-    <!-- Small notification presented to the user when they set multiple media items to be sent in standard (lower than high) visual quality. -->
-    <plurals name="MediaReviewFragment__items_set_to_standard_quality">
-        <item quantity="other">%1$d 個項目設定為標準品質</item>
-    </plurals>
 
     <string name="ImageEditorHud__cancel">取消</string>
     <string name="ImageEditorHud__draw">繪圖</string>
@@ -6260,27 +6244,9 @@
 
     <string name="MediaCountIndicatorButton__send">傳送</string>
 
-    <string name="MediaReviewSelectedItem__tap_to_remove">點擊以移除</string>
-    <string name="MediaReviewSelectedItem__tap_to_select">點取以選擇</string>
-
     <string name="MediaReviewImagePageFragment__discard">放棄</string>
     <string name="MediaReviewImagePageFragment__discard_changes">放棄更改？</string>
     <string name="MediaReviewImagePageFragment__youll_lose_any_changes">你將遺失對此照片所做的任何更改。</string>
-
-    <!-- The title of a dialog notifying that a user was found matching a scanned QR code. The placeholder is a username. Usernames are always latin characters. -->
-    <string name="MediaCaptureFragment_username_dialog_title">找到 %1$s</string>
-    <!-- The body of a dialog notifying that a user was found matching a scanned QR code, prompting the user to start a chat with them. The placeholder is a username. Usernames are always latin characters. -->
-    <string name="MediaCaptureFragment_username_dialog_body">開始與「 %1$s 」聊天</string>
-    <!-- The label of a dialog asking the user if they would like to start a chat with a specific user. -->
-    <string name="MediaCaptureFragment_username_dialog_go_to_chat_button">到聊天</string>
-
-    <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_device_link_dialog_title">要連結裝置嗎？</string>
-    <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">你似乎正嘗試連結 Signal 裝置。輕按繼續，然後輕按「連結新的裝置」並再次掃描二維碼。</string>
-    <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
-    <string name="MediaCaptureFragment_device_link_dialog_continue">繼續</string>
-
 
     <string name="BadgesOverviewFragment__my_badges">我的徽章</string>
     <string name="BadgesOverviewFragment__featured_badge">特色徽章</string>
@@ -6755,7 +6721,7 @@
     <!-- Donation receipts amount title -->
     <string name="DonationReceiptDetailsFragment__amount">金額</string>
     <!-- Donation receipts thanks -->
-    <string name="DonationReceiptDetailsFragment__thank_you_for_supporting">感謝你支持 Signal。你的捐款驅動我們的使命，致力開發開放原始碼的私隱技術，讓世界各地數以百萬計的使用者，能夠保護自由表達並讓全球通訊變得更安全。若你是美國公民，請保留此收據作為你的稅務紀錄。Signal Technology Foundation 是在美國依據《國稅法規》第 501c3 條的免稅非盈利組織。我們的聯邦稅識別號碼為 82–4506840。</string>
+    <string name="DonationReceiptDetailsFragment__thank_you_for_supporting" tools:ignore="TypographyDashes">感謝你對 Signal 的支持。你的捐款有助於推動保護自由表達的使命，並透過開放原始碼隱私技術，讓全球數百萬人能夠進行安全的全球通訊。若你是美國居民，請保留此收據作為你的稅務紀錄。Signal Technology Foundation 是在美國依據《國稅法規》(IRC) 第 501c3 條的免稅非盈利組織。我們的聯邦稅識別號碼為 82-4506840。Signal 並未因這筆捐款而提供任何商品或服務。</string>
     <!-- Donation reciepts screen empty state title -->
     <string name="DonationReceiptListFragment__no_receipts">沒有收據</string>
 
@@ -8052,8 +8018,23 @@
     <!-- Button of a megaphone that will snooze the reminder to upgrade to the new local backups type -->
     <string name="UseNewOnDeviceBackups__not_now">現在不要</string>
 
+    <!-- Title of a megaphone shown to prompt the user to open Signal on their primary device -->
+    <string name="InactivePrimary__title">在手機上開啟 Signal</string>
+    <!-- Body of a megaphone shown to prompt the user to open Signal on their primary device -->
+    <string name="InactivePrimary__body">若要讓你的帳戶保持在活躍狀態，請在主要裝置上開啟 Signal。</string>
+    <!-- Button of a megaphone shown to prompt the user to open Signal on their primary device that will navigate to a support page -->
+    <string name="InactivePrimary__learn_more">了解更多</string>
+    <!-- Button of a megaphone shown to prompt the user to open Signal on their primary device that will snooze the megaphone -->
+    <string name="InactivePrimary__got_it">我知道了</string>
+
     <!-- Text describing how to restore a backup displayed on the on-device backups screen -->
     <string name="OnDeviceBackupsScreen__to_restore_a_backup">"如要還原備份，請安裝全新的 Signal 。開啟應用程式並輕按「還原備份」，再找出備份檔案位置。"</string>
+    <!-- Body of a dialog shown when turning on on-device backups while "Optimize Signal storage" is enabled, warning that optimized media won\'t be included -->
+    <string name="OnDeviceBackupsScreen__you_have_optimize_signal_storage_on">你已啟用「最佳化 Signal 儲存空間」。如果想將所有媒體都包含在裝置上備份中，請關閉此設定。</string>
+    <!-- Dialog action that takes the user to the "Optimize Signal storage" setting -->
+    <string name="OnDeviceBackupsScreen__view_setting">檢視設定</string>
+    <!-- Dialog action to proceed with turning on on-device backups without turning off "Optimize Signal storage" -->
+    <string name="OnDeviceBackupsScreen__continue_without_turning_off">不關閉並繼續操作</string>
 
     <!-- Title of a megaphone shown to prompt the user to verify their recovery key -->
     <string name="VerifyBackupKey__title">驗證你的恢復金鑰</string>
@@ -8427,13 +8408,19 @@
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">啟用後，聊天訊息量上限也會應用在已連結裝置並刪除訊息。</string>
     <!-- Setting section title header for storage optimization -->
-    <string name="ManageStorageSettingsFragment__on_device_storage">裝置儲存</string>
+    <string name="ManageStorageSettingsFragment__on_device_storage">Signal 儲存空間</string>
     <!-- Setting row title for storage optimization -->
-    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">最佳化裝置儲存</string>
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">最佳化 Signal 儲存空間</string>
     <!-- Setting row explanation for storage optimization -->
     <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">未使用的媒體將被卸載，但可以隨時從備份中下載。</string>
     <!-- Dialog message for paid tier pending dialog -->
     <string name="ManageStorageSettingsFragment__storage_optimization_can_only_be_used">儲存最佳化只可供 Signal 安全備份付費級別使用。你的備份定期贊助仍在處理中，且尚未啟用。請稍後再試。</string>
+    <!-- Title of a dialog shown when turning on "Optimize Signal storage" while on-device backups are enabled -->
+    <string name="ManageStorageSettingsFragment__media_will_be_removed_from_your_on_device_backup">將從你的裝置上備份中移除媒體</string>
+    <!-- Body of a dialog shown when turning on "Optimize Signal storage" while on-device backups are enabled -->
+    <string name="ManageStorageSettingsFragment__turning_on_optimize_signal_storage_will_offload">開啟「最佳化 Signal 儲存空間」後，系統將會把舊媒體從你的裝置中移除。你可以隨時再次下載。系統也會從你的裝置上備份中移除舊媒體。</string>
+    <!-- Dialog action to confirm turning on "Optimize Signal storage" -->
+    <string name="ManageStorageSettingsFragment__turn_on">開啟</string>
 
     <!-- UpgradeToEnableOptimizedStorageSheet -->
     <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
@@ -8485,13 +8472,6 @@
     <!-- Body of bottom sheet shown when opening a terminated group -->
     <string name="TerminatedGroupBottomSheet__you_can_no_longer_send_and_receive">你將無法在此群組中收發訊息或通話。</string>
 
-    <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_title">現已在你所有裝置上同步刪除</string>
-    <!-- Educational bottom sheet dialog message shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_message">當你刪除訊息或聊天時，它們將從你的手機和已連結裝置中刪除。</string>
-    <!-- Educational bottom sheet confirm/dismiss button text shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_acknowledge_button">確定</string>
-
     <!-- NoManualBackupBottomSheet -->
     <!-- Title for bottom sheet, placeholder is number of days. -->
     <plurals name="NoManualBackupBottomSheet__no_backup_for_d_days">
@@ -8513,6 +8493,8 @@
     <string name="BackupsSettingsFragment__subscription_canceled">備份定期贊助已取消</string>
     <!-- Subtitle for row for no backup ever created -->
     <string name="BackupsSettingsFragment_automatic_backups_with_signals">使用 Signal 的安全端對端加密儲存服務自動備份。</string>
+    <!-- Subtitle shown on a linked device when backups are off, directing the user to set them up on their phone -->
+    <string name="BackupsSettingsFragment__automatic_backups_get_started_on_your_phone">使用 Signal 的安全端對端加密儲存服務自動備份。 就從你的手機開始。</string>
     <!-- Subtitle for row for backups that are active but subscription not found -->
     <string name="BackupsSettingsFragment_subscription_not_found_on_this_device">"在此裝置找不到定期贊助。"</string>
     <!-- Action button label to set up backups -->
@@ -8530,7 +8512,7 @@
     <!-- Displayed as a label when remote backups are off -->
     <string name="RemoteBackupsSettingsFragment__off">關</string>
     <!-- Text shown in a popup indicating that the user needs to enter their screen lock -->
-    <string name="RemoteBackupsSettingsFragment__authenticatino_required">需要身份認證</string>
+    <string name="RemoteBackupsSettingsFragment__authentication_required">需要身份認證</string>
     <!-- Row label to launch payment history screen -->
     <string name="RemoteBackupsSettingsFragment__payment_history">付款紀錄</string>
     <!-- Section header for backup information -->
@@ -8615,6 +8597,16 @@
     <string name="RemoteBackupsSettingsFragment__s_at_s">%1$s 在 %2$s</string>
     <!-- Subtext describing when a backup has never taken place. -->
     <string name="RemoteBackupsSettingsFragment__never">永不</string>
+    <!-- Subtext on a linked device describing when the primary device last backed up. Placeholder is the formatted date and time. -->
+    <string name="RemoteBackupsSettingsFragment__your_phone_s">你的手機 · %1$s</string>
+    <!-- Message shown on a linked device with a free backup plan explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_upgrade_your_subscription_on_your_primary_device">你可以在主要裝置上管理或升級「Signal 安全備份」定期贊助。</string>
+    <!-- Message shown on a linked device with a paid backup plan explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_cancel_your_subscription_on_your_primary_device">你可以在主要裝置上管理或取消「Signal 安全備份」定期贊助。</string>
+    <!-- Message shown on a linked device with a canceled backup subscription explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_renew_your_subscription_on_your_primary_device">你可以在主要裝置上管理「Signal 安全備份」定期贊助或為其續期。</string>
+    <!-- Message shown on a linked device when backups are off or the subscription was not found, explaining that backups are managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_upgrade_backups_on_your_primary_device">你可以在主要裝置上管理或升級「Signal 安全備份」。</string>
     <!-- Button label to perform a backup immediately -->
     <string name="RemoteBackupsSettingsFragment__back_up_now">馬上備份</string>
     <!-- Dialog title when confirming whether to turn off and deleting backups -->
@@ -8903,19 +8895,37 @@
     <!-- Dialog title for confirming you need to disable optimized storage and download media to rotate AEP key -->
     <string name="MessageBackupsKeyRecordScreen__download_media">下載媒體</string>
     <!-- Dialog body for confirming you need to disable optimized storage and download media to rotate AEP key -->
-    <string name="MessageBackupsKeyRecordScreen__to_create_a_new_backup_key">若要建立新的恢復金鑰，你必須關閉「最佳化儲存」功能，並等待媒體完成下載。下載完成後，你便可以建立新金鑰。</string>
+    <string name="MessageBackupsKeyRecordScreen__to_create_a_new_backup_key">若要建立新的恢復金鑰，你必須關閉「最佳化 Signal 儲存空間」功能，並等待下載媒體完成。下載完成後，你便可以建立新金鑰。</string>
     <!-- Action label to turn off optimized storage and download media -->
     <string name="MessageBackupsKeyRecordScreen__turn_off_and_download">關閉並下載</string>
     <!-- Bottom Sheet title for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__create_a_new_backup_key">建立新的恢復金鑰</string>
     <!-- Bottom Sheet body for creating a new AEP key -->
-    <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">只有當其他人知道你的金鑰時，才需要建立新的金鑰。你必須重新上載備份，包括媒體。如果你使用「最佳化儲存」，則必須先下載已卸載的媒體。</string>
+    <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">只有當其他人知道你的金鑰時，才需要建立新的金鑰。你必須重新上載備份，包括媒體。如果你使用「最佳化 Signal 儲存空間」，則必須先下載已卸載的媒體。</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
     <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">要退出備份設定嗎？</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
     <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">你尚未完成設定備份，也未建立任何備份。你可以在「設定」中啟用備份。</string>
     <!-- Dialog confirmation button to exit backup setup -->
     <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">退出備份設定</string>
+    <!-- Screen title when saving your recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__save_your_recovery_key">儲存你的恢復金鑰</string>
+    <!-- Screen subtitle for the recovery key screen -->
+    <string name="MessageBackupsKeyRecordScreen__your_recovery_key">你的恢復金鑰是一組 64 個字元的代碼，可讓你還原備份。如果你忘記了金鑰，你將會無法恢復帳戶。</string>
+    <!-- Hint text to see the full recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__see_full_key">查看完整金鑰</string>
+    <!-- Bottom sheet caption to confirm your recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__confirm_that_your_recovery">請確認你已正確地記錄恢復金鑰。下一步系統會提示你輸入已儲存的密碼。</string>
+    <!-- Button to confirm the recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__confirm_recovery">確認恢復金鑰</string>
+    <!-- Toast shown when the key is confirmed -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_confirmed">已確認恢復金鑰</string>
+    <!-- Dialog title shown when the recovery key fails to confirm -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_error">確認恢復金鑰時出錯</string>
+    <!-- Dialog body shown when the recovery key fails to confirm -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_error_body">無法確認你的恢復金鑰。請確保你已將其儲存至密碼管理器中，或手動儲存。</string>
+    <!-- Button option to save the key manually -->
+    <string name="MessageBackupsKeyRecordScreen__save_key_manually">手動儲存金鑰</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -9160,11 +9170,11 @@
     <!-- RestoreLocalBackupActivity: Label for the button that opens the contact support form -->
     <string name="RestoreLocalBackupActivity__contact_support">聯絡支援</string>
 
-    <!-- RestoreLocalBackupActivity: Title for the dialog shown when the restored backup belongs to a different account -->
+    <!-- RestoreLocalBackupActivity: Title for the dialog shown when on-device backups could not be automatically re-enabled -->
     <string name="RestoreLocalBackupActivity__turn_on_on_device_backups">要開啟裝置上備份嗎？</string>
 
-    <!-- RestoreLocalBackupActivity: Body for the dialog shown when the restored backup belongs to a different account, prompting the user to re-enable on-device backups -->
-    <string name="RestoreLocalBackupActivity__to_continue_using_on_device_backups">若要繼續使用裝置上備份，你需要為此帳戶啟用該功能，並記錄你的新恢復金鑰。你可以隨時透過「設定」&gt;「備份」來執行此操作。</string>
+    <!-- RestoreLocalBackupActivity: Body for the dialog shown when on-device backups could not be automatically re-enabled, prompting the user to re-enable on-device backups -->
+    <string name="RestoreLocalBackupActivity__to_continue_using_on_device_backups">若要繼續使用裝置上備份，你需要為此帳戶啟用該功能。你可以隨時透過「設定」&gt;「備份」來執行此操作。</string>
 
     <!-- RestoreLocalBackupActivity: Confirm button label for the dialog prompting the user to re-enable on-device backups -->
     <string name="RestoreLocalBackupActivity__turn_on_now">立即開啟</string>
@@ -9643,8 +9653,27 @@
     <!-- Body for screen shown to let the user know that displaying their member label will take priority over their about text. -->
     <string name="MemberLabelsAboutOverride__body">在這個群組中，你的成員標籤將顯示在相片旁邊，取代「關於」的位置。</string>
 
-    <!-- Label for internal-only section showing groups with same members -->
-  <!-- Removed by excludeNonTranslatables <string name="AddGroupDetailsFragment__groups_with_same_members" translatable="false">Groups with same members (Labs)</string> -->
+    <!-- Header for the section shown when creating a group that lists existing groups with the exact same members. Includes the number of such groups. -->
+    <plurals name="AddGroupDetailsFragment__d_groups_with_same_members">
+        <item quantity="other">%1$d 個具有相同成員的群組</item>
+    </plurals>
+
+    <!-- Header for a section showing all group member -->
+    <string name="MemberSearchFragment__search_members">搜尋成員</string>
+    <!-- Header for a section showing all group members who are contacts -->
+    <string name="MemberSearchFragment__search_contacts">搜尋聯絡人</string>
+    <!-- Header for a section showing all group member who are admins -->
+    <string name="MemberSearchFragment__search_admins">搜尋管理員</string>
+    <!-- Dialog title to filter search by -->
+    <string name="MemberSearchFragment__filter">篩選依據</string>
+    <!-- Dialog option for all group members -->
+    <string name="MemberSearchFragment__filter_all_members">所有成員</string>
+    <!-- Dialog option for group admins -->
+    <string name="MemberSearchFragment__filter_admins">管理員</string>
+    <!-- Dialog option for your contacts -->
+    <string name="MemberSearchFragment__filter_contacts">聯絡人</string>
+    <!-- Button to invite members via a group link -->
+    <string name="MemberSearchFragment__invite_via">透過群組連結邀請</string>
 
     <!-- Title of the sheet shown when a local backup restore could not be completed -->
     <string name="CouldNotCompleteBackupRestoreSheet__title">無法還原備份</string>
@@ -9654,6 +9683,109 @@
 
     <!-- Body of the sheet shown when a local backup restore could not be completed, explaining how to try again -->
     <string name="CouldNotCompleteBackupRestoreSheet__body_retry">若要重新嘗試，請在此裝置上解除安裝並重新安裝 Signal，然後選擇「還原或轉移」。</string>
+
+    <!-- Title of the sheet shown when the server reports a verification code was requested for the user\'s phone number -->
+    <string name="VerificationCodeRequestedBottomSheet__title">已要求驗證碼</string>
+    <!-- First paragraph of the body of the verification code requested sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__body_1">請勿將驗證碼透露給任何人。Signal 絕不會透過訊息向你索取驗證碼。如果你收到某人假冒 Signal 發送的訊息，那是詐騙。</string>
+    <!-- Second paragraph of the body of the verification code requested sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__body_2">如果是你本人要求此驗證碼，可以忽略此訊息。</string>
+    <!-- Button on the verification code requested sheet that opens the safety tips screen -->
+    <string name="VerificationCodeRequestedBottomSheet__safety_tips">安全提示</string>
+    <!-- Button on the verification code requested sheet that dismisses the sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__ok">確定</string>
+    <!-- Subtitle on the verification code requested sheet showing the time the code was requested followed by the relative day. %1$s is the time (e.g. "3:25 PM"), %2$s is the relative day (e.g. "Today", "Yesterday", "Jan 15") -->
+    <string name="VerificationCodeRequestedBottomSheet__time_with_day">%1$s %2$s</string>
+
+    <!-- Title of the safety tips screen within the verification code requested sheet -->
+    <string name="SafetyTipsBottomSheet__title">安全提示</string>
+    <!-- Title of the first safety tip: don\'t respond to chats claiming to be Signal -->
+    <string name="SafetyTipsBottomSheet__tip_1_title">請勿回覆來自 Signal 的聊天</string>
+    <!-- Body of the first safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_1_body">Signal 絕不會透過訊息向你索取註冊碼、PIN 碼或恢復金鑰。切勿回覆任何假冒 Signal 的聊天訊息。</string>
+    <!-- Title of the second safety tip: keep your verification code safe -->
+    <string name="SafetyTipsBottomSheet__tip_2_title">妥善保管你的驗證碼</string>
+    <!-- Body of the second safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_2_body">如果你收到了未曾要求的驗證碼，可能有人正試圖存取你的帳戶。請勿分享你的驗證碼。</string>
+    <!-- Title of the third safety tip: enable registration lock -->
+    <string name="SafetyTipsBottomSheet__tip_3_title">在帳戶設定開啟註冊鎖定</string>
+    <!-- Body of the third safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_3_body">在註冊 Signal 時，除了驗證碼之外，還需輸入 Signal PIN 碼，以保護你的帳戶安全。</string>
+    <!-- Button on the safety tips screen that opens account settings -->
+    <string name="SafetyTipsBottomSheet__open_account_settings">開啟帳戶設定</string>
+
+    <!-- Title of a warning sheet shown when the user copies or pastes their recovery key, urging them not to share it -->
+    <string name="RecoveryKeyWarningSheetContent__do_not_share_your_recovery_key">切勿分享你的恢復金鑰</string>
+    <!-- Bolded lead-in to the warning sheet body; combined with RecoveryKeyWarningSheetContent__for_your_recovery_key_never_respond to form a full sentence -->
+    <string name="RecoveryKeyWarningSheetContent__signal_will_never_message_you">Signal 絕不會透過訊息</string>
+    <!-- Remainder of the warning sheet body following the bolded lead-in RecoveryKeyWarningSheetContent__signal_will_never_message_you -->
+    <string name="RecoveryKeyWarningSheetContent__for_your_recovery_key_never_respond">向你索取恢復金鑰。切勿回覆任何假冒 Signal 的聊天訊息。將恢復金鑰存放在安全可靠的地方，並且不要與任何人分享。</string>
+    <!-- Button dismissing the recovery key warning sheet after the user has copied their key -->
+    <string name="RecoveryKeyWarningSheetContent__got_it">我知道了</string>
+    <!-- Button opening a help article with more information about recovery key safety -->
+    <string name="RecoveryKeyWarningSheetContent__learn_more">了解更多</string>
+    <!-- Inline link opening a help article with more information about recovery key safety -->
+    <string name="RecoveryKeyWarningSheetContent__learn_more_period">學習更多。</string>
+    <!-- Button declining to paste/share the recovery key, dismissing the warning sheet -->
+    <string name="RecoveryKeyWarningSheetContent__do_not_share_key">切勿分享金鑰</string>
+    <!-- Button indicating the user wants to proceed with sharing/pasting the recovery key, which shows a final confirmation -->
+    <string name="RecoveryKeyWarningSheetContent__share_key">分享金鑰</string>
+
+    <!-- Title of the final confirmation dialog shown before pasting a recovery key -->
+    <string name="RecoveryKeyWarningDialog__do_not_share_recovery_key">切勿分享恢復金鑰</string>
+    <!-- First sentence of the final confirmation dialog body warning against sharing the recovery key -->
+    <string name="RecoveryKeyWarningDialog__do_not_share_your_recovery_key_with_anyone">請勿與任何人分享你的恢復金鑰。這樣會讓他們盜用你的帳戶。</string>
+    <!-- Bolded middle sentence of the final confirmation dialog body -->
+    <string name="RecoveryKeyWarningDialog__signal_will_never_message_you_for_your_recovery_key">Signal 絕不會透過訊息向你索取恢復金鑰。</string>
+    <!-- Final sentence of the final confirmation dialog body -->
+    <string name="RecoveryKeyWarningDialog__never_respond_to_a_chat">切勿回覆任何假冒 Signal 的聊天訊息。</string>
+    <!-- Button confirming the user wants to paste the recovery key -->
+    <string name="RecoveryKeyWarningDialog__paste_key">貼上金鑰</string>
+    <!-- Button declining to paste the recovery key -->
+    <string name="RecoveryKeyWarningDialog__dont_share">切勿分享</string>
+
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, last two are the summaries for mentions and replies -->
+    <string name="UnreadReminderJob__calls_and_unread_full_summary">You have %1$s and %2$s including %3$s and %4$s.</string>
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, third is a summary of mentions or replies -->
+    <string name="UnreadReminderJob__calls_and_unread_summary">You have %1$s and %2$s including %3$s.</string>
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, third is a list of recipients who sent them -->
+    <string name="UnreadReminderJob__calls_and_unread_author">You have %1$s and %2$s from %3$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a summary of unread mentions or replies -->
+    <string name="UnreadReminderJob__unread_one_summary">You have %1$s, including %2$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a summary of unread mentions, third replies -->
+    <string name="UnreadReminderJob__unread_both_summary">You have %1$s, including %2$s and %3$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a list of people who sent them -->
+    <string name="UnreadReminderJob__calls_or_unread_author">You have %1$s from %2$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages or unread calls -->
+    <string name="UnreadReminderJob__calls_or_unread">You have %1$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is unread calls. -->
+    <string name="UnreadReminderJob__calls_and_unread">You have %1$s and %2$s.</string>
+    <!-- Notification placeholder for unread calls -->
+    <plurals name="UnreadReminderJob__calls">
+        <item quantity="other">%1$d missed calls</item>
+    </plurals>
+    <!-- Notification placeholder for unread messages -->
+    <plurals name="UnreadReminderJob__messages">
+        <item quantity="other">%1$d 則未讀訊息</item>
+    </plurals>
+    <!-- Notification placeholder for a single recipient who sent unread messages -->
+    <string name="UnreadReminderJob__authors_one">%1$s</string>
+    <!-- Notification placeholder for two recipients who sent unread messages -->
+    <string name="UnreadReminderJob__authors_two">%1$s 及 %2$s</string>
+    <!-- Notification placeholder for three or more recipients who sent unread messages -->
+    <string name="UnreadReminderJob__authors_many">%1$s and others</string>
+    <!-- Notification placeholder that sums up a single unread mention. Placeholder is the name of the person who sent the message -->
+    <string name="UnreadReminderJob__mentions_one">a mention of you by %1$s</string>
+    <!-- Notification placeholder that sums up unread mentions from two people. First placeholder is the number of mentions, second and third are the names of the people who sent them -->
+    <string name="UnreadReminderJob__mentions_two">%1$d mentions of you by %2$s and %3$s</string>
+    <!-- Notification placeholder that sums up unread mentions from three or more people. First placeholder is the number of mentions, second is the name of one person who sent them -->
+    <string name="UnreadReminderJob__mentions_many">%1$d mentions of you by %2$s and others</string>
+    <!-- Notification placeholder that sums up a single unread reply. Placeholder is the name of the person who sent the message -->
+    <string name="UnreadReminderJob__replies_one">a reply from %1$s</string>
+    <!-- Notification placeholder that sums up unread replies from two people. First placeholder is the number of replies, second and third are the names of the people who sent them -->
+    <string name="UnreadReminderJob__replies_two">%1$d replies from %2$s and %3$s</string>
+    <!-- Notification placeholder that sums up unread replies from three or more people. First placeholder is the number of replies, second is the name of one person who sent them -->
+    <string name="UnreadReminderJob__replies_many">%1$d replies from %2$s and others</string>
 
     <!-- EOF -->
 </resources>

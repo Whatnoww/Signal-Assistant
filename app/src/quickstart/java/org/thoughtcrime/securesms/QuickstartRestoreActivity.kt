@@ -75,6 +75,8 @@ class QuickstartRestoreActivity : BaseActivity() {
 
   private var restoreStatus by mutableStateOf("Restoring data...")
 
+  private val eventBusSubscriber = EventBusSubscriber()
+
   private val manageStorageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
     if (hasStorageAccess()) {
       startRestore()
@@ -110,7 +112,7 @@ class QuickstartRestoreActivity : BaseActivity() {
       }
     }
 
-    org.greenrobot.eventbus.EventBus.getDefault().registerForLifecycle(subscriber = this, lifecycleOwner = this)
+    org.greenrobot.eventbus.EventBus.getDefault().registerForLifecycle(subscriber = eventBusSubscriber, lifecycleOwner = this)
 
     if (hasStorageAccess()) {
       startRestore()
@@ -123,7 +125,7 @@ class QuickstartRestoreActivity : BaseActivity() {
   }
 
   private fun hasStorageAccess(): Boolean {
-    return Build.VERSION.SDK_INT < Build.VERSION_CODES.R || Environment.isExternalStorageManager()
+    return Build.VERSION.SDK_INT < 30 || Environment.isExternalStorageManager()
   }
 
   private fun startRestore() {
@@ -195,8 +197,10 @@ class QuickstartRestoreActivity : BaseActivity() {
     }
   }
 
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun onEvent(restoreEvent: RestoreV2Event) {
-    restoreStatus = "${restoreEvent.type}: ${restoreEvent.count} / ${restoreEvent.estimatedTotalCount}"
+  private inner class EventBusSubscriber {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEvent(restoreEvent: RestoreV2Event) {
+      restoreStatus = "${restoreEvent.type}: ${restoreEvent.count} / ${restoreEvent.estimatedTotalCount}"
+    }
   }
 }

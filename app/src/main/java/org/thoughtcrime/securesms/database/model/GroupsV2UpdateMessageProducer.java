@@ -11,21 +11,6 @@ import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.content.ContextCompat;
 
-import org.signal.core.models.ServiceId;
-import org.signal.core.util.BidiUtil;
-import org.signal.core.util.UuidUtil;
-import org.signal.storageservice.storage.protos.groups.AccessControl;
-import org.signal.storageservice.storage.protos.groups.Member;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedApproveMember;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedGroup;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedGroupChange;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedMember;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedModifyMemberRole;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedPendingMember;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedPendingMemberRemoval;
-import org.signal.storageservice.storage.protos.groups.local.DecryptedRequestingMember;
-import org.signal.storageservice.storage.protos.groups.local.EnabledState;
-import org.thoughtcrime.securesms.R;
 import org.signal.archive.proto.GenericGroupUpdate;
 import org.signal.archive.proto.GroupAdminStatusUpdate;
 import org.signal.archive.proto.GroupAnnouncementOnlyChangeUpdate;
@@ -54,6 +39,7 @@ import org.signal.archive.proto.GroupMemberRemovedUpdate;
 import org.signal.archive.proto.GroupMembershipAccessLevelChangeUpdate;
 import org.signal.archive.proto.GroupNameUpdate;
 import org.signal.archive.proto.GroupSelfInvitationRevokedUpdate;
+import org.signal.archive.proto.GroupSequenceOfRequestsAndCancelsUpdate;
 import org.signal.archive.proto.GroupTerminateChangeUpdate;
 import org.signal.archive.proto.GroupUnknownInviteeUpdate;
 import org.signal.archive.proto.GroupV2AccessLevel;
@@ -63,7 +49,22 @@ import org.signal.archive.proto.GroupV2MigrationSelfInvitedUpdate;
 import org.signal.archive.proto.GroupV2MigrationUpdate;
 import org.signal.archive.proto.SelfInvitedOtherUserToGroupUpdate;
 import org.signal.archive.proto.SelfInvitedToGroupUpdate;
-import org.thoughtcrime.securesms.fonts.SignalSymbols.Glyph;
+import org.signal.core.models.ServiceId;
+import org.signal.core.ui.fonts.SignalSymbols.Glyph;
+import org.signal.core.util.BidiUtil;
+import org.signal.core.util.UuidUtil;
+import org.signal.storageservice.storage.protos.groups.AccessControl;
+import org.signal.storageservice.storage.protos.groups.Member;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedApproveMember;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedGroup;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedGroupChange;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedMember;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedModifyMemberRole;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedPendingMember;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedPendingMemberRemoval;
+import org.signal.storageservice.storage.protos.groups.local.DecryptedRequestingMember;
+import org.signal.storageservice.storage.protos.groups.local.EnabledState;
+import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.groups.GV2AccessLevelUtil;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
@@ -199,6 +200,8 @@ final class GroupsV2UpdateMessageProducer {
       describeGroupJoinRequestApprovedUpdate(update.groupJoinRequestApprovalUpdate, updates);
     } else if (update.groupJoinRequestCanceledUpdate != null) {
       describeGroupJoinRequestCanceledUpdate(update.groupJoinRequestCanceledUpdate, updates);
+    } else if (update.groupSequenceOfRequestsAndCancelsUpdate != null) {
+      describeGroupSequenceOfRequestsAndCancelsUpdate(update.groupSequenceOfRequestsAndCancelsUpdate, updates);
     } else if (update.groupInviteLinkResetUpdate != null) {
       describeInviteLinkResetUpdate(update.groupInviteLinkResetUpdate, updates);
     } else if (update.groupInviteLinkEnabledUpdate != null) {
@@ -375,6 +378,18 @@ final class GroupsV2UpdateMessageProducer {
       updates.add(updateDescription(context.getString(R.string.MessageRecord_you_canceled_your_request_to_join_the_group), Glyph.PERSON_X));
     } else {
       updates.add(updateDescription(R.string.MessageRecord_s_canceled_their_request_to_join_the_group, update.requestorAci, Glyph.PERSON_X));
+    }
+  }
+
+  private void describeGroupSequenceOfRequestsAndCancelsUpdate(@NonNull GroupSequenceOfRequestsAndCancelsUpdate update, @NonNull List<UpdateDescription> updates) {
+    if (selfIds.matches(update.requestorAci)) {
+      updates.add(updateDescription(context.getString(R.string.MessageRecord_you_canceled_your_request_to_join_the_group), Glyph.GROUP));
+    } else {
+      updates.add(updateDescription(R.plurals.MessageRecord_s_requested_and_cancelled_their_request_to_join_via_the_group_link,
+                                    update.count,
+                                    update.requestorAci,
+                                    update.count,
+                                    Glyph.GROUP));
     }
   }
 

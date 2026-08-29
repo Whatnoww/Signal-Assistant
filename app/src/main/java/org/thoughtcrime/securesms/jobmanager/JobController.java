@@ -16,7 +16,7 @@ import org.thoughtcrime.securesms.jobmanager.persistence.FullSpec;
 import org.thoughtcrime.securesms.jobmanager.persistence.JobSpec;
 import org.thoughtcrime.securesms.jobmanager.persistence.JobStorage;
 import org.thoughtcrime.securesms.jobs.MinimalJobSpec;
-import org.thoughtcrime.securesms.util.Debouncer;
+import org.signal.core.util.Debouncer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +43,9 @@ class JobController {
   private static final String TAG = Log.tag(JobController.class);
 
   private static final Predicate<MinimalJobSpec> NO_PREDICATE = spec -> true;
+
+  /** Max number of items we'll print for any single collection in {@link #getDebugInfo()}, to avoid OOM'ing while building the string. */
+  private static final int DEBUG_ITEM_LIMIT = 500;
 
   private final Application                application;
   private final JobStorage                 jobStorage;
@@ -295,8 +298,13 @@ class JobController {
   }
 
   @WorkerThread
+  synchronized List<MinimalJobSpec> findMinimalJobs(@NonNull Predicate<MinimalJobSpec> predicate) {
+    return jobStorage.getAllMinimalJobSpecsMatchingFilter(predicate);
+  }
+
+  @WorkerThread
   synchronized void onRetry(@NonNull Job job, long backoffInterval) {
-    if (backoffInterval <= 0) {
+    if (backoffInterval < 0) {
       throw new IllegalArgumentException("Invalid backoff interval! " + backoffInterval);
     }
 
@@ -391,6 +399,7 @@ class JobController {
         }
       }
 
+
       jobStorage.markJobAsRunning(job.getId(), System.currentTimeMillis());
       runningJobs.put(job.getId(), new ActiveJobInfo(job, runnerName, timeoutMs == 0));
       jobTracker.onStateChange(job, JobTracker.JobState.RUNNING);
@@ -408,8 +417,8 @@ class JobController {
   @WorkerThread
   synchronized @NonNull String getDebugInfo() {
     List<JobSpec>        running      = runningJobs.keySet().stream().map(jobStorage::getJobSpec).collect(Collectors.toList());
-    List<JobSpec>        jobs         = jobStorage.debugGetJobSpecs(1000);
-    List<ConstraintSpec> constraints  = jobStorage.debugGetConstraintSpecs(1000);
+    List<JobSpec>        jobs         = jobStorage.debugGetJobSpecs(DEBUG_ITEM_LIMIT);
+    List<ConstraintSpec> constraints  = jobStorage.debugGetConstraintSpecs(DEBUG_ITEM_LIMIT);
     List<DependencySpec> dependencies = jobStorage.debugGetAllDependencySpecs();
     String               additional   = jobStorage.debugAdditionalDetails();
 
@@ -442,7 +451,10 @@ class JobController {
 
     info.append("\n-- Dependencies\n");
     if (!dependencies.isEmpty()) {
-      dependencies.stream().forEach(d -> info.append(d.toString()).append('\n'));
+      dependencies.stream().limit(DEBUG_ITEM_LIMIT).forEach(d -> info.append(d.toString()).append('\n'));
+      if (dependencies.size() > DEBUG_ITEM_LIMIT) {
+        info.append("...TRUNCATED, showing first ").append(DEBUG_ITEM_LIMIT).append(" of ").append(dependencies.size()).append('\n');
+      }
     } else {
       info.append("None\n");
     }

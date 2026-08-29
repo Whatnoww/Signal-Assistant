@@ -2,12 +2,15 @@ package org.thoughtcrime.securesms.components.settings.app
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Process
 import androidx.navigation.NavDirections
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.subjects.PublishSubject
 import io.reactivex.rxjava3.subjects.Subject
 import org.signal.core.util.getParcelableExtraCompat
+import org.signal.core.util.logging.Log
 import org.signal.donations.InAppPaymentType
 import org.thoughtcrime.securesms.MainActivity
 import org.thoughtcrime.securesms.R
@@ -34,20 +37,21 @@ private const val EXTRA_PERFORM_ACTION_ON_CREATE = "extra_perform_action_on_crea
 
 class AppSettingsActivity : DSLSettingsActivity(), GooglePayComponent {
 
+  private val TAG = Log.tag(AppSettingsActivity::class)
+
   private var wasConfigurationUpdated = false
 
   override val googlePayRepository: GooglePayRepository by lazy { GooglePayRepository(this) }
   override val googlePayResultPublisher: Subject<GooglePayComponent.GooglePayResult> = PublishSubject.create()
 
   override fun onCreate(savedInstanceState: Bundle?, ready: Boolean) {
-    if (intent?.hasExtra(ARG_NAV_GRAPH) != true) {
-      intent?.putExtra(ARG_NAV_GRAPH, R.navigation.app_settings_with_change_number)
-    }
-
     super.onCreate(savedInstanceState, ready)
 
     val startingAction: NavDirections? = if (intent?.categories?.contains(NOTIFICATION_CATEGORY) == true) {
       AppSettingsFragmentDirections.actionDirectToNotificationsSettingsFragment()
+    } else if (Build.VERSION.SDK_INT >= 34 && getLaunchedFromUid() != Process.myUid()) {
+      Log.w(TAG, "Settings was launched by an external process. Ignoring starting route.")
+      null
     } else {
       when (val appSettingsRoute: AppSettingsRoute? = intent?.getParcelableExtraCompat(START_ROUTE, AppSettingsRoute::class.java)) {
         AppSettingsRoute.Empty -> null
@@ -65,6 +69,7 @@ class AppSettingsActivity : DSLSettingsActivity(), GooglePayComponent {
         AppSettingsRoute.NotificationsRoute.Notifications -> AppSettingsFragmentDirections.actionDirectToNotificationsSettingsFragment()
         AppSettingsRoute.ChangeNumberRoute.Start -> AppSettingsFragmentDirections.actionDirectToChangeNumberFragment()
         is AppSettingsRoute.DonationsRoute.Donations -> AppSettingsFragmentDirections.actionDirectToManageDonations().setDirectToCheckoutType(appSettingsRoute.directToCheckoutType)
+        AppSettingsRoute.NotificationsRoute.MutedNotifications -> AppSettingsFragmentDirections.actionDirectToChatsSettingsFragment()
         AppSettingsRoute.NotificationsRoute.NotificationProfiles -> AppSettingsFragmentDirections.actionDirectToNotificationProfiles()
         is AppSettingsRoute.NotificationsRoute.EditProfile -> AppSettingsFragmentDirections.actionDirectToCreateNotificationProfiles()
         is AppSettingsRoute.NotificationsRoute.ProfileDetails -> AppSettingsFragmentDirections.actionDirectToNotificationProfileDetails(
@@ -86,6 +91,11 @@ class AppSettingsActivity : DSLSettingsActivity(), GooglePayComponent {
         is AppSettingsRoute.BackupsRoute.Backups -> AppSettingsFragmentDirections.actionDirectToBackupsSettingsFragment().setLaunchCheckoutFlow(appSettingsRoute.launchCheckoutFlow)
         AppSettingsRoute.Invite -> AppSettingsFragmentDirections.actionDirectToInviteFragment()
         AppSettingsRoute.DataAndStorageRoute.DataAndStorage -> AppSettingsFragmentDirections.actionDirectToStoragePreferenceFragment()
+        AppSettingsRoute.AccountRoute.Account -> if (SignalStore.account.isPrimaryDevice) {
+          AppSettingsFragmentDirections.actionDirectToAccountSettingsFragment()
+        } else {
+          AppSettingsFragmentDirections.actionDirectToLinkedDeviceAccountSettingsFragment()
+        }
         else -> error("Unsupported start location: ${appSettingsRoute?.javaClass?.name}")
       }
     }
@@ -143,6 +153,10 @@ class AppSettingsActivity : DSLSettingsActivity(), GooglePayComponent {
     }
   }
 
+  override fun resolveNavGraphId(): Int = R.navigation.app_settings_with_change_number
+
+  override fun resolveStartBundle(): Bundle? = null
+
   @Suppress("DEPRECATION")
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
@@ -176,6 +190,9 @@ class AppSettingsActivity : DSLSettingsActivity(), GooglePayComponent {
 
     @JvmStatic
     fun changeNumber(context: Context): Intent = getIntentForStartLocation(context, AppSettingsRoute.ChangeNumberRoute.Start)
+
+    @JvmStatic
+    fun account(context: Context): Intent = getIntentForStartLocation(context, AppSettingsRoute.AccountRoute.Account)
 
     @JvmStatic
     fun subscriptions(context: Context): Intent = getIntentForStartLocation(context, AppSettingsRoute.DonationsRoute.Donations(directToCheckoutType = InAppPaymentType.RECURRING_DONATION))

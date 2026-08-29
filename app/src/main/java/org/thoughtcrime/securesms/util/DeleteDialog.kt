@@ -6,6 +6,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.core.SingleEmitter
 import org.signal.core.util.concurrent.SignalExecutors
 import org.thoughtcrime.securesms.R
+import org.thoughtcrime.securesms.conversation.v2.data.DeletedMessageTombstoneCache
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.MessageRecord
 import org.thoughtcrime.securesms.jobs.MultiDeviceDeleteSyncJob
@@ -82,7 +83,7 @@ object DeleteDialog {
       handleDeleteForEveryone(context = context, messageRecords = messageRecords, emitter = emitter)
     } else {
       MaterialAlertDialogBuilder(context)
-        .setTitle("${context.getString(R.string.ConversationFragment_delete_for_everyone_title)} - INTERNAL ONLY")
+        .setTitle(context.getString(R.string.ConversationFragment_delete_for_everyone_title))
         .setMessage(context.resources.getQuantityString(R.plurals.ConversationFragment_delete_for_everyone_body, messageRecords.size, messageRecords.size))
         .setPositiveButton(R.string.ConversationFragment_delete_for_everyone) { _, _ ->
           SignalStore.uiHints.setHasSeenAdminDeleteEducationDialog()
@@ -141,6 +142,8 @@ object DeleteDialog {
       var threadDeleted = false
 
       messageRecords.forEach { record ->
+        DeletedMessageTombstoneCache.add(record)
+
         if (SignalDatabase.messages.deleteMessage(record.id)) {
           threadDeleted = true
         }

@@ -4,12 +4,13 @@ import android.net.Uri
 import android.os.Parcel
 import androidx.core.os.ParcelCompat
 import org.signal.blurhash.BlurHash
+import org.signal.core.models.database.AttachmentId
 import org.signal.core.models.media.TransformProperties
+import org.signal.core.util.ParcelUtil
 import org.thoughtcrime.securesms.audio.AudioHash
 import org.thoughtcrime.securesms.database.AttachmentTable
 import org.thoughtcrime.securesms.mms.PartAuthority
 import org.thoughtcrime.securesms.stickers.StickerLocator
-import org.thoughtcrime.securesms.util.ParcelUtil
 import java.util.UUID
 
 class DatabaseAttachment : Attachment {
@@ -38,6 +39,9 @@ class DatabaseAttachment : Attachment {
 
   @JvmField
   val archiveTransferState: AttachmentTable.ArchiveTransferState
+
+  @JvmField
+  val archiveThumbnailTransferState: AttachmentTable.ArchiveTransferState
 
   /** Metadata for this attachment, if null, no attempt was made to load the metadata and does not imply there is none */
   @JvmField
@@ -79,6 +83,7 @@ class DatabaseAttachment : Attachment {
     archiveCdn: Int?,
     thumbnailRestoreState: AttachmentTable.ThumbnailRestoreState,
     archiveTransferState: AttachmentTable.ArchiveTransferState,
+    archiveThumbnailTransferState: AttachmentTable.ArchiveTransferState,
     uuid: UUID?,
     quoteTargetContentType: String?,
     metadata: AttachmentMetadata?
@@ -117,6 +122,7 @@ class DatabaseAttachment : Attachment {
     this.archiveCdn = archiveCdn
     this.thumbnailRestoreState = thumbnailRestoreState
     this.archiveTransferState = archiveTransferState
+    this.archiveThumbnailTransferState = archiveThumbnailTransferState
     this.metadata = metadata
   }
 
@@ -130,6 +136,7 @@ class DatabaseAttachment : Attachment {
     archiveCdn = parcel.readInt().takeIf { it != NO_ARCHIVE_CDN }
     thumbnailRestoreState = AttachmentTable.ThumbnailRestoreState.deserialize(parcel.readInt())
     archiveTransferState = AttachmentTable.ArchiveTransferState.deserialize(parcel.readInt())
+    archiveThumbnailTransferState = AttachmentTable.ArchiveTransferState.deserialize(parcel.readInt())
     metadata = ParcelCompat.readParcelable(parcel, AttachmentMetadata::class.java.classLoader, AttachmentMetadata::class.java)
   }
 
@@ -144,6 +151,7 @@ class DatabaseAttachment : Attachment {
     dest.writeInt(archiveCdn ?: NO_ARCHIVE_CDN)
     dest.writeInt(thumbnailRestoreState.value)
     dest.writeInt(archiveTransferState.value)
+    dest.writeInt(archiveThumbnailTransferState.value)
     dest.writeParcelable(metadata, 0)
   }
 

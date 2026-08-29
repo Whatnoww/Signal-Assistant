@@ -1,8 +1,8 @@
 package org.thoughtcrime.securesms.database
 
 import org.signal.blurhash.BlurHash
+import org.signal.core.models.database.AttachmentId
 import org.signal.core.models.media.TransformProperties
-import org.thoughtcrime.securesms.attachments.AttachmentId
 import org.thoughtcrime.securesms.attachments.Cdn
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
 import org.thoughtcrime.securesms.audio.AudioHash
@@ -68,7 +68,8 @@ object FakeMessageRecords {
     archiveMediaId: String? = null,
     archiveThumbnailId: String? = null,
     thumbnailRestoreState: AttachmentTable.ThumbnailRestoreState = AttachmentTable.ThumbnailRestoreState.NONE,
-    archiveTransferState: AttachmentTable.ArchiveTransferState = AttachmentTable.ArchiveTransferState.NONE
+    archiveTransferState: AttachmentTable.ArchiveTransferState = AttachmentTable.ArchiveTransferState.NONE,
+    archiveThumbnailTransferState: AttachmentTable.ArchiveTransferState = AttachmentTable.ArchiveTransferState.NONE
   ): DatabaseAttachment {
     return DatabaseAttachment(
       attachmentId = attachmentId,
@@ -103,6 +104,7 @@ object FakeMessageRecords {
       archiveCdn = archiveCdn,
       thumbnailRestoreState = thumbnailRestoreState,
       archiveTransferState = archiveTransferState,
+      archiveThumbnailTransferState = archiveThumbnailTransferState,
       uuid = null,
       quoteTargetContentType = null,
       metadata = null

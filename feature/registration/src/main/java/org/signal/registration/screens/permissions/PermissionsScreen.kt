@@ -8,9 +8,9 @@
 package org.signal.registration.screens.permissions
 
 import android.Manifest
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Arrangement.SpaceAround
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,23 +27,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
-import org.signal.core.ui.WindowBreakpoint
 import org.signal.core.ui.compose.AllDevicePreviews
 import org.signal.core.ui.compose.Buttons
 import org.signal.core.ui.compose.Previews
-import org.signal.core.ui.compose.horizontalGutters
-import org.signal.core.ui.rememberWindowBreakpoint
 import org.signal.registration.R
-import org.signal.registration.screens.RegistrationScreen
+import org.signal.registration.screens.OnePaneRegistrationScaffold
+import org.signal.registration.screens.RegistrationScaffold
+import org.signal.registration.screens.TwoPaneRegistrationScaffold
+import org.signal.registration.screens.attachDebugLogHelper
 import org.signal.registration.screens.util.MockMultiplePermissionsState
 import org.signal.registration.screens.util.MockPermissionsState
 import org.signal.registration.test.TestTags
@@ -59,78 +59,64 @@ import org.signal.registration.test.TestTags
 @Composable
 fun PermissionsScreen(
   permissionsState: MultiplePermissionsState,
-  onProceed: () -> Unit = {},
-  modifier: Modifier = Modifier
+  modifier: Modifier = Modifier,
+  onProceed: () -> Unit = {}
 ) {
-  val windowBreakpoint = rememberWindowBreakpoint()
+  val layoutParams = RegistrationScaffold.rememberLayoutParams()
   val permissions = permissionsState.permissions.map { it.permission }
 
-  when (windowBreakpoint) {
-    WindowBreakpoint.SMALL -> {
-      Surface(modifier = modifier.testTag(TestTags.PERMISSIONS_SCREEN)) {
-        CompactLayout(
-          permissionsState = permissionsState,
-          permissions = permissions,
-          onProceed = onProceed,
-          modifier = modifier
-        )
-      }
-    }
+  Surface(modifier = modifier.testTag(TestTags.PERMISSIONS_SCREEN)) {
+    when (layoutParams) {
+      is RegistrationScaffold.Params.OnePane -> OnePaneLayout(
+        params = layoutParams,
+        permissionsState = permissionsState,
+        permissions = permissions,
+        onProceed = onProceed,
+        modifier = modifier
+      )
 
-    WindowBreakpoint.MEDIUM -> {
-      Surface(modifier = modifier.testTag(TestTags.PERMISSIONS_SCREEN)) {
-        MediumLayout(
-          permissionsState = permissionsState,
-          permissions = permissions,
-          onProceed = onProceed,
-          modifier = modifier
-        )
-      }
-    }
-
-    WindowBreakpoint.LARGE -> {
-      Surface(modifier = modifier.testTag(TestTags.PERMISSIONS_SCREEN)) {
-        LargeLayout(
-          permissionsState = permissionsState,
-          permissions = permissions,
-          onProceed = onProceed,
-          modifier = modifier
-        )
-      }
+      is RegistrationScaffold.Params.TwoPane -> TwoPaneLayout(
+        params = layoutParams,
+        permissionsState = permissionsState,
+        permissions = permissions,
+        onProceed = onProceed,
+        modifier = modifier
+      )
     }
   }
 }
 
 @Composable
-private fun CompactLayout(
+private fun OnePaneLayout(
+  params: RegistrationScaffold.Params.OnePane,
   modifier: Modifier,
   permissions: List<String>,
   permissionsState: MultiplePermissionsState,
   onProceed: () -> Unit
 ) {
-  RegistrationScreen(
+  val scrollState = rememberScrollState()
+
+  OnePaneRegistrationScaffold(
     modifier = modifier.fillMaxSize(),
-    content = {
+    params = params,
+    content = { paddingValues ->
       Box(
         modifier = Modifier
           .fillMaxWidth()
           .fillMaxHeight()
-          .padding(top = 24.dp),
-        contentAlignment = Alignment.BottomCenter
       ) {
-        val scrollState = rememberScrollState()
-
         Column(
           modifier = Modifier
             .fillMaxHeight()
             .verticalScroll(scrollState)
-            .padding(top = 16.dp)
-            .horizontalGutters()
+            .padding(paddingValues)
         ) {
           Text(
             text = stringResource(id = R.string.GrantPermissionsFragment__allow_permissions),
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+              .fillMaxWidth()
+              .attachDebugLogHelper()
           )
 
           Text(
@@ -141,136 +127,76 @@ private fun CompactLayout(
           )
 
           PermissionList(permissions)
-
-          Spacer(modifier = Modifier.padding(48.dp))
         }
-
-        PermissionButtons(onProceed, permissionsState, scrollState.canScrollForward)
       }
+    },
+    footer = {
+      PermissionButtons(
+        onProceed = onProceed,
+        permissionsState = permissionsState,
+        isElevated = scrollState.canScrollForward,
+        modifier = Modifier.padding(params.footerPadding)
+      )
     }
   )
 }
 
 @Composable
-private fun MediumLayout(
-  modifier: Modifier,
+private fun TwoPaneLayout(
+  params: RegistrationScaffold.Params.TwoPane,
+  modifier: Modifier = Modifier,
   permissions: List<String>,
   permissionsState: MultiplePermissionsState,
   onProceed: () -> Unit
 ) {
-  RegistrationScreen(
+  val firstPaneScrollState = rememberScrollState()
+  val secondPaneScrollState = rememberScrollState()
+
+  TwoPaneRegistrationScaffold(
     modifier = modifier.fillMaxSize(),
-    content = {
-      Row(
-        horizontalArrangement = SpaceAround,
-        modifier = Modifier.padding(top = 56.dp)
+    params = params,
+    firstPane = { paddingValues ->
+      Column(
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxHeight()
+          .verticalScroll(firstPaneScrollState)
+          .padding(paddingValues)
       ) {
-        Column(
+        Text(
+          text = stringResource(id = R.string.GrantPermissionsFragment__allow_permissions),
+          style = MaterialTheme.typography.headlineLarge,
           modifier = Modifier
-            .weight(1f)
-            .padding(horizontal = 24.dp)
-        ) {
-          Text(
-            text = stringResource(id = R.string.GrantPermissionsFragment__allow_permissions),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.fillMaxWidth()
-          )
+            .fillMaxWidth()
+            .attachDebugLogHelper()
+        )
 
-          Text(
-            text = stringResource(id = R.string.GrantPermissionsFragment__to_help_you_message_people_you_know),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 16.dp)
-          )
-        }
-
-        Box(
-          modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight(),
-          contentAlignment = Alignment.BottomCenter
-        ) {
-          val scrollState = rememberScrollState()
-
-          Column(
-            modifier = Modifier
-              .fillMaxHeight()
-              .verticalScroll(scrollState)
-              .padding(horizontal = 24.dp)
-          ) {
-            PermissionList(permissions)
-            Spacer(modifier = Modifier.padding(48.dp))
-          }
-
-          PermissionButtons(
-            onProceed,
-            permissionsState,
-            scrollState.canScrollForward
-          )
-        }
+        Text(
+          text = stringResource(id = R.string.GrantPermissionsFragment__to_help_you_message_people_you_know),
+          style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.padding(top = 16.dp)
+        )
       }
-    }
-  )
-}
-
-@Composable
-private fun LargeLayout(
-  modifier: Modifier,
-  permissions: List<String>,
-  permissionsState: MultiplePermissionsState,
-  onProceed: () -> Unit
-) {
-  RegistrationScreen(
-    modifier = modifier.fillMaxSize(),
-    content = {
-      Row(
-        horizontalArrangement = SpaceAround,
-        modifier = Modifier.padding(top = 76.dp)
+    },
+    secondPane = { paddingValues ->
+      Column(
+        modifier = Modifier
+          .weight(1f)
+          .fillMaxHeight()
+          .verticalScroll(secondPaneScrollState)
+          .padding(paddingValues)
       ) {
-        Column(
-          modifier = Modifier
-            .weight(1f)
-            .padding(horizontal = 24.dp)
-        ) {
-          Text(
-            text = stringResource(id = R.string.GrantPermissionsFragment__allow_permissions),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.fillMaxWidth()
-          )
-
-          Text(
-            text = stringResource(id = R.string.GrantPermissionsFragment__to_help_you_message_people_you_know),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 16.dp)
-          )
-        }
-
-        Box(
-          modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight(),
-          contentAlignment = Alignment.BottomCenter
-        ) {
-          val scrollState = rememberScrollState()
-
-          Column(
-            modifier = Modifier
-              .fillMaxHeight()
-              .verticalScroll(scrollState)
-              .padding(horizontal = 24.dp)
-          ) {
-            PermissionList(permissions)
-            Spacer(modifier = Modifier.padding(48.dp))
-          }
-
-          PermissionButtons(
-            onProceed,
-            permissionsState,
-            scrollState.canScrollForward
-          )
-        }
+        PermissionList(permissions)
       }
+    },
+    footer = {
+      PermissionButtons(
+        onProceed = onProceed,
+        permissionsState = permissionsState,
+        isElevated = firstPaneScrollState.canScrollForward || secondPaneScrollState.canScrollForward,
+        modifier = Modifier.padding(params.footerPadding)
+      )
     }
   )
 }
@@ -349,17 +275,18 @@ private fun PermissionRow(
 }
 
 @Composable
-private fun PermissionButtons(onProceed: () -> Unit, permissionsState: MultiplePermissionsState, canScrollForward: Boolean) {
-  Surface(
-    modifier = Modifier.fillMaxWidth(),
-    shadowElevation = if (canScrollForward) 8.dp else 0.dp
+private fun PermissionButtons(
+  onProceed: () -> Unit,
+  permissionsState: MultiplePermissionsState,
+  isElevated: Boolean,
+  modifier: Modifier = Modifier
+) {
+  RegistrationScaffold.FooterSurface(
+    isElevated = isElevated
   ) {
     Row(
-      horizontalArrangement = Arrangement.Absolute.Right,
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 16.dp)
-        .horizontalGutters()
+      horizontalArrangement = Arrangement.End,
+      modifier = modifier.fillMaxWidth()
     ) {
       TextButton(
         modifier = Modifier
@@ -392,6 +319,7 @@ private fun PermissionButtons(onProceed: () -> Unit, permissionsState: MultipleP
   }
 }
 
+@SuppressLint("InlinedApi")
 @AllDevicePreviews
 @Composable
 private fun PermissionsScreenPreview() {

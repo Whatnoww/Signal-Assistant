@@ -87,6 +87,7 @@ private val lightColorScheme = lightColorScheme(
   secondaryContainer = Color(0xFFDCE5F9),
   surface = Color(0xFFFBFCFF),
   surfaceContainerLow = Color(0xFFF2F5F9),
+  surfaceContainerHighest = Color(0xFFE7EBF3),
   surfaceVariant = Color(0xFFE7EBF3),
   background = Color(0xFFFBFCFF),
   error = Color(0xFFBA1B1B),
@@ -125,13 +126,15 @@ private val lightExtendedColors = ExtendedColors(
   colorNeutralInverse = Color(0xFF121212),
   colorNeutralVariantInverse = Color(0xFF5C5C5C),
   colorWarning = Color(0x1FB44828),
-  colorOnWarning = Color(0xFFB44828)
+  colorOnWarning = Color(0xFFB44828),
+  colorAlert = Color(0xFFEF5350),
+  colorAlertDisabled = Color(0x80EF5350)
 )
 
 private val darkExtendedColors = ExtendedColors(
   neutralSurface = Color(0x14FFFFFF),
   colorOnCustom = Color(0xFFFFFFFF),
-  colorOnCustomVariant = Color(0xB3FFFFFF),
+  colorOnCustomVariant = Color(0x18FFFFFF),
   colorSurface1 = Color(0xFF23242A),
   colorSurface2 = Color(0xFF272A31),
   colorSurface3 = Color(0xFF2C2F37),
@@ -152,7 +155,9 @@ private val darkExtendedColors = ExtendedColors(
   colorNeutralInverse = Color(0xE0FFFFFF),
   colorNeutralVariantInverse = Color(0xA3FFFFFF),
   colorWarning = Color(0x1FEB977D),
-  colorOnWarning = Color(0xFFEB977D)
+  colorOnWarning = Color(0xFFEB977D),
+  colorAlert = Color(0xFFF44336),
+  colorAlertDisabled = Color(0x80F44336)
 )
 
 private val darkColorScheme = darkColorScheme(
@@ -162,6 +167,7 @@ private val darkColorScheme = darkColorScheme(
   secondaryContainer = Color(0xFF414659),
   surface = Color(0xFF1B1C1F),
   surfaceContainerLow = Color(0xFF23242A),
+  surfaceContainerHighest = Color(0xFF303133),
   surfaceVariant = Color(0xFF303133),
   background = Color(0xFF1B1C1F),
   error = Color(0xFFFFB4A9),
@@ -209,6 +215,19 @@ fun SignalTheme(
         content = content
       )
     }
+  }
+}
+
+/**
+ * Applies the light color scheme to [content] regardless of the ambient theme, leaving typography and shapes untouched.
+ */
+@Composable
+fun ForceLightColors(content: @Composable () -> Unit) {
+  CompositionLocalProvider(LocalExtendedColors provides lightExtendedColors) {
+    MaterialTheme(
+      colorScheme = lightColorScheme,
+      content = content
+    )
   }
 }
 

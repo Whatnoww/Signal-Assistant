@@ -28,7 +28,7 @@ import androidx.annotation.WorkerThread;
 import org.greenrobot.eventbus.EventBus;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.attachments.Attachment;
-import org.thoughtcrime.securesms.attachments.AttachmentId;
+import org.signal.core.models.database.AttachmentId;
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment;
 import org.thoughtcrime.securesms.backup.v2.BackupRepository;
 import org.thoughtcrime.securesms.contacts.sync.ContactDiscovery;
@@ -68,10 +68,10 @@ import org.thoughtcrime.securesms.notifications.MarkReadReceiver;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.recipients.RecipientUtil;
-import org.thoughtcrime.securesms.util.ParcelUtil;
+import org.signal.core.util.ParcelUtil;
 import org.thoughtcrime.securesms.util.SignalLocalMetrics;
 import org.whispersystems.signalservice.api.push.DistributionId;
-import org.whispersystems.signalservice.api.util.Preconditions;
+import org.signal.network.util.Preconditions;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -706,7 +706,7 @@ public class MessageSender {
     private final AttachmentId       attachmentId;
     private final Collection<String> jobIds;
 
-    PreUploadResult(@NonNull Media media, @NonNull AttachmentId attachmentId, @NonNull Collection<String> jobIds) {
+    public PreUploadResult(@NonNull Media media, @NonNull AttachmentId attachmentId, @NonNull Collection<String> jobIds) {
       this.media        = media;
       this.attachmentId = attachmentId;
       this.jobIds       = jobIds;

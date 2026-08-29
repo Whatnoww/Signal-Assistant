@@ -8,27 +8,30 @@ package org.whispersystems.signalservice.api.profiles
 import org.signal.core.models.ServiceId
 import org.signal.core.util.Hex
 import org.signal.core.util.logging.Log
+import org.signal.libsignal.net.RequestResult
+import org.signal.libsignal.net.UnauthProfilesService
 import org.signal.libsignal.zkgroup.VerificationFailedException
 import org.signal.libsignal.zkgroup.profiles.ClientZkProfileOperations
 import org.signal.libsignal.zkgroup.profiles.ExpiringProfileKeyCredential
 import org.signal.libsignal.zkgroup.profiles.ProfileKey
 import org.signal.libsignal.zkgroup.profiles.ProfileKeyCredentialRequestContext
-import org.whispersystems.signalservice.api.NetworkResult
+import org.signal.network.NetworkResult
+import org.signal.network.util.JsonUtil
+import org.signal.network.websocket.WebSocketRequestMessage
+import org.signal.network.websocket.WebsocketResponse
+import org.signal.network.websocket.get
+import org.signal.network.websocket.put
 import org.whispersystems.signalservice.api.crypto.ProfileCipher
 import org.whispersystems.signalservice.api.crypto.ProfileCipherOutputStream
 import org.whispersystems.signalservice.api.crypto.SealedSenderAccess
+import org.whispersystems.signalservice.api.fromWebSocketRequest
 import org.whispersystems.signalservice.api.services.ProfileService
 import org.whispersystems.signalservice.api.websocket.SignalWebSocket
-import org.whispersystems.signalservice.internal.get
 import org.whispersystems.signalservice.internal.push.PaymentAddress
 import org.whispersystems.signalservice.internal.push.ProfileAvatarData
 import org.whispersystems.signalservice.internal.push.ProfileAvatarUploadAttributes
 import org.whispersystems.signalservice.internal.push.PushServiceSocket
 import org.whispersystems.signalservice.internal.push.http.ProfileCipherOutputStreamFactory
-import org.whispersystems.signalservice.internal.put
-import org.whispersystems.signalservice.internal.util.JsonUtil
-import org.whispersystems.signalservice.internal.websocket.WebSocketRequestMessage
-import org.whispersystems.signalservice.internal.websocket.WebsocketResponse
 import java.security.SecureRandom
 
 /**
@@ -115,7 +118,7 @@ class ProfileApi(
    * - 404: Recipient is not a registered Signal user
    * - 429: Rate-limited
    */
-  fun getVersionedProfileAndCredential(aci: ServiceId.ACI, profileKey: ProfileKey, sealedSenderAccess: SealedSenderAccess?): NetworkResult<Pair<SignalServiceProfile, ExpiringProfileKeyCredential?>> {
+  suspend fun getVersionedProfileAndCredential(aci: ServiceId.ACI, profileKey: ProfileKey, sealedSenderAccess: SealedSenderAccess?): NetworkResult<Pair<SignalServiceProfile, ExpiringProfileKeyCredential?>> {
     val profileVersion = profileKey.getProfileKeyVersion(aci.libSignalAci).serialize()
     val profileRequestContext = clientZkProfileOperations.createProfileKeyCredentialRequestContext(SecureRandom(), aci.libSignalAci, profileKey)
     val serializedProfileRequest = Hex.toStringCondensed(profileRequestContext.request.serialize())
@@ -124,12 +127,12 @@ class ProfileApi(
     val converter = ProfileAndCredentialResponseConverter(clientZkProfileOperations, profileRequestContext)
 
     return if (sealedSenderAccess == null) {
-      NetworkResult.fromWebSocket(converter) { authWebSocket.request(request) }
+      NetworkResult.fromWebSocketSuspend(converter) { authWebSocket.requestSuspend(request) }
     } else {
-      NetworkResult.fromWebSocket(converter) { unauthWebSocket.request(request, sealedSenderAccess) }
-        .fallback(
+      NetworkResult.fromWebSocketSuspend(converter) { unauthWebSocket.requestSuspend(request, sealedSenderAccess) }
+        .fallbackSuspend(
           predicate = { it is NetworkResult.StatusCodeError && it.code == 401 },
-          fallback = { NetworkResult.fromWebSocket(converter) { authWebSocket.request(request) } }
+          fallback = { NetworkResult.fromWebSocketSuspend(converter) { authWebSocket.requestSuspend(request) } }
         )
     }
   }
@@ -142,7 +145,7 @@ class ProfileApi(
    * - 404: Recipient is not a registered Signal user
    * - 429: Rate-limited
    */
-  fun getVersionedProfile(aci: ServiceId.ACI, profileKey: ProfileKey, sealedSenderAccess: SealedSenderAccess?): NetworkResult<SignalServiceProfile> {
+  suspend fun getVersionedProfile(aci: ServiceId.ACI, profileKey: ProfileKey, sealedSenderAccess: SealedSenderAccess?): NetworkResult<SignalServiceProfile> {
     val profileKeyIdentifier = profileKey.getProfileKeyVersion(aci.libSignalAci)
     val profileVersion = profileKeyIdentifier.serialize()
 
@@ -150,12 +153,12 @@ class ProfileApi(
     val converter = NetworkResult.DefaultWebSocketConverter(SignalServiceProfile::class)
 
     return if (sealedSenderAccess == null) {
-      NetworkResult.fromWebSocket(converter) { authWebSocket.request(request) }
+      NetworkResult.fromWebSocketSuspend(converter) { authWebSocket.requestSuspend(request) }
     } else {
-      NetworkResult.fromWebSocket(converter) { unauthWebSocket.request(request, sealedSenderAccess) }
-        .fallback(
+      NetworkResult.fromWebSocketSuspend(converter) { unauthWebSocket.requestSuspend(request, sealedSenderAccess) }
+        .fallbackSuspend(
           predicate = { it is NetworkResult.StatusCodeError && it.code == 401 },
-          fallback = { NetworkResult.fromWebSocket(converter) { authWebSocket.request(request) } }
+          fallback = { NetworkResult.fromWebSocketSuspend(converter) { authWebSocket.requestSuspend(request) } }
         )
     }
   }
@@ -168,18 +171,29 @@ class ProfileApi(
    * - 404: Recipient is not a registered Signal user
    * - 429: Rate-limited
    */
-  fun getUnversionedProfile(serviceId: ServiceId, sealedSenderAccess: SealedSenderAccess?): NetworkResult<SignalServiceProfile> {
+  suspend fun getUnversionedProfile(serviceId: ServiceId, sealedSenderAccess: SealedSenderAccess?): NetworkResult<SignalServiceProfile> {
     val request = WebSocketRequestMessage.get("/v1/profile/$serviceId")
     val converter = NetworkResult.DefaultWebSocketConverter(SignalServiceProfile::class)
 
     return if (sealedSenderAccess == null) {
-      NetworkResult.fromWebSocket(converter) { authWebSocket.request(request) }
+      NetworkResult.fromWebSocketSuspend(converter) { authWebSocket.requestSuspend(request) }
     } else {
-      NetworkResult.fromWebSocket(converter) { unauthWebSocket.request(request, sealedSenderAccess) }
-        .fallback(
+      NetworkResult.fromWebSocketSuspend(converter) { unauthWebSocket.requestSuspend(request, sealedSenderAccess) }
+        .fallbackSuspend(
           predicate = { it is NetworkResult.StatusCodeError && it.code == 401 },
-          fallback = { NetworkResult.fromWebSocket(converter) { authWebSocket.request(request) } }
+          fallback = { NetworkResult.fromWebSocketSuspend(converter) { authWebSocket.requestSuspend(request) } }
         )
+    }
+  }
+
+  /**
+   * Whether an account with the given ACI or PNI exists. This is an unauthenticated request.
+   *
+   * Note that we normally learn this from a 404 on a profile fetch instead.
+   */
+  suspend fun accountExists(serviceId: ServiceId): RequestResult<Boolean, Nothing> {
+    return unauthWebSocket.runCatchingWithChatConnection { connection ->
+      UnauthProfilesService(connection).accountExists(serviceId.libSignalServiceId)
     }
   }
 

@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx3.asFlow
 import org.signal.core.models.ServiceId
+import org.signal.core.models.database.StickerRecord
 import org.signal.core.util.concurrent.SignalDispatchers
 import org.signal.core.util.logging.Log
 import org.signal.core.util.orNull
@@ -74,7 +75,6 @@ import org.thoughtcrime.securesms.database.model.MessageId
 import org.thoughtcrime.securesms.database.model.MessageRecord
 import org.thoughtcrime.securesms.database.model.MmsMessageRecord
 import org.thoughtcrime.securesms.database.model.ReactionRecord
-import org.thoughtcrime.securesms.database.model.StickerRecord
 import org.thoughtcrime.securesms.database.model.StoryViewState
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
 import org.thoughtcrime.securesms.dependencies.AppDependencies
@@ -153,7 +153,7 @@ class ConversationViewModel(
 
   val groupMemberServiceIds: Observable<List<ServiceId>> = recipientRepository
     .groupRecord
-    .filter { it.isPresent && it.get().isV2Group }
+    .filter { it.isPresent && it.get().hasV2GroupProperties }
     .map { it.get().requireV2GroupProperties().getMemberServiceIds() }
     .distinctUntilChanged()
     .observeOn(AndroidSchedulers.mainThread())
@@ -246,6 +246,7 @@ class ConversationViewModel(
     disposables += chatColors.update(chatColorsDataObservable.toFlowable(BackpressureStrategy.LATEST)) { c, _ -> c }
 
     disposables += repository.getConversationThreadState(threadId, requestedStartingPosition)
+      .subscribeOn(Schedulers.io())
       .subscribeBy(onSuccess = {
         pagingController.set(it.items.controller)
         _conversationThreadState.onNext(it)
@@ -329,7 +330,8 @@ class ConversationViewModel(
       recipientRepository.groupRecord
     ) { _, r, g -> Pair(r, g) }
       .subscribeOn(Schedulers.io())
-      .flatMapSingle { (r, g) -> repository.getIdentityRecords(r, g.orNull()) }
+      .throttleLatest(250, TimeUnit.MILLISECONDS, true)
+      .switchMapSingle { (r, g) -> repository.getIdentityRecords(r, g.orNull()) }
       .subscribeBy { newState ->
         identityRecordsStore.update { newState }
       }
@@ -347,7 +349,7 @@ class ConversationViewModel(
   }
 
   fun onAvatarDownloadFailed() {
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       val recipient = recipientSnapshot
       if (recipient != null) {
         recipients.manuallyUpdateShowAvatar(recipient.id, false)
@@ -357,7 +359,7 @@ class ConversationViewModel(
   }
 
   private fun getPinnedMessages() {
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       val threadRecipient = SignalDatabase.threads.getRecipientForThreadId(threadId)
       internalPinnedMessages.value = repository.getPinnedMessages(threadId).map {
         ConversationMessage.ConversationMessageFactory.createWithUnresolvedData(AppDependencies.application, it, threadRecipient!!)
@@ -434,18 +436,18 @@ class ConversationViewModel(
       ),
       transform = { it.toList() }
     )
-      .flowOn(Dispatchers.IO)
+      .flowOn(Dispatchers.Default)
   }
 
   fun onCollapseEvents(messageId: Long) {
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       repository.collapseEvents(messageId)
       pagingController.onDataInvalidated()
     }
   }
 
   fun onExpandEvents(messageId: Long) {
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       repository.expandEvents(messageId)
       pagingController.onDataInvalidated()
     }
@@ -640,6 +642,13 @@ class ConversationViewModel(
     refreshIdentityRecords.onNext(Unit)
   }
 
+  fun refreshInputReadyState() {
+    val recipientId = recipientSnapshot?.id ?: return
+    viewModelScope.launch(Dispatchers.Default) {
+      Recipient.live(recipientId).refresh()
+    }
+  }
+
   fun updateIdentityRecords(): Completable {
     val state: IdentityRecordsState = identityRecordsStore.state
     if (state.recipient == null) {
@@ -741,7 +750,7 @@ class ConversationViewModel(
   }
 
   fun toggleVote(poll: PollRecord, pollOption: PollOption, isChecked: Boolean) {
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       val voteCount = if (isChecked) {
         SignalDatabase.polls.insertVote(poll, pollOption)
       } else {
@@ -823,7 +832,7 @@ class ConversationViewModel(
   }
 
   fun collapseAllEvents() {
-    viewModelScope.launch(SignalDispatchers.IO) {
+    viewModelScope.launch(SignalDispatchers.Default) {
       repository.collapseAllEvents()
     }
   }

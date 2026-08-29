@@ -42,7 +42,7 @@ fun RestoreLocalBackupNavDisplay(
   callback: RestoreLocalBackupCallback,
   isRegistrationInProgress: Boolean,
   enterBackupKeyState: EnterBackupKeyViewModel.EnterBackupKeyState,
-  backupKey: String
+  enteredText: String
 ) {
   val backstack = rememberNavBackStack(RestoreLocalBackupNavKey.SelectLocalBackupTypeScreen)
   val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
@@ -72,7 +72,7 @@ fun RestoreLocalBackupNavDisplay(
   Box(modifier = Modifier.fillMaxSize()) {
     NavDisplay(
       backStack = backstack,
-      sceneStrategy = bottomSheetStrategy,
+      sceneStrategies = listOf(bottomSheetStrategy),
       entryProvider = entryProvider {
         entry<RestoreLocalBackupNavKey.SelectLocalBackupTypeScreen> {
           SelectLocalBackupTypeScreen(
@@ -136,7 +136,7 @@ fun RestoreLocalBackupNavDisplay(
 
         entry<RestoreLocalBackupNavKey.EnterLocalBackupKeyScreen> {
           EnterLocalBackupKeyScreen(
-            backupKey = backupKey,
+            enteredText = enteredText,
             isRegistrationInProgress = isRegistrationInProgress,
             isBackupKeyValid = enterBackupKeyState.backupKeyValid,
             aepValidationError = enterBackupKeyState.aepValidationError,

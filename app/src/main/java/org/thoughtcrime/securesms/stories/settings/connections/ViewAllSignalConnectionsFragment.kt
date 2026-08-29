@@ -2,13 +2,15 @@ package org.thoughtcrime.securesms.stories.settings.connections
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.ViewBinderDelegate
 import org.thoughtcrime.securesms.components.WrapperDialogFragment
-import org.thoughtcrime.securesms.contacts.LetterHeaderDecoration
 import org.thoughtcrime.securesms.contacts.paged.ContactSearchAdapter
 import org.thoughtcrime.securesms.contacts.paged.ContactSearchConfiguration
 import org.thoughtcrime.securesms.contacts.paged.ContactSearchPagedDataSourceRepository
@@ -18,6 +20,7 @@ import org.thoughtcrime.securesms.database.RecipientTable
 import org.thoughtcrime.securesms.databinding.ViewAllSignalConnectionsFragmentBinding
 import org.thoughtcrime.securesms.groups.SelectionLimits
 import org.thoughtcrime.securesms.search.SearchRepository
+import org.thoughtcrime.securesms.util.SystemWindowInsetsSetter
 
 class ViewAllSignalConnectionsFragment : Fragment(R.layout.view_all_signal_connections_fragment) {
 
@@ -40,6 +43,10 @@ class ViewAllSignalConnectionsFragment : Fragment(R.layout.view_all_signal_conne
       requireActivity().onBackPressedDispatcher.onBackPressed()
     }
 
+    binding.toolbar.updateLayoutParams { height = ViewGroup.LayoutParams.WRAP_CONTENT }
+    SystemWindowInsetsSetter.attach(binding.toolbar, viewLifecycleOwner, WindowInsetsCompat.Type.statusBars())
+    SystemWindowInsetsSetter.attach(binding.recycler, viewLifecycleOwner, WindowInsetsCompat.Type.navigationBars())
+
     binding.recycler.bind(
       viewModel = contactSearchViewModel,
       fragmentManager = childFragmentManager,
@@ -47,8 +54,7 @@ class ViewAllSignalConnectionsFragment : Fragment(R.layout.view_all_signal_conne
         displayCheckBox = false,
         displaySecondaryInformation = ContactSearchAdapter.DisplaySecondaryInformation.NEVER
       ),
-      mapStateToConfiguration = { getConfiguration() },
-      itemDecorations = listOf(LetterHeaderDecoration(requireContext()) { false })
+      mapStateToConfiguration = { getConfiguration() }
     )
   }
 

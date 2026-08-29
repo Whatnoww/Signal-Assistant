@@ -71,6 +71,7 @@ public class GroupPreJoinActionProcessor extends GroupActionProcessor {
                                                                                AUDIO_LEVELS_INTERVAL,
                                                                                dredDuration,
                                                                                RingRtcDynamicConfiguration.getAudioConfig(),
+                                                                               RingRtcDynamicConfiguration.getSvcConfig(),
                                                                                webRtcInteractor.getGroupCallObserver());
 
     if (groupCall == null) {
@@ -196,7 +197,7 @@ public class GroupPreJoinActionProcessor extends GroupActionProcessor {
     webRtcInteractor.initializeAudioForCall(true);
 
     try {
-      groupCall.setOutgoingVideoSource(currentState.getVideoState().requireLocalSink(), currentState.getVideoState().requireCamera());
+      groupCall.setOutgoingVideoSource(currentState.getVideoState().requireLocalSink(), currentState.getVideoState().requireRouter());
       groupCall.setOutgoingVideoMuted(!currentState.getLocalDeviceState().getCameraState().isEnabled(), false);
       groupCall.setOutgoingAudioMuted(!currentState.getLocalDeviceState().isMicrophoneEnabled());
       groupCall.setDataMode(NetworkUtil.getCallingDataMode(context, groupCall.getLocalDeviceState().getNetworkRoute().getLocalAdapterType()));
@@ -220,13 +221,13 @@ public class GroupPreJoinActionProcessor extends GroupActionProcessor {
   protected @NonNull WebRtcServiceState handleSetEnableVideo(@NonNull WebRtcServiceState currentState, boolean enable) {
     Log.i(tag, "handleSetEnableVideo(): Changing for pre-join group call. enable: " + enable);
 
-    currentState.getVideoState().requireCamera().setEnabled(enable);
+    currentState.getVideoState().requireRouter().setEnabled(enable);
     return currentState.builder()
                        .changeCallSetupState(RemotePeer.GROUP_CALL_ID)
                        .enableVideoOnCreate(enable)
                        .commit()
                        .changeLocalDeviceState()
-                       .cameraState(currentState.getVideoState().requireCamera().getCameraState())
+                       .cameraState(currentState.getVideoState().requireRouter().getCameraState())
                        .build();
   }
 

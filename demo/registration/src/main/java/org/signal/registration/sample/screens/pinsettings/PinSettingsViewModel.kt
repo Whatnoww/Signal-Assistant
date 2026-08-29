@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.signal.core.util.logging.Log
 import org.signal.libsignal.net.RequestResult
+import org.signal.network.api.RegistrationApiV2.AccountAttributes
 import org.signal.registration.NetworkController
 import org.signal.registration.sample.storage.RegistrationPreferences
 
@@ -170,7 +171,7 @@ class PinSettingsViewModel(
         null
       }
 
-      val attributes = NetworkController.AccountAttributes(
+      val attributes = AccountAttributes(
         signalingKey = null,
         registrationId = RegistrationPreferences.aciRegistrationId,
         fetchesMessages = RegistrationPreferences.fetchesMessages,
@@ -178,13 +179,14 @@ class PinSettingsViewModel(
         unidentifiedAccessKey = unidentifiedAccessKey,
         unrestrictedUnidentifiedAccess = unidentifiedAccessKey == null,
         discoverableByPhoneNumber = false,
-        capabilities = NetworkController.AccountAttributes.Capabilities(
+        capabilities = AccountAttributes.Capabilities(
           storage = !newOptedOut,
           versionedExpirationTimer = true,
           attachmentBackfill = true,
-          spqr = true
+          spqr = true,
+          usernameChangeSyncMessage = true,
+          optionalPhoneNumber = false
         ),
-        name = null,
         pniRegistrationId = RegistrationPreferences.pniRegistrationId,
         recoveryPassword = recoveryPassword
       )

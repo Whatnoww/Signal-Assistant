@@ -6,6 +6,7 @@
 package org.thoughtcrime.securesms.backup.v2.exporters
 
 import android.database.Cursor
+import androidx.annotation.VisibleForTesting
 import okio.ByteString.Companion.toByteString
 import org.json.JSONArray
 import org.json.JSONException
@@ -42,9 +43,11 @@ import org.signal.archive.proto.Text
 import org.signal.archive.proto.ThreadMergeChatUpdate
 import org.signal.archive.proto.ViewOnceMessage
 import org.signal.core.models.ServiceId
+import org.signal.core.models.database.AttachmentId
 import org.signal.core.util.Base64
 import org.signal.core.util.EventTimer
 import org.signal.core.util.Hex
+import org.signal.core.util.JsonUtils
 import org.signal.core.util.ParallelEventTimer
 import org.signal.core.util.StringUtil
 import org.signal.core.util.UuidUtil
@@ -67,7 +70,6 @@ import org.signal.core.util.requireLong
 import org.signal.core.util.requireLongOrNull
 import org.signal.core.util.requireString
 import org.signal.core.util.toByteArray
-import org.thoughtcrime.securesms.attachments.AttachmentId
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
 import org.thoughtcrime.securesms.backup.v2.BackupMode
 import org.thoughtcrime.securesms.backup.v2.ExportOddities
@@ -105,7 +107,6 @@ import org.thoughtcrime.securesms.payments.FailureReason
 import org.thoughtcrime.securesms.payments.State
 import org.thoughtcrime.securesms.polls.PollRecord
 import org.thoughtcrime.securesms.recipients.RecipientId
-import org.thoughtcrime.securesms.util.JsonUtils
 import org.thoughtcrime.securesms.util.MediaUtil
 import org.thoughtcrime.securesms.util.mb
 import java.io.Closeable
@@ -142,12 +143,19 @@ class ChatItemArchiveExporter(
   private val backupStartTime: Long,
   private val batchSize: Int,
   private val exportState: ExportState,
-  private val cursorGenerator: (Long, Int) -> Cursor
+  private val cursorGenerator: (Long, Int) -> Cursor,
+  private val maxBufferMemorySize: Int = MAX_BUFFER_MEMORY_SIZE
 ) : Iterator<ChatItem?>, Closeable {
 
   companion object {
     val EXPIRATION_CUTOFF = 1.days
     private val MAX_BUFFER_MEMORY_SIZE = 15.mb
+
+    /** Never ask the database for fewer rows than this, no matter how large the individual records are. */
+    private const val MIN_ROW_LIMIT = 100
+
+    /** How many extra rows to ask for beyond what we expect to consume, to account for records getting smaller. */
+    private const val ROW_LIMIT_HEADROOM = 1.5
   }
 
   /** Timer for more macro-level events, like fetching extra data vs transforming the data. */
@@ -169,7 +177,19 @@ class ChatItemArchiveExporter(
 
   private var lastSeenReceivedTime = 0L
 
-  private var records: LinkedHashMap<Long, BackupMessageRecord> = readNextMessageRecordBatch(emptySet())
+  /**
+   * The ids of every record we've already exported that shares [lastSeenReceivedTime].
+   */
+  private val lastSeenReceivedTimeIds: MutableSet<Long> = hashSetOf()
+
+  /**
+   * The number of rows we ask the database for when reading the next batch. Starts with max and then adjusts
+   * up and down to account for changes in message sizes.
+   */
+  private var rowLimit = batchSize
+
+  @VisibleForTesting
+  internal var records: LinkedHashMap<Long, BackupMessageRecord> = readNextMessageRecordBatch()
 
   override fun hasNext(): Boolean {
     return buffer.isNotEmpty() || records.isNotEmpty()
@@ -193,14 +213,20 @@ class ChatItemArchiveExporter(
       }
 
       when {
-        record.deletedBy == record.fromRecipientId -> {
-          builder.remoteDeletedMessage = RemoteDeletedMessage()
-          transformTimer.emit("remote-delete")
-        }
-
         record.deletedBy != null -> {
-          builder.adminDeletedMessage = AdminDeletedMessage(adminId = record.deletedBy)
-          transformTimer.emit("admin-delete")
+          val deletedByAuthor = record.deletedBy == builder.authorId
+          val isGroupChat = exportState.threadIdToRecipientId[record.threadId] in exportState.groupRecipientIds
+
+          if (!deletedByAuthor && isGroupChat) {
+            builder.adminDeletedMessage = AdminDeletedMessage(adminId = record.deletedBy)
+            transformTimer.emit("admin-delete")
+          } else {
+            if (!deletedByAuthor) {
+              Log.w(TAG, ExportOddities.adminDeleteInNonGroupChat(record.dateSent))
+            }
+            builder.remoteDeletedMessage = RemoteDeletedMessage()
+            transformTimer.emit("remote-delete")
+          }
         }
 
         MessageTypes.isJoinedType(record.type) -> {
@@ -435,7 +461,7 @@ class ChatItemArchiveExporter(
 
         else -> {
           val attachments = extraData.attachmentsById[record.id]
-          val sticker = attachments?.firstOrNull { dbAttachment -> dbAttachment.isSticker }
+          val sticker = attachments?.firstOrNull { dbAttachment -> dbAttachment.isSticker && !dbAttachment.quote }
 
           if (sticker?.stickerLocator != null) {
             builder.stickerMessage = sticker.toRemoteStickerMessage(sentTimestamp = record.dateSent, reactions = extraData.reactionsById[id], exportState = exportState)
@@ -474,10 +500,9 @@ class ChatItemArchiveExporter(
     }
     eventTimer.emit("transform")
 
-    val recordIds = HashSet(records.keys)
     records.clear()
 
-    records = readNextMessageRecordBatch(recordIds)
+    records = readNextMessageRecordBatch()
     eventTimer.emit("messages")
 
     return if (buffer.isNotEmpty()) {
@@ -493,22 +518,55 @@ class ChatItemArchiveExporter(
     Log.d(TAG, "[ChatItemArchiveExporterExtraData][batchSize = $batchSize] ${extraDataTimer.stop().summary}")
   }
 
-  private fun readNextMessageRecordBatch(pastIds: Set<Long>): LinkedHashMap<Long, BackupMessageRecord> {
-    return cursorGenerator(lastSeenReceivedTime, batchSize).use { cursor ->
-      val records: LinkedHashMap<Long, BackupMessageRecord> = LinkedHashMap(batchSize)
-      var estimatedRecordsMemorySize = 0
-      while (cursor.moveToNext() && estimatedRecordsMemorySize < MAX_BUFFER_MEMORY_SIZE) {
-        cursor.toBackupMessageRecord(pastIds, backupStartTime)?.let { record ->
-          records[record.id] = record
-          lastSeenReceivedTime = record.dateReceived
-          estimatedRecordsMemorySize += record.estimatedSizeInBytes
+  @VisibleForTesting
+  internal fun readNextMessageRecordBatch(): LinkedHashMap<Long, BackupMessageRecord> {
+    var limit = rowLimit
+
+    while (true) {
+      val batch: LinkedHashMap<Long, BackupMessageRecord> = LinkedHashMap(limit.coerceAtMost(batchSize))
+      var estimatedBatchMemorySize = 0
+      var rowsRead = 0
+
+      cursorGenerator(lastSeenReceivedTime, limit).use { cursor ->
+        while (cursor.moveToNext()) {
+          rowsRead++
+
+          val record = cursor.toBackupMessageRecord(lastSeenReceivedTimeIds, backupStartTime) ?: continue
+
+          if (record.dateReceived != lastSeenReceivedTime) {
+            lastSeenReceivedTime = record.dateReceived
+            lastSeenReceivedTimeIds.clear()
+          }
+          lastSeenReceivedTimeIds += record.id
+
+          batch[record.id] = record
+          estimatedBatchMemorySize += record.estimatedSizeInBytes
+
+          if (estimatedBatchMemorySize >= maxBufferMemorySize) {
+            break
+          }
         }
       }
 
-      if (estimatedRecordsMemorySize > MAX_BUFFER_MEMORY_SIZE) {
-        Log.d(TAG, "[readNextMessageRecordBatch] recordsSize = ${records.size} recordsMemSize: ${estimatedRecordsMemorySize.bytes.toUnitString(spaced = false)}")
+      if (batch.isEmpty() && rowsRead >= limit) {
+        limit = lastSeenReceivedTimeIds.size + MIN_ROW_LIMIT
+        Log.w(TAG, "[readNextMessageRecordBatch] All $rowsRead rows read were already exported. Retrying with a limit of $limit.")
+        continue
       }
-      records
+
+      if (batch.isNotEmpty()) {
+        val previousRowLimit = rowLimit
+        val averageRecordSize = max(1, estimatedBatchMemorySize / batch.size)
+        val sizeBasedLimit = ((maxBufferMemorySize / averageRecordSize) * ROW_LIMIT_HEADROOM).toInt()
+
+        rowLimit = sizeBasedLimit.coerceIn(MIN_ROW_LIMIT, max(MIN_ROW_LIMIT, batchSize)) + lastSeenReceivedTimeIds.size
+
+        if (rowLimit != previousRowLimit) {
+          Log.d(TAG, "[readNextMessageRecordBatch] recordsSize = ${batch.size}, recordsMemSize = ${estimatedBatchMemorySize.bytes.toUnitString(spaced = false)}, avgRecordSize = ${averageRecordSize.bytes.toUnitString(spaced = false)}. Adjusting rowLimit $previousRowLimit -> $rowLimit")
+        }
+      }
+
+      return batch
     }
   }
 
@@ -647,14 +705,21 @@ private fun BackupMessageRecord.toBasicChatItemBuilder(selfRecipientId: Recipien
     }
   }
 
-  if (!MessageTypes.isExpirationTimerUpdate(record.type) && builder.expiresInMs != null && builder.expireStartDate != null) {
-    val cutoffDuration = ChatItemArchiveExporter.EXPIRATION_CUTOFF.inWholeMilliseconds
-    val expiresAt = builder.expireStartDate!! + builder.expiresInMs!!
-    val threshold = if (exportState.backupMode.isLinkAndSync) backupStartTime else backupStartTime + cutoffDuration
-
-    if (expiresAt < threshold || (builder.expiresInMs!! <= cutoffDuration && !exportState.backupMode.isLinkAndSync)) {
+  if (!MessageTypes.isExpirationTimerUpdate(record.type) && builder.expiresInMs != null) {
+    if (exportState.backupMode.isPlaintextExport) {
       Log.w(TAG, ExportSkips.messageExpiresTooSoon(record.dateSent))
       return null
+    }
+
+    if (builder.expireStartDate != null) {
+      val cutoffDuration = ChatItemArchiveExporter.EXPIRATION_CUTOFF.inWholeMilliseconds
+      val expiresAt = builder.expireStartDate!! + builder.expiresInMs!!
+      val threshold = if (exportState.backupMode.isLinkAndSync) backupStartTime else backupStartTime + cutoffDuration
+
+      if (expiresAt < threshold || (builder.expiresInMs!! <= cutoffDuration && !exportState.backupMode.isLinkAndSync)) {
+        Log.w(TAG, ExportSkips.messageExpiresTooSoon(record.dateSent))
+        return null
+      }
     }
   }
 
@@ -852,8 +917,8 @@ private fun BackupMessageRecord.toRemotePaymentNotificationUpdate(db: SignalData
     PaymentNotification()
   } else {
     PaymentNotification(
-      amountMob = payment.amount.serializeAmountString(),
-      feeMob = payment.fee.serializeAmountString(),
+      amountMob = payment.amount.requireMobileCoin().amountDecimalString,
+      feeMob = payment.fee.requireMobileCoin().amountDecimalString,
       note = payment.note.takeUnless { it.isEmpty() },
       transactionDetails = payment.toRemoteTransactionDetails()
     )
@@ -1814,9 +1879,9 @@ private fun RecipientId.hasAciOrE164(exportState: ExportState): Boolean {
   return exportState.recipientIdToAci[this.toLong()] != null || exportState.recipientIdToE164[this.toLong()] != null
 }
 
-private fun Cursor.toBackupMessageRecord(pastIds: Set<Long>, backupStartTime: Long): BackupMessageRecord? {
+private fun Cursor.toBackupMessageRecord(skipIds: Set<Long>, backupStartTime: Long): BackupMessageRecord? {
   val id = this.requireLong(MessageTable.ID)
-  if (pastIds.contains(id)) {
+  if (skipIds.contains(id)) {
     return null
   }
 
@@ -1866,7 +1931,7 @@ private fun Cursor.toBackupMessageRecord(pastIds: Set<Long>, backupStartTime: Lo
   )
 }
 
-private class BackupMessageRecord(
+internal class BackupMessageRecord(
   val id: Long,
   val dateSent: Long,
   val dateReceived: Long,

@@ -15,7 +15,6 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.text.buildSpannedString
-import com.google.android.material.appbar.MaterialToolbar
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.signal.core.models.media.Media
@@ -32,11 +31,9 @@ import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.SignalProgressDialog
 import org.thoughtcrime.securesms.contacts.paged.ContactSearchKey
 import org.thoughtcrime.securesms.conversation.ConversationIntents
-import org.thoughtcrime.securesms.conversation.MessageSendType
 import org.thoughtcrime.securesms.conversation.mutiselect.forward.MultiselectForwardFragment
 import org.thoughtcrime.securesms.conversation.mutiselect.forward.MultiselectForwardFragmentArgs
-import org.thoughtcrime.securesms.conversation.mutiselect.forward.MultiselectForwardFullScreenDialogFragment
-import org.thoughtcrime.securesms.mediasend.v2.MediaSelectionActivity.Companion.share
+import org.thoughtcrime.securesms.mediasend.MediaSendLauncher.share
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.sharing.MultiShareDialogs
 import org.thoughtcrime.securesms.sharing.MultiShareSender
@@ -44,9 +41,7 @@ import org.thoughtcrime.securesms.sharing.MultiShareSender.MultiShareSendResultC
 import org.thoughtcrime.securesms.sharing.interstitial.ShareInterstitialActivity
 import org.thoughtcrime.securesms.util.ConversationUtil
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme
-import org.thoughtcrime.securesms.util.visible
 import java.util.concurrent.TimeUnit
-import org.signal.core.ui.R as CoreUiR
 
 class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.Callback {
 
@@ -76,7 +71,9 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
   }
 
   private val directShareTarget: RecipientId?
-    get() = intent.getStringExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID).let { ConversationUtil.getRecipientId(it) }
+    get() = intent.getStringExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID)
+      .let { ConversationUtil.getRecipientId(it) }
+      ?.takeUnless { it.isUnknown }
 
   override fun onPreCreate() {
     super.onPreCreate()
@@ -84,7 +81,7 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
   }
 
   override fun onCreate(savedInstanceState: Bundle?, ready: Boolean) {
-    setContentView(R.layout.share_activity_v2)
+    setContentView(R.layout.multiselect_forward_activity)
 
     val isIntentValid = getUnresolvedShareData().either(
       onSuccess = {
@@ -106,16 +103,6 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
       if (it.resultCode == Activity.RESULT_OK) {
         finish()
       }
-    }
-
-    val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-
-    if (intent?.getBooleanExtra(EXTRA_NAVIGATION, false) == true) {
-      toolbar.setTitle(getTitleFromExtras())
-      toolbar.setNavigationIcon(CoreUiR.drawable.symbol_arrow_start_24)
-      toolbar.setNavigationOnClickListener { finish() }
-    } else {
-      toolbar.visible = false
     }
 
     lifecycleDisposable.bindTo(this)
@@ -175,6 +162,8 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
 
   override fun exitFlow() = Unit
 
+  override fun navigateUp() = finish()
+
   override fun onSearchInputFocused() = Unit
 
   override fun setResult(bundle: Bundle) {
@@ -191,7 +180,7 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
     viewModel.onContactSelectionConfirmed(contactSearchKeys)
   }
 
-  override fun getContainer(): ViewGroup = findViewById(R.id.container)
+  override fun getContainer(): ViewGroup = findViewById(R.id.fragment_container_wrapper)
 
   override fun getDialogBackgroundColor(): Int = ContextCompat.getColor(this, R.color.signal_background_primary)
 
@@ -253,7 +242,9 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
   }
 
   private fun ensureFragment(resolvedShareData: ResolvedShareData) {
-    if (!supportFragmentManager.isStateSaved && supportFragmentManager.fragments.none { it is MultiselectForwardFullScreenDialogFragment }) {
+    val hasToolbar = intent?.getBooleanExtra(EXTRA_NAVIGATION, false) == true
+
+    if (!supportFragmentManager.isStateSaved && supportFragmentManager.fragments.none { it is MultiselectForwardFragment }) {
       supportFragmentManager.beginTransaction()
         .replace(
           R.id.fragment_container,
@@ -262,7 +253,8 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
               multiShareArgs = listOf(resolvedShareData.toMultiShareArgs()),
               title = getTitleFromExtras(),
               forceDisableAddMessage = true,
-              forceSelectionOnly = true
+              forceSelectionOnly = true,
+              forceHideToolbar = !hasToolbar
             )
           )
         ).commitNow()
@@ -278,24 +270,30 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
 
     val multiShareArgs = shareEvent.getMultiShareArgs()
     lifecycleDisposable += ConversationIntents.createBuilder(this, shareEvent.contact.recipientId, -1L)
-      .subscribeBy { conversationIntentBuilder ->
-        conversationIntentBuilder
-          .withDataUri(multiShareArgs.dataUri)
-          .withDataType(multiShareArgs.dataType)
-          .withMedia(multiShareArgs.media)
-          .withDraftText(multiShareArgs.draftText)
-          .withStickerLocator(multiShareArgs.stickerLocator)
-          .asBorderless(multiShareArgs.isBorderless)
-          .withShareDataTimestamp(System.currentTimeMillis())
+      .subscribeBy(
+        onSuccess = { conversationIntentBuilder ->
+          conversationIntentBuilder
+            .withDataUri(multiShareArgs.dataUri)
+            .withDataType(multiShareArgs.dataType)
+            .withMedia(multiShareArgs.media)
+            .withDraftText(multiShareArgs.draftText)
+            .withStickerLocator(multiShareArgs.stickerLocator)
+            .asBorderless(multiShareArgs.isBorderless)
+            .withShareDataTimestamp(System.currentTimeMillis())
 
-        val conversationIntent = conversationIntentBuilder.build()
-        val mainActivityIntent = MainActivity.clearTop(this).apply {
-          action = ConversationIntents.ACTION
-          putExtras(conversationIntent)
+          val conversationIntent = conversationIntentBuilder.build()
+          val mainActivityIntent = MainActivity.clearTop(this).apply {
+            action = ConversationIntents.ACTION
+            putExtras(conversationIntent)
+          }
+          finish()
+          startActivity(mainActivityIntent)
+        },
+        onError = { throwable ->
+          Log.w(TAG, "Failed to build conversation intent for share target.", throwable)
+          finish()
         }
-        finish()
-        startActivity(mainActivityIntent)
-      }
+      )
   }
 
   private fun openMediaInterstitial(shareEvent: ShareEvent.OpenMediaInterstitial) {
@@ -327,7 +325,6 @@ class ShareActivity : PassphraseRequiredActivity(), MultiselectForwardFragment.C
 
     val intent = share(
       this,
-      MessageSendType.SignalMessageSendType,
       media,
       multiShareArgs.recipientSearchKeys.toList(),
       multiShareArgs.draftText,

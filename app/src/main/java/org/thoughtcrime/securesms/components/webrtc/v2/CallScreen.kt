@@ -67,8 +67,8 @@ import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.TriggerAlignedPopupState
 import org.signal.core.ui.compose.theme.SignalTheme
 import org.signal.core.util.DimensionUnit
+import org.signal.emoji.EmojiStrings
 import org.thoughtcrime.securesms.R
-import org.thoughtcrime.securesms.components.emoji.EmojiStrings
 import org.thoughtcrime.securesms.components.webrtc.WebRtcLocalRenderState
 import org.thoughtcrime.securesms.components.webrtc.controls.RaiseHandSnackbar
 import org.thoughtcrime.securesms.conversation.colors.ChatColorsPalette
@@ -81,6 +81,7 @@ import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.ringrtc.CameraState
 import org.thoughtcrime.securesms.service.webrtc.PendingParticipantCollection
+import org.thoughtcrime.securesms.util.RemoteConfig
 import kotlin.math.max
 import kotlin.math.round
 import kotlin.time.Duration.Companion.milliseconds
@@ -103,8 +104,10 @@ fun CallScreen(
   savedLocalParticipantLandscape: Boolean = false,
   callScreenState: CallScreenState,
   callControlsState: CallControlsState,
+  callParticipantsPagerState: CallParticipantsPagerState,
   callScreenController: CallScreenController = CallScreenController.rememberCallScreenController(
     skipHiddenState = callControlsState.skipHiddenState,
+    hasMultipleRemoteParticipants = callParticipantsPagerState.callParticipants.size > 1,
     onControlsToggled = {},
     callControlsState = callControlsState,
     callControlsListener = CallScreenControlsListener.Empty
@@ -112,7 +115,6 @@ fun CallScreen(
   callScreenControlsListener: CallScreenControlsListener = CallScreenControlsListener.Empty,
   callScreenSheetDisplayListener: CallScreenSheetDisplayListener = CallScreenSheetDisplayListener.Empty,
   additionalActionsListener: AdditionalActionsListener = AdditionalActionsListener.Empty,
-  callParticipantsPagerState: CallParticipantsPagerState,
   pendingParticipantsListener: PendingParticipantsListener = PendingParticipantsListener.Empty,
   callParticipantUpdatePopupController: CallParticipantUpdatePopupController,
   overflowParticipants: List<CallParticipant>,
@@ -132,6 +134,7 @@ fun CallScreen(
   onRemoteMuteToastDismissed: () -> Unit = {},
   isSelfAdmin: Boolean = false,
   isCallLink: Boolean = false,
+  canRemoteMute: Boolean = false,
   onMuteAudio: (CallParticipant) -> Unit = {},
   onRemoveFromCall: (CallParticipant) -> Unit = {},
   onContactDetails: (CallParticipant) -> Unit = {},
@@ -171,11 +174,16 @@ fun CallScreen(
   val additionalActionsPopupState = TriggerAlignedPopupState.rememberTriggerAlignedPopupState()
   val additionalActionsState = remember(
     callScreenState.reactions,
-    localParticipant.isHandRaised
+    localParticipant.isHandRaised,
+    callScreenState.isLocalScreenSharing,
+    callControlsState.displayEndCallButton
   ) {
     AdditionalActionsState(
       reactions = callScreenState.reactions,
       isSelfHandRaised = localParticipant.isHandRaised,
+      isScreenSharing = callScreenState.isLocalScreenSharing,
+      displayScreenShareToggle = callControlsState.displayEndCallButton && RemoteConfig.screenSharing,
+      isGroupCall = callControlsState.isGroupCall,
       listener = additionalActionsListener,
       triggerAlignedPopupState = additionalActionsPopupState
     )
@@ -376,6 +384,7 @@ fun CallScreen(
                   participant = longPressedParticipant,
                   isSelfAdmin = isSelfAdmin,
                   isCallLink = isCallLink,
+                  canRemoteMute = canRemoteMute,
                   onDismiss = { longPressedParticipantId = null },
                   onMuteAudio = onMuteAudio,
                   onRemoveFromCall = onRemoveFromCall,
@@ -505,7 +514,7 @@ fun CallScreen(
   )
 
   SwipeToSpeakerHintPopup(
-    visible = callScreenState.displaySwipeToSpeakerHint,
+    hintType = callScreenState.swipeHint,
     onDismiss = onSwipeToSpeakerHintDismissed,
     modifier = Modifier
       .statusBarsPadding()
@@ -536,7 +545,7 @@ private fun LargeLocalVideoRenderer(
     participant = localParticipant,
     renderInPip = false,
     raiseHandAllowed = false,
-    mirrorVideo = localParticipant.cameraDirection == CameraState.Direction.FRONT,
+    mirrorVideo = !localParticipant.isScreenSharing && localParticipant.cameraDirection == CameraState.Direction.FRONT,
     showAudioIndicator = false,
     onInfoMoreInfoClick = null,
     modifier = modifier
@@ -580,6 +589,7 @@ private fun ParticipantContextMenu(
   participant: CallParticipant?,
   isSelfAdmin: Boolean,
   isCallLink: Boolean,
+  canRemoteMute: Boolean,
   onDismiss: () -> Unit,
   onMuteAudio: (CallParticipant) -> Unit,
   onRemoveFromCall: (CallParticipant) -> Unit,
@@ -613,7 +623,7 @@ private fun ParticipantContextMenu(
         .background(color = MaterialTheme.colorScheme.surfaceVariant)
     )
 
-    if (isSelfAdmin && resolved.isMicrophoneEnabled) {
+    if (canRemoteMute && resolved.isMicrophoneEnabled) {
       DropdownMenuItem(
         text = { Text(stringResource(R.string.CallParticipantSheet__mute_audio)) },
         leadingIcon = { Icon(painter = painterResource(R.drawable.symbol_mic_slash_24), contentDescription = null) },
@@ -676,6 +686,7 @@ private fun ParticipantContextMenuAdminPreview() {
         ),
         isSelfAdmin = true,
         isCallLink = true,
+        canRemoteMute = true,
         onDismiss = {},
         onMuteAudio = {},
         onRemoveFromCall = {},
@@ -698,6 +709,7 @@ private fun ParticipantContextMenuNonAdminPreview() {
         ),
         isSelfAdmin = false,
         isCallLink = false,
+        canRemoteMute = true,
         onDismiss = {},
         onMuteAudio = {},
         onRemoveFromCall = {},

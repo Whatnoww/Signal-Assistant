@@ -49,7 +49,10 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.launch
 import org.signal.core.ui.BottomSheetUtil
 import org.signal.core.ui.permissions.Permissions
+import org.signal.core.util.Debouncer
 import org.signal.core.util.DimensionUnit
+import org.signal.core.util.ServiceUtil
+import org.signal.core.util.addDetectedLinks
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.dp
 import org.signal.core.util.getParcelableCompat
@@ -70,7 +73,7 @@ import org.thoughtcrime.securesms.conversation.mutiselect.forward.MultiselectFor
 import org.thoughtcrime.securesms.database.AttachmentTable
 import org.thoughtcrime.securesms.database.model.MmsMessageRecord
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
-import org.thoughtcrime.securesms.mediapreview.MediaPreviewFragment
+import org.thoughtcrime.securesms.mediapreview.MediaPreviewPageFragment
 import org.thoughtcrime.securesms.mediapreview.VideoControlsDelegate
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
@@ -92,12 +95,11 @@ import org.thoughtcrime.securesms.stories.viewer.reply.tabs.StoryViewsAndReplies
 import org.thoughtcrime.securesms.stories.viewer.views.StoryViewsBottomSheetDialogFragment
 import org.thoughtcrime.securesms.util.AvatarUtil
 import org.thoughtcrime.securesms.util.DateUtils
-import org.thoughtcrime.securesms.util.Debouncer
 import org.thoughtcrime.securesms.util.LinkUtil
 import org.thoughtcrime.securesms.util.LongClickCopySpan
 import org.thoughtcrime.securesms.util.LongClickMovementMethod
+import org.thoughtcrime.securesms.util.MediaUtil
 import org.thoughtcrime.securesms.util.Projection
-import org.thoughtcrime.securesms.util.ServiceUtil
 import org.thoughtcrime.securesms.util.ViewUtil
 import org.thoughtcrime.securesms.util.fragments.requireListener
 import org.thoughtcrime.securesms.util.views.TouchInterceptingFrameLayout
@@ -558,7 +560,7 @@ class StoryViewerPageFragment :
   override fun onDestroyView() {
     super.onDestroyView()
     childFragmentManager.fragments.forEach {
-      if (it is MediaPreviewFragment) {
+      if (it is MediaPreviewPageFragment) {
         it.cleanUp()
       }
     }
@@ -849,7 +851,7 @@ class StoryViewerPageFragment :
 
   private fun markViewedIfAble() {
     val post = viewModel.getPost() ?: return
-    if (post.content.transferState == AttachmentTable.TRANSFER_PROGRESS_DONE) {
+    if (post.content.transferState == AttachmentTable.TRANSFER_PROGRESS_DONE || post.content.transferState == AttachmentTable.TRANSFER_PROGRESS_STARTED) {
       if (isResumed) {
         viewModel.markViewed(post)
       }
@@ -894,6 +896,7 @@ class StoryViewerPageFragment :
 
     when (post.content.transferState) {
       AttachmentTable.TRANSFER_PROGRESS_DONE -> {
+        Log.d(TAG, "Story content download is done.")
         storySlate.moveToState(StorySlateView.State.HIDDEN, post.id)
         viewModel.setIsDisplayingSlate(false)
         markViewedIfAble()
@@ -907,10 +910,18 @@ class StoryViewerPageFragment :
       }
 
       AttachmentTable.TRANSFER_PROGRESS_STARTED -> {
-        Log.d(TAG, "Story content download is in progress.")
-        storySlate.moveToState(StorySlateView.State.LOADING, post.id)
-        sharedViewModel.setContentIsReady()
-        viewModel.setIsDisplayingSlate(true)
+        val isStreamable = post.content is StoryPost.Content.AttachmentContent && MediaUtil.isInstantVideoSupported(post.content.attachment)
+        if (isStreamable) {
+          Log.d(TAG, "Story content is streamable while download is in progress.")
+          storySlate.moveToState(StorySlateView.State.HIDDEN, post.id)
+          viewModel.setIsDisplayingSlate(false)
+          markViewedIfAble()
+        } else {
+          Log.d(TAG, "Story content download is in progress.")
+          storySlate.moveToState(StorySlateView.State.LOADING, post.id)
+          sharedViewModel.setContentIsReady()
+          viewModel.setIsDisplayingSlate(true)
+        }
       }
 
       AttachmentTable.TRANSFER_PROGRESS_FAILED -> {
@@ -993,20 +1004,16 @@ class StoryViewerPageFragment :
   }
 
   fun linkifyUrlLinks(spannable: Spannable) {
-    val hasLinks = LinkifyCompat.addLinks(spannable, CAPTION_LINK_PATTERN)
+    LinkifyCompat.addLinks(spannable, Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS)
+    spannable.addDetectedLinks()
 
-    if (hasLinks) {
-      spannable.getSpans(0, spannable.length, URLSpan::class.java)
-        .filterNot { url -> LinkUtil.isLegalUrl(url.url) }
-        .forEach { spannable.removeSpan(it) }
-
-      val urlSpans = spannable.getSpans(0, spannable.length, URLSpan::class.java)
-
-      for (urlSpan in urlSpans) {
-        val start = spannable.getSpanStart(urlSpan)
-        val end = spannable.getSpanEnd(urlSpan)
-        val span = LongClickCopySpan(urlSpan.url)
-        spannable.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    spannable.getSpans(0, spannable.length, URLSpan::class.java).forEach { urlSpan ->
+      val url = urlSpan.url
+      val start = spannable.getSpanStart(urlSpan)
+      val end = spannable.getSpanEnd(urlSpan)
+      spannable.removeSpan(urlSpan)
+      if (LinkUtil.isLegalUrl(url)) {
+        spannable.setSpan(LongClickCopySpan(url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
       }
     }
   }
@@ -1315,7 +1322,6 @@ class StoryViewerPageFragment :
     private val ONBOARDING_DURATION = TimeUnit.SECONDS.toMillis(10)
     private const val SMALL_CAPTION_TEXT_MAX_LENGTH = 280
     private const val SMALL_CAPTION_TEXT_MAX_LINES = 5
-    private const val CAPTION_LINK_PATTERN = Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS
 
     private const val ARGS = "args"
 

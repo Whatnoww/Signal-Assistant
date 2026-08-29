@@ -13,12 +13,11 @@ import org.thoughtcrime.securesms.crypto.ProfileKeyUtil
 import org.thoughtcrime.securesms.database.RecipientTable
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.RecipientRecord
-import org.thoughtcrime.securesms.jobs.RetrieveProfileJob.Companion.enqueue
+import org.thoughtcrime.securesms.jobs.RetrieveProfileJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
-import org.thoughtcrime.securesms.recipients.Recipient.Companion.trustedPush
+import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.storage.StorageSyncModels.localToRemoteRecord
-import org.thoughtcrime.securesms.util.RemoteConfig
 import org.whispersystems.signalservice.api.storage.SignalContactRecord
 import org.whispersystems.signalservice.api.storage.StorageId
 import org.whispersystems.signalservice.api.storage.signalAci
@@ -119,6 +118,10 @@ class ContactRecordProcessor(
     }
   }
 
+  override fun describeRecord(record: SignalContactRecord): String {
+    return "[${record.proto.signalAci ?: record.proto.signalPni}]"
+  }
+
   override fun getMatching(remote: SignalContactRecord, keyGenerator: StorageKeyGenerator): Optional<SignalContactRecord> {
     var found: Optional<RecipientId> = remote.proto.signalAci?.let { recipientTable.getByAci(it) } ?: Optional.empty()
 
@@ -167,20 +170,20 @@ class ContactRecordProcessor(
     val mergedIdentityState: IdentityState
     val mergedIdentityKey: ByteArray?
 
+    val identityKeysExistsAndConflict = remote.proto.identityKey.isNotEmpty() && local.proto.identityKey.isNotEmpty() && remote.proto.identityKey != local.proto.identityKey
+    val conflictAci = localAci ?: remoteAci
+    val unrepairableIdentityKeyConflict = identityKeysExistsAndConflict && conflictAci == null
+
     if ((remote.proto.identityState != local.proto.identityState && remote.proto.identityKey.isNotEmpty()) ||
       (remote.proto.identityKey.isNotEmpty() && local.proto.identityKey.isEmpty()) ||
-      (remote.proto.identityKey.isNotEmpty() && local.proto.unregisteredAtTimestamp > 0)
+      (remote.proto.identityKey.isNotEmpty() && local.proto.unregisteredAtTimestamp > 0) ||
+      (unrepairableIdentityKeyConflict && !SignalStore.account.isPrimaryDevice)
     ) {
       mergedIdentityState = remote.proto.identityState
       mergedIdentityKey = remote.proto.identityKey.takeIf { it.isNotEmpty() }?.toByteArray()
     } else {
       mergedIdentityState = local.proto.identityState
       mergedIdentityKey = local.proto.identityKey.takeIf { it.isNotEmpty() }?.toByteArray()
-    }
-
-    if (localAci != null && mergedIdentityKey != null && remote.proto.identityKey.isNotEmpty() && !mergedIdentityKey.contentEquals(remote.proto.identityKey.toByteArray())) {
-      Log.w(TAG, "The local and remote identity keys do not match for " + localAci + ". Enqueueing a profile fetch.")
-      enqueue(trustedPush(localAci, localPni, local.proto.e164).id, true)
     }
 
     val mergedPni: PNI?
@@ -199,24 +202,51 @@ class ContactRecordProcessor(
       local.proto.e164 != remote.proto.e164
 
     if (e164sMatchButPnisDont) {
-      Log.w(TAG, "Matching E164s, but the PNIs differ! Trusting our local pair.")
-      // TODO [pnp] Schedule CDS fetch?
-      mergedPni = localPni
-      mergedE164 = local.proto.e164
+      if (SignalStore.account.isPrimaryDevice) {
+        Log.w(TAG, "Matching E164s, but the PNIs differ! Trusting our local pair.")
+        // TODO [pnp] Schedule CDS fetch?
+        mergedPni = localPni
+        mergedE164 = local.proto.e164
+      } else {
+        Log.w(TAG, "Matching E164s, but the PNIs differ! Linked device — trusting the remote pair.")
+        mergedPni = remotePni
+        mergedE164 = remote.proto.e164
+      }
     } else if (pnisMatchButE164sDont) {
-      Log.w(TAG, "Matching PNIs, but the E164s differ! Trusting our local pair.")
-      // TODO [pnp] Schedule CDS fetch?
-      mergedPni = localPni
-      mergedE164 = local.proto.e164
+      if (SignalStore.account.isPrimaryDevice) {
+        Log.w(TAG, "Matching PNIs, but the E164s differ! Trusting our local pair.")
+        // TODO [pnp] Schedule CDS fetch?
+        mergedPni = localPni
+        mergedE164 = local.proto.e164
+      } else {
+        Log.w(TAG, "Matching PNIs, but the E164s differ! Linked device — trusting the remote pair.")
+        mergedPni = remotePni
+        mergedE164 = remote.proto.e164
+      }
     } else {
       mergedPni = remotePni ?: localPni
       mergedE164 = remote.proto.e164.nullIfBlank() ?: local.proto.e164.nullIfBlank()
     }
 
+    if (identityKeysExistsAndConflict) {
+      if (conflictAci != null) {
+        Log.w(TAG, "Identity keys conflict for $conflictAci. Enqueueing a profile fetch.")
+        SignalDatabase.runPostSuccessfulTransaction {
+          RetrieveProfileJob.enqueue(Recipient.trustedPush(conflictAci, mergedPni, mergedE164).id, true)
+        }
+      } else {
+        Log.w(TAG, "Identity keys conflict for $localPni. No ACI, so no profile fetch is possible.")
+      }
+    } else if (mergedIdentityKey != null && remote.proto.identityKey.isEmpty()) {
+      Log.w(TAG, "Remote identity key is missing for ${localAci ?: localPni}. Keeping ours.")
+    }
+
     val merged = SignalContactRecord.newBuilder(remote.serializedUnknowns).apply {
       e164 = mergedE164 ?: ""
-      aci = local.proto.aci.nullIfBlank() ?: remote.proto.aci
-      pni = mergedPni?.toStringWithoutPrefix() ?: ""
+      aciBinary = local.proto.aciBinary.nullIfEmpty() ?: remote.proto.aciBinary
+      aci = ""
+      pniBinary = mergedPni?.toByteStringWithoutPrefix() ?: byteArrayOf().toByteString()
+      pni = ""
       givenName = mergedProfileGivenName
       familyName = mergedProfileFamilyName
       profileKey = remote.proto.profileKey.nullIfEmpty()?.takeIf { ProfileKeyUtil.profileKeyOrNull(it.toByteArray()) != null } ?: local.proto.profileKey
@@ -224,6 +254,7 @@ class ContactRecordProcessor(
       identityState = mergedIdentityState
       identityKey = mergedIdentityKey?.toByteString() ?: ByteString.EMPTY
       blocked = remote.proto.blocked
+      blockedAtTimestamp = remote.proto.blockedAtTimestamp
       whitelisted = remote.proto.whitelisted
       archived = remote.proto.archived
       markedUnread = remote.proto.markedUnread
@@ -235,11 +266,9 @@ class ContactRecordProcessor(
       systemFamilyName = if (SignalStore.account.isPrimaryDevice) local.proto.systemFamilyName else remote.proto.systemFamilyName
       systemNickname = remote.proto.systemNickname
       nickname = remote.proto.nickname
-      pniSignatureVerified = remote.proto.pniSignatureVerified || local.proto.pniSignatureVerified
+      pniSignatureVerified = (remote.proto.pniSignatureVerified || local.proto.pniSignatureVerified) && mergedPni?.isValid == true
       note = remote.proto.note.nullIfBlank() ?: ""
       avatarColor = if (SignalStore.account.isPrimaryDevice) local.proto.avatarColor else remote.proto.avatarColor
-      aciBinary = if (RemoteConfig.useBinaryId) local.proto.aciBinary.nullIfEmpty() ?: remote.proto.aciBinary else ByteString.EMPTY
-      pniBinary = if (RemoteConfig.useBinaryId) mergedPni?.toByteStringWithoutPrefix() ?: byteArrayOf().toByteString() else ByteString.EMPTY
     }.build().toSignalContactRecord(StorageId.forContact(keyGenerator.generate()))
 
     val matchesRemote = doParamsMatch(remote, merged)

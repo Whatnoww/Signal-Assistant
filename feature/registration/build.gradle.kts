@@ -4,6 +4,7 @@ plugins {
   id("com.squareup.wire")
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlinx.serialization)
+  alias(testLibs.plugins.compose.screenshot)
 }
 
 android {
@@ -23,6 +24,21 @@ android {
       isIncludeAndroidResources = true
     }
   }
+
+  experimentalProperties["android.experimental.enableScreenshotTest"] = true
+}
+
+screenshotTests {
+  // Fraction of differing pixels tolerated before a screenshot test fails (0.0001 = 0.01%).
+  imageDifferenceThreshold = 0.0001f
+}
+
+// The screenshot validation task compares every reference image in a single forked JVM, which
+// exhausts the default heap once a module has many previews. Give it more room.
+tasks.withType<Test>().configureEach {
+  if (name.contains("ScreenshotTest")) {
+    maxHeapSize = "4g"
+  }
 }
 
 wire {
@@ -36,15 +52,17 @@ wire {
 }
 
 dependencies {
-  implementation(libs.androidx.ui.test.junit4)
   lintChecks(project(":lintchecks"))
 
   // Project dependencies
   api(project(":lib:archive"))
+  api(project(":lib:network"))
   implementation(project(":core:ui"))
   implementation(project(":core:util"))
   implementation(project(":core:models-jvm"))
   implementation(project(":core:serialization"))
+  implementation(project(":lib:device-transfer"))
+  implementation(project(":lib:signal-login"))
   implementation(libs.libsignal.android)
 
   // Compose BOM
@@ -76,6 +94,14 @@ dependencies {
   // Phone number formatting
   implementation(libs.google.libphonenumber)
 
+  // Phone number hint + SMS verification code retriever
+  implementation(libs.google.play.services.auth)
+  implementation(libs.kotlinx.coroutines.play.services)
+
+  // Credential Manager (password manager retrieval)
+  implementation(libs.androidx.credentials)
+  implementation(libs.androidx.credentials.compat)
+
   // Testing
   testImplementation(testFixtures(project(":core:ui")))
   testImplementation(testLibs.junit.junit)
@@ -86,6 +112,10 @@ dependencies {
   testImplementation(libs.androidx.compose.ui.test.junit4)
   androidTestImplementation(testLibs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-  implementation(libs.androidx.compose.ui.test.manifest)
   debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+  // Compose screenshot testing
+  screenshotTestImplementation(testLibs.compose.screenshot.validation.api)
+  screenshotTestImplementation(libs.androidx.compose.ui.tooling.core)
+  screenshotTestImplementation(libs.androidx.compose.ui.tooling.preview)
 }

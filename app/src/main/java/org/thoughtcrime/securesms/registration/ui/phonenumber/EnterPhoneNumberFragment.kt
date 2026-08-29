@@ -38,6 +38,7 @@ import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import org.signal.core.ui.logging.LoggingFragment
+import org.signal.core.util.PlayServicesUtil
 import org.signal.core.util.ThreadUtil
 import org.signal.core.util.getParcelableCompat
 import org.signal.core.util.isNotNullOrBlank
@@ -64,10 +65,10 @@ import org.thoughtcrime.securesms.registration.ui.toE164
 import org.thoughtcrime.securesms.registration.util.CountryPrefix
 import org.thoughtcrime.securesms.util.CommunicationActions
 import org.thoughtcrime.securesms.util.Dialogs
-import org.thoughtcrime.securesms.util.PlayServicesUtil
 import org.thoughtcrime.securesms.util.SignalE164Util
 import org.thoughtcrime.securesms.util.SpanUtil
 import org.thoughtcrime.securesms.util.SupportEmailUtil
+import org.thoughtcrime.securesms.util.SystemWindowInsetsSetter
 import org.thoughtcrime.securesms.util.ViewUtil
 import org.thoughtcrime.securesms.util.livedata.LiveDataObserverCallback
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
@@ -99,6 +100,7 @@ class EnterPhoneNumberFragment : LoggingFragment(R.layout.fragment_registration_
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    SystemWindowInsetsSetter.attach(view, viewLifecycleOwner, SystemWindowInsetsSetter.SAFE_AREA_WITH_KEYBOARD)
     setDebugLogSubmitMultiTapView(binding.verifyHeader)
     requireActivity().onBackPressedDispatcher.addCallback(
       viewLifecycleOwner,

@@ -9,7 +9,8 @@ data class AdvancedPrivacySettingsState(
   val showSealedSenderStatusIcon: Boolean,
   val allowSealedSenderFromAnyone: Boolean,
   val showProgressSpinner: Boolean,
-  val allowAutomaticKeyVerification: Boolean
+  val allowAutomaticKeyVerification: Boolean,
+  val isPrimaryDevice: Boolean
 )
 
 enum class CensorshipCircumventionState(val available: Boolean) {

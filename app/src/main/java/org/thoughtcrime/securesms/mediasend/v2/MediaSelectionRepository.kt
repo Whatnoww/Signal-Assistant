@@ -13,6 +13,10 @@ import org.signal.core.util.BreakIteratorCompat
 import org.signal.core.util.ThreadUtil
 import org.signal.core.util.logging.Log
 import org.signal.imageeditor.core.model.EditorModel
+import org.signal.mediasend.MediaConstraints
+import org.signal.mediasend.MediaValidator
+import org.signal.mediasend.SentMediaQuality
+import org.signal.mediasend.screens.edit.video.VideoTrimData
 import org.thoughtcrime.securesms.contacts.paged.ContactSearchKey
 import org.thoughtcrime.securesms.conversation.MessageSendType
 import org.thoughtcrime.securesms.database.SignalDatabase
@@ -30,16 +34,12 @@ import org.thoughtcrime.securesms.mediasend.MediaTransform
 import org.thoughtcrime.securesms.mediasend.MediaUploadRepository
 import org.thoughtcrime.securesms.mediasend.SentMediaQualityTransform
 import org.thoughtcrime.securesms.mediasend.VideoTrimTransform
-import org.thoughtcrime.securesms.mediasend.v2.videos.VideoTrimData
 import org.thoughtcrime.securesms.mms.GifSlide
 import org.thoughtcrime.securesms.mms.ImageSlide
-import org.thoughtcrime.securesms.mms.MediaConstraints
 import org.thoughtcrime.securesms.mms.OutgoingMessage
-import org.thoughtcrime.securesms.mms.SentMediaQuality
 import org.thoughtcrime.securesms.mms.Slide
 import org.thoughtcrime.securesms.mms.SlideDeck
 import org.thoughtcrime.securesms.mms.VideoSlide
-import org.thoughtcrime.securesms.providers.BlobProvider
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.scribbles.ImageEditorFragment
@@ -68,8 +68,9 @@ class MediaSelectionRepository(context: Context) {
     return Single.fromCallable {
       val populatedMedia = mediaRepository.getPopulatedMedia(context, media)
 
-      val result = MediaValidator.filterMedia(context, populatedMedia, mediaConstraints, maxSelection, isStory)
-      result
+      MediaValidator.filterMedia(populatedMedia, mediaConstraints, maxSelection, isStory) {
+        Stories.MediaTransform.getSendRequirements(it) != Stories.MediaTransform.SendRequirements.CAN_NOT_SEND
+      }
     }.subscribeOn(Schedulers.io())
   }
 
@@ -94,13 +95,12 @@ class MediaSelectionRepository(context: Context) {
     }
 
     val isSendingToStories = singleContact?.isStory == true || contacts.any { it.isStory }
-    val sentMediaQuality = if (isSendingToStories) SentMediaQuality.STANDARD else quality
 
     return Maybe.create { emitter ->
       val trimmedBody: String = if (isViewOnce) "" else getTruncatedBody(message?.toString()?.trim()) ?: ""
       val trimmedMentions: List<Mention> = if (isViewOnce) emptyList() else mentions
       val trimmedBodyRanges: BodyRangeList? = if (isViewOnce) null else bodyRanges
-      val modelsToTransform: Map<Media, MediaTransform> = buildModelsToTransform(selectedMedia, stateMap, sentMediaQuality)
+      val modelsToTransform: Map<Media, MediaTransform> = buildModelsToTransform(selectedMedia, stateMap, quality)
       val oldToNewMediaMap: Map<Media, Media> = MediaRepository.transformMediaSync(context, selectedMedia, modelsToTransform)
       val updatedMedia = oldToNewMediaMap.values.toList()
 
@@ -237,8 +237,8 @@ class MediaSelectionRepository(context: Context) {
   fun deleteBlobs(media: List<Media>) {
     media
       .map(Media::uri)
-      .filter(BlobProvider::isAuthority)
-      .forEach { BlobProvider.getInstance().delete(context, it) }
+      .filter { AppDependencies.blobs.isAuthority(it) }
+      .forEach { AppDependencies.blobs.delete(context, it) }
   }
 
   fun cleanUp(selectedMedia: List<Media>) {
@@ -264,7 +264,7 @@ class MediaSelectionRepository(context: Context) {
         }
       }
 
-      if (state is VideoTrimData && state.isDurationEdited) {
+      if (state is VideoTrimData && (state.isDurationEdited || state.isMuted)) {
         modelsToRender[it] = VideoTrimTransform(state)
       }
 

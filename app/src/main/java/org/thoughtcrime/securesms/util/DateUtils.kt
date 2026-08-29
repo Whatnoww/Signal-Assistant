@@ -27,6 +27,7 @@ import org.thoughtcrime.securesms.util.DateUtils.getBriefRelativeTimeSpanString
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.format.TextStyle
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -292,8 +293,12 @@ object DateUtils : android.text.format.DateUtils() {
       } else {
         context.getString(R.string.DateUtils_today)
       }
-    } else {
+    } else if (isTomorrow(timestamp)) {
       context.getString(R.string.DateUtils_tomorrow)
+    } else {
+      val locale = Locale.getDefault()
+      // Many locales (e.g. Dutch, French, Spanish) render weekday names in lowercase, but this is used as a standalone label, so we want it capitalized.
+      localDateTime.dayOfWeek.getDisplayName(TextStyle.FULL, locale).capitalizeFirstChar(locale)
     }
     val time = localDateTime.toLocalTime().formatHours(context)
     return context.getString(R.string.DateUtils_schedule_at, dayModifier, time)
@@ -303,6 +308,7 @@ object DateUtils : android.text.format.DateUtils() {
     return timestamp.toDateString("EEE, MMM d", locale)
   }
 
+  @JvmStatic
   fun formatDateWithYear(locale: Locale, timestamp: Long): String {
     return timestamp.toDateString("MMM d, yyyy", locale)
   }
@@ -383,6 +389,10 @@ object DateUtils : android.text.format.DateUtils() {
     return isToday(time + TimeUnit.DAYS.toMillis(1))
   }
 
+  private fun isTomorrow(time: Long): Boolean {
+    return isToday(time - TimeUnit.DAYS.toMillis(1))
+  }
+
   private fun getHour(context: Context, timestamp: Long): Int {
     val cal = Calendar.getInstance(Locale.getDefault())
     cal.timeInMillis = timestamp
@@ -448,6 +458,13 @@ object DateUtils : android.text.format.DateUtils() {
     }
     this.dateFormatSymbols = symbols
     return this
+  }
+
+  /**
+   * Uppercases the first character using the rules of the provided [locale]. A no-op for scripts that have no notion of case.
+   */
+  private fun String.capitalizeFirstChar(locale: Locale): String {
+    return replaceFirstChar { it.titlecase(locale) }
   }
 
   private data class TemplateLocale(val template: String, val locale: Locale)

@@ -12,7 +12,7 @@ import org.signal.core.util.ThreadUtil;
 import org.signal.core.util.concurrent.SignalExecutors;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.attachments.Attachment;
-import org.thoughtcrime.securesms.attachments.AttachmentId;
+import org.signal.core.models.database.AttachmentId;
 import org.thoughtcrime.securesms.database.AttachmentTable;
 import org.thoughtcrime.securesms.database.SignalDatabase;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
@@ -125,6 +125,19 @@ public class MediaUploadRepository {
     executor.execute(() -> {
       for (Media media : new HashSet<>(uploadResults.keySet())) {
         cancelUploadInternal(media);
+      }
+    });
+  }
+
+  /**
+   * Replaces the tracked results with pre-uploads performed elsewhere, so that a send driven by this repository
+   * can reuse them instead of uploading the same media again.
+   */
+  public void setPreUploadResults(@NonNull Collection<PreUploadResult> results) {
+    executor.execute(() -> {
+      uploadResults.clear();
+      for (PreUploadResult result : results) {
+        uploadResults.put(result.getMedia(), result);
       }
     });
   }

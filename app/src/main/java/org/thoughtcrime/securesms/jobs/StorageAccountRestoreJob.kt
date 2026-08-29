@@ -1,6 +1,7 @@
 package org.thoughtcrime.securesms.jobs
 
 import org.signal.core.util.logging.Log
+import org.signal.network.exceptions.PushNetworkException
 import org.signal.network.service.StorageServiceService
 import org.signal.network.service.StorageServiceService.ManifestResult
 import org.thoughtcrime.securesms.database.SignalDatabase
@@ -12,7 +13,6 @@ import org.thoughtcrime.securesms.net.SignalNetwork
 import org.thoughtcrime.securesms.profiles.manage.UsernameRepository.reclaimUsernameIfNecessary
 import org.thoughtcrime.securesms.recipients.Recipient.Companion.self
 import org.thoughtcrime.securesms.storage.StorageSyncHelper
-import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException
 import org.whispersystems.signalservice.api.storage.SignalAccountRecord
 import org.whispersystems.signalservice.api.storage.SignalStorageManifest
 import org.whispersystems.signalservice.api.storage.SignalStorageRecord

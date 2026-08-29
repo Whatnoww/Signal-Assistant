@@ -1,5 +1,6 @@
 package org.thoughtcrime.securesms.contacts.paged
 
+import androidx.annotation.WorkerThread
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.Lifecycle
@@ -13,9 +14,15 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.plusAssign
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
@@ -25,6 +32,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.signal.network.util.Preconditions
 import org.signal.paging.PagedData
 import org.signal.paging.PagingConfig
 import org.signal.paging.PagingController
@@ -37,7 +46,6 @@ import org.thoughtcrime.securesms.search.SearchFilter
 import org.thoughtcrime.securesms.search.SearchRepository
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingModelList
 import org.thoughtcrime.securesms.util.adapter.mapping.PagingMappingAdapter
-import org.whispersystems.signalservice.api.util.Preconditions
 
 /**
  * Manages paged contact search data, query/filter state, and contact selection. Drives
@@ -60,11 +68,13 @@ class ContactSearchViewModel(
   val arbitraryRepository: ArbitraryRepository?,
   private val searchRepository: SearchRepository,
   private val contactSearchPagedDataSourceRepository: ContactSearchPagedDataSourceRepository,
-  val fixedContacts: Set<ContactSearchKey> = emptySet()
+  val fixedContacts: Set<ContactSearchKey> = emptySet(),
+  private val debounceSearch: Boolean = false
 ) : ViewModel() {
 
   companion object {
     private const val QUERY = "query"
+    private const val SEARCH_DEBOUNCE_MILLIS = 300L
   }
 
   private val safetyNumberRepository: SafetyNumberRepository by lazy { SafetyNumberRepository() }
@@ -82,10 +92,28 @@ class ContactSearchViewModel(
   private val internalSelectedContacts = MutableStateFlow<Set<ContactSearchKey>>(emptySet())
   private val errorEvents = PublishSubject.create<ContactSearchError>()
   private val rawQuery = MutableStateFlow<String?>(savedStateHandle[QUERY])
+  private val internalFastScrollerEnabled = MutableStateFlow(false)
+  private val internalDisplayingContextMenu = MutableStateFlow(false)
+  private val internalScrollRequests = MutableSharedFlow<ScrollRequest>(extraBufferCapacity = 1)
+  private val internalSearchInProgress = MutableStateFlow(false)
+
+  val fastScrollerEnabled: StateFlow<Boolean> = internalFastScrollerEnabled
+  val isDisplayingContextMenu: StateFlow<Boolean> = internalDisplayingContextMenu
+  val scrollRequests: SharedFlow<ScrollRequest> = internalScrollRequests
+
+  /**
+   * True while a [setConfiguration] call has yet to publish anything for the current configuration. Suitable for driving a
+   * whole-list loading indicator. Goes false as soon as the first results are published, even if slower sections are still
+   * running -- those render their own placeholder.
+   */
+  val searchInProgress: StateFlow<Boolean> = internalSearchInProgress
+
+  val query: StateFlow<String?> = rawQuery
 
   init {
     viewModelScope.launch {
-      rawQuery.drop(1).debounce(300).collect { query ->
+      val querySource = if (debounceSearch) rawQuery.drop(1).debounce(SEARCH_DEBOUNCE_MILLIS) else rawQuery.drop(1)
+      querySource.collect { query ->
         savedStateHandle[QUERY] = query
         internalConfigurationState.update { it.copy(query = query) }
       }
@@ -110,26 +138,127 @@ class ContactSearchViewModel(
 
   /** Adapter-ready models combining [data] with [selectionState]. Suitable for direct submission to a [ContactSearchAdapter]. */
   val mappingModels: StateFlow<MappingModelList> = combine(data, selectionState) { contactData, selection ->
-    ContactSearchAdapter.toMappingModelList(contactData, selection, arbitraryRepository)
+    ContactSearchModels.toMappingModelList(contactData, selection, arbitraryRepository)
   }.stateIn(viewModelScope, SharingStarted.Eagerly, MappingModelList())
 
   val errorEventsStream: Observable<ContactSearchError> = errorEvents
+
+  val internalTotalCount = MutableStateFlow(0)
+  val totalCount: StateFlow<Int> = internalTotalCount
 
   override fun onCleared() {
     disposables.clear()
   }
 
-  fun setConfiguration(contactSearchConfiguration: ContactSearchConfiguration) {
-    val pagedDataSource = ContactSearchPagedDataSource(
-      contactSearchConfiguration,
-      arbitraryRepository = arbitraryRepository,
-      searchRepository = searchRepository,
-      contactSearchPagedDataSourceRepository = contactSearchPagedDataSourceRepository
-    )
-    pagedData.value = PagedData.createForStateFlow(pagedDataSource, pagingConfig)
+  fun setFastScrollEnabled(enabled: Boolean) {
+    internalFastScrollerEnabled.update { enabled }
   }
 
-  fun getQuery(): String? = rawQuery.value
+  fun setDisplayingContextMenu(isDisplayingContextMenu: Boolean) {
+    internalDisplayingContextMenu.update { isDisplayingContextMenu }
+  }
+
+  fun requestScrollPosition(position: Int) {
+    internalScrollRequests.tryEmit(ScrollRequest(position))
+  }
+
+  /**
+   * Builds the results for [contactSearchConfiguration] and publishes them to [pagedData].
+   *
+   * Each query-driven section runs its own database query, and how long those take varies wildly --
+   * a message search can take an order of magnitude longer than a contact search. So rather than
+   * hold every section back until the slowest one finishes, they are queried concurrently and
+   * published as they land. A section that hasn't reported yet renders as a loading placeholder, so
+   * an outstanding section can't be mistaken for an empty one.
+   *
+   * Nothing is published until the topmost section finishes, even if a lower one is ready sooner.
+   * Publishing earlier would put a placeholder above the results and then shove them down when it
+   * resolves, which on a device where the whole search takes a few milliseconds reads as a flicker.
+   * Until then [searchInProgress] covers the gap, and sections that finish together are published
+   * together for the same reason.
+   */
+  suspend fun setConfiguration(contactSearchConfiguration: ContactSearchConfiguration) {
+    internalSearchInProgress.value = true
+    try {
+      val query = contactSearchConfiguration.query?.takeIf { it.isNotEmpty() }
+      val parallelSections = if (query == null) emptyList() else contactSearchConfiguration.sections.filter { it.isQueriedInParallel() }
+
+      if (query == null || parallelSections.isEmpty()) {
+        publish(contactSearchConfiguration, ContactSearchSectionResults())
+        return
+      }
+
+      coroutineScope {
+        val completedSections = Channel<ContactSearchSectionResult>(capacity = parallelSections.size)
+
+        parallelSections.forEach { section ->
+          launch(Dispatchers.Default) {
+            completedSections.send(querySection(section, query, contactSearchConfiguration.searchFilter))
+          }
+        }
+
+        val topSection = parallelSections.first().sectionKey
+        var results = ContactSearchSectionResults(pending = parallelSections.mapTo(mutableSetOf()) { it.sectionKey })
+
+        while (results.pending.isNotEmpty()) {
+          results = results.withSection(completedSections.receive())
+
+          generateSequence { completedSections.tryReceive().getOrNull() }
+            .forEach { results = results.withSection(it) }
+
+          if (topSection !in results.pending) {
+            publish(contactSearchConfiguration, results)
+            internalSearchInProgress.value = false
+          }
+        }
+      }
+    } finally {
+      internalSearchInProgress.value = false
+    }
+  }
+
+  /**
+   * Whether [querySection] can produce this section's rows up front. The rest are left to
+   * [ContactSearchPagedDataSource], which reads them a page at a time off of a cursor -- either
+   * because they're unbounded, or because they aren't query-driven and so aren't what a search is
+   * waiting on.
+   */
+  private fun ContactSearchConfiguration.Section.isQueriedInParallel(): Boolean {
+    return when (this) {
+      is ContactSearchConfiguration.Section.Chats,
+      is ContactSearchConfiguration.Section.Messages,
+      is ContactSearchConfiguration.Section.GroupsWithMembers,
+      is ContactSearchConfiguration.Section.ContactsWithoutThreads -> true
+
+      else -> false
+    }
+  }
+
+  @WorkerThread
+  private fun querySection(section: ContactSearchConfiguration.Section, query: String, searchFilter: SearchFilter): ContactSearchSectionResult {
+    return when (section) {
+      is ContactSearchConfiguration.Section.Chats -> ContactSearchSectionResult.Chats(searchRepository.queryThreadsSync(query, section.isUnreadOnly).results)
+      is ContactSearchConfiguration.Section.Messages -> ContactSearchSectionResult.Messages(searchRepository.queryMessagesSync(query, searchFilter).results)
+      is ContactSearchConfiguration.Section.GroupsWithMembers -> ContactSearchSectionResult.GroupsWithMembers(contactSearchPagedDataSourceRepository.getGroupsWithMembers(query))
+      is ContactSearchConfiguration.Section.ContactsWithoutThreads -> ContactSearchSectionResult.ContactsWithoutThreads(contactSearchPagedDataSourceRepository.getContactsWithoutThreads(query))
+      else -> error("Section ${section.sectionKey} is not queried in parallel.")
+    }
+  }
+
+  private suspend fun publish(contactSearchConfiguration: ContactSearchConfiguration, sectionResults: ContactSearchSectionResults) {
+    val (pagedDataSource, size) = withContext(Dispatchers.Default) {
+      val source = ContactSearchPagedDataSource(
+        contactSearchConfiguration,
+        arbitraryRepository = arbitraryRepository,
+        searchRepository = searchRepository,
+        contactSearchPagedDataSourceRepository = contactSearchPagedDataSourceRepository,
+        sectionResults = sectionResults
+      )
+      source to source.size()
+    }
+    internalTotalCount.value = size
+    pagedData.value = PagedData.createForStateFlow(pagedDataSource, pagingConfig, data.value)
+  }
 
   fun setQuery(query: String?) {
     rawQuery.value = query
@@ -227,6 +356,13 @@ class ContactSearchViewModel(
     controller.value?.onDataInvalidated()
   }
 
+  fun refreshGroupData() {
+    contactSearchPagedDataSourceRepository.clearGroupRecordCache()
+    refresh()
+  }
+
+  data class ScrollRequest(val position: Int)
+
   class Factory(
     private val selectionLimits: SelectionLimits,
     private val isMultiSelect: Boolean = true,
@@ -235,7 +371,8 @@ class ContactSearchViewModel(
     private val arbitraryRepository: ArbitraryRepository?,
     private val searchRepository: SearchRepository,
     private val contactSearchPagedDataSourceRepository: ContactSearchPagedDataSourceRepository,
-    private val fixedContacts: Set<ContactSearchKey> = emptySet()
+    private val fixedContacts: Set<ContactSearchKey> = emptySet(),
+    private val debounceSearch: Boolean = false
   ) : AbstractSavedStateViewModelFactory() {
     override fun <T : ViewModel> create(key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
       return modelClass.cast(
@@ -248,7 +385,8 @@ class ContactSearchViewModel(
           arbitraryRepository = arbitraryRepository,
           searchRepository = searchRepository,
           contactSearchPagedDataSourceRepository = contactSearchPagedDataSourceRepository,
-          fixedContacts = fixedContacts
+          fixedContacts = fixedContacts,
+          debounceSearch = debounceSearch
         )
       ) as T
     }
@@ -271,7 +409,23 @@ fun ContactSearchViewModel.bindAdapterToLifecycle(
     lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
       launch { mappingModels.collect { adapter.submitList(it) } }
       launch { controller.collect { it?.let { c -> adapter.setPagingController(c) } } }
-      launch { configurationState.collect { setConfiguration(mapStateToConfiguration(it)) } }
+      launch { configurationState.collectLatest { setConfiguration(mapStateToConfiguration(it)) } }
+    }
+  }
+}
+
+/**
+ * Observes [ContactSearchViewModel.searchInProgress] scoped to the given [LifecycleOwner], invoking
+ * [onSearchInProgressChanged] on the main thread whenever the loading state changes. Designed for Java
+ * callers that want to drive a loading indicator.
+ */
+fun ContactSearchViewModel.bindSearchInProgressToLifecycle(
+  lifecycleOwner: LifecycleOwner,
+  onSearchInProgressChanged: (Boolean) -> Unit
+) {
+  lifecycleOwner.lifecycleScope.launch {
+    lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+      searchInProgress.collect { onSearchInProgressChanged(it) }
     }
   }
 }

@@ -12,7 +12,7 @@ import androidx.lifecycle.LiveData;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
-import org.thoughtcrime.securesms.mms.SentMediaQuality;
+import org.signal.mediasend.SentMediaQuality;
 import org.thoughtcrime.securesms.preferences.widgets.NotificationPrivacyPreference;
 import org.thoughtcrime.securesms.util.Environment;
 import org.thoughtcrime.securesms.util.SingleLiveEvent;
@@ -60,6 +60,12 @@ public final class SettingsValues extends SignalStoreValues {
   public static final  String MESSAGE_IN_CHAT_SOUNDS_ENABLED          = "settings.message.in.chats.sounds.enabled";
   public static final  String MESSAGE_REPEAT_ALERTS                   = "settings.message.repeat.alerts";
   public static final  String MESSAGE_NOTIFICATION_PRIVACY            = "settings.message.notification.privacy";
+  public static final  String MESSAGE_NOTIFICATION_REACTION           = "settings.message.notification.reaction";
+  public static final  String MESSAGE_NOTIFICATION_MUTED_CALLS        = "settings.message.notifications.muted.call";
+  public static final  String MESSAGE_NOTIFICATION_MUTED_MENTIONS     = "settings.message.notifications.muted.mentions";
+  public static final  String MESSAGE_NOTIFICATION_MUTED_REPLIES      = "settings.message.notifications.muted.replies";
+  public static final  String UNREAD_REMINDER_ENABLED                 = "settings.message.notifications.unread.reminder";
+  public static final  String UNREAD_REMINDER_NEXT_NOTIFY_TIME        = "settings.message.notifications.unread.reminder.next.notify.time";
   public static final  String CALL_NOTIFICATIONS_ENABLED              = "settings.call.notifications.enabled";
   public static final  String CALL_RINGTONE                           = "settings.call.ringtone";
   public static final  String CALL_VIBRATE_ENABLED                    = "settings.call.vibrate.enabled";
@@ -76,6 +82,7 @@ public final class SettingsValues extends SignalStoreValues {
   private static final String SCREEN_LOCK_ENABLED                     = "settings.screen.lock.enabled";
   private static final String SCREEN_LOCK_TIMEOUT                     = "settings.screen.lock.timeout";
   private static final String AUTOMATIC_VERIFICATION_ENABLED          = "settings.automatic.verification.enabled";
+  private static final String FORCE_WEBSOCKET_MODE                    = "settings.force.websocket.mode.2";
 
   public static final int BACKUP_DEFAULT_HOUR   = 2;
   public static final int BACKUP_DEFAULT_MINUTE = 0;
@@ -196,7 +203,7 @@ public final class SettingsValues extends SignalStoreValues {
       setSyncThreadTrimDeletes(!isTrimByLengthEnabled() && getKeepMessagesDuration() == KeepMessagesDuration.FOREVER);
     }
 
-    return getBoolean(THREAD_TRIM_SYNC_TO_LINKED_DEVICES, true);
+    return getBoolean(THREAD_TRIM_SYNC_TO_LINKED_DEVICES, true) && SignalStore.account().isPrimaryDevice();
   }
 
   public void setSyncThreadTrimDeletes(boolean syncDeletes) {
@@ -442,6 +449,54 @@ public final class SettingsValues extends SignalStoreValues {
     putString(MESSAGE_NOTIFICATION_PRIVACY, messageNotificationsPrivacy.toString());
   }
 
+  public boolean getReactionNotifications() {
+    return getBoolean(MESSAGE_NOTIFICATION_REACTION, true);
+  }
+
+  public void setReactionNotifications(boolean show) {
+    putBoolean(MESSAGE_NOTIFICATION_REACTION, show);
+  }
+
+  public boolean getAllowCallsWhileMuted() {
+    return getBoolean(MESSAGE_NOTIFICATION_MUTED_CALLS, false);
+  }
+
+  public void setAllowCallsWhileMuted(boolean allow) {
+    putBoolean(MESSAGE_NOTIFICATION_MUTED_CALLS, allow);
+  }
+
+  public boolean getAllowMentionsWhileMuted() {
+    return getBoolean(MESSAGE_NOTIFICATION_MUTED_MENTIONS, true);
+  }
+
+  public void setAllowMentionsWhileMuted(boolean allow) {
+    putBoolean(MESSAGE_NOTIFICATION_MUTED_MENTIONS, allow);
+  }
+
+  public boolean getAllowRepliesWhileMuted() {
+    return getBoolean(MESSAGE_NOTIFICATION_MUTED_REPLIES, true);
+  }
+
+  public void setAllowRepliesWhileMuted(boolean allow) {
+    putBoolean(MESSAGE_NOTIFICATION_MUTED_REPLIES, allow);
+  }
+
+  public boolean getUnreadReminderEnabled() {
+    return getBoolean(UNREAD_REMINDER_ENABLED, true);
+  }
+
+  public void setUnreadReminderEnabled(boolean enabled) {
+    putBoolean(UNREAD_REMINDER_ENABLED, enabled);
+  }
+
+  public long getUnreadReminderNextNotifyTime() {
+    return getLong(UNREAD_REMINDER_NEXT_NOTIFY_TIME, 0L);
+  }
+
+  public void setUnreadReminderNextNotifyTime(long time) { // TODO(michelle): Use in unread job
+    putLong(UNREAD_REMINDER_NEXT_NOTIFY_TIME, time);
+  }
+
   public boolean isCallNotificationsEnabled() {
     return getBoolean(CALL_NOTIFICATIONS_ENABLED, TextSecurePreferences.isCallNotificationsEnabled(AppDependencies.getApplication()));
   }
@@ -566,7 +621,19 @@ public final class SettingsValues extends SignalStoreValues {
   }
 
   public void setAutomaticVerificationEnabled(boolean enabled) {
+    Log.i(TAG, "Setting key transparency enabled to " + enabled);
     putBoolean(AUTOMATIC_VERIFICATION_ENABLED, enabled);
+  }
+
+  public @NonNull ForceWebsocketMode getForceWebsocketMode() {
+    if (getStore().containsKey(FORCE_WEBSOCKET_MODE)) {
+      return ForceWebsocketMode.deserialize(getInteger(FORCE_WEBSOCKET_MODE, ForceWebsocketMode.DISABLED.serialize()));
+    }
+    return getBoolean(FORCE_WEBSOCKET_MODE, false) ? ForceWebsocketMode.ENABLED_BY_USER : ForceWebsocketMode.DISABLED;
+  }
+
+  public void setForceWebsocketMode(@NonNull ForceWebsocketMode mode) {
+    putInteger(FORCE_WEBSOCKET_MODE, mode.serialize());
   }
 
   private @Nullable Uri getUri(@NonNull String key) {
@@ -603,6 +670,37 @@ public final class SettingsValues extends SignalStoreValues {
 
     public int serialize() {
       return value;
+    }
+  }
+
+  public enum ForceWebsocketMode {
+    DISABLED(0), ENABLED_BY_USER(1), ENABLED_AUTOMATICALLY(2);
+
+    private final int value;
+
+    ForceWebsocketMode(int value) {
+      this.value = value;
+    }
+
+    public boolean isEnabled() {
+      return this != DISABLED;
+    }
+
+    public int serialize() {
+      return value;
+    }
+
+    public static ForceWebsocketMode deserialize(int value) {
+      switch (value) {
+        case 0:
+          return DISABLED;
+        case 1:
+          return ENABLED_BY_USER;
+        case 2:
+          return ENABLED_AUTOMATICALLY;
+        default:
+          throw new IllegalArgumentException("Bad value: " + value);
+      }
     }
   }
 

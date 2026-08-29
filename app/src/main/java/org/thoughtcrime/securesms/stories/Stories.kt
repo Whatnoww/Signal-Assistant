@@ -16,6 +16,8 @@ import org.signal.core.ui.BottomSheetUtil
 import org.signal.core.util.ThreadUtil
 import org.signal.core.util.logging.Log
 import org.signal.core.util.orNull
+import org.signal.mediasend.MediaConstraints
+import org.signal.mediasend.SentMediaQuality
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.contacts.HeaderAction
 import org.thoughtcrime.securesms.database.SignalDatabase
@@ -25,9 +27,7 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobs.AttachmentDownloadJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.mediasend.v2.stories.ChooseStoryTypeBottomSheet
-import org.thoughtcrime.securesms.mms.MediaConstraints
 import org.thoughtcrime.securesms.mms.OutgoingMessage
-import org.thoughtcrime.securesms.mms.SentMediaQuality
 import org.thoughtcrime.securesms.mms.VideoSlide
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.RecipientId
@@ -119,7 +119,7 @@ object Stories {
     Log.d(TAG, "Enqueuing downloads for up to $limit stories for $recipientId (force: $force)")
     SignalDatabase.messages.getUnreadStories(recipientId, limit).use { reader ->
       reader.forEach {
-        enqueueAttachmentsFromStoryForDownloadSync(it as MmsMessageRecord, false)
+        enqueueAttachmentsFromStoryForDownloadSync(it as MmsMessageRecord, force)
       }
     }
   }
@@ -324,8 +324,9 @@ object Stories {
     @WorkerThread
     fun clipMediaToStoryDuration(media: Media): List<Media> {
       val storyDurationUs = TimeUnit.MILLISECONDS.toMicros(MAX_VIDEO_DURATION_MILLIS)
-      val startOffsetUs = media.transformProperties?.videoTrimStartTimeUs ?: 0L
-      val endOffsetUs = media.transformProperties?.videoTrimEndTimeUs ?: TimeUnit.MILLISECONDS.toMicros(getVideoDuration(media.uri))
+      val pendingTrim = media.transformProperties?.takeIf { it.videoTrim && !it.skipTransform }
+      val startOffsetUs = pendingTrim?.videoTrimStartTimeUs ?: 0L
+      val endOffsetUs = pendingTrim?.videoTrimEndTimeUs ?: TimeUnit.MILLISECONDS.toMicros(getVideoDuration(media.uri))
       val durationUs = endOffsetUs - startOffsetUs
 
       if (durationUs <= 0L) {
@@ -341,7 +342,7 @@ object Stories {
           error("Illegal clip: $startTimeUs > $endTimeUs for clip $clipIndex")
         }
 
-        TransformProperties(false, true, startTimeUs, endTimeUs, SentMediaQuality.STANDARD.code, false)
+        TransformProperties(false, true, startTimeUs, endTimeUs, media.transformProperties?.sentMediaQuality ?: SentMediaQuality.STANDARD.code, false)
       }.map { transformMedia(media, it) }
     }
 
@@ -399,7 +400,7 @@ object Stories {
         isVideoGif = videoSlide.isVideoGif,
         bucketId = null,
         caption = videoSlide.caption.orNull(),
-        transformProperties = null,
+        transformProperties = videoSlide.asAttachment().transformProperties,
         fileName = null
       )
     }

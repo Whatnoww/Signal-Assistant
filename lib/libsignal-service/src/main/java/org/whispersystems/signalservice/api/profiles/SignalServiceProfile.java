@@ -7,11 +7,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import org.signal.libsignal.protocol.logging.Log;
+import org.signal.core.util.logging.Log;
 import org.signal.libsignal.zkgroup.InvalidInputException;
 import org.signal.libsignal.zkgroup.profiles.ExpiringProfileKeyCredentialResponse;
 import org.signal.core.models.ServiceId;
-import org.whispersystems.signalservice.internal.util.JsonUtil;
+import org.signal.network.util.JsonUtil;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -195,12 +195,20 @@ public class SignalServiceProfile {
     @JsonProperty("ssre2")
     private boolean storageServiceEncryptionV2;
 
+    @JsonProperty("usernameChangeSyncMessage")
+    private boolean usernameSyncMessages;
+
+    @JsonProperty
+    private boolean optionalPhoneNumber;
+
     @JsonCreator
     public Capabilities() {}
 
-    public Capabilities(boolean storage, boolean storageServiceEncryptionV2) {
+    public Capabilities(boolean storage, boolean storageServiceEncryptionV2, boolean usernameSyncMessages, boolean optionalPhoneNumber) {
       this.storage                    = storage;
       this.storageServiceEncryptionV2 = storageServiceEncryptionV2;
+      this.usernameSyncMessages       = usernameSyncMessages;
+      this.optionalPhoneNumber        = optionalPhoneNumber;
     }
 
     public boolean isStorage() {
@@ -209,6 +217,14 @@ public class SignalServiceProfile {
 
     public boolean isStorageServiceEncryptionV2() {
       return storageServiceEncryptionV2;
+    }
+
+    public boolean isUsernameSyncMessages() {
+      return usernameSyncMessages;
+    }
+
+    public boolean isOptionalPhoneNumber() {
+      return optionalPhoneNumber;
     }
   }
 

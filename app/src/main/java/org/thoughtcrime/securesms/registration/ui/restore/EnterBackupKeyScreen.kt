@@ -68,7 +68,7 @@ import org.thoughtcrime.securesms.registration.ui.shared.RegistrationScreen
 @Composable
 fun EnterBackupKeyScreen(
   isDisplayedDuringManualRestore: Boolean,
-  backupKey: String,
+  enteredText: String,
   inProgress: Boolean,
   isBackupKeyValid: Boolean,
   chunkLength: Int,
@@ -140,7 +140,7 @@ fun EnterBackupKeyScreen(
     val autoFillHelper = backupKeyAutoFillHelper { onBackupKeyChanged(it) }
 
     TextField(
-      value = backupKey,
+      value = enteredText,
       onValueChange = {
         onBackupKeyChanged(it)
         autoFillHelper.onValueChanged(it)
@@ -222,7 +222,7 @@ private fun AccountEntropyPoolVerification.AEPValidationError.ValidationErrorMes
 private fun EnterBackupKeyScreenPreview() {
   Previews.Preview {
     EnterBackupKeyScreen(
-      backupKey = "UY38jh2778hjjhj8lk19ga61s672jsj089r023s6a57809bap92j2yh5t326vv7t".uppercase(),
+      enteredText = "UY38jh2778hjjhj8lk19ga61s672jsj089r023s6a57809bap92j2yh5t326vv7t".uppercase(),
       isBackupKeyValid = true,
       inProgress = false,
       chunkLength = 4,
@@ -237,7 +237,7 @@ private fun EnterBackupKeyScreenPreview() {
 private fun EnterBackupKeyScreenErrorPreview() {
   Previews.Preview {
     EnterBackupKeyScreen(
-      backupKey = "UY38jh2778hjjhj8lk19ga61s672jsj089r023s6a57809bap92j2yh5t326vv7t".uppercase(),
+      enteredText = "UY38jh2778hjjhj8lk19ga61s672jsj089r023s6a57809bap92j2yh5t326vv7t".uppercase(),
       isBackupKeyValid = true,
       inProgress = false,
       chunkLength = 4,

@@ -58,10 +58,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.launch
 import org.signal.core.ui.WindowBreakpoint
-import org.signal.core.ui.compose.AllDevicePreviews
+import org.signal.core.ui.compose.BreakpointPreviews
 import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.getWindowBreakpoint
-import org.signal.core.ui.isWidthExpanded
 import org.signal.core.ui.rememberIsSplitPane
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.main.MainFloatingActionButtonsCallback
@@ -82,16 +81,9 @@ enum class NavigationType {
       val windowBreakpoint = remember(config) { resources.getWindowBreakpoint() }
 
       return when (windowBreakpoint) {
-        WindowBreakpoint.SMALL -> BAR
-        WindowBreakpoint.MEDIUM -> {
-          val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
-          if (windowSizeClass.isWidthExpanded) {
-            RAIL
-          } else {
-            BAR
-          }
-        }
-        WindowBreakpoint.LARGE -> RAIL
+        is WindowBreakpoint.Small -> BAR
+        is WindowBreakpoint.Medium -> if (windowBreakpoint.isWidthExpanded) RAIL else BAR
+        is WindowBreakpoint.Large -> RAIL
       }
     }
   }
@@ -407,7 +399,7 @@ private fun ListAndNavigation(
 }
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
-@AllDevicePreviews
+@BreakpointPreviews
 @Composable
 private fun AppScaffoldPreview() {
   Previews.Preview {

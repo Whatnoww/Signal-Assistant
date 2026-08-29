@@ -18,13 +18,14 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.groups.GroupId;
 import org.thoughtcrime.securesms.jobmanager.JsonJobData;
 import org.thoughtcrime.securesms.jobmanager.Job;
+import org.thoughtcrime.securesms.jobmanager.impl.DataRestoreConstraint;
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint;
 import org.thoughtcrime.securesms.profiles.AvatarHelper;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.thoughtcrime.securesms.util.ByteUnit;
+import org.signal.core.util.ByteUnit;
 import org.whispersystems.signalservice.api.SignalServiceMessageReceiver;
 import org.whispersystems.signalservice.api.groupsv2.GroupsV2Operations;
-import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException;
+import org.signal.network.exceptions.NonSuccessfulResponseCodeException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -50,7 +51,14 @@ public final class AvatarGroupsV2DownloadJob extends BaseJob {
 
   public static void enqueueUnblurredAvatar(@NonNull GroupId.V2 groupId) {
     SignalExecutors.BOUNDED.execute(() -> {
-      String cdnKey = SignalDatabase.groups().getGroup(groupId).get().requireV2GroupProperties().getAvatarKey();
+      GroupRecord groupRecord = SignalDatabase.groups().getGroup(groupId).orElse(null);
+
+      if (groupRecord == null || !groupRecord.getHasV2GroupProperties()) {
+        Log.w(TAG, "Missing group properties (probably previously deleted)");
+        return;
+      }
+
+      String cdnKey = groupRecord.requireV2GroupProperties().getAvatarKey();
       AppDependencies.getJobManager().add(new AvatarGroupsV2DownloadJob(groupId, cdnKey, true));
     });
   }
@@ -62,6 +70,7 @@ public final class AvatarGroupsV2DownloadJob extends BaseJob {
   public AvatarGroupsV2DownloadJob(@NonNull GroupId.V2 groupId, @NonNull String cdnKey, boolean force) {
     this(new Parameters.Builder()
                        .addConstraint(NetworkConstraint.KEY)
+                       .addConstraint(DataRestoreConstraint.KEY)
                        .setQueue("AvatarGroupsV2DownloadJob::" + groupId)
                        .setMaxAttempts(10)
                        .build(),
@@ -98,8 +107,8 @@ public final class AvatarGroupsV2DownloadJob extends BaseJob {
     File                  attachment = null;
 
     try {
-      if (!record.isPresent()) {
-        Log.w(TAG, "Cannot download avatar for unknown group");
+      if (!record.isPresent() || !record.get().getHasV2GroupProperties()) {
+        Log.w(TAG, "Cannot download avatar for unknown group/group with no properties");
         return;
       }
 

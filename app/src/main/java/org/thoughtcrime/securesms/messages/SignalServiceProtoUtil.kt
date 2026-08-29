@@ -67,7 +67,8 @@ object SignalServiceProtoUtil {
         quote != null ||
         preview.isNotEmpty() ||
         bodyRanges.isNotEmpty() ||
-        sticker != null
+        sticker != null ||
+        pollCreate != null
     }
 
   val DataMessage.isExpirationUpdate: Boolean
@@ -77,7 +78,7 @@ object SignalServiceProtoUtil {
     get() = delete != null && delete!!.targetSentTimestamp != null
 
   val DataMessage.isGroupV2Update: Boolean
-    get() = !hasRenderableContent && hasSignedGroupChange
+    get() = hasSignedGroupChange && !hasRenderableContent
 
   val DataMessage?.hasGroupContext: Boolean
     get() = this?.groupV2?.masterKey.isNotEmpty()
@@ -87,9 +88,6 @@ object SignalServiceProtoUtil {
 
   val DataMessage.isMediaMessage: Boolean
     get() = attachments.isNotEmpty() || quote != null || contact.isNotEmpty() || sticker != null || bodyRanges.isNotEmpty() || preview.isNotEmpty()
-
-  val DataMessage.isEndSession: Boolean
-    get() = flags != null && flags!! and DataMessage.Flags.END_SESSION.value != 0
 
   val DataMessage.isStoryReaction: Boolean
     get() = reaction != null && storyContext != null

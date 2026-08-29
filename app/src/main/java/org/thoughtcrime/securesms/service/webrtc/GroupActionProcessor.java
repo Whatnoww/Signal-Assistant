@@ -317,7 +317,7 @@ public class GroupActionProcessor extends DeviceAwareActionProcessor {
                                                             .actionProcessor(actionProcessorFactory.createNetworkUnavailableActionProcessor(webRtcInteractor))
                                                             .changeVideoState()
                                                             .eglBase(videoState.getLockableEglBase())
-                                                            .camera(videoState.getCamera())
+                                                            .router(videoState.getRouter())
                                                             .localSink(videoState.getLocalSink())
                                                             .commit()
                                                             .changeCallInfoState()

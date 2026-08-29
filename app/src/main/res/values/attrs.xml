@@ -5,16 +5,6 @@
     <attr name="circularProgressMaterialButtonStyle" format="reference" />
     <attr name="circularProgressIndicatorStyle" format="reference" />
 
-    <attr name="emoji_category_recent" format="reference"/>
-    <attr name="emoji_category_people" format="reference"/>
-    <attr name="emoji_category_nature" format="reference"/>
-    <attr name="emoji_category_foods"  format="reference"/>
-    <attr name="emoji_category_activity" format="reference"/>
-    <attr name="emoji_category_places" format="reference"/>
-    <attr name="emoji_category_objects" format="reference"/>
-    <attr name="emoji_category_symbols" format="reference"/>
-    <attr name="emoji_category_flags" format="reference"/>
-    <attr name="emoji_category_emoticons" format="reference"/>
 
     <attr name="mediaKeyboardBackgroundColor" format="color" />
     <attr name="mediaKeyboardBottomBarBackgroundColor" format="color" />
@@ -243,12 +233,6 @@
         <attr name="media_keyboard_theme" format="reference" />
     </declare-styleable>
 
-    <declare-styleable name="CameraXFlashState">
-        <attr name="state_flash_auto" format="boolean" />
-        <attr name="state_flash_off" format="boolean" />
-        <attr name="state_flash_on" format="boolean" />
-    </declare-styleable>
-
     <declare-styleable name="ContactFilterView">
         <attr name="searchTextStyle" format="reference" />
         <attr name="showDialpad" format="boolean" />
@@ -271,20 +255,6 @@
 
     <declare-styleable name="ReactionsConversationView">
       <attr name="rcv_outgoing" format="boolean" />
-    </declare-styleable>
-
-    <declare-styleable name="VideoThumbnailsRangeSelectorView">
-        <attr name="thumbWidth" format="dimension" />
-        <attr name="thumbColorEdited" format="color" />
-        <attr name="thumbColor" format="color" />
-        <attr name="thumbTouchRadius" format="dimension" />
-        <attr name="thumbHintTextSize" format="dimension" />
-        <attr name="thumbHintTextColor" format="color" />
-        <attr name="thumbHintBackgroundColor" format="color" />
-    </declare-styleable>
-
-    <declare-styleable name="VideoPlayer">
-        <attr name="playerLayoutId" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="GroupMemberListView">

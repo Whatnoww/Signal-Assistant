@@ -8,6 +8,7 @@ package org.signal.registration
 import kotlinx.serialization.Serializable
 import org.signal.core.models.AccountEntropyPool
 import org.signal.core.models.MasterKey
+import org.signal.network.api.RegistrationApiV2.SessionMetadata
 
 /**
  * A serializable snapshot of [RegistrationFlowState] fields that need to survive app kills.
@@ -19,11 +20,16 @@ import org.signal.core.models.MasterKey
 @Serializable
 data class PersistedFlowState(
   val backStack: List<RegistrationRoute>,
-  val sessionMetadata: NetworkController.SessionMetadata?,
+  val sessionMetadata: SessionMetadata?,
   val sessionE164: String?,
+  val submittedVerificationCode: String? = null,
   val doNotAttemptRecoveryPassword: Boolean,
   val pendingRestoreOption: PendingRestoreOption? = null,
-  val restoredAepValue: String? = null
+  val restoredAepValue: String? = null,
+  val restoreMethodToken: String? = null,
+  val storageCapable: Boolean = false,
+  val smsVerificationCodeRequest: VerificationCodeRequest? = null,
+  val callVerificationCodeRequest: VerificationCodeRequest? = null
 )
 
 /**
@@ -34,9 +40,14 @@ fun RegistrationFlowState.toPersistedFlowState(): PersistedFlowState {
     backStack = backStack,
     sessionMetadata = sessionMetadata,
     sessionE164 = sessionE164,
+    submittedVerificationCode = submittedVerificationCode,
     doNotAttemptRecoveryPassword = doNotAttemptRecoveryPassword,
     pendingRestoreOption = pendingRestoreOption,
-    restoredAepValue = unverifiedRestoredAep?.value
+    restoredAepValue = unverifiedRestoredAep?.value,
+    restoreMethodToken = restoreMethodToken,
+    storageCapable = storageCapable,
+    smsVerificationCodeRequest = lastSmsVerificationCodeRequest,
+    callVerificationCodeRequest = lastCallVerificationCodeRequest
   )
 }
 
@@ -56,11 +67,16 @@ fun PersistedFlowState.toRegistrationFlowState(
     backStack = backStack,
     sessionMetadata = sessionMetadata,
     sessionE164 = sessionE164,
+    submittedVerificationCode = submittedVerificationCode,
     accountEntropyPool = accountEntropyPool,
     temporaryMasterKey = temporaryMasterKey,
     preExistingRegistrationData = preExistingRegistrationData,
     doNotAttemptRecoveryPassword = doNotAttemptRecoveryPassword,
     pendingRestoreOption = pendingRestoreOption,
-    unverifiedRestoredAep = restoredAepValue?.let { AccountEntropyPool(it) }
+    unverifiedRestoredAep = restoredAepValue?.let { AccountEntropyPool(it) },
+    restoreMethodToken = restoreMethodToken,
+    storageCapable = storageCapable,
+    lastSmsVerificationCodeRequest = smsVerificationCodeRequest,
+    lastCallVerificationCodeRequest = callVerificationCodeRequest
   )
 }

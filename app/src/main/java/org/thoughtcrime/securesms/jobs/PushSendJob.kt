@@ -16,6 +16,7 @@ import org.signal.core.util.Util
 import org.signal.core.util.logging.Log
 import org.signal.libsignal.zkgroup.InvalidInputException
 import org.signal.libsignal.zkgroup.receipts.ReceiptCredentialPresentation
+import org.signal.network.service.CdnService
 import org.thoughtcrime.securesms.BuildConfig
 import org.thoughtcrime.securesms.TextSecureExpiredException
 import org.thoughtcrime.securesms.attachments.Attachment
@@ -25,6 +26,7 @@ import org.thoughtcrime.securesms.contactshare.ContactModelMapper
 import org.thoughtcrime.securesms.crypto.ProfileKeyUtil
 import org.thoughtcrime.securesms.database.MessageTable
 import org.thoughtcrime.securesms.database.NoSuchMessageException
+import org.thoughtcrime.securesms.database.RecipientTable.RegisteredState
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.SignalDatabase.Companion.messages
 import org.thoughtcrime.securesms.database.SignalDatabase.Companion.stickers
@@ -43,9 +45,7 @@ import org.thoughtcrime.securesms.net.NotPushRegisteredException
 import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.forConversation
 import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.fromThreadAndReply
 import org.thoughtcrime.securesms.recipients.Recipient
-import org.thoughtcrime.securesms.recipients.Recipient.Companion.resolved
 import org.thoughtcrime.securesms.recipients.Recipient.Companion.self
-import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.transport.RetryLaterException
 import org.thoughtcrime.securesms.transport.UndeliverableMessageException
 import org.thoughtcrime.securesms.util.MediaUtil
@@ -72,7 +72,7 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
     private val TAG = Log.tag(PushSendJob::class.java)
 
     @JvmStatic
-    protected fun enqueueCompressingAndUploadAttachmentsChains(jobManager: JobManager, message: OutgoingMessage): Set<String> {
+    fun enqueueCompressingAndUploadAttachmentsChains(jobManager: JobManager, message: OutgoingMessage): Set<String> {
       val attachments: MutableList<Attachment> = mutableListOf()
 
       attachments += message.attachments
@@ -108,7 +108,7 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
     }
 
     @JvmStatic
-    protected fun notifyMediaMessageDeliveryFailed(context: Context, messageId: Long) {
+    fun notifyMediaMessageDeliveryFailed(context: Context, messageId: Long) {
       val threadId = messages.getThreadIdForMessage(messageId)
       val recipient = threads.getRecipientForThreadId(threadId)
       val groupReplyStoryId = messages.getParentStoryIdForGroupReply(messageId)
@@ -134,7 +134,7 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
     }
 
     @JvmStatic
-    protected fun markAttachmentsUploaded(messageId: Long, message: OutgoingMessage) {
+    fun markAttachmentsUploaded(messageId: Long, message: OutgoingMessage) {
       val attachments: MutableList<Attachment> = mutableListOf()
 
       attachments += message.attachments
@@ -233,7 +233,7 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
 
       val inputStream = PartAuthority.getAttachmentStream(context, attachment.uri!!)
       val ciphertextLength = getCiphertextLength(PaddingInputStream.getPaddedSize(attachment.size))
-      val uploadSpec = AppDependencies.signalServiceMessageSender.getResumableUploadSpec(ciphertextLength)
+      val uploadSpec = CdnService(AppDependencies.signalRestClient, AppDependencies.attachmentApi).getResumableUploadSpecBlocking(ciphertextLength)
 
       return SignalServiceAttachment.newStreamBuilder()
         .withStream(inputStream)
@@ -281,7 +281,7 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
     }
 
     try {
-      val remoteId = SignalServiceAttachmentRemoteId.from(attachment.remoteLocation!!)
+      val remoteId = SignalServiceAttachmentRemoteId.from(attachment.remoteLocation!!, attachment.cdn.cdnNumber)
       val key = Base64.decode(attachment.remoteKey!!)
 
       var width = attachment.width
@@ -361,25 +361,18 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
       )
     }
 
-    val quoteAuthorRecipient = resolved(quoteAuthor)
+    val quoteAuthorRecord = SignalDatabase.recipients.getRecord(quoteAuthor)
+    val author: ServiceId? = if (quoteAuthorRecord.registered != RegisteredState.NOT_REGISTERED) {
+      quoteAuthorRecord.serviceId
+    } else {
+      quoteAuthorRecord.aci
+    }
 
-    if (quoteAuthorRecipient.isMaybeRegistered) {
-      return Optional.of(
+    return if (author != null) {
+      Optional.of(
         SignalServiceDataMessage.Quote(
           id = quoteId,
-          author = RecipientUtil.getOrFetchServiceId(context, quoteAuthorRecipient),
-          text = quoteBody,
-          attachments = quoteAttachments,
-          mentions = quoteMentions,
-          type = quoteType.dataMessageType,
-          bodyRanges = bodyRanges
-        )
-      )
-    } else if (quoteAuthorRecipient.hasServiceId) {
-      return Optional.of(
-        SignalServiceDataMessage.Quote(
-          id = quoteId,
-          author = quoteAuthorRecipient.requireAci(),
+          author = author,
           text = quoteBody,
           attachments = quoteAttachments,
           mentions = quoteMentions,
@@ -388,7 +381,7 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
         )
       )
     } else {
-      return Optional.empty()
+      Optional.empty()
     }
   }
 

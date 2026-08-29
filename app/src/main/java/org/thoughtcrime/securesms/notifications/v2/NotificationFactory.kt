@@ -17,13 +17,14 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import org.signal.core.util.PendingIntentFlags
+import org.signal.core.util.ServiceUtil
 import org.signal.core.util.concurrent.SignalExecutors
 import org.signal.core.util.logging.Log
+import org.signal.emoji.EmojiStrings
 import org.thoughtcrime.securesms.MainActivity
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.avatar.fallback.FallbackAvatar
 import org.thoughtcrime.securesms.avatar.fallback.FallbackAvatarDrawable
-import org.thoughtcrime.securesms.components.emoji.EmojiStrings
 import org.thoughtcrime.securesms.conversation.ConversationIntents
 import org.thoughtcrime.securesms.conversation.colors.AvatarColor
 import org.thoughtcrime.securesms.database.SignalDatabase
@@ -36,7 +37,6 @@ import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.stories.my.MyStoriesActivity
 import org.thoughtcrime.securesms.util.BubbleUtil
 import org.thoughtcrime.securesms.util.ConversationUtil
-import org.thoughtcrime.securesms.util.ServiceUtil
 import org.thoughtcrime.securesms.util.TextSecurePreferences
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -49,8 +49,9 @@ object NotificationFactory {
 
   val TAG: String = Log.tag(NotificationFactory::class.java)
 
-  private val STILL_DECRYPTING_INDIVIDUAL_THROTTLE: Duration = 5.seconds
+  private val INDIVIDUAL_THROTTLE: Duration = 5.seconds
   private val GROUP_THROTTLE: Duration = 20.seconds
+  private val STILL_DECRYPTING_THROTTLE: Duration = 30.seconds
 
   @WorkerThread
   fun notify(
@@ -209,13 +210,14 @@ object NotificationFactory {
 
   private fun shouldAlert(conversation: NotificationConversation, lastNotificationTimestamp: Long, alertOverride: Boolean): Boolean {
     val throttle: Duration = when {
+      !AppDependencies.incomingMessageObserver.decryptionDrained -> STILL_DECRYPTING_THROTTLE
       conversation.recipient.isGroup && (conversation.mostRecentNotification as? MessageNotification)?.hasSelfMention == false -> GROUP_THROTTLE
-      AppDependencies.incomingMessageObserver.decryptionDrained -> STILL_DECRYPTING_INDIVIDUAL_THROTTLE
-      else -> 0.seconds
+      else -> INDIVIDUAL_THROTTLE
     }
     val canAlertBasedOnTime: Boolean = lastNotificationTimestamp < System.currentTimeMillis() - throttle.inWholeMilliseconds || lastNotificationTimestamp > System.currentTimeMillis()
+    val isUnreadNoteToSelf: Boolean = conversation.recipient.isSelf && (conversation.mostRecentNotification as? MessageNotification)?.isUnread == true
 
-    return ((conversation.hasNewNotifications() && canAlertBasedOnTime) || alertOverride) && !conversation.mostRecentNotification.authorRecipient.isSelf
+    return ((conversation.hasNewNotifications() && canAlertBasedOnTime) || alertOverride) && (!conversation.mostRecentNotification.authorRecipient.isSelf || isUnreadNoteToSelf)
   }
 
   @WorkerThread

@@ -37,7 +37,7 @@ import org.thoughtcrime.securesms.profiles.AvatarHelper;
 import org.thoughtcrime.securesms.profiles.ProfileName;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientUtil;
-import org.whispersystems.signalservice.api.NetworkResult;
+import org.signal.network.NetworkResult;
 import org.whispersystems.signalservice.api.NetworkResultUtil;
 import org.whispersystems.signalservice.api.crypto.InvalidCiphertextException;
 import org.whispersystems.signalservice.api.crypto.ProfileCipher;

@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.signal.core.util.PendingIntentFlags
+import org.signal.core.util.SafeForegroundService
 import org.signal.core.util.logging.Log
 import org.signal.core.util.throttleLatest
 import org.thoughtcrime.securesms.MainActivity
@@ -168,7 +169,7 @@ class AttachmentProgressService : SafeForegroundService() {
   }
 
   class Controller(private val context: Context, title: String) : AutoCloseable {
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val progressFlow = MutableSharedFlow<Float>(replay = 0, extraBufferCapacity = 1)
 
     init {

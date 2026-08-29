@@ -113,6 +113,8 @@ class RemoteRestoreActivity : BaseActivity() {
 
   private lateinit var wakeLock: RemoteRestoreWakeLock
 
+  private val eventBusSubscriber = EventBusSubscriber()
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -235,12 +237,14 @@ class RemoteRestoreActivity : BaseActivity() {
       }
     }
 
-    EventBus.getDefault().registerForLifecycle(subscriber = this, lifecycleOwner = this)
+    EventBus.getDefault().registerForLifecycle(subscriber = eventBusSubscriber, lifecycleOwner = this)
   }
 
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  fun onEvent(restoreEvent: RestoreV2Event) {
-    viewModel.updateRestoreProgress(restoreEvent)
+  private inner class EventBusSubscriber {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    fun onEvent(restoreEvent: RestoreV2Event) {
+      viewModel.updateRestoreProgress(restoreEvent)
+    }
   }
 
   private fun showUnregisteredDialog() {

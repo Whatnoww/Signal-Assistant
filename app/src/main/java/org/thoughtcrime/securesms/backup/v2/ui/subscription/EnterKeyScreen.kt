@@ -93,7 +93,8 @@ fun EnterKeyScreen(
 
       val updateEnteredBackupKey = { input: String ->
         enteredBackupKey = AccountEntropyPool.removeIllegalCharacters(input).uppercase()
-        isBackupKeyValid = enteredBackupKey == backupKey
+        val normalized = AccountEntropyPool.formatForStorage(enteredBackupKey)
+        isBackupKeyValid = normalized.equals(AccountEntropyPool.formatForStorage(backupKey), ignoreCase = true)
         showError = !isBackupKeyValid && enteredBackupKey.length >= backupKey.length
       }
 

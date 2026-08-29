@@ -29,6 +29,7 @@ import org.signal.core.util.logging.Log
 import org.signal.core.util.mebiBytes
 import org.signal.core.util.throttleLatest
 import org.signal.donations.InAppPaymentType
+import org.signal.network.NetworkResult
 import org.thoughtcrime.securesms.backup.ArchiveUploadProgress
 import org.thoughtcrime.securesms.backup.DeletionState
 import org.thoughtcrime.securesms.backup.v2.ArchiveRestoreProgress
@@ -51,7 +52,6 @@ import org.thoughtcrime.securesms.keyvalue.protos.ArchiveUploadProgressState
 import org.thoughtcrime.securesms.util.Environment
 import org.thoughtcrime.securesms.util.RemoteConfig
 import org.thoughtcrime.securesms.util.TextSecurePreferences
-import org.whispersystems.signalservice.api.NetworkResult
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -79,7 +79,8 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
       internalUser = RemoteConfig.internalUser,
       includeDebuglog = SignalStore.internal.includeDebuglogInBackup.takeIf { RemoteConfig.internalUser },
       backupCreationError = SignalStore.backup.backupCreationError,
-      lastMessageCutoffTime = SignalStore.backup.lastUsedMessageCutoffTime
+      lastMessageCutoffTime = SignalStore.backup.lastUsedMessageCutoffTime,
+      isLinkedDevice = SignalStore.account.isLinkedDevice
     )
   )
 
@@ -92,6 +93,14 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
   private var forQuickRestore = false
 
   init {
+    if (state.value.isLinkedDevice) {
+      initLinkedDevice()
+    } else {
+      initPrimaryDevice()
+    }
+  }
+
+  private fun initPrimaryDevice() {
     ArchiveUploadProgress.triggerUpdate()
 
     viewModelScope.launch(Dispatchers.IO) {
@@ -143,7 +152,7 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
         }
     }
 
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       var optimizedRemainingBytes = 0L
       while (isActive) {
         if (ArchiveRestoreProgress.state.let { it.restoreState.isMediaRestoreOperation || it.restoreStatus == RestoreStatus.FINISHED }) {
@@ -194,8 +203,31 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
       }
     }
 
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       BackupRepository.maybeFixAnyDanglingUploadProgress()
+    }
+  }
+
+  /**
+   * Render remote backups as read-only and refresh the last-backup time from the CDN.
+   */
+  private fun initLinkedDevice() {
+    viewModelScope.launch(Dispatchers.IO) {
+      BackupStateObserver(viewModelScope, useDatabaseFallbackOnNetworkError = true).backupState.collect { backupState ->
+        _state.update {
+          it.copy(backupState = backupState)
+        }
+      }
+    }
+
+    viewModelScope.launch(Dispatchers.Default) {
+      SignalStore.backup.lastBackupTimeFlow.collect { lastBackupTime ->
+        _state.update { it.copy(lastBackupTimestamp = lastBackupTime) }
+      }
+    }
+
+    viewModelScope.launch(Dispatchers.IO) {
+      BackupRepository.refreshBackupFileTimestamp()
     }
   }
 
@@ -244,13 +276,15 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
 
   fun getKeyRotationLimit() {
     viewModelScope.launch(SignalDispatchers.IO) {
-      val result = BackupRepository.getKeyRotationLimit()
-      val canRotateKey = if (result is NetworkResult.Success) {
-        result.result.hasPermitsRemaining!!
-      } else {
-        Log.w(TAG, "Error while getting rotation limit: $result. Default to allowing key rotations.")
-        true
-      }
+      val canRotateKey = AppDependencies.archiveService
+        .getKeyRotationLimit()
+        .fold(
+          ifRight = { it.hasPermitsRemaining!! },
+          ifLeft = { error ->
+            Log.w(TAG, "Error while getting rotation limit: ${error::class.simpleName}. Default to allowing key rotations.")
+            true
+          }
+        )
 
       if (!canRotateKey) {
         requestDialog(RemoteBackupsSettingsState.Dialog.KEY_ROTATION_LIMIT_REACHED)
@@ -259,6 +293,10 @@ class RemoteBackupsSettingsViewModel : ViewModel() {
   }
 
   fun refresh() {
+    if (state.value.isLinkedDevice) {
+      return
+    }
+
     viewModelScope.launch(Dispatchers.IO) {
       val id = SignalDatabase.inAppPayments.getLatestInAppPaymentByType(InAppPaymentType.RECURRING_BACKUP)?.id
 

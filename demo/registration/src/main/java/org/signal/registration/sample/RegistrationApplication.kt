@@ -6,33 +6,42 @@
 package org.signal.registration.sample
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.conscrypt.Conscrypt
 import org.signal.core.models.ServiceId.ACI
 import org.signal.core.models.ServiceId.PNI
 import org.signal.core.ui.CoreUiDependencies
 import org.signal.core.util.Base64
 import org.signal.core.util.logging.AndroidLogger
 import org.signal.core.util.logging.Log
+import org.signal.network.config.SignalCdnUrl
+import org.signal.network.config.SignalCdsiUrl
+import org.signal.network.config.SignalServiceConfiguration
+import org.signal.network.config.SignalServiceUrl
+import org.signal.network.config.SignalStorageUrl
+import org.signal.network.config.SignalSvr2Url
+import org.signal.network.config.TrustStore
+import org.signal.registration.ContactSupportController
 import org.signal.registration.RegistrationDependencies
 import org.signal.registration.sample.debug.DebugNetworkController
 import org.signal.registration.sample.dependencies.DemoNetworkController
 import org.signal.registration.sample.dependencies.DemoStorageController
 import org.signal.registration.sample.storage.RegistrationPreferences
-import org.whispersystems.signalservice.api.push.TrustStore
 import org.whispersystems.signalservice.api.util.CredentialsProvider
-import org.whispersystems.signalservice.internal.configuration.SignalCdnUrl
-import org.whispersystems.signalservice.internal.configuration.SignalCdsiUrl
-import org.whispersystems.signalservice.internal.configuration.SignalServiceConfiguration
-import org.whispersystems.signalservice.internal.configuration.SignalServiceUrl
-import org.whispersystems.signalservice.internal.configuration.SignalStorageUrl
-import org.whispersystems.signalservice.internal.configuration.SignalSvr2Url
 import org.whispersystems.signalservice.internal.push.PushServiceSocket
 import java.io.InputStream
+import java.security.Security
 import java.util.Optional
 
 class RegistrationApplication : Application() {
 
   companion object {
+    private val TAG = Log.tag(RegistrationApplication::class)
+
     // Staging SVR2 mrEnclave value
     private const val SVR2_MRENCLAVE = "97f151f6ed078edbbfd72fa9cae694dcc08353f1f5e8d9ccd79a971b10ffc535"
 
@@ -44,8 +53,10 @@ class RegistrationApplication : Application() {
     super.onCreate()
 
     Log.initialize(AndroidLogger)
+    initializeSecurityProvider()
 
     RegistrationPreferences.init(this)
+    createDeviceTransferNotificationChannel()
 
     val trustStore = SampleTrustStore()
     val configuration = createServiceConfiguration(trustStore)
@@ -59,7 +70,26 @@ class RegistrationApplication : Application() {
       RegistrationDependencies(
         networkController = networkController,
         storageController = storageController,
-        sensitiveLogger = LogLogger
+        sensitiveLogger = LogLogger,
+        debugLogCallback = {},
+        proxyConfigCallback = { context ->
+          MaterialAlertDialogBuilder(context)
+            .setMessage("Proxy configuration not supported in the demo.")
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+        },
+        contactSupportController = object : ContactSupportController {
+          override suspend fun uploadDebugLog(): String? = null
+
+          override fun sendSupportEmail(context: Context, subject: String, filter: String, debugLogUrl: String?) {
+            MaterialAlertDialogBuilder(context)
+              .setMessage("Contact support not supported in the demo. Subject: $subject, Filter: $filter, Debug log: $debugLogUrl")
+              .setPositiveButton(android.R.string.ok, null)
+              .show()
+          }
+        },
+        isLinkAndSyncAvailable = true,
+        isPhoneNumberlessRegistrationAvailable = true
       )
     )
 
@@ -72,6 +102,25 @@ class RegistrationApplication : Application() {
         override fun provideForceSplitPane(): Boolean = false
       }
     )
+  }
+
+  private fun initializeSecurityProvider() {
+    val position = Security.insertProviderAt(Conscrypt.newProvider(), 1)
+    Log.i(TAG, "Installed Conscrypt provider: $position")
+  }
+
+  private fun createDeviceTransferNotificationChannel() {
+    if (Build.VERSION.SDK_INT < 26) {
+      return
+    }
+
+    val manager = getSystemService(NotificationManager::class.java) ?: return
+    val channel = NotificationChannel(
+      DemoNetworkController.DEVICE_TRANSFER_NOTIFICATION_CHANNEL_ID,
+      "Device transfer",
+      NotificationManager.IMPORTANCE_LOW
+    )
+    manager.createNotificationChannel(channel)
   }
 
   private fun createPushServiceSocket(configuration: SignalServiceConfiguration): PushServiceSocket {

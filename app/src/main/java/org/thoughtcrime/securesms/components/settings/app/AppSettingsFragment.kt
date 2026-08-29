@@ -58,6 +58,7 @@ import org.signal.core.ui.compose.SignalIcons
 import org.signal.core.ui.compose.horizontalGutters
 import org.signal.core.ui.compose.theme.SignalTheme
 import org.signal.core.util.Util
+import org.signal.emoji.Emojifier
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.avatar.AvatarImage
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
@@ -68,19 +69,20 @@ import org.thoughtcrime.securesms.banner.banners.UnauthorizedBanner
 import org.thoughtcrime.securesms.banner.ui.compose.Action
 import org.thoughtcrime.securesms.banner.ui.compose.DefaultBanner
 import org.thoughtcrime.securesms.banner.ui.compose.Importance
-import org.thoughtcrime.securesms.components.emoji.Emojifier
 import org.thoughtcrime.securesms.components.settings.app.routes.AppSettingsRoute
 import org.thoughtcrime.securesms.components.settings.app.routes.AppSettingsRouter
 import org.thoughtcrime.securesms.components.settings.app.subscription.BadgeImageMedium
 import org.thoughtcrime.securesms.components.settings.app.subscription.InAppPaymentsRepository
 import org.thoughtcrime.securesms.components.settings.app.subscription.completed.InAppPaymentsBottomSheetDelegate
-import org.thoughtcrime.securesms.compose.rememberStatusBarColorNestedScrollModifier
 import org.thoughtcrime.securesms.database.model.InAppPaymentSubscriberRecord
+import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.profiles.ProfileName
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.util.CommunicationActions
 import org.thoughtcrime.securesms.util.SignalE164Util
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
+import org.signal.appsettings.R as AppSettingsR
+import org.signal.core.ui.R as CoreUiR
 
 class AppSettingsFragment : ComposeFragment(), Callbacks {
 
@@ -95,7 +97,11 @@ class AppSettingsFragment : ComposeFragment(), Callbacks {
         appSettingsRouter.currentRoute.collect { route ->
           when (route) {
             is AppSettingsRoute.BackupsRoute.Remote -> findNavController().safeNavigate(R.id.action_appSettingsFragment_to_remoteBackupsSettingsFragment)
-            is AppSettingsRoute.AccountRoute.Account -> findNavController().safeNavigate(R.id.action_appSettingsFragment_to_accountSettingsFragment)
+            is AppSettingsRoute.AccountRoute.Account -> if (SignalStore.account.isPrimaryDevice) {
+              findNavController().safeNavigate(R.id.action_appSettingsFragment_to_accountSettingsFragment)
+            } else {
+              findNavController().safeNavigate(R.id.action_appSettingsFragment_to_linkedDeviceAccountSettingsFragment)
+            }
             is AppSettingsRoute.LinkDeviceRoute.LinkDevice -> findNavController().safeNavigate(R.id.action_appSettingsFragment_to_linkDeviceFragment)
             is AppSettingsRoute.DonationsRoute.Donations -> findNavController().safeNavigate(R.id.action_appSettingsFragment_to_manageDonationsFragment)
             is AppSettingsRoute.AppearanceRoute.Appearance -> findNavController().safeNavigate(R.id.action_appSettingsFragment_to_appearanceSettingsFragment)
@@ -179,7 +185,7 @@ class AppSettingsFragment : ComposeFragment(), Callbacks {
     @StringRes toastSuccessStringRes: Int
   ) {
     lifecycleScope.launch {
-      val subscriber = withContext(Dispatchers.IO) {
+      val subscriber = withContext(Dispatchers.Default) {
         InAppPaymentsRepository.getSubscriber(subscriberType)
       }
 
@@ -213,9 +219,7 @@ private fun AppSettingsContent(
     ) {
       bannerManager.Banner()
 
-      LazyColumn(
-        modifier = rememberStatusBarColorNestedScrollModifier()
-      ) {
+      LazyColumn {
         item {
           BioRow(
             self = self,
@@ -291,70 +295,70 @@ private fun AppSettingsContent(
           BackupFailureState.NONE -> Unit
         }
 
+        item {
+          Rows.TextRow(
+            text = stringResource(AppSettingsR.string.AccountSettingsFragment__account),
+            icon = painterResource(CoreUiR.drawable.symbol_person_circle_24),
+            onClick = {
+              callbacks.navigate(AppSettingsRoute.AccountRoute.Account)
+            }
+          )
+        }
+
         if (state.isPrimaryDevice) {
           item {
             Rows.TextRow(
-              text = stringResource(R.string.AccountSettingsFragment__account),
-              icon = painterResource(R.drawable.symbol_person_circle_24),
-              onClick = {
-                callbacks.navigate(AppSettingsRoute.AccountRoute.Account)
-              }
-            )
-          }
-
-          item {
-            Rows.TextRow(
               text = stringResource(R.string.preferences__linked_devices),
-              icon = painterResource(R.drawable.symbol_devices_24),
+              icon = painterResource(CoreUiR.drawable.symbol_devices_24),
               onClick = {
                 callbacks.navigate(AppSettingsRoute.LinkDeviceRoute.LinkDevice)
               },
               enabled = isRegisteredAndUpToDate
             )
           }
+        }
 
-          item {
-            val context = LocalContext.current
-            val donateUrl = stringResource(R.string.donate_url)
+        item {
+          val context = LocalContext.current
+          val donateUrl = stringResource(R.string.donate_url)
 
-            Rows.TextRow(
-              text = {
-                Text(
-                  text = stringResource(R.string.preferences__donate_to_signal),
-                  modifier = Modifier.weight(1f)
-                )
+          Rows.TextRow(
+            text = {
+              Text(
+                text = stringResource(R.string.preferences__donate_to_signal),
+                modifier = Modifier.weight(1f)
+              )
 
-                if (state.hasExpiredGiftBadge) {
-                  Icon(
-                    painter = painterResource(R.drawable.symbol_info_fill_24),
-                    tint = colorResource(R.color.signal_accent_primary),
-                    contentDescription = null
-                  )
-                }
-              },
-              icon = {
+              if (state.hasExpiredGiftBadge) {
                 Icon(
-                  painter = painterResource(R.drawable.symbol_heart_24),
-                  contentDescription = null,
-                  tint = MaterialTheme.colorScheme.onSurface
+                  painter = painterResource(R.drawable.symbol_info_fill_24),
+                  tint = colorResource(R.color.signal_accent_primary),
+                  contentDescription = null
                 )
-              },
-              onClick = {
-                if (state.allowUserToGoToDonationManagementScreen) {
-                  callbacks.navigate(AppSettingsRoute.DonationsRoute.Donations())
-                } else {
-                  CommunicationActions.openBrowserLink(context, donateUrl)
-                }
-              },
-              onLongClick = {
-                callbacks.copyDonorBadgeSubscriberIdToClipboard()
               }
-            )
-          }
+            },
+            icon = {
+              Icon(
+                painter = painterResource(R.drawable.symbol_heart_24),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface
+              )
+            },
+            onClick = {
+              if (state.allowUserToGoToDonationManagementScreen) {
+                callbacks.navigate(AppSettingsRoute.DonationsRoute.Donations())
+              } else {
+                CommunicationActions.openBrowserLink(context, donateUrl)
+              }
+            },
+            onLongClick = {
+              callbacks.copyDonorBadgeSubscriberIdToClipboard()
+            }
+          )
+        }
 
-          item {
-            Dividers.Default()
-          }
+        item {
+          Dividers.Default()
         }
 
         item {
@@ -411,20 +415,20 @@ private fun AppSettingsContent(
           )
         }
 
-        if (state.isPrimaryDevice) {
-          item {
-            Rows.TextRow(
-              icon = SignalIcons.Backup.imageVector,
-              text = stringResource(R.string.preferences_chats__backups),
-              onClick = {
-                callbacks.navigate(AppSettingsRoute.BackupsRoute.Backups())
-              },
-              onLongClick = {
-                callbacks.copyRemoteBackupsSubscriberIdToClipboard()
-              },
-              enabled = isRegisteredAndUpToDate
-            )
-          }
+        item {
+          Rows.TextRow(
+            icon = SignalIcons.Backup.imageVector,
+            text = stringResource(R.string.preferences_chats__backups),
+            onClick = {
+              callbacks.navigate(AppSettingsRoute.BackupsRoute.Backups())
+            },
+            onLongClick = if (state.isPrimaryDevice) {
+              { callbacks.copyRemoteBackupsSubscriberIdToClipboard() }
+            } else {
+              null
+            },
+            enabled = isRegisteredAndUpToDate
+          )
         }
 
         item {

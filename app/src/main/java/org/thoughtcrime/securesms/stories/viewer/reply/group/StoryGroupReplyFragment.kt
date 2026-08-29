@@ -18,11 +18,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import kotlinx.coroutines.launch
+import org.signal.core.util.ServiceUtil
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.concurrent.SignalExecutors
 import org.signal.core.util.getParcelableCompat
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.R
+import org.thoughtcrime.securesms.components.KeyboardAwareLinearLayout
 import org.thoughtcrime.securesms.components.emoji.MediaKeyboard
 import org.thoughtcrime.securesms.components.mention.MentionAnnotation
 import org.thoughtcrime.securesms.components.settings.DSLConfiguration
@@ -57,7 +59,6 @@ import org.thoughtcrime.securesms.stories.viewer.reply.StoryViewsAndRepliesPager
 import org.thoughtcrime.securesms.stories.viewer.reply.StoryViewsAndRepliesPagerParent
 import org.thoughtcrime.securesms.stories.viewer.reply.composer.StoryReplyComposer
 import org.thoughtcrime.securesms.util.DeleteDialog
-import org.thoughtcrime.securesms.util.ServiceUtil
 import org.thoughtcrime.securesms.util.ViewUtil
 import org.thoughtcrime.securesms.util.adapter.mapping.PagingMappingAdapter
 import org.thoughtcrime.securesms.util.fragments.findListener
@@ -172,6 +173,8 @@ class StoryGroupReplyFragment :
 
     composer.callback = this
     composer.hint = getString(R.string.StoryViewerPageFragment__reply_to_group)
+    // The hosting bottom sheet already clears the navigation bar; the composer only needs to ride above the keyboard.
+    composer.setInsetPaddingMode(KeyboardAwareLinearLayout.InsetPaddingMode.KEYBOARD)
 
     onPageSelected(findListener<StoryViewsAndRepliesPagerParent>()?.selectedChild ?: StoryViewsAndRepliesPagerParent.Child.REPLIES)
 
@@ -248,9 +251,9 @@ class StoryGroupReplyFragment :
     markReadHelper?.onViewsRevealed(adapterItem.replyBody.sentAtMillis)
   }
 
-  private fun getConfiguration(pageData: List<ReplyBody>): DSLConfiguration {
+  private fun getConfiguration(pageData: List<ReplyBody?>): DSLConfiguration {
     return configure {
-      pageData.forEach {
+      pageData.filterNotNull().forEach {
         when (it) {
           is ReplyBody.Text -> {
             customPref(

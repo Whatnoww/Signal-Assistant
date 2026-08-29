@@ -24,7 +24,7 @@ import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.SignalDatabase.Companion.media
 import org.thoughtcrime.securesms.database.ThreadTable
 import org.thoughtcrime.securesms.dependencies.AppDependencies
-import org.thoughtcrime.securesms.jobs.OptimizeMediaJob
+import org.thoughtcrime.securesms.jobs.BackupMessagesJob
 import org.thoughtcrime.securesms.jobs.RestoreOptimizedMediaJob
 import org.thoughtcrime.securesms.keyvalue.KeepMessagesDuration
 import org.thoughtcrime.securesms.keyvalue.SignalStore
@@ -35,13 +35,16 @@ class ManageStorageSettingsViewModel : ViewModel() {
     ManageStorageState(
       keepMessagesDuration = SignalStore.settings.keepMessagesDuration,
       lengthLimit = if (SignalStore.settings.isTrimByLengthEnabled) SignalStore.settings.threadTrimLength else ManageStorageState.NO_LIMIT,
-      syncTrimDeletes = SignalStore.settings.shouldSyncThreadTrimDeletes()
+      syncTrimDeletes = SignalStore.settings.shouldSyncThreadTrimDeletes(),
+      localBackupsEnabled = SignalStore.backup.newLocalBackupsEnabled,
+      isPrimary = SignalStore.account.isPrimaryDevice,
+      initialOptimizeStorage = SignalStore.backup.optimizeStorage
     )
   )
   val state = store.asStateFlow()
 
   init {
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.Default) {
       InAppPaymentsRepository.observeLatestBackupPayment()
         .collectLatest { payment ->
           store.update { it.copy(isPaidTierPending = payment.state == InAppPaymentTable.State.PENDING) }
@@ -119,7 +122,7 @@ class ManageStorageSettingsViewModel : ViewModel() {
         store.update {
           it.copy(
             onDeviceStorageOptimizationState = if (enabled) OnDeviceStorageOptimizationState.ENABLED else OnDeviceStorageOptimizationState.DISABLED,
-            storageOptimizationStateChanged = true
+            storageOptimizationStateChanged = enabled != it.initialOptimizeStorage
           )
         }
       }
@@ -132,6 +135,7 @@ class ManageStorageSettingsViewModel : ViewModel() {
 
   private suspend fun getOnDeviceStorageOptimizationState(): OnDeviceStorageOptimizationState {
     return when {
+      !SignalStore.account.isPrimaryDevice -> OnDeviceStorageOptimizationState.FEATURE_NOT_AVAILABLE
       !SignalStore.backup.areBackupsEnabled || !BackupUpgradeAvailabilityChecker.isUpgradeAvailable(AppDependencies.application) -> OnDeviceStorageOptimizationState.FEATURE_NOT_AVAILABLE
       SignalStore.backup.backupTier != MessageBackupTier.PAID -> OnDeviceStorageOptimizationState.REQUIRES_PAID_TIER
       SignalStore.backup.optimizeStorage -> OnDeviceStorageOptimizationState.ENABLED
@@ -143,7 +147,10 @@ class ManageStorageSettingsViewModel : ViewModel() {
     if (state.value.storageOptimizationStateChanged) {
       when (state.value.onDeviceStorageOptimizationState) {
         OnDeviceStorageOptimizationState.DISABLED -> RestoreOptimizedMediaJob.enqueue()
-        OnDeviceStorageOptimizationState.ENABLED -> OptimizeMediaJob.enqueue()
+
+        // Backing up first guarantees a media snapshot exists to reconcile against, and the backup enqueues the offload for us once it succeeds
+        OnDeviceStorageOptimizationState.ENABLED -> BackupMessagesJob.enqueue()
+
         else -> Unit
       }
     }
@@ -179,7 +186,10 @@ class ManageStorageSettingsViewModel : ViewModel() {
     val breakdown: MediaTable.StorageBreakdown? = null,
     val onDeviceStorageOptimizationState: OnDeviceStorageOptimizationState = OnDeviceStorageOptimizationState.FEATURE_NOT_AVAILABLE,
     val storageOptimizationStateChanged: Boolean = false,
-    val isPaidTierPending: Boolean = false
+    val isPaidTierPending: Boolean = false,
+    val localBackupsEnabled: Boolean = false,
+    val isPrimary: Boolean = true,
+    val initialOptimizeStorage: Boolean = false
   ) {
     companion object {
       const val NO_LIMIT = 0

@@ -57,6 +57,8 @@ class AccountAttributes @JsonCreator constructor(
     @JsonProperty val storage: Boolean,
     @JsonProperty val versionedExpirationTimer: Boolean,
     @JsonProperty val attachmentBackfill: Boolean,
-    @JsonProperty val spqr: Boolean
+    @JsonProperty val spqr: Boolean,
+    @JsonProperty val usernameChangeSyncMessage: Boolean,
+    @JsonProperty val optionalPhoneNumber: Boolean
   )
 }

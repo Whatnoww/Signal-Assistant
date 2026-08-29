@@ -8,6 +8,7 @@ import org.signal.core.models.backup.MediaRootBackupKey
 import org.signal.core.models.backup.MessageBackupKey
 import org.signal.core.util.LongSerializer
 import org.signal.core.util.logging.Log
+import org.signal.network.util.JsonUtil
 import org.thoughtcrime.securesms.backup.DeletionState
 import org.thoughtcrime.securesms.backup.RestoreState
 import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
@@ -21,7 +22,6 @@ import org.thoughtcrime.securesms.keyvalue.protos.BackupDownloadNotifierState
 import org.thoughtcrime.securesms.util.Environment
 import org.whispersystems.signalservice.api.archive.ArchiveServiceCredential
 import org.whispersystems.signalservice.api.archive.GetArchiveCdnCredentialsResponse
-import org.whispersystems.signalservice.internal.util.JsonUtil
 import java.io.IOException
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.time.Duration
@@ -52,6 +52,9 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
     private const val KEY_NEXT_BACKUP_TIME = "backup.nextBackupTime"
     private const val KEY_LAST_BACKUP_TIME = "backup.lastBackupTime"
     private const val KEY_LAST_ATTACHMENT_RECONCILIATION_TIME = "backup.lastBackupMediaSyncTime"
+    private const val KEY_LAST_COMPLETED_RECONCILIATION_SNAPSHOT_VERSION = "backup.lastCompletedReconciliationSnapshotVersion"
+    private const val KEY_LAST_COMPLETED_RECONCILIATION_TIME = "backup.lastCompletedReconciliationTime"
+    private const val KEY_LAST_FORCED_RECONCILIATION_ATTEMPT_TIME = "backup.lastForcedReconciliationAttemptTime"
     private const val KEY_TOTAL_RESTORABLE_ATTACHMENT_SIZE = "backup.totalRestorableAttachmentSize"
     private const val KEY_LAST_BACKUP_PROTO_VERSION = "backup.lastBackupProtoVersion"
 
@@ -62,6 +65,8 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
     private const val KEY_RESTORE_OVER_CELLULAR = "backup.restore.useCellular"
     private const val KEY_OPTIMIZE_STORAGE = "backup.optimizeStorage"
     private const val KEY_BACKUPS_INITIALIZED = "backup.initialized"
+    private const val KEY_MESSAGE_BACKUP_INITIALIZED = "backup.messageBackupInitialized"
+    private const val KEY_MEDIA_BACKUP_INITIALIZED = "backup.mediaBackupInitialized"
     private const val KEY_IMPORTED_EMPTY_ANDROID_SETTINGS = "backup.importedEmptyAndroidSettings"
 
     const val KEY_ARCHIVE_UPLOAD_STATE = "backup.archiveUploadState"
@@ -85,6 +90,7 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
     private const val KEY_BACKUP_DELETION_STATE = "backup.deletion.state"
     private const val KEY_REMOTE_STORAGE_GARBAGE_COLLECTION_PENDING = "backup.remoteStorageGarbageCollectionPending"
     private const val KEY_ARCHIVE_ATTACHMENT_RECONCILIATION_ATTEMPTS = "backup.archiveAttachmentReconciliationAttempts"
+    private const val KEY_LOCAL_RESTORE_RECONCILE_PENDING = "backup.localRestoreReconcilePending"
 
     private const val KEY_MEDIA_ROOT_BACKUP_KEY = "backup.mediaRootBackupKey"
 
@@ -112,6 +118,12 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
     private val cachedCdnCredentialsExpiresIn: Duration = 12.hours
 
     private val lock = ReentrantLock()
+  }
+
+  init {
+    if (!store.containsKey(KEY_MESSAGE_BACKUP_INITIALIZED)) {
+      migrateSplitBackupsInitialized()
+    }
   }
 
   public override fun onFirstEverAppLaunch() = Unit
@@ -184,7 +196,39 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
 
   var lastAttachmentReconciliationTime: Long by longValue(KEY_LAST_ATTACHMENT_RECONCILIATION_TIME, -1)
 
+  /**
+   * Negative if no crawl has ever completed on this device. Must be cleared by anything that invalidates our view of the CDN (new media root backup key, tier
+   * change), because it gates deleting local copies of media.
+   */
+  var lastCompletedReconciliationSnapshotVersion: Long by longValue(KEY_LAST_COMPLETED_RECONCILIATION_SNAPSHOT_VERSION, -1)
+
+  /**
+   * When the crawl behind [lastCompletedReconciliationSnapshotVersion] finished, or zero if none ever has. Written alongside it.
+   */
+  var lastCompletedReconciliationTime: Long by longValue(KEY_LAST_COMPLETED_RECONCILIATION_TIME, 0)
+
+  /**
+   * Advances when a forced crawl *starts*, unlike [lastAttachmentReconciliationTime] which only advances on completion, so that a crawl which can never finish
+   * doesn't get re-forced daily while one that never started still can be.
+   */
+  var lastForcedReconciliationAttemptTime: Long by longValue(KEY_LAST_FORCED_RECONCILIATION_ATTEMPT_TIME, 0)
+
+  /**
+   * Discards everything we know about having verified our media against the archive CDN, so offloading stays gated until a fresh crawl confirms it again. Call
+   * this from anything that invalidates that view.
+   */
+  fun clearArchiveVerificationState() {
+    lastCompletedReconciliationSnapshotVersion = -1
+    lastCompletedReconciliationTime = 0
+    lastForcedReconciliationAttemptTime = 0
+  }
+
   var userManuallySkippedMediaRestore: Boolean by booleanValue(KEY_USER_MANUALLY_SKIPPED_MEDIA_RESTORE, false)
+
+  /**
+   * Set when a local backup restore is kicked off so that, once media restore completes, we reconcile the restored media against the archive CDN.
+   */
+  var localRestoreReconcilePending: Boolean by booleanValue(KEY_LOCAL_RESTORE_RECONCILE_PENDING, false)
 
   var backupExpiredAndDowngraded: Boolean by booleanValue(KEY_BACKUP_EXPIRED_AND_DOWNGRADED, false)
 
@@ -244,6 +288,8 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
         store.beginWrite().putBlob(KEY_MEDIA_ROOT_BACKUP_KEY, value.value).commit()
         mediaCredentials.clearAll()
         cachedMediaCdnPath = null
+
+        clearArchiveVerificationState()
       }
     }
 
@@ -284,6 +330,8 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
           clearNotEnoughRemoteStorageSpace()
           clearMessageBackupFailureSheetWatermark()
           backupCreationError = null
+
+          clearArchiveVerificationState()
 
           if (storedValue == null) {
             Log.i(TAG, "Enabling backups. Resetting 'finished initial backup' state.")
@@ -379,7 +427,8 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
       .beginWrite()
       .putLong(KEY_NEXT_BACKUP_TIME, -1)
       .putLong(KEY_LAST_BACKUP_TIME, -1)
-      .putBoolean(KEY_BACKUPS_INITIALIZED, false)
+      .putBoolean(KEY_MESSAGE_BACKUP_INITIALIZED, false)
+      .putBoolean(KEY_MEDIA_BACKUP_INITIALIZED, false)
       .putBoolean(KEY_BACKUP_UPLOADED, false)
       .putLong(KEY_LAST_VERIFY_KEY_TIME, -1)
       .putBoolean(KEY_HAS_VERIFIED_BEFORE, false)
@@ -389,7 +438,11 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
     backupTierInternalOverride = null
   }
 
-  var backupsInitialized: Boolean by booleanValue(KEY_BACKUPS_INITIALIZED, false)
+  /** Whether the message backupId has been reserved with the service and our public key set. */
+  var messageBackupInitialized: Boolean by booleanValue(KEY_MESSAGE_BACKUP_INITIALIZED, false)
+
+  /** The media counterpart to [messageBackupInitialized]. */
+  var mediaBackupInitialized: Boolean by booleanValue(KEY_MEDIA_BACKUP_INITIALIZED, false)
 
   var restoreState: RestoreState by enumValue(KEY_RESTORE_STATE, RestoreState.NONE, RestoreState.serializer)
   var totalRestorableAttachmentSize: Long by longValue(KEY_TOTAL_RESTORABLE_ATTACHMENT_SIZE, 0)
@@ -576,6 +629,18 @@ class BackupValues(store: KeyValueStore) : SignalStoreValues(store) {
 
   private fun getNextBackupFailureSheetSnoozeTime(previous: Duration): Duration {
     return previous + 7.days
+  }
+
+  /** Do not alter. If you need to migrate more stuff, create a new method. */
+  private fun migrateSplitBackupsInitialized() {
+    val initialized = getBoolean(KEY_BACKUPS_INITIALIZED, false)
+    Log.i(TAG, "Splitting the backups-initialized flag into message/media. Existing value: $initialized")
+
+    store
+      .beginWrite()
+      .putBoolean(KEY_MESSAGE_BACKUP_INITIALIZED, initialized)
+      .putBoolean(KEY_MEDIA_BACKUP_INITIALIZED, initialized)
+      .commit()
   }
 
   class SerializedCredentials(

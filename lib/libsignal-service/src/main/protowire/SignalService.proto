@@ -187,7 +187,7 @@ message CallMessage {
 
 message DataMessage {
   enum Flags {
-    END_SESSION = 1;
+    reserved /*END_SESSION*/ 1;
     EXPIRATION_TIMER_UPDATE = 2;
     PROFILE_KEY_UPDATE = 4;
     FORWARD = 8;
@@ -579,10 +579,29 @@ message SyncMessage {
   }
 
   message Blocked {
-    repeated string numbers = 1;
+    repeated string numbers = 1; // deprecated: this field will be removed in a future release.
     repeated string acis = 3;
-    repeated bytes groupIds = 2;
-    repeated bytes acisBinary = 4; // 16-byte UUID
+    repeated bytes groupIds = 2; // deprecated: this field will be removed in a future release.
+    repeated bytes acisBinary = 4; // deprecated: this field will be removed in a future release.
+
+    message BlockedE164 {
+      optional string e164 = 1;
+      optional uint64 timestamp = 2;
+    }
+
+    message BlockedAci {
+      optional bytes aciBinary = 1; // 16-byte UUID
+      optional uint64 timestamp = 2;
+    }
+
+    message BlockedGroup {
+      optional bytes groupId = 1;
+      optional uint64 timestamp = 2;
+    }
+
+    repeated BlockedE164 blockedE164s = 5;
+    repeated BlockedAci blockedAcis = 6;
+    repeated BlockedGroup blockedGroups = 7;
   }
 
   message Request {
@@ -850,6 +869,8 @@ message SyncMessage {
     }
   }
 
+  message UsernameChange {}
+
   oneof content {
     Sent sent = 1;
     Contacts contacts = 2;
@@ -870,6 +891,7 @@ message SyncMessage {
     DeviceNameChange deviceNameChange = 23;
     AttachmentBackfillRequest attachmentBackfillRequest = 24;
     AttachmentBackfillResponse attachmentBackfillResponse = 25;
+    UsernameChange usernameChange = 26;
   }
 
   reserved /*groups*/ 3;

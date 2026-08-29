@@ -13,7 +13,9 @@ object AppCapabilities {
       storage = storageCapable,
       versionedExpirationTimer = true,
       attachmentBackfill = true,
-      spqr = true
+      spqr = true,
+      usernameChangeSyncMessage = true,
+      optionalPhoneNumber = false
     )
   }
 }

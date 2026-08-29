@@ -12,6 +12,7 @@ plugins {
   alias(libs.plugins.compose.compiler) apply false
   alias(libs.plugins.ktlint)
   alias(benchmarkLibs.plugins.baselineprofile) apply false
+  id("dependency-verification")
 }
 
 buildscript {
@@ -30,7 +31,7 @@ buildscript {
     classpath(libs.gradle)
     classpath(libs.androidx.navigation.safe.args.gradle.plugin)
     classpath(libs.protobuf.gradle.plugin)
-    classpath("com.squareup.wire:wire-gradle-plugin:6.0.0-alpha02") {
+    classpath("com.squareup.wire:wire-gradle-plugin:6.4.5") {
       exclude(group = "com.squareup.wire", module = "wire-swift-generator")
       exclude(group = "com.squareup.wire", module = "wire-grpc-client")
       exclude(group = "com.squareup.wire", module = "wire-grpc-jvm")
@@ -57,7 +58,10 @@ subprojects {
   }
 
   tasks.withType<Test>().configureEach {
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 4).coerceAtLeast(1)
+
+    // Raised for robolectric
+    maxHeapSize = "2g"
   }
 }
 
@@ -73,15 +77,40 @@ tasks.register("buildQa") {
 
 tasks.register("qa") {
   group = "Verification"
-  description = "Quality Assurance. Run before pushing."
+  description = "Quality Assurance. Run before release."
   dependsOn("clean")
+}
+
+tasks.register("ci") {
+  group = "Verification"
+  description = "Faster version of qa that's intended to be run on PRs. Uses a :fast-lint instead of full lint."
+  dependsOn("clean")
+}
+
+tasks.register("validateScreenshots") {
+  group = "Verification"
+  description = "Validates Compose screenshot tests. Intended to run only on CI, not local builds."
+}
+
+tasks.register("qaRemote") {
+  group = "Verification"
+  description = "Full qa plus screenshot validation. Intended to run on CI, not local builds."
+  dependsOn("qa")
+  dependsOn("validateScreenshots")
+}
+
+tasks.register("ciRemote") {
+  group = "Verification"
+  description = "Faster PR verification (ci) plus screenshot validation. Intended to run on CI, not local builds."
+  dependsOn("ci")
+  dependsOn("validateScreenshots")
 }
 
 // Wire up QA dependencies after all projects are evaluated
 gradle.projectsEvaluated {
-  val appTestTask = tasks.findByPath(":Signal-Android:testPlayProdReleaseUnitTest")
-  val appLintTask = tasks.findByPath(":Signal-Android:lintPlayProdRelease")
-  val appCompileInstrumentationTask = tasks.findByPath(":Signal-Android:compilePlayProdInstrumentationAndroidTestSources")
+  val appTestTask = tasks.findByPath(":Signal-Android:testPlayProdDebugUnitTest")!!
+  val appLintTask = tasks.findByPath(":Signal-Android:lintPlayProdDebug")!!
+  val appCompileInstrumentationTask = tasks.findByPath(":Signal-Android:compilePlayProdDebugAndroidTestSources")
 
   tasks.named("qa") {
     dependsOn("ktlintCheck")
@@ -89,8 +118,8 @@ gradle.projectsEvaluated {
     dependsOn("checkStopship")
 
     // Main app tasks
-    appTestTask?.let { dependsOn(it) }
-    appLintTask?.let { dependsOn(it) }
+    dependsOn(appTestTask)
+    dependsOn(appLintTask)
 
     // Instrumentation
     appCompileInstrumentationTask?.let { dependsOn(it) }
@@ -102,11 +131,36 @@ gradle.projectsEvaluated {
 
     // Library module tasks
     subprojects.filter { it.name != "Signal-Android" }.forEach { subproject ->
-      val testTask = subproject.tasks.findByName("testDebugUnitTest")
-        ?: subproject.tasks.findByName("test")
+      val testTask = subproject.tasks.findByName("testDebugUnitTest") ?: subproject.tasks.findByName("test")
       testTask?.let { dependsOn(it) }
 
       subproject.tasks.findByName("lintDebug")?.let { dependsOn(it) }
+    }
+  }
+
+  tasks.named("validateScreenshots") {
+    subprojects.filter { it.name != "Signal-Android" }.forEach { subproject ->
+      subproject.tasks.findByName("validateDebugScreenshotTest")?.let { dependsOn(it) }
+    }
+  }
+
+  tasks.named("ci") {
+    dependsOn("ktlintCheck")
+    dependsOn("buildQa")
+    dependsOn("checkStopship")
+
+    dependsOn(appTestTask)
+    appCompileInstrumentationTask?.let { dependsOn(it) }
+
+    dependsOn(":fast-lint:fastLint")
+
+    subprojects.forEach { subproject ->
+      subproject.tasks.findByName("ktlintCheck")?.let { dependsOn(it) }
+    }
+
+    subprojects.filter { it.name != "Signal-Android" }.forEach { subproject ->
+      val testTask = subproject.tasks.findByName("testDebugUnitTest") ?: subproject.tasks.findByName("test")
+      testTask?.let { dependsOn(it) }
     }
   }
 
@@ -120,11 +174,11 @@ gradle.projectsEvaluated {
   // If you let all of these things run in parallel, gradle will likely OOM.
   // To avoid this, we put non-app tests and lints behind the much heavier app tests and lints.
   subprojects.filter { it.name != "Signal-Android" }.forEach { subproject ->
-    appTestTask?.let { task ->
+    appTestTask.let { task ->
       subproject.tasks.findByName("testDebugUnitTest")?.mustRunAfter(task)
       subproject.tasks.findByName("test")?.mustRunAfter(task)
     }
-    appLintTask?.let { task ->
+    appLintTask.let { task ->
       subproject.tasks.findByName("lintDebug")?.mustRunAfter(task)
     }
   }

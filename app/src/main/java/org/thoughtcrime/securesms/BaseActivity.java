@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +17,7 @@ import androidx.core.app.ActivityOptionsCompat;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.util.AppStartup;
-import org.thoughtcrime.securesms.util.ConfigurationUtil;
+import org.signal.core.util.ConfigurationUtil;
 import org.thoughtcrime.securesms.util.WindowUtil;
 import org.thoughtcrime.securesms.util.dynamiclanguage.DynamicLanguageContextWrapper;
 
@@ -34,6 +35,7 @@ public abstract class BaseActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     AppStartup.getInstance().onCriticalRenderEventStart();
     logEvent("onCreate()");
+    EdgeToEdge.enable(this);
     super.onCreate(savedInstanceState);
     AppStartup.getInstance().onCriticalRenderEventEnd();
   }

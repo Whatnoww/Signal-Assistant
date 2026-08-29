@@ -79,7 +79,7 @@ data class MainContentLayoutData(
       val isSplitPane = resources.rememberIsSplitPane()
 
       return remember(windowSizeClass, mode, breakpoint, isSplitPane) {
-        val isLargeWindowSize = breakpoint == WindowBreakpoint.LARGE
+        val isLargeWindowSize = breakpoint is WindowBreakpoint.Large
 
         MainContentLayoutData(
           shape = when {

@@ -5,14 +5,14 @@
 
 package org.signal.camera
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraCharacteristics
+import android.hardware.camera2.CameraManager
 import android.hardware.camera2.CameraMetadata
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.camera.camera2.internal.compat.CameraManagerCompat
+import org.signal.core.util.EncryptedProxyFileDescriptor
 import org.signal.core.util.MemoryFileDescriptor
 import org.signal.core.util.logging.Log
 
@@ -23,8 +23,17 @@ object CameraXUtil {
   private const val VIDEO_SIZE = 10L * 1024 * 1024
 
   @Throws(MemoryFileDescriptor.MemoryFileException::class)
-  fun createVideoFileDescriptor(context: Context): MemoryFileDescriptor {
+  fun createMemoryVideoFileDescriptor(context: Context): MemoryFileDescriptor {
     return MemoryFileDescriptor.newMemoryFileDescriptor(context, VIDEO_DEBUG_LABEL, VIDEO_SIZE)
+  }
+
+  /**
+   * Creates a disk-backed, transparently-encrypted video file descriptor. Callers should gate on
+   * [EncryptedProxyFileDescriptor.isSupported].
+   */
+  @RequiresApi(26)
+  fun createEncryptedDiskVideoFileDescriptor(context: Context): EncryptedProxyFileDescriptor? {
+    return EncryptedProxyFileDescriptor.create(context, VIDEO_DEBUG_LABEL)
   }
 
   private val CAMERA_HARDWARE_LEVEL_ORDERING = intArrayOf(
@@ -55,8 +64,7 @@ object CameraXUtil {
   }
 
   fun getLowestSupportedHardwareLevel(context: Context): Int {
-    @SuppressLint("RestrictedApi")
-    val cameraManager = CameraManagerCompat.from(context.applicationContext).unwrap()
+    val cameraManager = context.applicationContext.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
     try {
       var supported = maxHardwareLevel()

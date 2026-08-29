@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-sdk tools:overrideLibrary="androidx.camera.core,androidx.camera.camera2,androidx.camera.lifecycle,androidx.camera.view" />
-
     <!-- ======================================= -->
     <!-- Features                                -->
     <!-- ======================================= -->
@@ -40,6 +38,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -453,12 +452,7 @@
             android:theme="@style/Theme.Signal.DayNight.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
 
-        <activity
-            android:name=".calls.links.details.CallLinkDetailsActivity"
-            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
-            android:exported="false"
-            android:theme="@style/Theme.Signal.DayNight.NoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden" />
+
 
         <activity
             android:name=".calls.new.NewCallActivity"
@@ -487,21 +481,13 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity
-            android:name=".mediasend.v2.MediaSelectionActivity"
-            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode"
-            android:exported="false"
-            android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/TextSecure.DarkNoActionBar"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustNothing" />
-
-        <activity
             android:name=".mediasend.v3.MediaSendV3Activity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize|uiMode"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:theme="@style/Signal.DayNight.NoActionBar"
+            android:enableOnBackInvokedCallback="true"
+            android:theme="@style/TextSecure.DarkNoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustNothing" />
 
         <activity
@@ -541,6 +527,13 @@
                 <category android:name="android.intent.category.NOTIFICATION_PREFERENCES" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".preferences.EditProxyActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
+            android:exported="false"
+            android:theme="@style/Signal.DayNight.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".stories.my.MyStoriesActivity"
@@ -666,7 +659,7 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity
-            android:name=".mediapreview.MediaPreviewV2Activity"
+            android:name=".mediapreview.MediaPreviewActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:exported="false"
             android:label="@string/AndroidManifest__media_preview"
@@ -901,6 +894,14 @@
         <activity
             android:name=".megaphone.ClientDeprecatedActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Signal.DayNight.NoActionBar" />
+
+        <activity
+            android:name=".clockskew.ClockSkewActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
+            android:excludeFromRecents="true"
             android:exported="false"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Signal.DayNight.NoActionBar" />
@@ -1386,7 +1387,7 @@
 
         <service
             android:name=".gcm.FcmReceiveService"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -1419,7 +1420,7 @@
         <service
             android:name="org.thoughtcrime.securesms.service.webrtc.ActiveCallManager$ActiveCallForegroundService"
             android:exported="false"
-            android:foregroundServiceType="dataSync|microphone|camera|phoneCall" />
+            android:foregroundServiceType="dataSync|microphone|camera|phoneCall|mediaProjection" />
 
         <service
             android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
@@ -1549,7 +1550,7 @@
         </receiver>
 
         <receiver
-            android:name="org.thoughtcrime.securesms.jobs.ForegroundServiceUtil$Receiver"
+            android:name="org.signal.core.util.ForegroundServiceUtil$Receiver"
             android:exported="false" />
 
         <receiver

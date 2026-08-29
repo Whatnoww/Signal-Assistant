@@ -16,7 +16,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import org.signal.core.ui.compose.DayNightPreviews
 import org.signal.core.ui.compose.Dialogs
-import org.signal.core.ui.compose.IconButtons.IconButton
 import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.Scaffolds
 import org.signal.core.ui.compose.SignalIcons
@@ -59,6 +60,7 @@ import org.thoughtcrime.securesms.components.verify.SafetyNumberQrView
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.rememberRecipientField
 import org.thoughtcrime.securesms.util.CommunicationActions
+import org.signal.core.ui.R as CoreUiR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,16 +74,18 @@ fun VerifyDisplayScreen(
   val context = LocalContext.current
   val backPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
   val displayName by rememberRecipientField(state.recipient) { getDisplayName(context) }
+  val scrollState = rememberScrollState()
 
-  Scaffolds.Settings(
+  Scaffolds.Default(
     title = stringResource(R.string.AndroidManifest__verify_safety_number),
-    navigationIcon = SignalIcons.ArrowStart.imageVector,
+    navigationIconRes = CoreUiR.drawable.symbol_arrow_start_24,
     onNavigationClick = { backPressedDispatcher?.onBackPressed() }
   ) {
     Column(
       horizontalAlignment = Alignment.CenterHorizontally,
       modifier = Modifier
         .fillMaxWidth()
+        .verticalScroll(scrollState)
         .padding(it)
     ) {
       SafetyNumberQr(
@@ -121,36 +125,38 @@ fun VerifyDisplayScreen(
         )
       )
 
-      AutomaticKeyVerificationBlock(
-        state = state,
-        emitter = emitter
-      )
+      if (state.isAutomaticVerificationVisible) {
+        AutomaticKeyVerificationBlock(
+          state = state,
+          emitter = emitter
+        )
 
-      Text(
-        text = buildAnnotatedString {
-          append(stringResource(R.string.verify_display_fragment__auto_verify_not_available))
-          append(" ")
+        Text(
+          text = buildAnnotatedString {
+            append(stringResource(R.string.verify_display_fragment__auto_verify_not_available))
+            append(" ")
 
-          val url = stringResource(R.string.verify_display_fragment__link)
-          withLink(
-            link = LinkAnnotation.Clickable(
-              tag = "auto-verify-learn-more",
-              styles = TextLinkStyles(
-                style = SpanStyle(
-                  color = MaterialTheme.colorScheme.primary
+            val url = stringResource(R.string.verify_display_fragment__link)
+            withLink(
+              link = LinkAnnotation.Clickable(
+                tag = "auto-verify-learn-more",
+                styles = TextLinkStyles(
+                  style = SpanStyle(
+                    color = MaterialTheme.colorScheme.primary
+                  )
                 )
-              )
+              ) {
+                CommunicationActions.openBrowserLink(context, url)
+              }
             ) {
-              CommunicationActions.openBrowserLink(context, url)
+              append(stringResource(R.string.LearnMoreTextView_learn_more))
             }
-          ) {
-            append(stringResource(R.string.LearnMoreTextView_learn_more))
-          }
-        },
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(vertical = 12.dp)
-      )
+          },
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.padding(vertical = 12.dp, horizontal = 24.dp)
+        )
+      }
     }
   }
 
@@ -183,6 +189,7 @@ private fun SafetyNumberQr(
   val fingerprint = (state.fingerprintHolder as? FingerprintHolder.Initialised)?.fingerprint
   var animateSuccess by remember { mutableStateOf(false) }
   var animateFailure by remember { mutableStateOf(false) }
+  var initialLoad by remember { mutableStateOf(true) }
 
   AndroidView(
     factory = { SafetyNumberQrView(it) },
@@ -192,7 +199,8 @@ private fun SafetyNumberQr(
     // TODO - animateVerifiedSuccess // animateVerifiedFailure
 
     if (fingerprint != null) {
-      it.setFingerprintViews(fingerprint.fingerprint, true) // TODO - animateCodeChanges
+      it.setFingerprintViews(fingerprint.fingerprint, initialLoad) // TODO - animateCodeChanges
+      initialLoad = false
     }
 
     if (animateSuccess) {
@@ -292,11 +300,21 @@ private fun AutomaticKeyVerificationBlock(
         .background(color = SignalTheme.colors.colorSurface1, shape = RoundedCornerShape(38.dp))
         .padding(horizontal = 16.dp)
     ) { targetStatus ->
+      val hasInfoSheet = targetStatus != AutomaticVerificationStatus.NONE && targetStatus != AutomaticVerificationStatus.VERIFYING
+
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.clickable(enabled = targetStatus == AutomaticVerificationStatus.NONE, onClick = {
-          emitter(VerifyDisplayScreenEvent.VerifyAutomaticallyClick)
-        }, role = Role.Button)
+        modifier = Modifier.clickable(
+          enabled = targetStatus == AutomaticVerificationStatus.NONE || hasInfoSheet,
+          onClick = {
+            if (targetStatus == AutomaticVerificationStatus.NONE) {
+              emitter(VerifyDisplayScreenEvent.VerifyAutomaticallyClick)
+            } else {
+              displayEncryptedSheet = true
+            }
+          },
+          role = Role.Button
+        )
       ) {
         if (targetStatus == AutomaticVerificationStatus.VERIFYING) {
           CircularProgressIndicator(
@@ -316,21 +334,18 @@ private fun AutomaticKeyVerificationBlock(
           modifier = Modifier
             .padding(vertical = 16.dp)
             .padding(start = 12.dp)
+            .weight(1f, fill = false)
         )
 
-        if (targetStatus != AutomaticVerificationStatus.NONE && targetStatus != AutomaticVerificationStatus.VERIFYING) {
-          IconButton(onClick = {
-            displayEncryptedSheet = true
-          }) {
-            Icon(
-              imageVector = SignalIcons.ChevronRight.imageVector,
-              contentDescription = null,
-              tint = MaterialTheme.colorScheme.outline,
-              modifier = Modifier
-                .padding(start = 2.dp)
-                .size(16.dp)
-            )
-          }
+        if (hasInfoSheet) {
+          Icon(
+            imageVector = SignalIcons.ChevronRight.imageVector,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.outline,
+            modifier = Modifier
+              .padding(start = 2.dp)
+              .size(16.dp)
+          )
         }
       }
     }
@@ -364,7 +379,7 @@ private fun YouMustFirstExchangeMessagesDialog(
   state.recipient ?: return
 
   val context = LocalContext.current
-  val recipientName = rememberRecipientField(state.recipient) { getDisplayName(context) }
+  val recipientName by rememberRecipientField(state.recipient) { getDisplayName(context) }
 
   Dialogs.SimpleMessageDialog(
     message = stringResource(R.string.VerifyIdentityActivity_you_must_first_exchange_messages_in_order_to_view, recipientName),

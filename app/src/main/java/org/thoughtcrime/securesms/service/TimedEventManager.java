@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -19,7 +18,7 @@ import org.signal.core.util.PendingIntentFlags;
 import org.signal.core.util.ThreadUtil;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.util.RemoteConfig;
-import org.thoughtcrime.securesms.util.ServiceUtil;
+import org.signal.core.util.ServiceUtil;
 
 /**
  * Class to help manage scheduling events to happen in the future, whether the app is open or not.
@@ -84,7 +83,7 @@ public abstract class TimedEventManager<E> {
    * Schedules an alarm to call {@link #scheduleIfNecessary()} after the specified delay. You can
    * use {@link #setAlarm(Context, long, Class)} as a helper method.
    */
-  @AnyThread
+  @WorkerThread
   protected abstract void scheduleAlarm(@NonNull Application application, E event, long delay);
 
   /**

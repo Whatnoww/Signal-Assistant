@@ -7,6 +7,7 @@ package org.thoughtcrime.securesms.jobs
 import android.text.TextUtils
 import okhttp3.internal.http2.StreamResetException
 import org.greenrobot.eventbus.EventBus
+import org.signal.core.models.database.AttachmentId
 import org.signal.core.util.Base64
 import org.signal.core.util.Util
 import org.signal.core.util.concurrent.SignalExecutors
@@ -16,10 +17,10 @@ import org.signal.core.util.readLength
 import org.signal.libsignal.net.RequestResult
 import org.signal.libsignal.net.RetryLaterException
 import org.signal.libsignal.net.UploadTooLargeException
+import org.signal.network.api.AttachmentUploadResult
 import org.signal.protos.resumableuploads.ResumableUpload
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.attachments.Attachment
-import org.thoughtcrime.securesms.attachments.AttachmentId
 import org.thoughtcrime.securesms.attachments.AttachmentUploadUtil
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
@@ -41,7 +42,6 @@ import org.thoughtcrime.securesms.transport.UndeliverableMessageException
 import org.thoughtcrime.securesms.util.MediaUtil
 import org.thoughtcrime.securesms.util.MessageUtil
 import org.thoughtcrime.securesms.util.RemoteConfig
-import org.whispersystems.signalservice.api.attachment.AttachmentUploadResult
 import org.whispersystems.signalservice.api.crypto.AttachmentCipherStreamUtil
 import org.whispersystems.signalservice.api.messages.AttachmentTransferProgress
 import org.whispersystems.signalservice.api.messages.SignalServiceAttachment
@@ -81,9 +81,7 @@ class AttachmentUploadJob private constructor(
     @JvmStatic
     val maxPlaintextSize: Long
       get() {
-        val maxCipherTextSize = RemoteConfig.maxAttachmentSizeBytes
-        val maxPaddedSize = AttachmentCipherStreamUtil.getPlaintextLength(maxCipherTextSize)
-        return PaddingInputStream.getMaxUnpaddedSize(maxPaddedSize)
+        return AttachmentCipherStreamUtil.getMaxPlaintextSizeForCiphertext(RemoteConfig.maxAttachmentSizeBytes)
       }
 
     @JvmStatic

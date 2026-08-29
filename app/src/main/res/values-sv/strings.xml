@@ -4,7 +4,7 @@
   ~ SPDX-License-Identifier: AGPL-3.0-only
   -->
 <!-- smartling.instruction_comments_enabled = on -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <!-- Removed by excludeNonTranslatables <string name="app_name" translatable="false">Signal</string> -->
 
   <!-- Removed by excludeNonTranslatables <string name="install_url" translatable="false">https://signal.org/install</string> -->
@@ -22,6 +22,8 @@
   <!-- Removed by excludeNonTranslatables <string name="export_account_data_url" translatable="false">https://support.signal.org/hc/articles/5538911756954</string> -->
   <!-- Removed by excludeNonTranslatables <string name="pending_transfer_url" translatable="false">https://support.signal.org/hc/articles/360031949872#pending</string> -->
   <!-- Removed by excludeNonTranslatables <string name="donate_faq_url" translatable="false">https://support.signal.org/hc/articles/360031949872#donate</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="inactive_primary_support" translatable="false">https://support.signal.org/hc/articles/9021007554074</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="recovery_key_phishing_support_url" translatable="false">https://support.signal.org/hc/articles/9932566320410</string> -->
 
     <!-- First placeholder is productId, second placeholder is app package -->
     <string name="backup_subscription_management_url">https://play.google.com/store/account/subscriptions?sku=%1$s&amp;package=%2$s</string>
@@ -169,6 +171,8 @@
     <string name="BlockedUsersActivity__block_user">Blockera användare?</string>
     <string name="BlockedUserActivity__s_will_not_be_able_to">\"%1$s\" kommer inte att kunna ringa eller skicka meddelanden till dig.</string>
     <string name="BlockedUsersActivity__block">Blockera</string>
+    <!-- Subtitle shown under a blocked user. Placeholder is the time they were blocked-->
+    <string name="BlockedUsersActivity__blocked_on_s">Blockerad %1$s</string>
 
     <!-- CreditCardFragment -->
     <!-- Title of fragment -->
@@ -271,77 +275,7 @@
     <!-- Unknown people row info dialog action to close the dialog -->
     <string name="CallInfoView__got_it">Uppfattat</string>
 
-    <!-- CameraFragment -->
-    <!-- Toasted when user device does not support video recording -->
-    <string name="CameraFragment__video_recording_is_not_supported_on_your_device">Videoinspelning stöds inte på din enhet</string>
 
-    <!-- CameraXFragment -->
-    <string name="CameraXFragment_tap_for_photo_hold_for_video">Tryck för foto, håll för video</string>
-    <!-- Accessibility content description to describe the capture button when taking an image/video -->
-    <string name="CameraXFragment_capture_description">Ta foto</string>
-    <string name="CameraXFragment_change_camera_description">Byt kamera</string>
-    <string name="CameraXFragment_open_gallery_description">Öppna galleri</string>
-    <!-- Button text asking for access to camera permissions -->
-    <string name="CameraXFragment_allow_access">Tillåt åtkomst</string>
-    <!-- Dialog title asking users for camera and microphone permission -->
-    <string name="CameraXFragment_allow_access_camera_microphone">Tillåt åtkomst till din kamera och mikrofon</string>
-    <!-- Dialog title asking users for camera permission -->
-    <string name="CameraXFragment_allow_access_camera">Tillåt åtkomst till din kamera</string>
-    <!-- Dialog title asking users for microphone permission -->
-    <string name="CameraXFragment_allow_access_microphone">Tillåt åtkomst till din mikrofon</string>
-    <!-- Text explaining why Signal needs camera access in order to take photos -->
-    <string name="CameraXFragment_to_capture_photos_allow_camera">Ge Signal åtkomst till kameran för att ta bilder.</string>
-    <!-- Text explaining why Signal needs camera access in order to take photos and videos -->
-    <string name="CameraXFragment_to_capture_photos_and_video_allow_camera">För att fånga fotografier och video, tillåt Signal att tillgå kameran.</string>
-    <!-- Text explaining why Signal needs camera and microphone access in order to take photos and videos -->
-    <string name="CameraXFragment_to_capture_photos_and_video_allow_camera_microphone">För att kunna ta bilder och spela in video måste Signal ha åtkomst till kameran och mikrofonen.</string>
-    <!-- Text explaining why Signal needs microphone access to take videos -->
-    <string name="CameraXFragment_to_capture_videos_with_sound">Ge Signal åtkomst till mikrofonen för att spela in videor med ljud.</string>
-    <!-- Text explaining why Signal needs camera access to scan QR codes -->
-    <string name="CameraXFragment_to_scan_qr_code_allow_camera">Ge Signal åtkomst till kameran för att skanna en QR-kod.</string>
-    <!-- Toast dialog explaining why Signal needs camera permissions when capturing photos -->
-    <string name="CameraXFragment_signal_needs_camera_access_capture_photos">Signal behöver åtkomst till kameran för att ta bilder</string>
-    <!-- Toast dialog explaining why Signal needs camera permissions when scanning QR codes -->
-    <string name="CameraXFragment_signal_needs_camera_access_scan_qr_code">Signal behöver åtkomst till kameran för att skanna QR-koder</string>
-    <!-- Toast dialog explaining why Signal needs microphone permissions -->
-    <string name="CameraXFragment_signal_needs_microphone_access_video">Signal behöver åtkomst till mikrofonen för att spela in video</string>
-    <!-- Dialog description that explains the steps needed to give camera permission -->
-    <string name="CameraXFragment_to_capture_photos">För att ta bilder i Signal:</string>
-    <!-- Dialog description that explains the steps needed to give camera and microphone permission -->
-    <string name="CameraXFragment_to_capture_photos_videos">För att ta bilder och spela in videor i Signal:</string>
-    <!-- Dialog description that explains the steps needed to give microphone permission -->
-    <string name="CameraXFragment_to_capture_videos">För att spela in videor med ljud:</string>
-    <!-- Dialog description that explains the steps needed to give Signal camera permissions -->
-    <string name="CameraXFragment_to_scan_qr_codes">För att skanna QR-koder:</string>
-    <!-- Error message shown when we try to take a photo, but fail -->
-    <string name="CameraXFragment_photo_capture_failed">Det gick inte att ta fotot. Försök igen.</string>
-    <!-- Error message shown when we try to take a photo, but fail when trying to process it (convert it into something the user can see). -->
-    <string name="CameraXFragment_photo_processing_failed">Det gick inte att bearbeta fotot. Försök igen.</string>
-    <!-- Accessibility label for the switch camera button -->
-    <string name="CameraXFragment_switch_camera">Växla kamera</string>
-    <!-- Accessibility label for flash button when flash is off -->
-    <string name="CameraXFragment_flash_off">Blixt av</string>
-    <!-- Accessibility label for flash button when flash is on -->
-    <string name="CameraXFragment_flash_on">Blixt på</string>
-    <!-- Accessibility label for flash button when flash is set to auto -->
-    <string name="CameraXFragment_flash_auto">Automatisk blixt</string>
-    <!-- Accessibility label for the send button in media selection -->
-    <string name="CameraXFragment_send">Skicka</string>
-
-    <!-- CameraContacts -->
-    <string name="CameraContacts_recent_contacts">Senaste kontakter</string>
-    <string name="CameraContacts_signal_contacts">Signal-kontakter</string>
-    <string name="CameraContacts_signal_groups">Signal-grupper</string>
-    <!-- A warning shown in a toast when  -->
-    <plurals name="CameraContacts_you_can_share_with_a_maximum_of_n_conversations">
-        <item quantity="one">Du kan dela med maximalt %1$d chatt.</item>
-        <item quantity="other">Du kan dela med maximalt %1$d chattar.</item>
-    </plurals>
-    <string name="CameraContacts_select_signal_recipients">Välj Signal-mottagare</string>
-    <string name="CameraContacts_no_signal_contacts">Inga Signal-kontakter</string>
-    <string name="CameraContacts_you_can_only_use_the_camera_button">Du kan bara använda kameraknappen för att skicka foton till Signal-kontakter. </string>
-    <string name="CameraContacts_cant_find_who_youre_looking_for">Kan du inte hitta den du letar efter?</string>
-    <string name="CameraContacts_invite_a_contact_to_join_signal">Bjud in en kontakt för att gå med i Signal</string>
     <string name="CameraContacts__menu_search">Sök</string>
 
     <!-- Censorship Circumvention Megaphone -->
@@ -361,6 +295,16 @@
     <string name="ClientDeprecatedActivity_dont_update">Uppdatera inte</string>
     <string name="ClientDeprecatedActivity_warning">Varning</string>
     <string name="ClientDeprecatedActivity_your_version_of_signal_has_expired_you_can_view_your_message_history">Din version av Signal har upphört att gälla. Du kan visa din meddelandehistorik men du kan inte skicka eller ta emot meddelanden förrän du uppdaterar.</string>
+
+    <!-- ClockSkewActivity -->
+    <!-- Title of the full-screen dialog shown when the device clock is too far off from the real time -->
+    <string name="ClockSkewActivity__title">Datumet är felaktigt</string>
+    <!-- Body text explaining that the device clock is wrong and needs to be fixed -->
+    <string name="ClockSkewActivity__date_inaccurate_description">Enhetens datum är felaktigt.\nJustera klockan och försök igen.</string>
+    <!-- Shows the user the current, inaccurate date and time reported by their device. Placeholder is the formatted date, time, and time zone. -->
+    <string name="ClockSkewActivity__time_prefix">Enhetens datum och tid är:\n%1$s</string>
+    <!-- Button that opens the system date and time settings -->
+    <string name="ClockSkewActivity__adjust_date_button">Justera datum</string>
 
     <!-- CommunicationActions -->
     <string name="CommunicationActions_no_browser_found">Ingen webbläsare hittades.</string>
@@ -456,6 +400,8 @@
     <!-- Conversation message shown when someone deletes their own message. Placeholder is the name of the person. -->
     <string name="ConversationItem_s_deleted_this_message">%1$s tog bort det här meddelandet</string>
     <string name="ConversationItem_you_deleted_this_message">Du tog bort detta meddelande</string>
+    <!-- Tappable text shown on a locally-deleted message tombstone, prompting the user to promote it to a delete-for-everyone -->
+    <string name="ConversationItem_delete_for_everyone_question">Ta bort för alla?</string>
     <!-- Conversation message when a message has been deleted by an admin. The placeholder is the admin\'s name. -->
     <string name="ConversationItem_admin_s_deleted_this_message">Admin %1$s tog bort detta meddelande</string>
     <!-- Dialog error message shown when user can\'t download a message from someone else due to a permanent failure (e.g., unable to decrypt), placeholder is other\'s name -->
@@ -484,7 +430,6 @@
     <!-- Accessibility text associated with image button to send an edited message. -->
     <string name="ConversationActivity_send_edit">Skicka redigerad</string>
     <string name="ConversationActivity_compose_message">Skriv meddelande</string>
-    <string name="ConversationActivity_sorry_there_was_an_error_setting_your_attachment">Tyvärr uppstod ett fel vid inställningen av din bilaga.</string>
     <!-- Toast shown when user is unable to find the recipient when sending a message -->
     <string name="ConversationActivity_recipient_is_not_a_valid_sms_or_email_address_exclamation">Mottagaren är inte en giltig SMS eller e-postadress!</string>
     <string name="ConversationActivity_message_is_empty_exclamation">Meddelandet är tomt!</string>
@@ -542,7 +487,6 @@
     <string name="ConversationActivity_signal_needs_the_camera_permission_to_take_photos_or_video">Signal behöver behörigheten Kamera för att ta bilder och filma men den har avfärdats permanent. Fortsätt till inställningar för appar, välj \"Behörigheter\" och aktivera \"Kamera\".</string>
     <string name="ConversationActivity_signal_needs_camera_permissions_to_take_photos_or_video">Signal behöver behörigheten Kamera för att ta bilder och filma</string>
     <string name="ConversationActivity_enable_the_microphone_permission_to_capture_videos_with_sound">Aktivera behörigheten Mikrofon för att spela in videor med ljud.</string>
-    <string name="ConversationActivity_signal_needs_the_recording_permissions_to_capture_video">Signal behöver mikrofonbehörigheter för att spela in videor men de har avfärdats. Fortsätt till inställningar för appar, välj \"Behörigheter\" och aktivera \"Mikrofon\" och \"Kamera\".</string>
     <string name="ConversationActivity_signal_needs_recording_permissions_to_capture_video">Signal behöver behörigheten Mikrofon för att filma.</string>
 
     <string name="ConversationActivity_quoted_contact_message">%1$s %2$s</string>
@@ -648,7 +592,7 @@
     <string name="ConversationFragment_delete">Ta bort</string>
     <!-- Dialog button for deleting one or more note-to-self messages on all linked devices. -->
     <string name="ConversationFragment_delete_everywhere">Ta bort överallt</string>
-    <string name="ConversationFragment_this_message_will_be_deleted_for_everyone_in_the_conversation">Detta meddelande tas bort för alla i chatten om de använder en ny version av Signal. De kommer att kunna se att du har tagit bort ett meddelande.</string>
+    <string name="ConversationFragment_this_message_will_be_deleted_for_everyone_in_the_conversation">Det här meddelandet raderas för alla i chatten. De kommer att kunna se att du har raderat ett meddelande.</string>
     <string name="ConversationFragment_quoted_message_not_found">Hittade inte originalmeddelandet.</string>
     <string name="ConversationFragment_quoted_message_no_longer_available">Originalmeddelandet inte längre tillgänglig.</string>
     <string name="ConversationFragment_failed_to_open_message">Det gick inte att öppna meddelandet</string>
@@ -684,6 +628,8 @@
     <string name="ConversationFragment__update_build">Uppdatera Signal</string>
     <!-- Action shown to allow a user to re-register as they are no longer registered -->
     <string name="ConversationFragment__reregister_signal">Registrera om Signal</string>
+    <!-- Action shown in the conversation input area to allow a user to re-link this device as it is no longer linked -->
+    <string name="ConversationFragment__relink_signal">Länka igen</string>
     <!-- Label for a button displayed in the conversation toolbar to return to the previous screen. -->
     <string name="ConversationFragment__content_description_back_button">Navigera tillbaka.</string>
     <!-- Label for a button displayed in the conversation toolbar to open the main screen of the app. -->
@@ -721,7 +667,7 @@
     <!-- Description shown in the Signal release notes conversation header -->
     <string name="ConversationFragment_release_notes_description">Den enda officiella chatten från Signal. Håll dig uppdaterad med nyheter och versionsinformation.</string>
     <!-- Label shown in place of the input in the Signal release notes conversation -->
-    <string name="ConversationFragment_the_only_official_chat_from_signal">The only official chat from Signal</string>
+    <string name="ConversationFragment_the_only_official_chat_from_signal">Den enda officiella chatten från Signal</string>
     <!-- Plural for group member count shown in conversation header. %1$d is the number of members -->
     <plurals name="ConversationFragment_group_member_count">
         <item quantity="one">%1$d medlem</item>
@@ -733,6 +679,12 @@
     <string name="ConversationFragment_group_names">Gruppnamn</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">Det gick inte att ladda ner fotot. Försök igen.</string>
+    <!-- Title of the dialog shown when re-requesting an expired attachment from your primary device fails -->
+    <string name="ConversationFragment_attachment_backfill_failed_title">Det går inte att ladda ner media</string>
+    <!-- Body of the dialog shown when your phone didn\'t respond to a request to re-send an expired attachment -->
+    <string name="ConversationFragment_attachment_backfill_timeout">Kontrollera den här enheten och telefonens internetanslutning. Öppna Signal på din telefon och försök sedan ladda ner igen.</string>
+    <!-- Body of the dialog shown when your phone no longer has the attachment you tried to download -->
+    <string name="ConversationFragment_attachment_backfill_not_found">Den här mediefilen är inte längre tillgänglig på din telefon och kan inte laddas ner.</string>
     <!-- Dialog for how to long to keep a messaged pinned for -->
     <string name="ConversationFragment__keep_pinned">Håll fäst i …</string>
     <!-- Dialog option to keep message pin for 24 hours -->
@@ -819,17 +771,28 @@
     <!-- Notice on chat list when no unread chats are available, centered on display -->
     <string name="ConversationListFragment__no_unread_chats">Inga olästa chattar</string>
     <plurals name="ConversationListFragment_delete_selected_conversations">
-        <item quantity="one">Ta bort vald chatt?</item>
-        <item quantity="other">Ta bort valda chattar?</item>
+        <item quantity="one">Radera meddelandehistorik?</item>
+        <item quantity="other">Radera meddelandehistorik?</item>
     </plurals>
+    <!-- Dialog message shown when deleting chats, none of which are groups -->
     <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations">
-        <item quantity="one">Detta kommer att ta bort den valda chatten permanent.</item>
-        <item quantity="other">Detta kommer att ta bort alla %1$d valda chattar permanent.</item>
+        <item quantity="one">Alla meddelanden i den här chatten kommer att raderas.</item>
+        <item quantity="other">Alla meddelanden i de här chattarna kommer att raderas.</item>
     </plurals>
-    <!-- Dialog message shown when deleting one to many conversations from the chat list and the user has a linked device -->
+    <!-- Dialog message shown when deleting chats, with at least one group -->
+    <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_group">
+        <item quantity="one">Alla meddelanden i den här chatten kommer att raderas. Du kommer fortfarande att vara medlem i den här gruppen.</item>
+        <item quantity="other">Alla meddelanden i de här chattarna kommer att raderas. Du kommer fortfarande att vara medlem i alla grupper som du inte har lämnat än.</item>
+    </plurals>
+    <!-- Dialog message shown when deleting chats, none of which are groups, and the user has a linked device -->
     <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_linked_device">
-        <item quantity="one">Detta tar permanent bort den valda chatten från alla dina enheter.</item>
-        <item quantity="other">Detta tar permanent bort de %1$d valda chattarna från alla dina enheter.</item>
+        <item quantity="one">Alla meddelanden i den här chatten kommer att raderas från alla dina enheter.</item>
+        <item quantity="other">Alla meddelanden i de här chattarna kommer att raderas från alla dina enheter.</item>
+    </plurals>
+    <!-- Dialog message shown when deleting chats with at least one group, and the user has a linked device -->
+    <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_linked_device_group">
+        <item quantity="one">Alla meddelanden i den här chatten kommer att raderas från alla dina enheter. Du kommer fortfarande att vara medlem i den här gruppen.</item>
+        <item quantity="other">Alla meddelanden i de här chattarna kommer att raderas från alla dina enheter. Du kommer fortfarande att vara medlem i alla grupper som du inte har lämnat än.</item>
     </plurals>
     <string name="ConversationListFragment_deleting">Tar bort</string>
     <plurals name="ConversationListFragment_deleting_selected_conversations">
@@ -1033,7 +996,6 @@
     <string name="CustomDefaultPreference_none">Inga</string>
 
     <!-- AvatarSelectionBottomSheetDialogFragment -->
-    <string name="AvatarSelectionBottomSheetDialogFragment__taking_a_photo_requires_the_camera_permission">För att ta ett foto krävs kamerabehörigheten.</string>
     <string name="AvatarSelectionBottomSheetDialogFragment__viewing_your_gallery_requires_the_storage_permission">För att visa ditt galleri krävs lagringstillstånd.</string>
 
     <!-- DateUtils -->
@@ -1108,13 +1070,13 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Använd detta Signal-konto på skrivbord eller iPad.</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Använd det här Signal-kontot på en annan enhet.</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">Länka en ny enhet</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
     <string name="LinkDeviceFragment__messages_and_chat_info_are_protected">%1$s Meddelanden och chattinformation skyddas av totalsträckskryptering på alla enheter</string>
     <!-- Bottom sheet title explaining how Signal works on a linked device -->
-    <string name="LinkDeviceFragment__signal_on_desktop_ipad">Signal på Desktop eller iPad</string>
+    <string name="LinkDeviceFragment__signal_on_desktop_ipad">Signal på en länkad enhet</string>
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">Alla meddelanden på länkade enheter är privata</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
@@ -1180,6 +1142,8 @@
     <string name="LinkDeviceFragment__edit_name">Redigera namn</string>
     <!-- Toast shown when the process of linking a device has been cancelled -->
     <string name="LinkDeviceFragment__linking_cancelled">Länkningen avbröts</string>
+    <!-- Snackbar shown when the user tries to link a new device but has already reached the maximum number of linked devices. Placeholder is the maximum count. -->
+    <string name="LinkDeviceFragment__you_can_only_have_d_linked_devices">Du kan bara ha %1$d länkade enheter.</string>
     <!-- Message shown in progress dialog telling users to avoid closing the app while messages are being synced -->
     <string name="LinkDeviceFragment__do_not_close">Stäng inte appen</string>
     <!-- Dialog title shown when a device is unlinked -->
@@ -1226,6 +1190,8 @@
     <string name="AddLinkDeviceFragment__this_qr_code_not_valid">Denna QR-kod är inte giltig. Se till att du skannar QR-koden som visas på enheten som du vill länka.</string>
     <!-- Button in dialog to retry linking a device with a qr code -->
     <string name="AddLinkDeviceFragment__retry">Försök igen</string>
+    <!-- Text shown in a dialog when the device being linked is too out-of-date to be linked to this account -->
+    <string name="AddLinkDeviceFragment__the_device_you_are_trying_to_link_is_out_of_date">Enheten du försöker länka är inaktuell. Uppgradera och försök igen.</string>
 
     <!-- LinkDeviceSyncBottomSheet -->
     <!-- Option in bottom sheet to transfer message history -->
@@ -1286,10 +1252,6 @@
         <item quantity="other">%1$d väntande medlemsförfrågningar.</item>
     </plurals>
     <string name="PendingGroupJoinRequestsReminder_view">Visa</string>
-
-    <!-- GcmRefreshJob -->
-    <string name="GcmRefreshJob_Permanent_Signal_communication_failure">Permanent kommunikationsfel med Signal!</string>
-    <string name="GcmRefreshJob_Signal_was_unable_to_register_with_Google_Play_Services">Signal kunde inte registrera sig på Google Play-tjänster. Signal-meddelanden och -samtal har inaktiverats, försök att återregistrera i Inställningar &gt; Avancerat.</string>
 
 
     <!-- GiphyActivity -->
@@ -1518,6 +1480,12 @@
     <string name="AddGroupDetailsFragment__remove">Ta bort</string>
     <string name="AddGroupDetailsFragment__sms_contact">SMS-kontakt</string>
     <string name="AddGroupDetailsFragment__remove_s_from_this_group">Ta bort %1$s från denna grupp?</string>
+    <!-- Title of the dialog shown when tapping an existing group while creating a new group, confirming the user wants to leave and discard their in-progress group -->
+    <string name="AddGroupDetailsFragment__discard_group">Kassera grupp?</string>
+    <!-- Body of the dialog shown when tapping an existing group while creating a new group. Placeholder is the name of the group being navigated to. -->
+    <string name="AddGroupDetailsFragment__if_you_continue_to_the_group_s_your_changes_wont_be_saved">Om du går vidare till gruppen \"%1$s\" sparas inte dina ändringar.</string>
+    <!-- Label for the button that confirms discarding the in-progress group and navigating to an existing group -->
+    <string name="AddGroupDetailsFragment__discard">Kassera</string>
     <!-- Info message shown in the middle of the screen, displayed when adding group details to an MMS Group -->
     <string name="AddGroupDetailsFragment__youve_selected_a_contact_that_doesnt_support">Du har valt en kontakt som inte stöder Signal-grupper, så den här gruppen blir mms. Anpassade mms-gruppnamn och foton kommer bara att vara synliga för dig.</string>
     <!-- Info message shown in the middle of the screen, displayed when adding group details to an MMS Group after SMS Phase 0 -->
@@ -1608,12 +1576,6 @@
     <string name="RestoreActivity__no_longer_registered_title">Den här enheten är inte längre registrerad</string>
     <!-- Dialog message -->
     <string name="RestoreActivity__no_longer_registered_message">Detta beror troligtvis på att du registrerade ditt Signal-konto på en annan enhet.</string>
-
-    <!-- GroupMentionSettingDialog -->
-    <string name="GroupMentionSettingDialog_notify_me_for_mentions">Meddela mig om omnämnanden</string>
-    <string name="GroupMentionSettingDialog_receive_notifications_when_youre_mentioned_in_muted_chats">Få aviseringar när du omnämns i tystade chattar?</string>
-    <string name="GroupMentionSettingDialog_always_notify_me">Meddela mig alltid</string>
-    <string name="GroupMentionSettingDialog_dont_notify_me">Meddela inte mig</string>
 
     <!-- ManageProfileFragment -->
     <!-- Explanation text about usernames etc displayed underneath buttons to view and edit username etc -->
@@ -1915,9 +1877,6 @@
 
     <!-- MediaPickerActivity -->
     <string name="MediaPickerActivity__menu_open_camera">Öppna kameran</string>
-
-    <!-- MediaSendActivity -->
-    <string name="MediaSendActivity_camera_unavailable">Kamera otillgänglig.</string>
 
     <!-- MediaRepository -->
     <string name="MediaRepository_all_media">Alla media</string>
@@ -2701,6 +2660,10 @@
     <string name="CallOverflowPopupWindow__lower_hand">Ta ner</string>
     <!-- A negative button for a dialog confirming the user wants to lower their hand (withdraw a raised hand) -->
     <string name="CallOverflowPopupWindow__cancel">Avbryt</string>
+    <!-- A clickable button to share your screen in a call -->
+    <string name="CallOverflowPopupWindow__share_screen">Dela skärm</string>
+    <!-- A clickable button to stop sharing your screen in a call -->
+    <string name="CallOverflowPopupWindow__stop_screen_share">Sluta dela</string>
     <!-- A button to take you to a list of participants with raised hands -->
     <string name="CallOverflowPopupWindow__view">Visa</string>
 
@@ -2825,6 +2788,8 @@
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">Svep för att visa skärmdelning</string>
+    <!-- Hint shown to teach the user they can swipe between the grid view and the active speaker view -->
+    <string name="CallToastPopupWindow__swipe_to_view_speaker">Svep för att visa högtalare</string>
 
     <!-- ProxyBottomSheetFragment -->
     <string name="ProxyBottomSheetFragment_proxy_server">Proxyserver</string>
@@ -2920,13 +2885,6 @@
     <!--    A clickable piece of text that will pre-fill a request for support email in the user\'s email app.-->
     <string name="RegistrationActivity_support_bottom_sheet_cta_contact_support_substring">Kontakta supporten</string>
 
-    <!-- RegistrationLockV2Dialog -->
-    <string name="RegistrationLockV2Dialog_turn_on_registration_lock">Aktivera registreringslåset?</string>
-    <string name="RegistrationLockV2Dialog_turn_off_registration_lock">Inaktivera registreringslåset?</string>
-    <string name="RegistrationLockV2Dialog_if_you_forget_your_signal_pin_when_registering_again">Om du glömmer din PIN-kod när du registrerar dig hos Signal igen, kommer du att vara utelåst från ditt konto i 7 dagar.</string>
-    <string name="RegistrationLockV2Dialog_turn_on">Aktivera</string>
-    <string name="RegistrationLockV2Dialog_turn_off">Inaktivera</string>
-
     <!-- RevealableMessageView -->
     <string name="RevealableMessageView_view_photo">Visa foto</string>
     <string name="RevealableMessageView_view_video">Visa video</string>
@@ -2941,6 +2899,8 @@
 
     <!-- Search -->
     <string name="SearchFragment_no_results">Inga resultat hittades för \"%1$s\"</string>
+    <!-- Text shown when no search results are found.   -->
+    <string name="SearchFragment_no_results_empty">Inga resultat hittades</string>
 
     <!-- ShakeToReport -->
   <!-- Removed by excludeNonTranslatables <string name="ShakeToReport_shake_detected" translatable="false">Shake detected</string> -->
@@ -3106,6 +3066,10 @@
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_info" translatable="false">Info</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_warning" translatable="false">Warn</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_error" translatable="false">Error</string> -->
+    <!-- Title of dialog shown when debug log prefix generation is unusually slow -->
+  <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_slow_log_title" translatable="false">Slow log generation</string> -->
+    <!-- Body of dialog shown when debug log prefix generation is unusually slow. %1$d is duration in seconds. -->
+  <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_slow_log_message" translatable="false">Generating the debug log header took %1$d seconds. We should figure out what\&apos;s slowing things down.</string> -->
 
     <!-- SupportEmailUtil -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_support_email" translatable="false">support@signal.org</string> -->
@@ -3118,6 +3082,7 @@
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_locale" translatable="false">Locale:</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_challenge_received" translatable="false">Challenge Received:</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_registered" translatable="false">Registered:</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_backups" translatable="false">Backups:</string> -->
 
     <!-- ThreadRecord -->
     <string name="ThreadRecord_group_updated">Gruppen uppdaterad</string>
@@ -3289,7 +3254,7 @@
     <!-- Title for a dialog where a user chooses how long they\'d like to mute notifications for -->
     <string name="MuteDialog_mute_notifications">Tysta aviseringar</string>
     <!-- Dialog option that, when pressed, will open a time picker to let the user choose how long they\'d like to mute notifications for -->
-    <string name="MuteDialog__mute_until">Tysta tills …</string>
+    <string name="MuteDialog__mute_until">Tills …</string>
 
     <!-- MuteUntilTimePickerBottomSheet -->
     <!-- Title for a dialog where a user chooses how long they\'d like to mute notifications for -->
@@ -3399,6 +3364,8 @@
     <string name="NotificationChannel_calls">Samtal</string>
     <!-- Notification channel name for notifications involving failures of some sort (eg donations, message sends, etc.) -->
     <string name="NotificationChannel_failures">Misslyckanden</string>
+    <!-- Notification channel name for internal-only app issue notifications. Only ever shown to internal users. -->
+    <string name="NotificationChannel_internal_issues">Interna problem</string>
     <string name="NotificationChannel_backups">Säkerhetskopior</string>
     <string name="NotificationChannel_locked_status">Låsstatus</string>
     <string name="NotificationChannel_app_updates">Appuppdateringar</string>
@@ -3464,11 +3431,11 @@
     <!-- Dialog title shown when attempting to save media that has been offloaded from the device by the storage optimization feature. -->
     <string name="AttachmentSaver__cant_save_media">Kan inte spara medier</string>
     <!-- Dialog message explaining that media cannot be saved because it has been offloaded from the device by the storage optimization feature. -->
-    <string name="AttachmentSaver__media_offloaded_message">Det här mediet har avlastats från din enhet eftersom ”Optimera lagring på enheten” är aktiverat. Du kan ladda ner objekt ett i taget eller stänga av ”Optimera lagring på enheten” för att ladda ner alla medier till din enhet.</string>
+    <string name="AttachmentSaver__media_offloaded_message">Det här mediet har avlastats från din enhet eftersom Optimera Signal-lagring är aktiverat. Du kan ladda ner objekt ett i taget eller stänga av Optimera Signal-lagring för att ladda ner alla medier till din enhet.</string>
     <!-- Dialog title shown when attempting to save multiple media items, some of which have been offloaded from the device by the storage optimization feature. -->
     <string name="AttachmentSaver__cant_save_all_items">Kan inte spara alla objekt</string>
     <!-- Dialog message explaining that some selected media cannot be saved because it has been offloaded from the device by the storage optimization feature. -->
-    <string name="AttachmentSaver__some_media_offloaded_message">En del av medierna du har valt har avlastats från din enhet eftersom ”Optimera lagring på enheten” är aktiverat. Du kan spara objekten ett i taget eller stänga av ”Optimera lagring på enheten” för att ladda ner alla medier till din enhet.</string>
+    <string name="AttachmentSaver__some_media_offloaded_message">En del av medierna du har valt har avlastats från din enhet eftersom Optimera Signal-lagring är aktiverat. Du kan spara objekten ett i taget eller stänga av Optimera Signal-lagring för att ladda ner alla medier till din enhet.</string>
     <!-- Button label in the offloaded media dialog that navigates to the storage settings screen. -->
     <string name="AttachmentSaver__view_storage_settings">Visa lagringsinställningar</string>
 
@@ -3527,12 +3494,20 @@
     <string name="TransferControlView__processing">Bearbetar …</string>
     <!-- Status update label used while the device is transmitting data over the network. Will take the form of "1.0 MB/2.0 MB" -->
     <string name="TransferControlView__download_progress_s_s">%1$s/%2$s</string>
+    <!-- Accessibility description for the button that starts downloading an attachment -->
+    <string name="TransferControlView__download">Hämta</string>
+    <!-- Accessibility description for the button that starts uploading an attachment -->
+    <string name="TransferControlView__upload">Ladda upp</string>
 
     <!-- UnauthorizedReminder -->
     <!-- Message shown in a reminder banner when the user\'s device is no longer registered -->
     <string name="UnauthorizedReminder_this_is_likely_because_you_registered_your_phone_number_with_Signal_on_a_different_device">Den här enheten är inte längre registrerad. Detta beror troligen på att du registrerade ditt telefonnummer med Signal på en annan enhet.</string>
     <!-- Action in reminder banner that will take user to re-register -->
     <string name="UnauthorizedReminder_reregister_action">Registrera om enheten</string>
+    <!-- Message shown in a reminder banner when this linked device is no longer linked to a primary device -->
+    <string name="UnauthorizedReminder_this_device_is_no_longer_linked_relink_to_continue_messaging">Den här enheten är inte längre länkad. Länka om Signal med din telefon för att fortsätta skicka meddelanden.</string>
+    <!-- Action in reminder banner that will take the user to re-link this device -->
+    <string name="UnauthorizedReminder_relink_action">Länka om enheten</string>
 
     <!-- Push notification when the app is forcibly logged out by the server. -->
     <string name="LoggedOutNotification_you_have_been_logged_out">Du har loggats ut från Signal på den här enheten.</string>
@@ -4007,11 +3982,11 @@
     <!-- Bottom sheet title when encryption is auto-verified -->
     <string name="EncryptionVerifiedSheet__title_success">Krypteringen verifierades automatiskt för den här chatten</string>
     <!-- Bottom sheet body when encryption is auto-verified -->
-    <string name="EncryptionVerifiedSheet__body_success">För kontakter som du är ansluten till via telefonnummer kan Signal automatiskt bekräfta om anslutningen är säker med hjälp av en process som kallas nyckeltransparens. För ökad säkerhet, verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.</string>
+    <string name="EncryptionVerifiedSheet__body_success">För personer som du är ansluten till via telefonnummer kan Signal automatiskt bekräfta om anslutningen är säker med hjälp av en process som kallas nyckeltransparens. För ökad säkerhet, verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.</string>
     <!-- Bottom sheet title when encryption is no longer auto-verified -->
-    <string name="EncryptionVerifiedSheet__title_no_longer_unavailable">Automatisk verifiering är inte längre tillgänglig för den här chatten</string>
+    <string name="EncryptionVerifiedSheet__title_no_longer_unavailable">Automatisk verifiering är inte tillgänglig för den här chatten</string>
     <!-- Bottom sheet body when encryption is no longer auto-verified. Placeholder is the name of the person. -->
-    <string name="EncryptionVerifiedSheet__body_no_longer_unavailable">Signal kan inte längre automatiskt verifiera krypteringen för den här chatten. Detta beror troligen på att %1$s har ändrat sitt telefonnummer. Verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.</string>
+    <string name="EncryptionVerifiedSheet__body_no_longer_unavailable">Signal kan inte automatiskt verifiera krypteringen för den här chatten. Detta kan bero på att %1$s har ändrat sitt telefonnummer eller inställningarna för integritet för telefonnummer. Verifiera totalsträckskryptering manuellt genom att jämföra siffrorna på den föregående skärmen eller skanna koden på deras enhet.</string>
     <!-- Bottom sheet title when encryption cannot be auto-verified -->
     <string name="EncryptionVerifiedSheet__title_unavailable">Automatisk verifiering är inte tillgänglig för den här chatten</string>
     <!-- Bottom sheet body when encryption cannot be auto-verified -->
@@ -4103,6 +4078,11 @@
   <!-- Removed by excludeNonTranslatables <string name="HelpFragment__debug_log" translatable="false">Debug Log:</string> -->
     <string name="HelpFragment__could_not_upload_logs">Det gick inte att ladda upp loggar</string>
     <string name="HelpFragment__please_be_as_descriptive_as_possible">Var så beskrivande som möjligt för att hjälpa oss att förstå problemet.</string>
+    <!-- Error shown under the "tell us what\'s going on" field when the entered description is shorter than the required minimum length. The placeholder is the minimum number of characters. -->
+    <plurals name="HelpFragment__must_be_at_least_n_characters">
+        <item quantity="one">Måste ha minst %1$d tecken</item>
+        <item quantity="other">Måste ha minst %1$d tecken</item>
+    </plurals>
     <string-array name="HelpFragment__categories_6">
         <item>Välj ett alternativ</item>
         <item>Något fungerar inte</item>
@@ -4125,15 +4105,6 @@
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recents">Senaste</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__this_message">Detta meddelande</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recently_used">Nyligen använda</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__smileys_and_people">Humörsymboler &amp; personer</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__nature">Natur</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__food">Mat</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__activities">Aktiviteter</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__places">Platser</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__objects">Objekt</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__symbols">Symboler</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__flags">Flaggor</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__emoticons">Uttryckssymboler</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__no_results_found">Inga resultat hittades</string>
 
     <!-- GifQuickSearchOption -->
@@ -4151,10 +4122,10 @@
     <string name="arrays__use_default">Använd standardinställning</string>
     <string name="arrays__use_custom">Använd anpassad inställning</string>
 
-    <string name="arrays__mute_for_one_hour">Tysta i 1 timme</string>
-    <string name="arrays__mute_for_eight_hours">Tysta i 8 timmar</string>
-    <string name="arrays__mute_for_one_day">Tysta i 1 dag</string>
-    <string name="arrays__mute_for_seven_days">Tysta i 7 dagar</string>
+    <string name="arrays__mute_for_one_hour">1 timme</string>
+    <string name="arrays__mute_for_eight_hours">8 timmar</string>
+    <string name="arrays__mute_for_one_day">1 dag</string>
+    <string name="arrays__mute_for_seven_days">1 vecka</string>
     <string name="arrays__always">Alltid</string>
 
     <string name="arrays__settings_default">Inställningars standardvärden</string>
@@ -4209,6 +4180,10 @@
     <!-- Legacy preference menu item to choose the interval of inactivity before lockout -->
     <string name="preferences__inactivity_timeout_interval">Tidsintervall för inaktivitet</string>
     <string name="preferences__notifications">Aviseringar</string>
+    <!-- Preference item menu to enable notifications -->
+    <string name="preferences__enable_notifications">Aktivera aviseringar</string>
+    <!-- Preference header for call notifications -->
+    <string name="preferences__call_notifications">Samtalsaviseringar</string>
     <string name="preferences__led_color">Färg på ljusindikator</string>
     <string name="preferences__led_color_unknown">Okänd</string>
     <string name="preferences__pref_led_blink_title">Blinkmönster på ljusindikator</string>
@@ -4296,12 +4271,10 @@
     <string name="preferences__system_default">Systemets standard</string>
     <string name="preferences__language">Språk</string>
     <string name="preferences__signal_messages_and_calls">Signal-meddelanden och -samtal</string>
-    <string name="preferences__advanced_pin_settings">Avancerade PIN-kodsinställningar</string>
     <!-- Title of toolbar for the advanced pin settings screen -->
     <string name="preferences__advanced_pin_settings_title">Avancerade PIN-kodsinställningar</string>
     <string name="preferences__free_private_messages_and_calls">Gratis privata meddelanden och samtal med andra Signal-användare</string>
     <string name="preferences__submit_debug_log">Skicka in felsökningslogg</string>
-    <string name="preferences__delete_account">Ta bort konto</string>
     <string name="preferences__support_wifi_calling">\"Wi-Fi-samtal\"-kompatibilitetsläge</string>
     <string name="preferences__enable_if_your_device_supports_sms_mms_delivery_over_wifi">Aktivera om din enhet använder SMS/MMS sändning över Wi-Fi (aktivera endast när \"Wi-Fi-samtal\" är aktiverat på din enhet)</string>
     <string name="preferences__incognito_keyboard">Inkognito-tangentbord</string>
@@ -4365,9 +4338,19 @@
     <string name="preferences_data_and_storage__never">Aldrig</string>
     <string name="preferences_data_and_storage__wifi_and_mobile_data">Wi-Fi och mobildata</string>
     <string name="preferences_data_and_storage__mobile_data_only">Endast mobildata</string>
-    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">Att använda mindre data kan förbättra samtal på dåliga nätverk</string>
+    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">Att använda mindre data kan förbättra samtal på dåliga nätverk.</string>
     <string name="preferences_notifications__in_chat_sounds">Ljud i chattar</string>
     <string name="preferences_notifications__show">Visa</string>
+    <!-- Preference item to set notification settings when chats are muted -->
+    <string name="preferences_notifications__while_muted">Vid tystad</string>
+    <!-- Option in settings to turn on reaction notifications -->
+    <string name="preferences_notifications__reaction">Aviseringar för reaktioner</string>
+    <!-- Body option in settings to turn on reaction notifications    -->
+    <string name="preferences_notifications__notify_reaction">Visa aviseringar för reaktioner på meddelanden du skickar</string>
+    <!-- Option in settings to turn on unread reminders -->
+    <string name="preferences_notifications__unread">Påminnelser om olästa</string>
+    <!-- Body option to turn on unread reminders -->
+    <string name="preferences_notifications__notify_unread">Avisera ibland när det finns olästa meddelanden i tystade chattar</string>
     <string name="preferences_notifications__ringtone">Rington</string>
     <string name="preferences_chats__message_text_size">Teckenstorlek för meddelanden</string>
     <!-- Option in settings that will provide a shortcut to notification system settings to control the priority of Signal notifications -->
@@ -4895,8 +4878,6 @@
     <string name="RegistrationLockFragment__enter_the_pin_you_created">Ange PIN-koden du skapade för ditt konto. Denna skiljer sig från din SMS-verifieringskod.</string>
     <!-- Info text shown above a pin entry text box describing what pin they should be entering. -->
     <string name="RegistrationLockFragment__enter_the_pin_you_created_for_your_account">Ange pinkoden du skapade för ditt konto.</string>
-    <!-- Button label to prompt the user to switch between an alphanumeric and numeric-only keyboards -->
-    <string name="RegistrationLockFragment__switch_keyboard">Växla tangentbord</string>
     <string name="RegistrationLockFragment__incorrect_pin_try_again">Felaktig PIN-kod. Försök igen.</string>
     <string name="RegistrationLockFragment__forgot_pin">Glömt PIN-kod?</string>
     <string name="RegistrationLockFragment__incorrect_pin">Felaktig PIN-kod</string>
@@ -4974,8 +4955,6 @@
     <!-- Text label button to skip restoring -->
     <string name="registration_activity__skip_restore">Hoppa över återställning</string>
     <string name="preferences_chats__chat_backups">Säkerhetskopior av chattar</string>
-    <string name="preferences_chats__transfer_account">Överför konto</string>
-    <string name="preferences_chats__transfer_account_to_a_new_android_device">Överför konto till en ny Android-enhet</string>
     <!-- Title for dialog to enter in the backup passphrase -->
     <string name="RegistrationActivity_enter_backup_passphrase">Ange lösenord för säkerhetskopian</string>
     <string name="RegistrationActivity_restore">Återställ</string>
@@ -5063,19 +5042,9 @@
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">Skärmlåsets tidsgräns för inaktivitet</string>
     <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
     <string name="preferences_app_protection__to_use_screen_lock">Om du vill använda skärmlåset anger du en pinkod, ett mönster eller ett lösenord på den här enheten.</string>
-    <string name="preferences_app_protection__signal_pin">Signal PIN-kod</string>
-    <string name="preferences_app_protection__create_a_pin">Skapa en PIN-kod</string>
-    <string name="preferences_app_protection__change_your_pin">Ändra din PIN-kod</string>
-    <string name="preferences_app_protection__pin_reminders">PIN-kodspåminnelser</string>
-    <string name="preferences_app_protection__turn_off">Inaktivera</string>
-    <string name="preferences_app_protection__confirm_pin">Bekräfta PIN-kod</string>
-    <string name="preferences_app_protection__confirm_your_signal_pin">Bekräfta din Signal PIN-kod</string>
-    <string name="preferences_app_protection__make_sure_you_memorize_or_securely_store_your_pin">Se till att du lagrar din PIN-kod på ett säkert sätt, eftersom den inte kan återställas. Om du glömmer din PIN-kod kan du förlora data när du registrerar ditt Signal-konto igen.</string>
-    <string name="preferences_app_protection__incorrect_pin_try_again">Felaktig PIN-kod. Försök igen.</string>
     <string name="preferences_app_protection__failed_to_enable_registration_lock">Det gick inte att aktivera registreringslåset.</string>
     <string name="preferences_app_protection__failed_to_disable_registration_lock">Det gick inte att inaktivera registreringslåset.</string>
     <string name="AppProtectionPreferenceFragment_none">Ingen</string>
-    <string name="preferences_app_protection__registration_lock">Registreringslås</string>
     <string name="RegistrationActivity_you_must_enter_your_registration_lock_PIN">Du måste ange din PIN-kod för registreringslåset</string>
     <string name="RegistrationActivity_your_pin_has_at_least_d_digits_or_characters">Din PIN-kod måste vara minst %1$d siffror eller tecken</string>
     <string name="RegistrationActivity_too_many_attempts">För många försök</string>
@@ -5123,22 +5092,34 @@
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">Raderat konto</string>
 
-    <!-- Option in settings that will take use to re-register if they are no longer registered -->
-    <string name="preferences_account_reregister">Registrera om konto</string>
-    <!-- Option in settings that will take user to our website or playstore to update their expired build -->
-    <string name="preferences_account_update_signal">Uppdatera Signal</string>
-    <!-- Option in settings shown when user is no longer registered or expired client that will WIPE ALL THEIR DATA -->
-    <string name="preferences_account_delete_all_data">Ta bort alla data</string>
-    <!-- Title for confirmation dialog confirming user wants to delete all their data -->
-    <string name="preferences_account_delete_all_data_confirmation_title">Ta bort alla data?</string>
-    <!-- Message in confirmation dialog to delete all data explaining how it works, and that the app will be closed after deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_message">Detta återställer appen och tar bort alla meddelanden. Appen stängs när den här processen är klar.</string>
-    <!-- Confirmation action to proceed with application data deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_proceed">Fortsätt</string>
-    <!-- Confirmation action to cancel application data deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_cancel">Avbryt</string>
     <!-- Error message shown when we fail to delete the data for some unknown reason -->
     <string name="preferences_account_delete_all_data_failed">Det gick inte att ta bort data</string>
+
+    <!-- LinkedDeviceAccountSettingsFragment -->
+    <!-- Title of an informational card shown on the account settings screen of a linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_is_a_linked_device">Det här är en länkad enhet</string>
+    <!-- Body of an informational card explaining that account settings must be managed from the primary device -->
+    <string name="LinkedDeviceAccountSettingsFragment__to_manage_your_account_settings">Öppna Signal på din primära enhet för att hantera dina kontoinställningar.</string>
+    <!-- Title of a settings row that deletes all Signal data from this linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__delete_app_data">Radera appdata</string>
+    <!-- Subtitle of the delete app data row explaining what it does -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_will_remove_all_data">Detta tar bort alla data från Signal-appen på den här enheten.</string>
+    <!-- Title of the confirmation dialog shown when deleting app data from a linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__delete_app_data_question">Radera appdata?</string>
+    <!-- Message of the confirmation dialog explaining that only this device\'s data is deleted, not the account -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_will_delete_all_data_and_messages">Detta raderar alla data och meddelanden från Signal-appen på den här enheten. Ditt Signal-konto och dina data på din primära enhet eller andra länkade enheter raderas inte. Appen stängs när den här processen är klar.</string>
+
+    <!-- LinkedDeviceAccountLearnMoreBottomSheet -->
+    <!-- Emphasized lead-in phrase shown in bold at the start of the learn more sheet body. Must appear verbatim within LinkedDeviceAccountLearnMoreBottomSheet__linked_devices_let_you_access. -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__linked_devices">Länkade enheter</string>
+    <!-- Body text of the linked devices learn more sheet. The leading \"Linked Devices\" is shown in bold. -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__linked_devices_let_you_access">Länkade enheter låter dig komma åt ditt Signal-konto och dina meddelanden på ett säkert sätt på alla dina ytterligare enheter.</string>
+    <!-- Bullet point describing what devices can be linked -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__you_can_link_a_desktop">Du kan länka en dator, surfplatta eller ytterligare telefon</string>
+    <!-- Bullet point describing that the primary device manages linked devices -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__your_primary_device_manages">Din primära enhet hanterar vad som är länkat, och du kan länka upp till 5 enheter.</string>
+    <!-- Bullet point describing that some settings are only available on the primary device -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__some_account_settings">Vissa kontoinställningar hanteras endast på din primära enhet, inklusive kontoinställningar och säkerhetskopior.</string>
 
     <!-- TransferOrRestoreFragment -->
     <string name="TransferOrRestoreFragment__transfer_or_restore_account">Överför eller återställ konto</string>
@@ -5633,18 +5614,6 @@
     <!-- GroupDescriptionDialog -->
     <string name="GroupDescriptionDialog__group_description">Gruppbeskrivning</string>
 
-    <!-- QualitySelectorBottomSheetDialog -->
-    <!-- Label for our standard quality media conversion. -->
-    <string name="QualitySelectorBottomSheetDialog__standard">Standard</string>
-    <!-- Description for our standard quality media conversion. -->
-    <string name="QualitySelectorBottomSheetDialog__faster_less_data">Snabbare, mindre data</string>
-    <!-- Label for our high quality media conversion. This has better quality than standard. -->
-    <string name="QualitySelectorBottomSheetDialog__high">Hög</string>
-    <!-- Label for our high quality media conversion. This has better quality than standard. -->
-    <string name="QualitySelectorBottomSheetDialog__slower_more_data">Långsammare, mera data</string>
-    <!-- Title heading for our media conversion quality selector. -->
-    <string name="QualitySelectorBottomSheetDialog__media_quality">Mediekvalitet</string>
-
     <!-- AppSettingsFragment -->
     <!-- String alerting user that something is wrong with their backups subscription -->
     <string name="AppSettingsFragment__renew_your_signal_backups_subscription">Förnya din prenumeration på Säkerhetskopiering av Signal</string>
@@ -5662,14 +5631,6 @@
     <string name="AppSettingsFragment__copied_backups_subscriber_id_to_clipboard">Kopierade prenumerant-id för säkerhetskopior till urklipp</string>
     <!-- String displayed in a toast when a subscriber id is not present for a given type -->
     <string name="AppSettingsFragment__no_subscriber_id_set">Inget prenumerant-id angivet</string>
-
-    <!-- AccountSettingsFragment -->
-    <string name="AccountSettingsFragment__account">Konto</string>
-    <string name="AccountSettingsFragment__youll_be_asked_less_frequently">Du blir ombedd mindre ofta över tiden</string>
-    <string name="AccountSettingsFragment__require_your_signal_pin">Kräv din PIN-kod för att registrera ditt telefonnummer hos Signal igen</string>
-    <string name="AccountSettingsFragment__change_phone_number">Ändra telefonnummer</string>
-    <!-- Account setting that allows user to request and export their signal account data -->
-    <string name="AccountSettingsFragment__request_account_data">Dina kontodata</string>
 
     <!-- ExportAccountDataFragment -->
     <!-- Part of requesting account data flow, this is the section title for requesting that account data -->
@@ -5719,6 +5680,33 @@
     <string name="ChangeNumber__your_phone_number_has_changed_to_s">Ditt telefonnummer har ändrats till %1$s</string>
     <!-- Confirmation button to dismiss number changed dialog -->
     <string name="ChangeNumber__okay">Okej</string>
+
+    <!-- ChangeNumberPostRegistrationWaitSheet: title of the sheet shown when the user tries to change number too soon after registering -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__title">Det går inte att ändra nummer</string>
+    <!-- ChangeNumberPostRegistrationWaitSheet: explanation body shown above the wait-time line -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__body">Eftersom du nyligen registrerade det här kontot kan du inte byta telefonnummer just nu. En kort väntetid hjälper till att skydda ditt konto.</string>
+    <!-- ChangeNumberPostRegistrationWaitSheet: remaining-wait line when wait is one hour or more, %1$d is the number of hours, rounded up -->
+    <plurals name="ChangeNumberPostRegistrationWaitSheet__try_again_in_hours">
+        <item quantity="one">Försök igen om %1$d timme.</item>
+        <item quantity="other">Försök igen om %1$d timmar.</item>
+    </plurals>
+    <!-- ChangeNumberPostRegistrationWaitSheet: remaining-wait line when wait is under one hour, %1$d is the number of minutes, rounded up -->
+    <plurals name="ChangeNumberPostRegistrationWaitSheet__try_again_in_minutes">
+        <item quantity="one">Försök igen om %1$d minut.</item>
+        <item quantity="other">Försök igen om %1$d minuter.</item>
+    </plurals>
+    <!-- ChangeNumberPostRegistrationWaitSheet: dismiss button -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__ok">OK</string>
+    <!-- ChangeNumberEnterCodeFragment: rate-limit dialog message when retry-after is one hour or more, %1$d is hours rounded up -->
+    <plurals name="ChangeNumberEnterCodeFragment__too_many_attempts_try_again_in_hours">
+        <item quantity="one">Du har gjort för många försök. Försök igen om %1$d timme.</item>
+        <item quantity="other">Du har gjort för många försök. Försök igen om %1$d timmar.</item>
+    </plurals>
+    <!-- ChangeNumberEnterCodeFragment: rate-limit dialog message when retry-after is under one hour, %1$d is minutes rounded up -->
+    <plurals name="ChangeNumberEnterCodeFragment__too_many_attempts_try_again_in_minutes">
+        <item quantity="one">Du har gjort för många försök. Försök igen om %1$d minut.</item>
+        <item quantity="other">Du har gjort för många försök. Försök igen om %1$d minuter.</item>
+    </plurals>
 
     <!-- ChangeNumberEnterPhoneNumberFragment -->
     <string name="ChangeNumberEnterPhoneNumberFragment__change_number">Ändra nummer</string>
@@ -5937,14 +5925,48 @@
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">Meddelanden</string>
     <string name="NotificationsSettingsFragment__calls">Samtal</string>
-    <string name="NotificationsSettingsFragment__notify_when">Meddela när…</string>
+    <!-- Notification header for sounds -->
+    <string name="NotificationsSettingsFragment__sounds">Ljud</string>
     <string name="NotificationsSettingsFragment__contact_joins_signal">Kontakt ansluter sig till Signal</string>
+    <!-- Notification body to get notified when someone joins Signal -->
+    <string name="NotificationsSettingsFragment__notify_contact">Visa en avisering när en telefonkontakt börjar använda Signal</string>
+    <!-- Option to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset">Återställ aviseringsinställningar</string>
+    <!-- Option body to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset_notifications">Återställ aviseringsinställningarna till standard, inklusive anpassade inställningar för dina chattar</string>
+    <!-- Dialog to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset_body">Återställ alla aviseringsinställningar till standard för alla chattar?</string>
+    <!-- Confirmation button to reset dialog -->
+    <string name="NotificationsSettingsFragment__reset_confirm">Återställ</string>
     <!-- Notification preference header -->
     <string name="NotificationsSettingsFragment__notification_profiles">Aviseringsprofiler</string>
     <!-- Notification preference option header -->
     <string name="NotificationsSettingsFragment__profiles">Profiler</string>
     <!-- Notification preference summary text -->
     <string name="NotificationsSettingsFragment__create_a_profile_to_receive_notifications_only_from_people_and_groups_you_choose">Skapa en profil för att bara få aviseringar från personer och grupper du väljer.</string>
+
+    <!-- Header to describe screen that shows while muted settings -->
+    <string name="MutedNotificationsFragment__while">Vid tystad</string>
+    <!-- Title for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls">Samtal</string>
+    <!-- Description for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls_body_global">Ring eller avisera när ett samtal startas i tystade chattar.</string>
+    <!-- Title for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions">Omnämnanden</string>
+    <!-- Description for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions_body_global">Avisera när du nämns i tystade chattar.</string>
+    <!-- Title for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies">Svar</string>
+    <!-- Description for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies_body_global">Avisera när någon svarar på ditt meddelande i tystade chattar.</string>
+    <!-- Description for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls_body">Ring eller avisera när ett samtal startas medan den här chatten är tystad.</string>
+    <!-- Description for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions_body">Avisera när du nämns medan den här chatten är tystad.</string>
+    <!-- Description for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies_body">Avisera när någon svarar på ditt meddelande medan den här chatten är tystad.</string>
+    <!-- Description for toggle row to control unread reminders while muted -->
+    <string name="MutedNotificationsFragment__unread_body">Occasionally notify when there are unread messages while this chat is muted.</string>
 
     <!-- NotificationProfilesFragment -->
     <!-- Title for notification profiles screen that shows all existing profiles; Title with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -6008,6 +6030,8 @@
     <string name="HelpSettingsFragment__support_center">Supportcenter</string>
     <string name="HelpSettingsFragment__contact_us">Kontakta oss</string>
     <string name="HelpSettingsFragment__version">Version</string>
+    <!-- Displayed when copying help screen text to the clipboard -->
+    <string name="HelpSettingsFragment__copied_to_clipboard">Kopierad till urklipp</string>
     <string name="HelpSettingsFragment__debug_log">Felsökningslogg</string>
     <!--    Header for the screen that displays the licenses of the open-source software dependencies of the Signal app-->
     <string name="HelpSettingsFragment__licenses">Licenser</string>
@@ -6023,12 +6047,14 @@
     <string name="DataAndStorageSettingsFragment__sent_media_quality">Skickade mediekvalitet</string>
     <string name="DataAndStorageSettingsFragment__sending_high_quality_media_will_use_more_data">Om du skickar högkvalitativa medier kommer du att använda mera data.</string>
     <!-- Disclaimer shown under the media auto-download settings. Placeholder is a formatted size like "100 KB". -->
-    <string name="DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded">Voice messages and stickers (under %1$s) are always auto-downloaded.</string>
-    <!-- Setting option that can be selected to default media to be sent as high quality by default -->
-    <string name="DataAndStorageSettingsFragment__high">Hög</string>
-    <!-- Setting option that can be selected to default media to be sent as standard quality by default -->
-    <string name="DataAndStorageSettingsFragment__standard">Standard</string>
+    <string name="DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded">Röstmeddelanden och klistermärken (under %1$s) hämtas alltid automatiskt.</string>
     <string name="DataAndStorageSettingsFragment__calls">Samtal</string>
+    <!-- Title of a toggle that keeps Signal connected in the background via a persistent foreground service instead of using FCM push messages -->
+    <string name="DataAndStorageSettingsFragment__stay_connected_in_background">Förbli ansluten i bakgrunden</string>
+    <!-- Body of a confirmation dialog shown when a user tries to enable the "Stay connected in background" setting -->
+    <string name="DataAndStorageSettingsFragment__staying_connected_while_in_the_background_will_likely_result_in_increased_battery_usage">Att vara ansluten i bakgrunden leder troligen till ökad batteriförbrukning. Det här är inte nödvändigt för de flesta enheter. Aktivera bara det här om du har haft problem med aviseringar.</string>
+    <!-- Button label that enables the "Stay connected in background" setting from a confirmation dialog -->
+    <string name="DataAndStorageSettingsFragment__enable">Aktivera</string>
 
     <!-- ChatColorSelectionFragment -->
     <!-- Text shown on a circle button to indicate the app will automatically select a color for conversation bubbles for this chat. -->
@@ -6169,6 +6195,8 @@
     <string name="ConversationSettingsFragment__end_group">Avsluta gruppen</string>
     <!-- Banner shown at the top of group settings when the group has been ended -->
     <string name="ConversationSettingsFragment__this_group_was_ended">Gruppen har avslutats.</string>
+    <!-- Subhead under a legacy group\'s name, joining the member count and the "Legacy Group" label. %1$s is the member count, %2$s is the label -->
+    <string name="ConversationSettingsFragment__s_dot_s">%1$s · %2$s</string>
     <!-- Archive chat option in group conversation settings screen -->
     <string name="ConversationSettingsFragment__archive_chat">Arkivera chatt</string>
     <!-- Delete chat option in group conversation settings screen -->
@@ -6290,13 +6318,15 @@
     <!-- AvatarPickerFragment -->
     <string name="AvatarPickerFragment__avatar_preview">Avatar-förhandsgranskning</string>
     <string name="AvatarPickerFragment__camera">Kamera</string>
-    <string name="AvatarPickerFragment__take_a_picture">Ta en bild</string>
-    <string name="AvatarPickerFragment__choose_a_photo">Välj ett foto</string>
     <string name="AvatarPickerFragment__photo">Foto</string>
     <!-- Button label during avatar selection/creation that when tapped lets you generate an avatar from typed in text. -->
     <string name="AvatarPickerFragment__text">Text</string>
     <string name="AvatarPickerFragment__save">Spara</string>
     <string name="AvatarPickerFragment__clear_avatar">Ta bort avatar</string>
+    <!-- Content description for the edit icon displayed over the currently selected avatar. -->
+    <string name="AvatarPickerFragment__edit_avatar">Edit avatar</string>
+    <!-- Accessibility label describing the menu shown when long pressing one of your saved avatars. -->
+    <string name="AvatarPickerFragment__avatar_options">Avatar options</string>
     <string name="AvatarPickerRepository__failed_to_save_avatar">Det gick inte att spara avataren</string>
 
     <!-- TextAvatarCreationFragment -->
@@ -6352,53 +6382,11 @@
     <!-- Positive dialog action when sending a story via an add to group story button -->
     <string name="MediaReviewFragment__add_to_story">Lägg till i story</string>
     <string name="MediaReviewFragment__add_a_message">Lägg till ett meddelande</string>
-    <!-- Hint text inside of a compose box that is shown when the user is adding media while quoting a message. -->
-    <string name="MediaReviewFragment__add_a_reply">Lägg till ett svar</string>
     <string name="MediaReviewFragment__send_to">Skicka till</string>
-    <string name="MediaReviewFragment__view_once_message">Tillfällig mediefil</string>
-    <string name="MediaReviewFragment__one_or_more_items_were_too_large">Ett eller flera objekt var för stora</string>
-    <string name="MediaReviewFragment__one_or_more_items_were_invalid">Ett eller flera objekt var ogiltiga</string>
-    <string name="MediaReviewFragment__too_many_items_selected">För många objekt valda</string>
-    <!-- Small notification presented to the user when they set their video to view-once mode -->
-    <string name="MediaReviewFragment__video_set_to_view_once">Video inställd för att visas en gång</string>
-    <!-- Small notification presented to the user when they set their photo to view-once mode -->
-    <string name="MediaReviewFragment__photo_set_to_view_once">Foto inställt för att visas en gång</string>
-    <!-- Small notification presented to the user when they set their video to be sent in high visual quality. -->
-    <string name="MediaReviewFragment__video_set_to_high_quality">Video inställd på hög kvalitet</string>
-    <!-- Small notification presented to the user when they set their video to be sent in standard (lower than high) visual quality. -->
-    <string name="MediaReviewFragment__video_set_to_standard_quality">Video inställd på standardkvalitet</string>
-    <!-- Small notification presented to the user when they set their still image to be sent in high visual quality. -->
-    <string name="MediaReviewFragment__photo_set_to_high_quality">Foto inställt på hög kvalitet</string>
-    <!-- Small notification presented to the user when they set their still image to be sent in standard (lower than high) visual quality. -->
-    <string name="MediaReviewFragment__photo_set_to_standard_quality">Foto inställt på standardkvalitet</string>
-    <!-- Accessibility label describing the add media button on the Media review screen -->
-    <string name="MediaReviewFragment__add_media_accessibility_label">Lägg till en mediefil</string>
-    <!-- Accessibility label describing the brush and pen button on the Media review screen -->
-    <string name="MediaReviewFragment__brush_pen_accessibility_label">Pensel och penna</string>
-    <!-- Accessibility label describing the crop and rotate button on the Media review screen -->
-    <string name="MediaReviewFragment__crop_rotate_accessibility_label">Beskär och rotera</string>
-    <!-- Accessibility label describing the change media quality button on the Media review screen -->
-    <string name="MediaReviewFragment__change_media_quality_accessibility_label">Ändra mediekvalitet</string>
-    <!-- Accessibility label describing the save media button on the Media review screen -->
-    <string name="MediaReviewFragment__save_media_accessibility_label">Spara media</string>
-    <!-- Accessibility label describing the toggle emoji keyboard button on the Media review screen -->
-    <string name="MediaReviewFragment__emoji_toggle_accessibility_label">Växla till emoji-tangentbord</string>
     <!-- Accessibility label describing the toggle view once button on the Media review screen -->
     <string name="MediaReviewFragment__view_once_toggle_accessibility_label">Växla Visa-en-gång</string>
-    <!-- Accessibility label describing the send media button on the Media review screen -->
-    <string name="MediaReviewFragment__send_media_accessibility_label">Skicka media</string>
     <!-- Accessibility label describing the finish adding a message button on the Media review screen dialog -->
     <string name="MediaReviewFragment__finish_adding_a_message_accessibility_label">Slutför att lägga till ett meddelande</string>
-    <!-- Small notification presented to the user when they set multiple media items to be sent in high visual quality. -->
-    <plurals name="MediaReviewFragment__items_set_to_high_quality">
-        <item quantity="one">%1$d objekt inställda på hög kvalitet</item>
-        <item quantity="other">%1$d objekt inställda på hög kvalitet</item>
-    </plurals>
-    <!-- Small notification presented to the user when they set multiple media items to be sent in standard (lower than high) visual quality. -->
-    <plurals name="MediaReviewFragment__items_set_to_standard_quality">
-        <item quantity="one">%1$d objekt inställda på standardkvalitet</item>
-        <item quantity="other">%1$d objekt inställda på standardkvalitet</item>
-    </plurals>
 
     <string name="ImageEditorHud__cancel">Avbryt</string>
     <string name="ImageEditorHud__draw">Dra</string>
@@ -6416,27 +6404,9 @@
 
     <string name="MediaCountIndicatorButton__send">Skicka</string>
 
-    <string name="MediaReviewSelectedItem__tap_to_remove">Tryck för att ta bort</string>
-    <string name="MediaReviewSelectedItem__tap_to_select">Tryck för att välja</string>
-
     <string name="MediaReviewImagePageFragment__discard">Kassera</string>
     <string name="MediaReviewImagePageFragment__discard_changes">Kassera ändringar?</string>
     <string name="MediaReviewImagePageFragment__youll_lose_any_changes">Du förlorar alla ändringar du har gjort på detta foto.</string>
-
-    <!-- The title of a dialog notifying that a user was found matching a scanned QR code. The placeholder is a username. Usernames are always latin characters. -->
-    <string name="MediaCaptureFragment_username_dialog_title">Hittade %1$s</string>
-    <!-- The body of a dialog notifying that a user was found matching a scanned QR code, prompting the user to start a chat with them. The placeholder is a username. Usernames are always latin characters. -->
-    <string name="MediaCaptureFragment_username_dialog_body">Starta en chatt med \"%1$s\"</string>
-    <!-- The label of a dialog asking the user if they would like to start a chat with a specific user. -->
-    <string name="MediaCaptureFragment_username_dialog_go_to_chat_button">Gå till chatt</string>
-
-    <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_device_link_dialog_title">Länka enhet?</string>
-    <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">Det verkar som om du försöker länka en Signal-enhet. Tryck på fortsätt och tryck sedan på Länka en ny enhet och skanna QR-koden igen.</string>
-    <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
-    <string name="MediaCaptureFragment_device_link_dialog_continue">Fortsätt</string>
-
 
     <string name="BadgesOverviewFragment__my_badges">Mina märken</string>
     <string name="BadgesOverviewFragment__featured_badge">Presenterat märke</string>
@@ -6911,7 +6881,7 @@
     <!-- Donation receipts amount title -->
     <string name="DonationReceiptDetailsFragment__amount">Belopp</string>
     <!-- Donation receipts thanks -->
-    <string name="DonationReceiptDetailsFragment__thank_you_for_supporting">Tack för att du stöder Signal. Ditt bidrag hjälper till att driva på uppdraget att utveckla öppen källkods integritetsteknik som skyddar yttrandefrihet och möjliggör säker global kommunikation för miljoner runt om i världen. Om du är bosatt i USA, spara detta kvitto för dina skatteuppgifter. Signal Technology Foundation är en skattebefriad ideell organisation i USA enligt avsnitt 501c3 i Internal Revenue Code. Vårt federala skatte-ID är 82–4506840.</string>
+    <string name="DonationReceiptDetailsFragment__thank_you_for_supporting" tools:ignore="TypographyDashes">Tack för att du stöder Signal. Ditt bidrag hjälper till att främja uppdraget att skydda yttrandefriheten och möjliggöra säker global kommunikation för miljontals människor runt om i världen, genom öppen källkod för integritetsskydd. Spara detta kvitto för dina skatteuppgifter om du är bosatt i USA. Signal Technology Foundation är en skattebefriad ideell organisation i USA enligt avsnitt 501c3 i Internal Revenue Code. Vårt federala skatte-ID är 82-4506840. Signal har inte tillhandahållit några varor eller tjänster i utbyte mot detta bidrag.</string>
     <!-- Donation reciepts screen empty state title -->
     <string name="DonationReceiptListFragment__no_receipts">Inga kvitton</string>
 
@@ -8236,8 +8206,23 @@
     <!-- Button of a megaphone that will snooze the reminder to upgrade to the new local backups type -->
     <string name="UseNewOnDeviceBackups__not_now">Inte nu</string>
 
+    <!-- Title of a megaphone shown to prompt the user to open Signal on their primary device -->
+    <string name="InactivePrimary__title">Öppna Signal på din telefon</string>
+    <!-- Body of a megaphone shown to prompt the user to open Signal on their primary device -->
+    <string name="InactivePrimary__body">Öppna Signal på din primära enhet för att hålla ditt konto aktivt.</string>
+    <!-- Button of a megaphone shown to prompt the user to open Signal on their primary device that will navigate to a support page -->
+    <string name="InactivePrimary__learn_more">Läs mer</string>
+    <!-- Button of a megaphone shown to prompt the user to open Signal on their primary device that will snooze the megaphone -->
+    <string name="InactivePrimary__got_it">Uppfattat</string>
+
     <!-- Text describing how to restore a backup displayed on the on-device backups screen -->
     <string name="OnDeviceBackupsScreen__to_restore_a_backup">"Installera en ny kopia av Signal för att återställa en säkerhetskopia. Öppna appen och tryck på Återställ säkerhetskopia. Leta sedan upp säkerhetskopian."</string>
+    <!-- Body of a dialog shown when turning on on-device backups while "Optimize Signal storage" is enabled, warning that optimized media won\'t be included -->
+    <string name="OnDeviceBackupsScreen__you_have_optimize_signal_storage_on">Du har Optimera Signal-lagring aktiverat. Om du vill inkludera alla medier i din säkerhetskopia på enheten stänger du av inställningen.</string>
+    <!-- Dialog action that takes the user to the "Optimize Signal storage" setting -->
+    <string name="OnDeviceBackupsScreen__view_setting">Visa inställningar</string>
+    <!-- Dialog action to proceed with turning on on-device backups without turning off "Optimize Signal storage" -->
+    <string name="OnDeviceBackupsScreen__continue_without_turning_off">Fortsätt utan att stänga av</string>
 
     <!-- Title of a megaphone shown to prompt the user to verify their recovery key -->
     <string name="VerifyBackupKey__title">Verifiera din återställningsnyckel</string>
@@ -8614,13 +8599,19 @@
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">När det är aktiverat kommer gränser för chattlängd också att radera meddelanden från dina länkade enheter.</string>
     <!-- Setting section title header for storage optimization -->
-    <string name="ManageStorageSettingsFragment__on_device_storage">Lagring på enheten</string>
+    <string name="ManageStorageSettingsFragment__on_device_storage">Signal-lagring</string>
     <!-- Setting row title for storage optimization -->
-    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimera lagring på enheten</string>
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimera Signal-lagring</string>
     <!-- Setting row explanation for storage optimization -->
     <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">Oanvända mediafiler kommer att avlastas, men kan laddas ner från din säkerhetskopia när som helst.</string>
     <!-- Dialog message for paid tier pending dialog -->
     <string name="ManageStorageSettingsFragment__storage_optimization_can_only_be_used">Lagringsoptimering kan endast användas med den betalda nivån av Säkerhetskopiering av Signal. Ditt abonnemang för säkerhetskopiering bearbetas fortfarande och är inte aktivt ännu. Försök igen senare.</string>
+    <!-- Title of a dialog shown when turning on "Optimize Signal storage" while on-device backups are enabled -->
+    <string name="ManageStorageSettingsFragment__media_will_be_removed_from_your_on_device_backup">Medier tas bort från din säkerhetskopia på enheten</string>
+    <!-- Body of a dialog shown when turning on "Optimize Signal storage" while on-device backups are enabled -->
+    <string name="ManageStorageSettingsFragment__turning_on_optimize_signal_storage_will_offload">När du aktiverar Optimera Signal-lagring avlastas gamla medier från din enhet. Du kan ladda ner dem igen när som helst. Det tar också bort gamla medier från din säkerhetskopia på enheten.</string>
+    <!-- Dialog action to confirm turning on "Optimize Signal storage" -->
+    <string name="ManageStorageSettingsFragment__turn_on">Aktivera</string>
 
     <!-- UpgradeToEnableOptimizedStorageSheet -->
     <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
@@ -8673,13 +8664,6 @@
     <!-- Body of bottom sheet shown when opening a terminated group -->
     <string name="TerminatedGroupBottomSheet__you_can_no_longer_send_and_receive">Du kan inte längre skicka eller ta emot meddelanden eller samtal i den här gruppen.</string>
 
-    <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_title">Radering synkroniseras nu mellan alla dina enheter</string>
-    <!-- Educational bottom sheet dialog message shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_message">När du raderar meddelanden eller chattar kommer de att tas bort från din telefon och länkade enheter.</string>
-    <!-- Educational bottom sheet confirm/dismiss button text shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_acknowledge_button">OK</string>
-
     <!-- NoManualBackupBottomSheet -->
     <!-- Title for bottom sheet, placeholder is number of days. -->
     <plurals name="NoManualBackupBottomSheet__no_backup_for_d_days">
@@ -8703,6 +8687,8 @@
     <string name="BackupsSettingsFragment__subscription_canceled">Abonnemanget uppsagt</string>
     <!-- Subtitle for row for no backup ever created -->
     <string name="BackupsSettingsFragment_automatic_backups_with_signals">Automatiska säkerhetskopieringar med Signals säkra totalsträckskrypterade lagringstjänst.</string>
+    <!-- Subtitle shown on a linked device when backups are off, directing the user to set them up on their phone -->
+    <string name="BackupsSettingsFragment__automatic_backups_get_started_on_your_phone">Automatiska säkerhetskopieringar med Signals säkra totalsträckskrypterade lagringstjänst. Kom igång på din telefon.</string>
     <!-- Subtitle for row for backups that are active but subscription not found -->
     <string name="BackupsSettingsFragment_subscription_not_found_on_this_device">"Abonnemanget hittades inte på den här enheten."</string>
     <!-- Action button label to set up backups -->
@@ -8720,7 +8706,7 @@
     <!-- Displayed as a label when remote backups are off -->
     <string name="RemoteBackupsSettingsFragment__off">Av</string>
     <!-- Text shown in a popup indicating that the user needs to enter their screen lock -->
-    <string name="RemoteBackupsSettingsFragment__authenticatino_required">Autentisering krävs</string>
+    <string name="RemoteBackupsSettingsFragment__authentication_required">Autentisering krävs</string>
     <!-- Row label to launch payment history screen -->
     <string name="RemoteBackupsSettingsFragment__payment_history">Betalningshistorik</string>
     <!-- Section header for backup information -->
@@ -8806,6 +8792,16 @@
     <string name="RemoteBackupsSettingsFragment__s_at_s">%1$s %2$s</string>
     <!-- Subtext describing when a backup has never taken place. -->
     <string name="RemoteBackupsSettingsFragment__never">Aldrig</string>
+    <!-- Subtext on a linked device describing when the primary device last backed up. Placeholder is the formatted date and time. -->
+    <string name="RemoteBackupsSettingsFragment__your_phone_s">Din telefon · %1$s</string>
+    <!-- Message shown on a linked device with a free backup plan explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_upgrade_your_subscription_on_your_primary_device">Du kan hantera eller uppgradera ditt abonnemang på Signal Säker säkerhetskopiering på din primära enhet.</string>
+    <!-- Message shown on a linked device with a paid backup plan explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_cancel_your_subscription_on_your_primary_device">Du kan hantera eller avsluta ditt abonnemang på Signal Säker säkerhetskopiering på din primära enhet.</string>
+    <!-- Message shown on a linked device with a canceled backup subscription explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_renew_your_subscription_on_your_primary_device">Du kan hantera eller förnya ditt abonnemang på Signal Säker säkerhetskopiering på din primära enhet.</string>
+    <!-- Message shown on a linked device when backups are off or the subscription was not found, explaining that backups are managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_upgrade_backups_on_your_primary_device">Du kan hantera eller uppgradera ditt Signal Säker säkerhetskopiering på din primära enhet.</string>
     <!-- Button label to perform a backup immediately -->
     <string name="RemoteBackupsSettingsFragment__back_up_now">Säkerhetskopiera nu</string>
     <!-- Dialog title when confirming whether to turn off and deleting backups -->
@@ -9097,19 +9093,37 @@
     <!-- Dialog title for confirming you need to disable optimized storage and download media to rotate AEP key -->
     <string name="MessageBackupsKeyRecordScreen__download_media">Ladda ner media</string>
     <!-- Dialog body for confirming you need to disable optimized storage and download media to rotate AEP key -->
-    <string name="MessageBackupsKeyRecordScreen__to_create_a_new_backup_key">För att skapa en ny återställningsnyckel måste du inaktivera Optimera lagring och vänta tills dina media har laddats ner. När nedladdningen är klar kan du skapa en ny nyckel.</string>
+    <string name="MessageBackupsKeyRecordScreen__to_create_a_new_backup_key">För att skapa en ny återställningsnyckel måste du inaktivera Optimera Signal-lagring och vänta tills dina media har laddats ner. När nedladdningen är klar kan du skapa en ny nyckel.</string>
     <!-- Action label to turn off optimized storage and download media -->
     <string name="MessageBackupsKeyRecordScreen__turn_off_and_download">Stäng av och ladda ner</string>
     <!-- Bottom Sheet title for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__create_a_new_backup_key">Skapa en ny återställningsnyckel</string>
     <!-- Bottom Sheet body for creating a new AEP key -->
-    <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Att skapa en ny nyckel är bara nödvändigt om någon annan känner till din nyckel. Du måste ladda upp din säkerhetskopia igen, inklusive media. Om du använder Optimera lagring måste du först ladda ner avlastade media.</string>
+    <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Att skapa en ny nyckel är bara nödvändigt om någon annan känner till din nyckel. Du måste ladda upp din säkerhetskopia igen, inklusive media. Om du använder Optimera Signal-lagring måste du först ladda ner avlastade media.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
     <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Avsluta säkerhetskopieringsinställning?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
     <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">Du har inte slutfört konfigureringen av säkerhetskopior, och ingen säkerhetskopia har skapats. Du kan aktivera säkerhetskopiering i Inställningar.</string>
     <!-- Dialog confirmation button to exit backup setup -->
     <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Avsluta säkerhetskopieringsinställning</string>
+    <!-- Screen title when saving your recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__save_your_recovery_key">Spara din återställningsnyckel</string>
+    <!-- Screen subtitle for the recovery key screen -->
+    <string name="MessageBackupsKeyRecordScreen__your_recovery_key">Din återställningsnyckel är en kod på 64 tecken som låter dig återställa din säkerhetskopia. Om du glömmer din nyckel kommer du inte att kunna återställa ditt konto.</string>
+    <!-- Hint text to see the full recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__see_full_key">Se hela nyckeln</string>
+    <!-- Bottom sheet caption to confirm your recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__confirm_that_your_recovery">Bekräfta att din återställningsnyckel har registrerats korrekt. Du kommer att uppmanas att fylla i ditt sparade lösenord i nästa steg.</string>
+    <!-- Button to confirm the recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__confirm_recovery">Bekräfta återställningsnyckel</string>
+    <!-- Toast shown when the key is confirmed -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_confirmed">Återställningsnyckel bekräftad</string>
+    <!-- Dialog title shown when the recovery key fails to confirm -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_error">Det gick inte att bekräfta återställningsnyckeln</string>
+    <!-- Dialog body shown when the recovery key fails to confirm -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_error_body">Din återställningsnyckel kunde inte bekräftas. Se till att du har sparat den i din lösenordshanterare, eller spara den manuellt.</string>
+    <!-- Button option to save the key manually -->
+    <string name="MessageBackupsKeyRecordScreen__save_key_manually">Spara nyckel manuellt</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -9356,11 +9370,11 @@
     <!-- RestoreLocalBackupActivity: Label for the button that opens the contact support form -->
     <string name="RestoreLocalBackupActivity__contact_support">Kontakta supporten</string>
 
-    <!-- RestoreLocalBackupActivity: Title for the dialog shown when the restored backup belongs to a different account -->
+    <!-- RestoreLocalBackupActivity: Title for the dialog shown when on-device backups could not be automatically re-enabled -->
     <string name="RestoreLocalBackupActivity__turn_on_on_device_backups">Aktivera säkerhetskopiering på enheten?</string>
 
-    <!-- RestoreLocalBackupActivity: Body for the dialog shown when the restored backup belongs to a different account, prompting the user to re-enable on-device backups -->
-    <string name="RestoreLocalBackupActivity__to_continue_using_on_device_backups">För att fortsätta använda säkerhetskopior på enheten måste du aktivera dem för det här kontot och spara din nya återställningsnyckel. Det kan du göra när som helst via Inställningar &gt; Säkerhetskopior.</string>
+    <!-- RestoreLocalBackupActivity: Body for the dialog shown when on-device backups could not be automatically re-enabled, prompting the user to re-enable on-device backups -->
+    <string name="RestoreLocalBackupActivity__to_continue_using_on_device_backups">För att fortsätta använda säkerhetskopior på enheten behöver du aktivera dem för det här kontot. Det kan du göra när som helst via Inställningar &gt; Säkerhetskopior.</string>
 
     <!-- RestoreLocalBackupActivity: Confirm button label for the dialog prompting the user to re-enable on-device backups -->
     <string name="RestoreLocalBackupActivity__turn_on_now">Aktivera nu</string>
@@ -9842,8 +9856,28 @@
     <!-- Body for screen shown to let the user know that displaying their member label will take priority over their about text. -->
     <string name="MemberLabelsAboutOverride__body">I den här gruppen visas din medlemsetikett bredvid ditt foto istället för din Om-profil.</string>
 
-    <!-- Label for internal-only section showing groups with same members -->
-  <!-- Removed by excludeNonTranslatables <string name="AddGroupDetailsFragment__groups_with_same_members" translatable="false">Groups with same members (Labs)</string> -->
+    <!-- Header for the section shown when creating a group that lists existing groups with the exact same members. Includes the number of such groups. -->
+    <plurals name="AddGroupDetailsFragment__d_groups_with_same_members">
+        <item quantity="one">%1$d grupp med samma medlemmar</item>
+        <item quantity="other">%1$d grupper med samma medlemmar</item>
+    </plurals>
+
+    <!-- Header for a section showing all group member -->
+    <string name="MemberSearchFragment__search_members">Sök medlemmar</string>
+    <!-- Header for a section showing all group members who are contacts -->
+    <string name="MemberSearchFragment__search_contacts">Sök kontakter</string>
+    <!-- Header for a section showing all group member who are admins -->
+    <string name="MemberSearchFragment__search_admins">Sök administratörer</string>
+    <!-- Dialog title to filter search by -->
+    <string name="MemberSearchFragment__filter">Filtrera efter</string>
+    <!-- Dialog option for all group members -->
+    <string name="MemberSearchFragment__filter_all_members">Alla medlemmar</string>
+    <!-- Dialog option for group admins -->
+    <string name="MemberSearchFragment__filter_admins">Administratörer</string>
+    <!-- Dialog option for your contacts -->
+    <string name="MemberSearchFragment__filter_contacts">Kontakter</string>
+    <!-- Button to invite members via a group link -->
+    <string name="MemberSearchFragment__invite_via">Bjud in via grupplänk</string>
 
     <!-- Title of the sheet shown when a local backup restore could not be completed -->
     <string name="CouldNotCompleteBackupRestoreSheet__title">Det går inte att återställa säkerhetskopia</string>
@@ -9853,6 +9887,111 @@
 
     <!-- Body of the sheet shown when a local backup restore could not be completed, explaining how to try again -->
     <string name="CouldNotCompleteBackupRestoreSheet__body_retry">Försök igen genom att avinstallera och installera om Signal på den här enheten och välja ”Återställ eller överför”.</string>
+
+    <!-- Title of the sheet shown when the server reports a verification code was requested for the user\'s phone number -->
+    <string name="VerificationCodeRequestedBottomSheet__title">En verifieringskod har begärts</string>
+    <!-- First paragraph of the body of the verification code requested sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__body_1">Ge inte din verifieringskod till någon. Signal kommer aldrig att skicka meddelanden till dig för att be om den. Om du har fått ett meddelande från någon som utger sig för att vara Signal är det ett bedrägeri.</string>
+    <!-- Second paragraph of the body of the verification code requested sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__body_2">Du kan tryggt bortse från det här meddelandet om du själv har begärt koden.</string>
+    <!-- Button on the verification code requested sheet that opens the safety tips screen -->
+    <string name="VerificationCodeRequestedBottomSheet__safety_tips">Säkerhetstips</string>
+    <!-- Button on the verification code requested sheet that dismisses the sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__ok">OK</string>
+    <!-- Subtitle on the verification code requested sheet showing the time the code was requested followed by the relative day. %1$s is the time (e.g. "3:25 PM"), %2$s is the relative day (e.g. "Today", "Yesterday", "Jan 15") -->
+    <string name="VerificationCodeRequestedBottomSheet__time_with_day">%1$s %2$s</string>
+
+    <!-- Title of the safety tips screen within the verification code requested sheet -->
+    <string name="SafetyTipsBottomSheet__title">Säkerhetstips</string>
+    <!-- Title of the first safety tip: don\'t respond to chats claiming to be Signal -->
+    <string name="SafetyTipsBottomSheet__tip_1_title">Svara inte på chattar från Signal</string>
+    <!-- Body of the first safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_1_body">Signal kommer aldrig att skicka meddelanden till dig för att be om din registreringskod, PIN-kod eller återställningsnyckel. Svara aldrig på en chatt som utger sig för att vara Signal.</string>
+    <!-- Title of the second safety tip: keep your verification code safe -->
+    <string name="SafetyTipsBottomSheet__tip_2_title">Förvara din verifieringskod säkert</string>
+    <!-- Body of the second safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_2_body">Om du har fått en verifieringskod som du inte har begärt kan det vara någon som försöker komma åt ditt konto. Dela inte din kod.</string>
+    <!-- Title of the third safety tip: enable registration lock -->
+    <string name="SafetyTipsBottomSheet__tip_3_title">Aktivera registreringslås i kontoinställningarna</string>
+    <!-- Body of the third safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_3_body">Skydda ditt konto genom att kräva din Signal-pinkod, utöver din verifieringskod, vid registrering i Signal.</string>
+    <!-- Button on the safety tips screen that opens account settings -->
+    <string name="SafetyTipsBottomSheet__open_account_settings">Öppna kontoinställningar</string>
+
+    <!-- Title of a warning sheet shown when the user copies or pastes their recovery key, urging them not to share it -->
+    <string name="RecoveryKeyWarningSheetContent__do_not_share_your_recovery_key">Dela inte din återställningsnyckel</string>
+    <!-- Bolded lead-in to the warning sheet body; combined with RecoveryKeyWarningSheetContent__for_your_recovery_key_never_respond to form a full sentence -->
+    <string name="RecoveryKeyWarningSheetContent__signal_will_never_message_you">Signal kommer aldrig att skicka meddelanden till dig</string>
+    <!-- Remainder of the warning sheet body following the bolded lead-in RecoveryKeyWarningSheetContent__signal_will_never_message_you -->
+    <string name="RecoveryKeyWarningSheetContent__for_your_recovery_key_never_respond">för att be om din återställningsnyckel. Svara aldrig på en chatt som utger sig för att vara Signal. Förvara din återställningsnyckel någonstans säkert och dela den aldrig med någon.</string>
+    <!-- Button dismissing the recovery key warning sheet after the user has copied their key -->
+    <string name="RecoveryKeyWarningSheetContent__got_it">Uppfattat</string>
+    <!-- Button opening a help article with more information about recovery key safety -->
+    <string name="RecoveryKeyWarningSheetContent__learn_more">Läs mer</string>
+    <!-- Inline link opening a help article with more information about recovery key safety -->
+    <string name="RecoveryKeyWarningSheetContent__learn_more_period">Läs mer.</string>
+    <!-- Button declining to paste/share the recovery key, dismissing the warning sheet -->
+    <string name="RecoveryKeyWarningSheetContent__do_not_share_key">Dela inte nyckel</string>
+    <!-- Button indicating the user wants to proceed with sharing/pasting the recovery key, which shows a final confirmation -->
+    <string name="RecoveryKeyWarningSheetContent__share_key">Dela nyckel</string>
+
+    <!-- Title of the final confirmation dialog shown before pasting a recovery key -->
+    <string name="RecoveryKeyWarningDialog__do_not_share_recovery_key">Dela inte återställningsnyckeln</string>
+    <!-- First sentence of the final confirmation dialog body warning against sharing the recovery key -->
+    <string name="RecoveryKeyWarningDialog__do_not_share_your_recovery_key_with_anyone">Dela inte din återställningsnyckel med någon. Det gör att de kan ta över ditt konto.</string>
+    <!-- Bolded middle sentence of the final confirmation dialog body -->
+    <string name="RecoveryKeyWarningDialog__signal_will_never_message_you_for_your_recovery_key">Signal kommer aldrig att skicka meddelanden till dig för att be om din återställningsnyckel.</string>
+    <!-- Final sentence of the final confirmation dialog body -->
+    <string name="RecoveryKeyWarningDialog__never_respond_to_a_chat">Svara aldrig på en chatt som utger sig för att vara Signal.</string>
+    <!-- Button confirming the user wants to paste the recovery key -->
+    <string name="RecoveryKeyWarningDialog__paste_key">Klistra in nyckel</string>
+    <!-- Button declining to paste the recovery key -->
+    <string name="RecoveryKeyWarningDialog__dont_share">Dela inte</string>
+
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, last two are the summaries for mentions and replies -->
+    <string name="UnreadReminderJob__calls_and_unread_full_summary">You have %1$s and %2$s including %3$s and %4$s.</string>
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, third is a summary of mentions or replies -->
+    <string name="UnreadReminderJob__calls_and_unread_summary">You have %1$s and %2$s including %3$s.</string>
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, third is a list of recipients who sent them -->
+    <string name="UnreadReminderJob__calls_and_unread_author">You have %1$s and %2$s from %3$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a summary of unread mentions or replies -->
+    <string name="UnreadReminderJob__unread_one_summary">You have %1$s, including %2$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a summary of unread mentions, third replies -->
+    <string name="UnreadReminderJob__unread_both_summary">You have %1$s, including %2$s and %3$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a list of people who sent them -->
+    <string name="UnreadReminderJob__calls_or_unread_author">You have %1$s from %2$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages or unread calls -->
+    <string name="UnreadReminderJob__calls_or_unread">You have %1$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is unread calls. -->
+    <string name="UnreadReminderJob__calls_and_unread">You have %1$s and %2$s.</string>
+    <!-- Notification placeholder for unread calls -->
+    <plurals name="UnreadReminderJob__calls">
+        <item quantity="one">%1$d missed call</item>
+        <item quantity="other">%1$d missed calls</item>
+    </plurals>
+    <!-- Notification placeholder for unread messages -->
+    <plurals name="UnreadReminderJob__messages">
+        <item quantity="one">%1$d oläst meddelande</item>
+        <item quantity="other">%1$d olästa meddelanden</item>
+    </plurals>
+    <!-- Notification placeholder for a single recipient who sent unread messages -->
+    <string name="UnreadReminderJob__authors_one">%1$s</string>
+    <!-- Notification placeholder for two recipients who sent unread messages -->
+    <string name="UnreadReminderJob__authors_two">%1$s och %2$s</string>
+    <!-- Notification placeholder for three or more recipients who sent unread messages -->
+    <string name="UnreadReminderJob__authors_many">%1$s and others</string>
+    <!-- Notification placeholder that sums up a single unread mention. Placeholder is the name of the person who sent the message -->
+    <string name="UnreadReminderJob__mentions_one">a mention of you by %1$s</string>
+    <!-- Notification placeholder that sums up unread mentions from two people. First placeholder is the number of mentions, second and third are the names of the people who sent them -->
+    <string name="UnreadReminderJob__mentions_two">%1$d mentions of you by %2$s and %3$s</string>
+    <!-- Notification placeholder that sums up unread mentions from three or more people. First placeholder is the number of mentions, second is the name of one person who sent them -->
+    <string name="UnreadReminderJob__mentions_many">%1$d mentions of you by %2$s and others</string>
+    <!-- Notification placeholder that sums up a single unread reply. Placeholder is the name of the person who sent the message -->
+    <string name="UnreadReminderJob__replies_one">a reply from %1$s</string>
+    <!-- Notification placeholder that sums up unread replies from two people. First placeholder is the number of replies, second and third are the names of the people who sent them -->
+    <string name="UnreadReminderJob__replies_two">%1$d replies from %2$s and %3$s</string>
+    <!-- Notification placeholder that sums up unread replies from three or more people. First placeholder is the number of replies, second is the name of one person who sent them -->
+    <string name="UnreadReminderJob__replies_many">%1$d replies from %2$s and others</string>
 
     <!-- EOF -->
 </resources>

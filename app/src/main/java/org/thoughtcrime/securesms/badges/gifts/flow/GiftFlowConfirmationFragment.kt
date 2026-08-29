@@ -13,14 +13,16 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import org.signal.core.util.Debouncer
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.getParcelableCompat
 import org.signal.core.util.money.FiatMoney
 import org.signal.donations.InAppPaymentType
+import org.signal.emoji.EmojiEventListener
 import org.thoughtcrime.securesms.MainActivity
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.components.InputAwareLayout
-import org.thoughtcrime.securesms.components.emoji.EmojiEventListener
+import org.thoughtcrime.securesms.components.KeyboardAwareLinearLayout
 import org.thoughtcrime.securesms.components.emoji.MediaKeyboard
 import org.thoughtcrime.securesms.components.settings.DSLConfiguration
 import org.thoughtcrime.securesms.components.settings.DSLSettingsFragment
@@ -39,7 +41,6 @@ import org.thoughtcrime.securesms.keyboard.emoji.EmojiKeyboardPageFragment
 import org.thoughtcrime.securesms.keyboard.emoji.search.EmojiSearchFragment
 import org.thoughtcrime.securesms.payments.FiatMoneyUtil
 import org.thoughtcrime.securesms.payments.currency.CurrencyUtil
-import org.thoughtcrime.securesms.util.Debouncer
 import org.thoughtcrime.securesms.util.activityViewModel
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingAdapter
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
@@ -94,6 +95,7 @@ class GiftFlowConfirmationFragment :
       .create()
 
     inputAwareLayout = requireView().findViewById(R.id.input_aware_layout)
+    inputAwareLayout.setInsetPaddingMode(KeyboardAwareLinearLayout.InsetPaddingMode.KEYBOARD_AND_NAVIGATION_BAR)
     emojiKeyboard = requireView().findViewById(R.id.emoji_drawer)
 
     emojiKeyboard.setFragmentManager(childFragmentManager)
@@ -306,7 +308,5 @@ class GiftFlowConfirmationFragment :
 
   override fun navigateToDonationPending(inAppPayment: InAppPaymentTable.InAppPayment) = error("Not supported for gifts")
 
-  override fun exitCheckoutFlow() {
-    requireActivity().finishAfterTransition()
-  }
+  override fun exitCheckoutFlow() = Unit
 }

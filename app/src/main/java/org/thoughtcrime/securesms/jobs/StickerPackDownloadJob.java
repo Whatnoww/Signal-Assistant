@@ -7,19 +7,20 @@ import androidx.core.util.Preconditions;
 import org.signal.core.util.logging.Log;
 import org.signal.libsignal.protocol.InvalidMessageException;
 import org.thoughtcrime.securesms.database.SignalDatabase;
-import org.thoughtcrime.securesms.database.StickerTable;
+import org.thoughtcrime.securesms.database.StickerTables;
 import org.thoughtcrime.securesms.database.model.IncomingSticker;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.jobmanager.JsonJobData;
 import org.thoughtcrime.securesms.jobmanager.Job;
 import org.thoughtcrime.securesms.jobmanager.JobManager;
+import org.thoughtcrime.securesms.jobmanager.impl.DataRestoreConstraint;
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint;
 import org.thoughtcrime.securesms.stickers.BlessedPacks;
 import org.signal.core.util.Hex;
 import org.whispersystems.signalservice.api.SignalServiceMessageReceiver;
 import org.whispersystems.signalservice.api.messages.SignalServiceStickerManifest;
 import org.whispersystems.signalservice.api.messages.SignalServiceStickerManifest.StickerInfo;
-import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException;
+import org.signal.network.exceptions.PushNetworkException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,6 +32,8 @@ public class StickerPackDownloadJob extends BaseJob {
   public static final String KEY = "StickerPackDownloadJob";
 
   private static final String TAG = Log.tag(StickerPackDownloadJob.class);
+
+  private static final int MAX_STICKERS_PER_PACK = 1024;
 
   private static final String KEY_PACK_ID        = "pack_key";
   private static final String KEY_PACK_KEY       = "pack_id";
@@ -61,6 +64,7 @@ public class StickerPackDownloadJob extends BaseJob {
   {
     this(new Parameters.Builder()
                        .addConstraint(NetworkConstraint.KEY)
+                       .addConstraint(DataRestoreConstraint.KEY)
                        .setLifespan(TimeUnit.DAYS.toMillis(30))
                        .setQueue("StickerPackDownloadJob_" + packId)
                        .build(),
@@ -114,9 +118,9 @@ public class StickerPackDownloadJob extends BaseJob {
     }
 
     SignalServiceMessageReceiver receiver        = AppDependencies.getSignalServiceMessageReceiver();
-    JobManager   jobManager      = AppDependencies.getJobManager();
-    StickerTable stickerDatabase = SignalDatabase.stickers();
-    byte[]       packIdBytes     = Hex.fromStringCondensed(packId);
+    JobManager    jobManager      = AppDependencies.getJobManager();
+    StickerTables stickerDatabase = SignalDatabase.stickers();
+    byte[]        packIdBytes     = Hex.fromStringCondensed(packId);
     byte[]                       packKeyBytes    = Hex.fromStringCondensed(packKey);
     SignalServiceStickerManifest manifest        = receiver.retrieveStickerManifest(packIdBytes, packKeyBytes);
 
@@ -125,11 +129,17 @@ public class StickerPackDownloadJob extends BaseJob {
       return;
     }
 
+    List<StickerInfo> stickers = manifest.getStickers();
+    if (stickers.size() > MAX_STICKERS_PER_PACK) {
+      Log.w(TAG, "Pack manifest contains " + stickers.size() + " stickers, which exceeds the cap of " + MAX_STICKERS_PER_PACK + ". Truncating.");
+      stickers = stickers.subList(0, MAX_STICKERS_PER_PACK);
+    }
+
     if (!isReferencePack && stickerDatabase.isPackAvailableAsReference(packId)) {
       stickerDatabase.markPackAsInstalled(packId, notify);
     }
 
-    StickerInfo      cover = manifest.getCover().orElse(manifest.getStickers().get(0));
+    StickerInfo      cover = manifest.getCover().orElse(stickers.get(0));
     JobManager.Chain chain = jobManager.startChain(new StickerDownloadJob(new IncomingSticker(packId,
                                                                                               packKey,
                                                                                               manifest.getTitle().orElse(""),
@@ -144,9 +154,9 @@ public class StickerPackDownloadJob extends BaseJob {
 
 
     if (!isReferencePack) {
-      List<Job> jobs = new ArrayList<>(manifest.getStickers().size());
+      List<Job> jobs = new ArrayList<>(stickers.size());
 
-      for (StickerInfo stickerInfo : manifest.getStickers()) {
+      for (StickerInfo stickerInfo : stickers) {
         jobs.add(new StickerDownloadJob(new IncomingSticker(packId,
                                                             packKey,
                                                             manifest.getTitle().orElse(""),

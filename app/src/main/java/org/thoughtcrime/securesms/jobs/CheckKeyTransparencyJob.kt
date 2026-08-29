@@ -18,9 +18,11 @@ import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.net.SignalNetwork
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.util.RemoteConfig
+import org.thoughtcrime.securesms.util.TextSecurePreferences
 import org.whispersystems.signalservice.api.crypto.UnidentifiedAccess
+import kotlin.random.Random
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 /**
@@ -38,14 +40,18 @@ class CheckKeyTransparencyJob private constructor(
     private val TIME_BETWEEN_CHECK = 7.days
 
     @JvmStatic
-    fun enqueueIfNecessary(addDelay: Boolean) {
+    fun enqueueIfNecessary(addDelay: Boolean, force: Boolean = false) {
       if (!canRunJob()) {
         return
       }
 
-      val nextCheckIn = SignalStore.misc.lastKeyTransparencyTime.milliseconds + TIME_BETWEEN_CHECK
+      if (SignalStore.misc.nextKeyTransparencyTime == 0L) {
+        val nextTime = System.currentTimeMillis() + getRandomDelay(maxHours = 168)
+        Log.i(TAG, "Initializing next key transparency time to $nextTime")
+        SignalStore.misc.nextKeyTransparencyTime = nextTime
+      }
 
-      if (nextCheckIn.inWholeMilliseconds < System.currentTimeMillis()) {
+      if (force || System.currentTimeMillis() > SignalStore.misc.nextKeyTransparencyTime) {
         AppDependencies.jobManager.add(
           CheckKeyTransparencyJob(
             showFailure = false,
@@ -81,16 +87,19 @@ class CheckKeyTransparencyJob private constructor(
     }
 
     private fun canRunJob(): Boolean {
-      return if (!RemoteConfig.internalUser) {
-        Log.i(TAG, "Remote config is not on. Exiting.")
-        false
-      } else if (!SignalStore.account.isRegistered) {
+      return if (!SignalStore.account.isRegistered) {
         Log.i(TAG, "Account not registered. Exiting.")
+        false
+      } else if (!SignalStore.registration.isRegistrationComplete) {
+        Log.i(TAG, "Registration is not complete. Exiting.")
+        false
+      } else if (TextSecurePreferences.isUnauthorizedReceived(AppDependencies.application)) {
+        Log.i(TAG, "Account is unauthorized. Exiting.")
         false
       } else if (!SignalStore.settings.automaticVerificationEnabled) {
         Log.i(TAG, "Automatic verification disabled. Exiting.")
         false
-      } else if (SignalStore.account.usernameSyncState != AccountValues.UsernameSyncState.IN_SYNC) {
+      } else if (SignalStore.account.usernameSyncState != AccountValues.UsernameSyncState.IN_SYNC || SignalStore.account.usernameSyncErrorCount > 0) {
         Log.i(TAG, "Username is in a bad state. Exiting.")
         false
       } else if (!Recipient.self().hasAci || !Recipient.self().hasE164) {
@@ -100,6 +109,14 @@ class CheckKeyTransparencyJob private constructor(
         true
       }
     }
+
+    /**
+     * Generates a random delay between 0 - maxHours in milliseconds
+     */
+    private fun getRandomDelay(maxHours: Int): Long {
+      val delay = Random.nextInt(0, maxHours)
+      return delay.hours.inWholeMilliseconds
+    }
   }
 
   override suspend fun doRun(): Result {
@@ -107,7 +124,7 @@ class CheckKeyTransparencyJob private constructor(
       return Result.failure()
     }
 
-    SignalStore.misc.lastKeyTransparencyTime = System.currentTimeMillis()
+    SignalStore.misc.nextKeyTransparencyTime = System.currentTimeMillis() + TIME_BETWEEN_CHECK.inWholeMilliseconds + getRandomDelay(maxHours = 8)
 
     val recipient = SignalDatabase.recipients.getRecord(Recipient.self().id)
 
@@ -117,11 +134,11 @@ class CheckKeyTransparencyJob private constructor(
       aciIdentityKey = SignalStore.account.aciIdentityKey.publicKey,
       e164 = recipient.e164!!,
       unidentifiedAccessKey = ProfileKeyUtil.profileKeyOrNull(recipient.profileKey).let { UnidentifiedAccess.deriveAccessKeyFrom(it) },
-      usernameHash = SignalStore.account.username?.let { Username(it).hash },
+      usernameHash = SignalStore.account.username?.let { Username(it).hash }.takeIf { Recipient.self().usernameSyncMessagesCapability.isSupported },
       keyTransparencyStore = KeyTransparencyStore
     )
 
-    Log.i(TAG, "Key transparency complete, result: $result")
+    Log.i(TAG, "Key transparency complete, result: $result. Included username in check: ${Recipient.self().usernameSyncMessagesCapability.isSupported}, discoverability: ${SignalStore.phoneNumberPrivacy.phoneNumberDiscoverabilityMode}, next check time: ${SignalStore.misc.nextKeyTransparencyTime}")
     return when (result) {
       is RequestResult.Success -> {
         SignalStore.misc.hasKeyTransparencyFailure = false
@@ -130,9 +147,10 @@ class CheckKeyTransparencyJob private constructor(
       }
 
       is RequestResult.NonSuccess -> {
-        if (!showFailure) {
+        if (!showFailure && !SignalStore.misc.hasKeyTransparencyFailure) {
           Log.w(TAG, "Verification failure. Enqueuing this job again to run again a day.")
-          StorageSyncJob.forRemoteChange()
+          AppDependencies.jobManager.add(StorageSyncJob.forRemoteChange())
+          AppDependencies.jobManager.add(RefreshAttributesJob())
           enqueueFollowingFailure()
         } else {
           Log.w(TAG, "Second verification failure. Showing failure sheet.")
@@ -167,9 +185,11 @@ class CheckKeyTransparencyJob private constructor(
    * For others, it will only show once and only be cleared on the next successful verification.
    */
   private fun markFailure() {
-    SignalStore.misc.hasKeyTransparencyFailure = true
-    if (RemoteConfig.internalUser) {
-      SignalStore.misc.hasSeenKeyTransparencyFailure = false
+    if (SignalStore.account.isRegistered && !TextSecurePreferences.isUnauthorizedReceived(AppDependencies.application)) {
+      SignalStore.misc.hasKeyTransparencyFailure = true
+      if (RemoteConfig.internalUser) {
+        SignalStore.misc.hasSeenKeyTransparencyFailure = false
+      }
     }
   }
 

@@ -17,14 +17,12 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.video.StreamingTranscoder
-import org.thoughtcrime.securesms.video.TranscodingPreset
 import org.thoughtcrime.securesms.video.postprocessing.Mp4FaststartPostProcessor
 import org.thoughtcrime.securesms.video.videoconverter.mediadatasource.InputStreamMediaDataSource
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
-import java.time.Instant
 
 /**
  * Repository that performs video transcoding using coroutines.
@@ -34,20 +32,21 @@ class TranscodeTestRepository {
   data class TranscodeResult(val outputUri: Uri, val originalFile: File, val originalSize: Long, val outputSize: Long)
 
   /**
-   * Transcode a video using a [TranscodingPreset] and save the result to the Downloads folder.
+   * Transcode a video using a [TranscodeQuality] and save the result to the Downloads folder.
    */
   @RequiresApi(26)
-  suspend fun transcodeWithPreset(
+  suspend fun transcodeWithQuality(
     context: Context,
     inputUri: Uri,
-    preset: TranscodingPreset,
+    quality: TranscodeQuality,
     enableFastStart: Boolean,
     enableAudioRemux: Boolean,
+    outputTag: String = "preset01",
     onProgress: (Int) -> Unit
   ): TranscodeResult {
-    return doTranscode(context, inputUri, enableFastStart, onProgress) { inputFile ->
+    return doTranscode(context, inputUri, enableFastStart, outputTag, onProgress) { inputFile ->
       val dataSource = FileMediaDataSource(inputFile)
-      StreamingTranscoder(dataSource, null, preset, DEFAULT_FILE_SIZE_LIMIT, enableAudioRemux)
+      StreamingTranscoder(dataSource, null, listOf(quality.qualityTier), DEFAULT_FILE_SIZE_LIMIT, enableAudioRemux, false)
     }
   }
 
@@ -59,9 +58,10 @@ class TranscodeTestRepository {
     context: Context,
     inputUri: Uri,
     options: CustomTranscodingOptions,
+    outputTag: String = "preset01",
     onProgress: (Int) -> Unit
   ): TranscodeResult {
-    return doTranscode(context, inputUri, options.enableFastStart, onProgress) { inputFile ->
+    return doTranscode(context, inputUri, options.enableFastStart, outputTag, onProgress) { inputFile ->
       val dataSource = FileMediaDataSource(inputFile)
       StreamingTranscoder.createManuallyForTesting(
         dataSource,
@@ -70,7 +70,8 @@ class TranscodeTestRepository {
         options.videoBitrate,
         options.audioBitrate,
         options.videoResolution.shortEdge,
-        options.enableAudioRemux
+        options.enableAudioRemux,
+        false
       )
     }
   }
@@ -80,12 +81,13 @@ class TranscodeTestRepository {
     context: Context,
     inputUri: Uri,
     enableFastStart: Boolean,
+    outputTag: String,
     onProgress: (Int) -> Unit,
     createTranscoder: (File) -> StreamingTranscoder
   ): TranscodeResult {
     val inputFilename = inputUri.lastPathSegment?.substringAfterLast('/') ?: "input"
     val baseName = inputFilename.substringBeforeLast('.')
-    val filenameBase = "transcoded-${Instant.now()}-$baseName"
+    val filenameBase = "transcoded-$outputTag-$baseName"
     val tempTranscodeFilename = "$filenameBase.tmp"
     val outputFilename = "$filenameBase.mp4"
 
@@ -143,7 +145,7 @@ class TranscodeTestRepository {
   }
 
   private fun saveToDownloads(context: Context, sourceFile: File, filename: String): Uri {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    if (Build.VERSION.SDK_INT >= 29) {
       return saveToDownloadsMediaStore(context, filename) { outputStream ->
         sourceFile.inputStream().use { it.copyTo(outputStream) }
       }
@@ -157,7 +159,7 @@ class TranscodeTestRepository {
     val processor = Mp4FaststartPostProcessor(inputStreamFactory)
     val sourceLength = sourceFile.length()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    if (Build.VERSION.SDK_INT >= 29) {
       return saveToDownloadsMediaStore(context, filename) { outputStream ->
         processor.processWithMdatLength(sourceLength, mdatSize).use { it.copyTo(outputStream) }
       }
@@ -171,7 +173,7 @@ class TranscodeTestRepository {
     }
   }
 
-  @RequiresApi(Build.VERSION_CODES.Q)
+  @RequiresApi(29)
   private fun saveToDownloadsMediaStore(context: Context, filename: String, writeContent: (java.io.OutputStream) -> Unit): Uri {
     val contentValues = ContentValues().apply {
       put(MediaStore.Downloads.DISPLAY_NAME, filename)

@@ -11,29 +11,25 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -48,7 +44,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,15 +51,17 @@ import kotlinx.coroutines.launch
 import org.signal.core.ui.compose.AllDevicePreviews
 import org.signal.core.ui.compose.BottomSheets
 import org.signal.core.ui.compose.Buttons
+import org.signal.core.ui.compose.KeepScreenOnEffect
 import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.SignalIcons
 import org.signal.core.util.mebiBytes
 import org.signal.registration.R
+import org.signal.registration.screens.shared.RestoreProgress
+import org.signal.registration.screens.shared.RestoreProgressDialog
 import org.signal.registration.test.TestTags
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocalBackupRestoreScreen(
   state: LocalBackupRestoreState,
@@ -87,6 +84,10 @@ fun LocalBackupRestoreScreen(
     }
   }
 
+  if (state.restorePhase == LocalBackupRestoreState.RestorePhase.Preparing || state.restorePhase == LocalBackupRestoreState.RestorePhase.InProgress) {
+    KeepScreenOnEffect()
+  }
+
   when (state.restorePhase) {
     LocalBackupRestoreState.RestorePhase.SelectFolder -> {
       SelectFolderContent(onEvent = onEvent, modifier = modifier)
@@ -101,10 +102,21 @@ fun LocalBackupRestoreScreen(
       NoBackupFoundContent(onEvent = onEvent, modifier = modifier)
     }
     LocalBackupRestoreState.RestorePhase.Preparing -> {
-      PreparingContent(modifier = modifier)
+      if (state.backupInfo?.type == LocalBackupInfo.BackupType.V2) {
+        V2RestoreInProgressContent(state = state, onEvent = onEvent, modifier = modifier)
+      } else {
+        V1PreparingContent(modifier = modifier)
+      }
     }
     LocalBackupRestoreState.RestorePhase.InProgress -> {
-      InProgressContent(progressFraction = state.progressFraction, onEvent = onEvent, modifier = modifier)
+      if (state.backupInfo?.type == LocalBackupInfo.BackupType.V2) {
+        V2RestoreInProgressContent(state = state, onEvent = onEvent, modifier = modifier)
+      } else {
+        V1InProgressContent(progressFraction = state.progressFraction, onEvent = onEvent, modifier = modifier)
+      }
+    }
+    LocalBackupRestoreState.RestorePhase.IncorrectCredential -> {
+      IncorrectCredentialContent(backupType = state.backupInfo?.type, onEvent = onEvent, modifier = modifier)
     }
     LocalBackupRestoreState.RestorePhase.Error -> {
       ErrorContent(errorMessage = state.errorMessage, onEvent = onEvent, modifier = modifier)
@@ -117,85 +129,43 @@ private fun SelectFolderContent(
   onEvent: (LocalBackupRestoreEvents) -> Unit,
   modifier: Modifier = Modifier
 ) {
-  val scrollState = rememberScrollState()
-
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .verticalScroll(scrollState)
-      .padding(horizontal = 24.dp)
-      .testTag(TestTags.LOCAL_BACKUP_RESTORE_SCREEN),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    Spacer(modifier = Modifier.height(40.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__restore_on_device_backup),
-      style = MaterialTheme.typography.headlineMedium,
-      modifier = Modifier.fillMaxWidth()
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__select_folder_description),
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      modifier = Modifier.fillMaxWidth()
-    )
-
-    Spacer(modifier = Modifier.height(28.dp))
-
-    BackupOptionCard(
-      icon = {
-        Icon(
-          painter = painterResource(R.drawable.symbol_folder_24),
-          contentDescription = null,
-          tint = MaterialTheme.colorScheme.primary,
-          modifier = Modifier.size(32.dp)
-        )
-      },
-      title = stringResource(R.string.LocalBackupRestoreScreen__choose_backup_folder),
-      subtitle = stringResource(R.string.LocalBackupRestoreScreen__choose_folder_subtitle),
-      onClick = { onEvent(LocalBackupRestoreEvents.PickBackupFolder) },
-      modifier = Modifier.testTag(TestTags.LOCAL_BACKUP_RESTORE_SELECT_FOLDER_BUTTON)
-    )
-
-    Spacer(modifier = Modifier.weight(1f))
-
-    TextButton(
-      onClick = { onEvent(LocalBackupRestoreEvents.Cancel) },
-      modifier = Modifier.padding(bottom = 32.dp)
-    ) {
-      Text(
-        text = stringResource(android.R.string.cancel),
-        color = MaterialTheme.colorScheme.primary
+  LocalBackupRestoreLayout(
+    modifier = modifier,
+    description = { twoPane ->
+      Description(
+        headline = stringResource(R.string.LocalBackupRestoreScreen__restore_on_device_backup),
+        body = stringResource(R.string.LocalBackupRestoreScreen__select_folder_description),
+        twoPane = twoPane
       )
+    },
+    content = {
+      BackupOptionCard(
+        icon = {
+          Icon(
+            imageVector = SignalIcons.Folder.imageVector,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(32.dp)
+          )
+        },
+        title = stringResource(R.string.LocalBackupRestoreScreen__choose_backup_folder),
+        subtitle = stringResource(R.string.LocalBackupRestoreScreen__choose_folder_subtitle),
+        onClick = { onEvent(LocalBackupRestoreEvents.PickBackupFolder) },
+        modifier = Modifier.testTag(TestTags.LOCAL_BACKUP_RESTORE_SELECT_FOLDER_BUTTON)
+      )
+    },
+    secondaryButton = { buttonModifier ->
+      CancelButton(onEvent, buttonModifier)
     }
-  }
+  )
 }
 
 @Composable
 private fun ScanningContent(modifier: Modifier = Modifier) {
-  Column(
+  Loading(
+    label = stringResource(R.string.LocalBackupRestoreScreen__scanning_folder),
     modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
-      .testTag(TestTags.LOCAL_BACKUP_RESTORE_SCREEN),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
-  ) {
-    CircularProgressIndicator(
-      modifier = Modifier.size(48.dp)
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__scanning_folder),
-      style = MaterialTheme.typography.bodyLarge
-    )
-  }
+  )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -206,7 +176,6 @@ private fun BackupFoundContent(
   onEvent: (LocalBackupRestoreEvents) -> Unit,
   modifier: Modifier = Modifier
 ) {
-  val scrollState = rememberScrollState()
   val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   val coroutineScope = rememberCoroutineScope()
   var showBottomSheet by remember { mutableStateOf(false) }
@@ -232,76 +201,48 @@ private fun BackupFoundContent(
     )
   }
 
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .verticalScroll(scrollState)
-      .padding(horizontal = 24.dp)
-      .testTag(TestTags.LOCAL_BACKUP_RESTORE_SCREEN),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    Spacer(modifier = Modifier.height(40.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__restore_on_device_backup),
-      style = MaterialTheme.typography.headlineMedium,
-      modifier = Modifier.fillMaxWidth()
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__backup_found_description),
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      modifier = Modifier.fillMaxWidth()
-    )
-
-    Spacer(modifier = Modifier.height(28.dp))
-
-    BackupInfoCard(backupInfo = backupInfo)
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    if (allBackups.size > 1) {
-      TextButton(
-        onClick = { showBottomSheet = true }
-      ) {
-        Icon(
-          painter = SignalIcons.Backup.painter,
-          contentDescription = null,
-          modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-          text = stringResource(R.string.LocalBackupRestoreScreen__choose_earlier_backup)
-        )
-      }
-    }
-
-    Spacer(modifier = Modifier.weight(1f))
-
-    Buttons.LargeTonal(
-      onClick = { onEvent(LocalBackupRestoreEvents.RestoreBackup) },
-      modifier = Modifier
-        .fillMaxWidth()
-        .testTag(TestTags.LOCAL_BACKUP_RESTORE_RESTORE_BUTTON)
-    ) {
-      Text(text = stringResource(R.string.LocalBackupRestoreScreen__restore_backup))
-    }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    TextButton(
-      onClick = { onEvent(LocalBackupRestoreEvents.Cancel) },
-      modifier = Modifier.padding(bottom = 32.dp)
-    ) {
-      Text(
-        text = stringResource(android.R.string.cancel),
-        color = MaterialTheme.colorScheme.primary
+  LocalBackupRestoreLayout(
+    modifier = modifier,
+    description = { twoPane ->
+      Description(
+        headline = stringResource(R.string.LocalBackupRestoreScreen__restore_on_device_backup),
+        body = stringResource(R.string.LocalBackupRestoreScreen__backup_found_description),
+        twoPane = twoPane
       )
+    },
+    content = {
+      BackupInfoCard(backupInfo = backupInfo)
+
+      Spacer(modifier = Modifier.height(16.dp))
+
+      if (allBackups.size > 1) {
+        TextButton(
+          onClick = { showBottomSheet = true }
+        ) {
+          Icon(
+            imageVector = SignalIcons.Backup.imageVector,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+          )
+          Spacer(modifier = Modifier.width(8.dp))
+          Text(
+            text = stringResource(R.string.LocalBackupRestoreScreen__choose_earlier_backup)
+          )
+        }
+      }
+    },
+    primaryButton = { buttonModifier ->
+      Buttons.LargeTonal(
+        onClick = { onEvent(LocalBackupRestoreEvents.RestoreBackup) },
+        modifier = buttonModifier.testTag(TestTags.LOCAL_BACKUP_RESTORE_RESTORE_BUTTON)
+      ) {
+        Text(text = stringResource(R.string.LocalBackupRestoreScreen__restore_backup))
+      }
+    },
+    secondaryButton = { buttonModifier ->
+      CancelButton(onEvent, buttonModifier)
     }
-  }
+  )
 }
 
 @Composable
@@ -337,7 +278,7 @@ private fun BackupInfoCard(
 
       Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-          painter = SignalIcons.Recent.painter,
+          imageVector = SignalIcons.Recent.imageVector,
           contentDescription = null,
           tint = MaterialTheme.colorScheme.primary,
           modifier = Modifier.size(20.dp)
@@ -353,14 +294,14 @@ private fun BackupInfoCard(
         Spacer(modifier = Modifier.height(8.dp))
 
         val sizeIcon = if (backupInfo.type == LocalBackupInfo.BackupType.V1) {
-          SignalIcons.File.painter
+          SignalIcons.File.imageVector
         } else {
-          painterResource(R.drawable.symbol_folder_24)
+          SignalIcons.Folder.imageVector
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
           Icon(
-            painter = sizeIcon,
+            imageVector = sizeIcon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(20.dp)
@@ -381,7 +322,7 @@ private fun BackupInfoCard(
 private fun BackupPickerBottomSheet(
   allBackups: List<LocalBackupInfo>,
   initialSelection: LocalBackupInfo,
-  sheetState: androidx.compose.material3.SheetState,
+  sheetState: SheetState,
   onConfirm: (LocalBackupInfo) -> Unit,
   onDismiss: () -> Unit
 ) {
@@ -501,50 +442,28 @@ private fun NoBackupFoundContent(
   onEvent: (LocalBackupRestoreEvents) -> Unit,
   modifier: Modifier = Modifier
 ) {
-  val scrollState = rememberScrollState()
-
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .verticalScroll(scrollState)
-      .padding(horizontal = 24.dp)
-      .testTag(TestTags.LOCAL_BACKUP_RESTORE_SCREEN),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    Spacer(modifier = Modifier.height(40.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__no_backup_found),
-      style = MaterialTheme.typography.headlineMedium,
-      modifier = Modifier.fillMaxWidth()
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__no_backup_found_description),
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      modifier = Modifier.fillMaxWidth()
-    )
-
-    Spacer(modifier = Modifier.height(32.dp))
-
-    OutlinedButton(
-      onClick = { onEvent(LocalBackupRestoreEvents.PickBackupFolder) },
-      modifier = Modifier.fillMaxWidth()
-    ) {
-      Text(text = stringResource(R.string.LocalBackupRestoreScreen__try_different_folder))
+  LocalBackupRestoreLayout(
+    modifier = modifier,
+    description = { twoPane ->
+      Description(
+        headline = stringResource(R.string.LocalBackupRestoreScreen__no_backup_found),
+        body = stringResource(R.string.LocalBackupRestoreScreen__no_backup_found_description),
+        twoPane = twoPane
+      )
+    },
+    content = {},
+    primaryButton = { buttonModifier ->
+      OutlinedButton(
+        onClick = { onEvent(LocalBackupRestoreEvents.PickBackupFolder) },
+        modifier = buttonModifier
+      ) {
+        Text(text = stringResource(R.string.LocalBackupRestoreScreen__try_different_folder))
+      }
+    },
+    secondaryButton = { buttonModifier ->
+      CancelButton(onEvent, buttonModifier)
     }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    TextButton(
-      onClick = { onEvent(LocalBackupRestoreEvents.Cancel) }
-    ) {
-      Text(text = stringResource(android.R.string.cancel))
-    }
-  }
+  )
 }
 
 @Composable
@@ -587,82 +506,102 @@ private fun BackupOptionCard(
 }
 
 @Composable
-private fun PreparingContent(modifier: Modifier = Modifier) {
-  Column(
+private fun V1PreparingContent(modifier: Modifier = Modifier) {
+  Loading(
+    label = stringResource(R.string.LocalBackupRestoreScreen__preparing_restore),
     modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
-      .testTag(TestTags.LOCAL_BACKUP_RESTORE_SCREEN),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
-  ) {
-    CircularProgressIndicator(
-      modifier = Modifier.size(48.dp)
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__preparing_restore),
-      style = MaterialTheme.typography.bodyLarge
-    )
-  }
+  )
 }
 
 @Composable
-private fun InProgressContent(
+private fun V1InProgressContent(
   progressFraction: Float,
   onEvent: (LocalBackupRestoreEvents) -> Unit,
   modifier: Modifier = Modifier
 ) {
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
-      .testTag(TestTags.LOCAL_BACKUP_RESTORE_SCREEN),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
-  ) {
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__restoring_backup),
-      style = MaterialTheme.typography.headlineMedium,
-      textAlign = TextAlign.Center
-    )
+  LocalBackupRestoreLayout(
+    modifier = modifier,
+    description = { twoPane ->
+      Description(
+        headline = stringResource(R.string.LocalBackupRestoreScreen__restoring_backup),
+        body = stringResource(R.string.LocalBackupRestoreScreen__restoring_description),
+        twoPane = twoPane
+      )
+    },
+    content = {
+      Spacer(modifier = Modifier.height(32.dp))
 
-    Spacer(modifier = Modifier.height(8.dp))
+      LinearProgressIndicator(
+        progress = { progressFraction },
+        modifier = Modifier
+          .fillMaxWidth()
+          .testTag(TestTags.LOCAL_BACKUP_RESTORE_PROGRESS_BAR)
+      )
 
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__restoring_description),
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      textAlign = TextAlign.Center
-    )
+      Spacer(modifier = Modifier.height(8.dp))
 
-    Spacer(modifier = Modifier.height(32.dp))
-
-    LinearProgressIndicator(
-      progress = { progressFraction },
-      modifier = Modifier
-        .fillMaxWidth()
-        .testTag(TestTags.LOCAL_BACKUP_RESTORE_PROGRESS_BAR)
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-      text = "${(progressFraction * 100).toInt()}%",
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-
-    Spacer(modifier = Modifier.height(32.dp))
-
-    TextButton(
-      onClick = { onEvent(LocalBackupRestoreEvents.Cancel) }
-    ) {
-      Text(text = stringResource(android.R.string.cancel))
+      Text(
+        text = "${(progressFraction * 100).toInt()}%",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+      )
+    },
+    secondaryButton = { buttonModifier ->
+      CancelButton(onEvent, buttonModifier)
     }
+  )
+}
+
+@Composable
+private fun V2RestoreInProgressContent(
+  state: LocalBackupRestoreState,
+  onEvent: (LocalBackupRestoreEvents) -> Unit,
+  modifier: Modifier = Modifier
+) {
+  BackupFoundContent(
+    backupInfo = state.backupInfo!!,
+    allBackups = state.allBackups,
+    onEvent = onEvent,
+    modifier = modifier
+  )
+
+  RestoreProgressDialog(restoreProgress = state.restoreProgress)
+}
+
+@Composable
+private fun IncorrectCredentialContent(
+  backupType: LocalBackupInfo.BackupType?,
+  onEvent: (LocalBackupRestoreEvents) -> Unit,
+  modifier: Modifier = Modifier
+) {
+  val headline = if (backupType == LocalBackupInfo.BackupType.V1) {
+    stringResource(R.string.LocalBackupRestoreScreen__incorrect_passphrase)
+  } else {
+    stringResource(R.string.LocalBackupRestoreScreen__incorrect_recovery_key)
   }
+
+  LocalBackupRestoreLayout(
+    modifier = modifier,
+    description = { twoPane ->
+      Description(
+        headline = headline,
+        body = stringResource(R.string.LocalBackupRestoreScreen__incorrect_credential_description),
+        twoPane = twoPane
+      )
+    },
+    content = {},
+    primaryButton = { buttonModifier ->
+      OutlinedButton(
+        onClick = { onEvent(LocalBackupRestoreEvents.RestoreBackup) },
+        modifier = buttonModifier
+      ) {
+        Text(text = stringResource(R.string.LocalBackupRestoreScreen__try_again))
+      }
+    },
+    secondaryButton = { buttonModifier ->
+      CancelButton(onEvent, buttonModifier)
+    }
+  )
 }
 
 @Composable
@@ -671,47 +610,28 @@ private fun ErrorContent(
   onEvent: (LocalBackupRestoreEvents) -> Unit,
   modifier: Modifier = Modifier
 ) {
-  Column(
-    modifier = modifier
-      .fillMaxSize()
-      .padding(horizontal = 24.dp)
-      .testTag(TestTags.LOCAL_BACKUP_RESTORE_SCREEN),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center
-  ) {
-    Text(
-      text = stringResource(R.string.LocalBackupRestoreScreen__restore_failed),
-      style = MaterialTheme.typography.headlineMedium,
-      color = MaterialTheme.colorScheme.error,
-      textAlign = TextAlign.Center
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-      text = errorMessage ?: stringResource(R.string.LocalBackupRestoreScreen__restore_failed_description),
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      textAlign = TextAlign.Center
-    )
-
-    Spacer(modifier = Modifier.height(32.dp))
-
-    OutlinedButton(
-      onClick = { onEvent(LocalBackupRestoreEvents.PickBackupFolder) },
-      modifier = Modifier.fillMaxWidth()
-    ) {
-      Text(text = stringResource(R.string.LocalBackupRestoreScreen__try_again))
+  LocalBackupRestoreLayout(
+    modifier = modifier,
+    description = { twoPane ->
+      Description(
+        headline = stringResource(R.string.LocalBackupRestoreScreen__restore_failed),
+        body = errorMessage ?: stringResource(R.string.LocalBackupRestoreScreen__restore_failed_description),
+        twoPane = twoPane
+      )
+    },
+    content = {},
+    primaryButton = { buttonModifier ->
+      OutlinedButton(
+        onClick = { onEvent(LocalBackupRestoreEvents.PickBackupFolder) },
+        modifier = buttonModifier
+      ) {
+        Text(text = stringResource(R.string.LocalBackupRestoreScreen__try_again))
+      }
+    },
+    secondaryButton = { buttonModifier ->
+      CancelButton(onEvent, buttonModifier)
     }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    TextButton(
-      onClick = { onEvent(LocalBackupRestoreEvents.Cancel) }
-    ) {
-      Text(text = stringResource(android.R.string.cancel))
-    }
-  }
+  )
 }
 
 @AllDevicePreviews
@@ -818,10 +738,55 @@ private fun LocalBackupRestoreScreenInProgressPreview() {
 
 @AllDevicePreviews
 @Composable
+private fun LocalBackupRestoreScreenV2InProgressPreview() {
+  Previews.Preview {
+    LocalBackupRestoreScreen(
+      state = LocalBackupRestoreState(
+        restorePhase = LocalBackupRestoreState.RestorePhase.InProgress,
+        backupInfo = LocalBackupInfo(
+          type = LocalBackupInfo.BackupType.V2,
+          date = LocalDateTime.of(2026, 3, 15, 14, 30, 0),
+          name = "signal-backup-2026-03-15-14-30-00",
+          uri = Uri.EMPTY,
+          sizeBytes = 511.mebiBytes.bytes
+        ),
+        restoreProgress = RestoreProgress(
+          phase = RestoreProgress.Phase.Restoring,
+          bytesCompleted = 332.mebiBytes.bytes,
+          totalBytes = 511.mebiBytes.bytes
+        )
+      ),
+      onEvent = {}
+    )
+  }
+}
+
+@AllDevicePreviews
+@Composable
 private fun LocalBackupRestoreScreenErrorPreview() {
   Previews.Preview {
     LocalBackupRestoreScreen(
       state = LocalBackupRestoreState(restorePhase = LocalBackupRestoreState.RestorePhase.Error, errorMessage = "Backup file is corrupted"),
+      onEvent = {}
+    )
+  }
+}
+
+@AllDevicePreviews
+@Composable
+private fun LocalBackupRestoreScreenIncorrectCredentialPreview() {
+  Previews.Preview {
+    LocalBackupRestoreScreen(
+      state = LocalBackupRestoreState(
+        restorePhase = LocalBackupRestoreState.RestorePhase.IncorrectCredential,
+        backupInfo = LocalBackupInfo(
+          type = LocalBackupInfo.BackupType.V2,
+          date = LocalDateTime.of(2026, 3, 15, 14, 30, 0),
+          name = "signal-backup-2026-03-15-14-30-00",
+          uri = Uri.EMPTY,
+          sizeBytes = 511.mebiBytes.bytes
+        )
+      ),
       onEvent = {}
     )
   }

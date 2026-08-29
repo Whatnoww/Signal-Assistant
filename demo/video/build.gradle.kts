@@ -19,7 +19,10 @@ val localProperties: Properties? = if (localPropertiesFile.exists()) {
 
 android {
   namespace = "org.thoughtcrime.video.app"
-  compileSdkVersion(libs.versions.compileSdk.get())
+
+  compileSdk {
+    version = release(libs.versions.compileSdk.get().toInt())
+  }
 
   defaultConfig {
     applicationId = "org.thoughtcrime.video.app"
@@ -41,8 +44,10 @@ android {
 
   buildTypes {
     release {
-      isMinifyEnabled = false
+      isMinifyEnabled = true
+      isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      signingConfig = signingConfigs.getByName("debug")
     }
   }
   compileOptions {
@@ -54,7 +59,18 @@ android {
   }
   packaging {
     resources {
-      excludes += "/META-INF/{AL2.0,LGPL2.1}"
+      excludes += setOf(
+        "/META-INF/{AL2.0,LGPL2.1}",
+        "**/*.dylib",
+        "**/*.dll"
+      )
+    }
+    jniLibs {
+      excludes += setOf(
+        "**/libsignal_jni_testing.so",
+        "**/*.dylib",
+        "**/*.dll"
+      )
     }
   }
 
@@ -63,7 +79,7 @@ android {
     if (sampleVideosPath != null) {
       val sampleVideosDir = File(sampleVideosPath)
       if (sampleVideosDir.isDirectory) {
-        getByName("androidTest").assets.srcDir(sampleVideosDir)
+        getByName("androidTest").assets.directories.add(sampleVideosPath)
       }
     }
   }
@@ -79,8 +95,9 @@ dependencies {
   implementation(project(":lib:video"))
   implementation(project(":core:util"))
   implementation(project(":core:ui"))
+  implementation(libs.androidx.documentfile)
   implementation(libs.androidx.compose.ui.tooling.core)
-  implementation(libs.androidx.compose.ui.test.manifest)
+  debugImplementation(libs.androidx.compose.ui.test.manifest)
   androidTestImplementation(testLibs.junit.junit)
   androidTestImplementation(testLibs.androidx.test.runner)
   androidTestImplementation(testLibs.androidx.test.ext.junit.ktx)

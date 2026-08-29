@@ -42,6 +42,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import org.signal.core.util.DrawableUtil;
 
 public final class AvatarUtil {
 
@@ -114,7 +115,7 @@ public final class AvatarUtil {
 
   @WorkerThread
   public static @NonNull IconCompat getIconCompat(@NonNull Context context, @NonNull Recipient recipient) {
-    if (Build.VERSION.SDK_INT > 29) {
+    if (Build.VERSION.SDK_INT > 29 && Build.VERSION.SDK_INT < 36) {
       return IconCompat.createWithContentUri(AvatarProvider.getContentUri(recipient.getId()));
     } else {
       return IconCompat.createWithBitmap(getBitmapForNotification(context, recipient, AdaptiveBitmapMetrics.getInnerWidth()));
@@ -127,17 +128,17 @@ public final class AvatarUtil {
    */
   @WorkerThread
   public static @NonNull IconCompat getIconCompatForShortcut(@NonNull Context context, @NonNull Recipient recipient) {
-    int    size  = AdaptiveBitmapMetrics.getInnerWidth();
-    Bitmap inner;
-
     if (recipient.isSelf()) {
-      inner = DrawableUtil.toBitmap(getNoteToSelfDrawable(context, recipient.getAvatarColor(), size), size, size);
-    } else {
-      inner = getBitmapForNotification(context, recipient, size);
+      return getIconCompatForNoteToSelf(context, recipient);
     }
+    return IconCompat.createWithBitmap(getBitmapForNotification(context, recipient, AdaptiveBitmapMetrics.getInnerWidth()));
+  }
 
-    Bitmap wrapped = DrawableUtil.wrapBitmapForShortcutInfo(inner);
-    return IconCompat.createWithAdaptiveBitmap(wrapped);
+  @WorkerThread
+  public static @NonNull IconCompat getIconCompatForNoteToSelf(@NonNull Context context, @NonNull Recipient recipient) {
+    int      size               = AdaptiveBitmapMetrics.getInnerWidth();
+    Drawable noteToSelfDrawable = getNoteToSelfDrawable(context, recipient.getAvatarColor(), size);
+    return IconCompat.createWithBitmap(DrawableUtil.toBitmap(noteToSelfDrawable, size, size));
   }
 
   @WorkerThread
@@ -243,27 +244,13 @@ public final class AvatarUtil {
     }
 
     @Override
-    public void onDestroy() {
-      Log.d(TAG, "AvatarTarget: onDestroy");
-      super.onDestroy();
-    }
-
-    @Override
-    public void onLoadStarted(@Nullable Drawable placeholder) {
-      Log.d(TAG, "AvatarTarget: onLoadStarted");
-      super.onLoadStarted(placeholder);
-    }
-
-    @Override
     public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-      Log.d(TAG, "AvatarTarget: onResourceReady");
       bitmap.set(resource);
       countDownLatch.countDown();
     }
 
     @Override
     public void onLoadFailed(@Nullable Drawable errorDrawable) {
-      Log.d(TAG, "AvatarTarget: onLoadFailed");
       if (errorDrawable == null) {
         throw new AssertionError("Expected an error drawable.");
       }
@@ -275,7 +262,6 @@ public final class AvatarUtil {
 
     @Override
     public void onLoadCleared(@Nullable Drawable placeholder) {
-      Log.d(TAG, "AvatarTarget: onLoadCleared");
       bitmap.set(null);
       countDownLatch.countDown();
     }

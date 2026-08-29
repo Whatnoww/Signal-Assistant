@@ -3,7 +3,7 @@ package org.thoughtcrime.securesms.testing
 import android.app.Application
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import org.thoughtcrime.securesms.crypto.AttachmentSecret
+import org.signal.core.util.crypto.AttachmentSecret
 import org.thoughtcrime.securesms.crypto.DatabaseSecret
 import org.thoughtcrime.securesms.database.SignalDatabase
 import java.security.SecureRandom
@@ -15,8 +15,9 @@ import net.zetetic.database.sqlcipher.SQLiteDatabase as SQLCipherSQLiteDatabase
 class TestSignalDatabase(
   context: Application,
   val supportReadableDatabase: SupportSQLiteDatabase,
-  val supportWritableDatabase: SupportSQLiteDatabase
-) : SignalDatabase(context, DatabaseSecret(ByteArray(32).apply { SecureRandom().nextBytes(this) }), AttachmentSecret()) {
+  val supportWritableDatabase: SupportSQLiteDatabase,
+  name: String = SignalDatabase.DATABASE_NAME
+) : SignalDatabase(context, DatabaseSecret(ByteArray(32).apply { SecureRandom().nextBytes(this) }), AttachmentSecret(null, null, ByteArray(32).apply { SecureRandom().nextBytes(this) }), name) {
 
   constructor(context: Application, testOpenHelper: SupportSQLiteOpenHelper) : this(context, testOpenHelper.readableDatabase, testOpenHelper.writableDatabase)
 

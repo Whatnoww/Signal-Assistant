@@ -11,15 +11,30 @@ object Environment {
   const val IS_STAGING: Boolean = BuildConfig.BUILD_ENVIRONMENT_TYPE == "Staging" || BuildConfig.BUILD_ENVIRONMENT_TYPE == "Pnp" || BuildConfig.BUILD_ENVIRONMENT_TYPE == "Backup"
   const val IS_NIGHTLY: Boolean = BuildConfig.BUILD_DISTRIBUTION_TYPE == "nightly"
   const val IS_WEBSITE: Boolean = BuildConfig.BUILD_DISTRIBUTION_TYPE == "website"
-  const val IS_INSTRUMENTATION: Boolean = BuildConfig.BUILD_VARIANT_TYPE == "Instrumentation" || BuildConfig.BUILD_VARIANT_TYPE == "Benchmark"
   const val IS_BENCHMARK: Boolean = BuildConfig.BUILD_VARIANT_TYPE == "Benchmark"
   const val IS_PERF: Boolean = BuildConfig.BUILD_VARIANT_TYPE == "Perf"
 
+  @JvmField
+  var IS_INSTRUMENTATION: Boolean = IS_BENCHMARK
+
+  @JvmStatic
   fun isInternal(): Boolean {
     return !IS_INSTRUMENTATION && (BuildConfig.DEBUG || IS_NIGHTLY || IS_PERF || IS_STAGING)
   }
 
-  const val USE_NEW_REGISTRATION: Boolean = false
+  @JvmField
+  val USE_NEW_REGISTRATION: Boolean = true
+
+  @JvmField
+  val IS_LINK_AND_SYNC_AVAILABLE: Boolean = true
+
+  const val PHONENUMBERLESS_REGISTRATION: Boolean = false
+
+  /**
+   * When true, all local knowledge of the user's phone number (E164 and PNI) is wiped once registration completes,
+   * mimicking the experience of an account that has no phone number. Flip manually for local testing.
+   */
+  const val MOCK_PHONE_NUMBERLESS_REGISTRATION: Boolean = false
 
   object Backups {
     @JvmStatic

@@ -1,17 +1,22 @@
 package org.whispersystems.signalservice.internal.websocket;
 
+import org.signal.network.websocket.WebSocketRequestMessage;
+import org.signal.network.websocket.WebSocketResponseMessage;
+import org.signal.network.websocket.WebSocketMessage;
+import org.signal.network.websocket.WebsocketResponse;
+
 import org.jetbrains.annotations.NotNull;
-import org.signal.libsignal.protocol.logging.Log;
-import org.whispersystems.signalservice.api.push.TrustStore;
-import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException;
+import org.signal.core.util.logging.Log;
+import org.signal.network.config.TrustStore;
+import org.signal.network.exceptions.NonSuccessfulResponseCodeException;
 import org.whispersystems.signalservice.api.util.CredentialsProvider;
-import org.whispersystems.signalservice.api.util.Tls12SocketFactory;
-import org.whispersystems.signalservice.api.util.TlsProxySocketFactory;
+import org.signal.network.util.Tls12SocketFactory;
+import org.signal.network.util.TlsProxySocketFactory;
 import org.whispersystems.signalservice.api.websocket.HealthMonitor;
 import org.whispersystems.signalservice.api.websocket.WebSocketConnectionState;
-import org.whispersystems.signalservice.internal.configuration.SignalProxy;
-import org.whispersystems.signalservice.internal.configuration.SignalServiceConfiguration;
-import org.whispersystems.signalservice.internal.configuration.SignalServiceUrl;
+import org.signal.network.config.SignalProxy;
+import org.signal.network.config.SignalServiceConfiguration;
+import org.signal.network.config.SignalServiceUrl;
 import org.whispersystems.signalservice.internal.util.BlacklistingTrustManager;
 import org.whispersystems.signalservice.internal.util.Util;
 

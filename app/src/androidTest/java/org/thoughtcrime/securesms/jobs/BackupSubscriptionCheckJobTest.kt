@@ -6,6 +6,9 @@
 package org.thoughtcrime.securesms.jobs
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
@@ -27,6 +30,9 @@ import org.signal.core.util.billing.BillingPurchaseState
 import org.signal.core.util.billing.BillingResponseCode
 import org.signal.core.util.money.FiatMoney
 import org.signal.donations.InAppPaymentType
+import org.signal.network.NetworkResult
+import org.signal.network.exceptions.NonSuccessfulResponseCodeException
+import org.signal.network.service.ArchiveError
 import org.thoughtcrime.securesms.backup.DeletionState
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.backup.v2.MessageBackupTier
@@ -40,10 +46,10 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.net.SignalNetwork
+import org.thoughtcrime.securesms.testing.Flag
+import org.thoughtcrime.securesms.testing.RemoteConfigForTest
 import org.thoughtcrime.securesms.testing.SignalActivityRule
-import org.thoughtcrime.securesms.util.RemoteConfig
-import org.whispersystems.signalservice.api.NetworkResult
-import org.whispersystems.signalservice.api.push.exceptions.NonSuccessfulResponseCodeException
+import org.thoughtcrime.securesms.testing.TestRemoteConfigFlag
 import org.whispersystems.signalservice.api.storage.IAPSubscriptionId
 import org.whispersystems.signalservice.api.subscriptions.ActiveSubscription
 import org.whispersystems.signalservice.api.subscriptions.ActiveSubscription.ChargeFailure
@@ -55,6 +61,7 @@ import java.util.Currency
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
 
+@RemoteConfigForTest(flags = [Flag(TestRemoteConfigFlag.INTERNAL_USER, "true") ])
 @RunWith(AndroidJUnit4::class)
 class BackupSubscriptionCheckJobTest {
 
@@ -67,9 +74,6 @@ class BackupSubscriptionCheckJobTest {
 
   @Before
   fun setUp() {
-    mockkObject(RemoteConfig)
-    every { RemoteConfig.internalUser } returns true
-
     coEvery { AppDependencies.billingApi.getApiAvailability() } returns BillingResponseCode.OK
 
     coEvery { AppDependencies.billingApi.queryPurchases() } returns BillingPurchaseResult.Success(
@@ -88,25 +92,12 @@ class BackupSubscriptionCheckJobTest {
     every { RecurringInAppPaymentRepository.getActiveSubscriptionSync(InAppPaymentSubscriberRecord.Type.BACKUP) } returns NetworkResult.Success(
       createActiveSubscription()
     )
+    every { RecurringInAppPaymentRepository.ensureSubscriberIdSync(any(), any(), any()) } returns Unit
 
     mockkObject(BackupRepository)
-    every { BackupRepository.getBackupTier() } answers {
-      val tier = SignalStore.backup.backupTier
-      if (tier != null) {
-        NetworkResult.Success(tier)
-      } else {
-        NetworkResult.StatusCodeError(NonSuccessfulResponseCodeException(404))
-      }
-    }
+    every { BackupRepository.getBackupTier() } answers { currentTierResult() }
 
-    every { BackupRepository.getBackupTierWithoutDowngrade() } answers {
-      val tier = SignalStore.backup.backupTier
-      if (tier != null) {
-        NetworkResult.Success(tier)
-      } else {
-        NetworkResult.StatusCodeError(NonSuccessfulResponseCodeException(404))
-      }
-    }
+    every { BackupRepository.getBackupTierWithoutDowngrade() } answers { currentTierResult() }
 
     every { BackupRepository.resetInitializedStateAndAuthCredentials() } returns Unit
 
@@ -119,8 +110,6 @@ class BackupSubscriptionCheckJobTest {
         number = "+1234567890"
       )
     )
-
-    every { AppDependencies.donationsApi.putSubscription(any()) } returns NetworkResult.Success(Unit)
 
     insertSubscriber()
   }
@@ -142,26 +131,22 @@ class BackupSubscriptionCheckJobTest {
 
   @Test
   fun givenUserIsNotRegistered_whenIRun_thenIExpectSuccessAndEarlyExit() {
-    mockkObject(SignalStore.account) {
-      every { SignalStore.account.isRegistered } returns false
+    SignalStore.account.setRegistered(false)
 
-      val job = BackupSubscriptionCheckJob.create()
-      val result = job.run()
+    val job = BackupSubscriptionCheckJob.create()
+    val result = job.run()
 
-      assertEarlyExit(result)
-    }
+    assertEarlyExit(result)
   }
 
   @Test
   fun givenIsLinkedDevice_whenIRun_thenIExpectSuccessAndEarlyExit() {
-    mockkObject(SignalStore.account) {
-      every { SignalStore.account.isLinkedDevice } returns true
+    SignalStore.account.deviceId = 2
 
-      val job = BackupSubscriptionCheckJob.create()
-      val result = job.run()
+    val job = BackupSubscriptionCheckJob.create()
+    val result = job.run()
 
-      assertEarlyExit(result)
-    }
+    assertEarlyExit(result)
   }
 
   @Test
@@ -469,7 +454,7 @@ class BackupSubscriptionCheckJobTest {
 
     // Set up mismatched state: local tier is PAID but ZK tier is FREE
     SignalStore.backup.backupTier = MessageBackupTier.PAID
-    every { BackupRepository.getBackupTierWithoutDowngrade() } returns NetworkResult.Success(MessageBackupTier.FREE)
+    every { BackupRepository.getBackupTierWithoutDowngrade() } returns MessageBackupTier.FREE.right()
     every { BackupRepository.resetInitializedStateAndAuthCredentials() } returns Unit
 
     val job = BackupSubscriptionCheckJob.create()
@@ -490,7 +475,7 @@ class BackupSubscriptionCheckJobTest {
 
     // Set up synced state: both local and ZK tiers are PAID
     SignalStore.backup.backupTier = MessageBackupTier.PAID
-    every { BackupRepository.getBackupTierWithoutDowngrade() } returns NetworkResult.Success(MessageBackupTier.PAID)
+    every { BackupRepository.getBackupTierWithoutDowngrade() } returns MessageBackupTier.PAID.right()
 
     val job = BackupSubscriptionCheckJob.create()
     val result = job.run()
@@ -509,7 +494,7 @@ class BackupSubscriptionCheckJobTest {
 
     SignalStore.backup.backupTier = MessageBackupTier.PAID
     // ZK credential fetch fails, should trigger refresh
-    every { BackupRepository.getBackupTierWithoutDowngrade() } returns NetworkResult.StatusCodeError(NonSuccessfulResponseCodeException(500))
+    every { BackupRepository.getBackupTierWithoutDowngrade() } returns ArchiveError.NetworkError(IOException("Server error: 500")).left()
     every { BackupRepository.resetInitializedStateAndAuthCredentials() } returns Unit
 
     val job = BackupSubscriptionCheckJob.create()
@@ -673,5 +658,9 @@ class BackupSubscriptionCheckJobTest {
       purchaseTime = System.currentTimeMillis(),
       isAutoRenewing = false // Not auto-renewing means canceled
     )
+  }
+
+  private fun currentTierResult(): Either<ArchiveError.CredentialError, MessageBackupTier> {
+    return SignalStore.backup.backupTier?.right() ?: ArchiveError.CredentialError.NotFound(NonSuccessfulResponseCodeException(404)).left()
   }
 }

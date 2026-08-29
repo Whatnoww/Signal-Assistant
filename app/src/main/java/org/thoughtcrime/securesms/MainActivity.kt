@@ -5,17 +5,17 @@
 
 package org.thoughtcrime.securesms
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -25,6 +25,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
@@ -59,10 +60,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.compose.AndroidFragment
 import androidx.fragment.compose.rememberFragmentState
@@ -72,6 +76,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -85,8 +94,10 @@ import kotlinx.coroutines.withContext
 import org.signal.core.ui.BottomSheetUtil
 import org.signal.core.ui.compose.Snackbars
 import org.signal.core.ui.compose.theme.SignalTheme
+import org.signal.core.ui.navigation.TransitionSpecs
 import org.signal.core.ui.permissions.Permissions
 import org.signal.core.ui.rememberIsSplitPane
+import org.signal.core.util.AppForegroundObserver
 import org.signal.core.util.Util
 import org.signal.core.util.concurrent.LifecycleDisposable
 import org.signal.core.util.getParcelableCompat
@@ -100,11 +111,14 @@ import org.thoughtcrime.securesms.backup.v2.ArchiveRestoreProgressState
 import org.thoughtcrime.securesms.backup.v2.ui.CouldNotCompleteBackupRestoreSheet
 import org.thoughtcrime.securesms.backup.v2.ui.verify.VerifyBackupKeyActivity
 import org.thoughtcrime.securesms.calls.YouAreAlreadyInACallSnackbar.show
+import org.thoughtcrime.securesms.calls.callsNavEntries
 import org.thoughtcrime.securesms.calls.log.CallLogFilter
 import org.thoughtcrime.securesms.calls.log.CallLogFragment
 import org.thoughtcrime.securesms.calls.new.NewCallActivity
 import org.thoughtcrime.securesms.calls.quality.CallQuality
 import org.thoughtcrime.securesms.calls.quality.CallQualityBottomSheetFragment
+import org.thoughtcrime.securesms.chats.ConversationTransitionState
+import org.thoughtcrime.securesms.chats.chatsNavEntries
 import org.thoughtcrime.securesms.components.DebugLogsPromptDialogFragment
 import org.thoughtcrime.securesms.components.PromptBatterySaverDialogFragment
 import org.thoughtcrime.securesms.components.compose.ConnectivityWarningBottomSheet
@@ -117,12 +131,12 @@ import org.thoughtcrime.securesms.components.settings.app.subscription.GooglePay
 import org.thoughtcrime.securesms.components.snackbars.LocalSnackbarStateConsumerRegistry
 import org.thoughtcrime.securesms.components.snackbars.SnackbarHostKey
 import org.thoughtcrime.securesms.components.snackbars.SnackbarState
+import org.thoughtcrime.securesms.components.verificationrequested.VerificationCodeRequestedBottomSheet
 import org.thoughtcrime.securesms.components.voice.VoiceNoteMediaController
 import org.thoughtcrime.securesms.components.voice.VoiceNoteMediaControllerOwner
 import org.thoughtcrime.securesms.conversation.ConversationIntents
 import org.thoughtcrime.securesms.conversation.NewConversationActivity
 import org.thoughtcrime.securesms.conversation.v2.MotionEventRelay
-import org.thoughtcrime.securesms.conversation.v2.ShareDataTimestampViewModel
 import org.thoughtcrime.securesms.conversationlist.ConversationListArchiveFragment
 import org.thoughtcrime.securesms.conversationlist.ConversationListFragment
 import org.thoughtcrime.securesms.conversationlist.RelinkDevicesReminderBottomSheetFragment
@@ -133,8 +147,6 @@ import org.thoughtcrime.securesms.devicetransfer.olddevice.OldDeviceExitActivity
 import org.thoughtcrime.securesms.groups.ui.creategroup.CreateGroupActivity
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.lock.v2.CreateSvrPinActivity
-import org.thoughtcrime.securesms.main.ChatNavGraphState
-import org.thoughtcrime.securesms.main.DetailsScreenNavHost
 import org.thoughtcrime.securesms.main.MainBottomChrome
 import org.thoughtcrime.securesms.main.MainBottomChromeCallback
 import org.thoughtcrime.securesms.main.MainBottomChromeState
@@ -142,7 +154,6 @@ import org.thoughtcrime.securesms.main.MainContentLayoutData
 import org.thoughtcrime.securesms.main.MainMegaphoneState
 import org.thoughtcrime.securesms.main.MainNavigationBar
 import org.thoughtcrime.securesms.main.MainNavigationDetailLocation
-import org.thoughtcrime.securesms.main.MainNavigationDetailLocationEffect
 import org.thoughtcrime.securesms.main.MainNavigationListLocation
 import org.thoughtcrime.securesms.main.MainNavigationRail
 import org.thoughtcrime.securesms.main.MainNavigationRouter
@@ -155,15 +166,7 @@ import org.thoughtcrime.securesms.main.MainToolbarMode
 import org.thoughtcrime.securesms.main.MainToolbarState
 import org.thoughtcrime.securesms.main.MainToolbarViewModel
 import org.thoughtcrime.securesms.main.Material3OnScrollHelperBinder
-import org.thoughtcrime.securesms.main.callNavGraphBuilder
-import org.thoughtcrime.securesms.main.chatNavGraphBuilder
-import org.thoughtcrime.securesms.main.navigateToDetailLocation
-import org.thoughtcrime.securesms.main.rememberDetailNavHostController
-import org.thoughtcrime.securesms.main.rememberFocusRequester
-import org.thoughtcrime.securesms.main.storiesNavGraphBuilder
-import org.thoughtcrime.securesms.mediasend.camerax.CameraXRemoteConfig
-import org.thoughtcrime.securesms.mediasend.v2.MediaSelectionActivity
-import org.thoughtcrime.securesms.mediasend.v3.mediaSendLauncher
+import org.thoughtcrime.securesms.mediasend.MediaSendLauncher
 import org.thoughtcrime.securesms.megaphone.Megaphone
 import org.thoughtcrime.securesms.megaphone.MegaphoneActionController
 import org.thoughtcrime.securesms.megaphone.Megaphones
@@ -176,15 +179,12 @@ import org.thoughtcrime.securesms.service.BackupMediaRestoreService
 import org.thoughtcrime.securesms.service.KeyCachingService
 import org.thoughtcrime.securesms.starred.StarredMessagesActivity
 import org.thoughtcrime.securesms.stories.Stories
-import org.thoughtcrime.securesms.stories.archive.StoryArchiveActivity
 import org.thoughtcrime.securesms.stories.landing.StoriesLandingFragment
-import org.thoughtcrime.securesms.stories.settings.StorySettingsActivity
-import org.thoughtcrime.securesms.util.AppForegroundObserver
+import org.thoughtcrime.securesms.stories.storiesNavEntries
 import org.thoughtcrime.securesms.util.AppStartup
 import org.thoughtcrime.securesms.util.CachedInflater
 import org.thoughtcrime.securesms.util.CommunicationActions
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme
-import org.thoughtcrime.securesms.util.DynamicTheme
 import org.thoughtcrime.securesms.util.Material3OnScrollHelper
 import org.thoughtcrime.securesms.util.SplashScreenUtil
 import org.thoughtcrime.securesms.util.TopToastPopup
@@ -196,6 +196,7 @@ import org.thoughtcrime.securesms.window.AppScaffoldNavigator
 import org.thoughtcrime.securesms.window.NavigationType
 import org.thoughtcrime.securesms.window.rememberThreePaneScaffoldNavigatorDelegate
 import org.whispersystems.signalservice.api.websocket.WebSocketConnectionState
+import kotlin.time.Duration.Companion.minutes
 import org.signal.core.ui.R as CoreUiR
 
 class MainActivity :
@@ -258,7 +259,6 @@ class MainActivity :
 
   private val toolbarViewModel: MainToolbarViewModel by viewModels()
   private val toolbarCallback = ToolbarCallback()
-  private val shareDataTimestampViewModel: ShareDataTimestampViewModel by viewModels()
 
   private val motionEventRelay: MotionEventRelay by viewModels()
 
@@ -271,8 +271,6 @@ class MainActivity :
 
   override val googlePayRepository: GooglePayRepository by lazy { GooglePayRepository(this) }
   override val googlePayResultPublisher: Subject<GooglePayComponent.GooglePayResult> = PublishSubject.create()
-
-  private lateinit var mediaSendLauncher: ActivityResultLauncher<MediaSendActivityContract.Args>
 
   override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
     return motionEventRelay.offer(ev) || super.dispatchTouchEvent(ev)
@@ -288,18 +286,8 @@ class MainActivity :
 
     AppStartup.getInstance().onCriticalRenderEventStart()
 
-    enableEdgeToEdge(
-      navigationBarStyle = if (DynamicTheme.isDarkTheme(this)) {
-        SystemBarStyle.dark(0)
-      } else {
-        SystemBarStyle.light(0, 0)
-      }
-    )
-
     super.onCreate(savedInstanceState, ready)
     navigator = MainNavigator(this, mainNavigationViewModel)
-
-    mediaSendLauncher = mediaSendLauncher()
 
     AppForegroundObserver.addListener(object : AppForegroundObserver.Listener {
       override fun onForeground() {
@@ -358,6 +346,25 @@ class MainActivity :
             }
         }
       }
+
+      launch {
+        repeatOnLifecycle(Lifecycle.State.RESUMED) {
+          SignalStore
+            .account
+            .verificationCodeRequestedAtMsFlow
+            .filter { it > 0L }
+            .collect { requestedAt ->
+              val notificationThreshold = requestedAt + 10.minutes.inWholeMilliseconds
+              if (System.currentTimeMillis() < notificationThreshold) {
+                VerificationCodeRequestedBottomSheet.show(supportFragmentManager, requestedAt)
+              } else {
+                Log.i(TAG, "Verification code requested but is older than 10 minutes, not showing sheet")
+              }
+
+              SignalStore.account.verificationCodeRequestedAtMs = 0L
+            }
+        }
+      }
     }
 
     supportFragmentManager.setFragmentResultListener(
@@ -375,8 +382,6 @@ class MainActivity :
         )
       }
     }
-
-    shareDataTimestampViewModel.setTimestampFromActivityCreation(savedInstanceState, intent)
 
     setContent {
       val mainToolbarState by toolbarViewModel.state.collectAsStateWithLifecycle()
@@ -437,6 +442,33 @@ class MainActivity :
         val listPaneWidth = contentLayoutData.rememberDefaultPanePreferredWidth(maxWidth)
         val navigationType = NavigationType.rememberNavigationType()
 
+        val detailLocation by mainNavigationViewModel.detailLocation.collectAsStateWithLifecycle()
+        val isConversationFullscreen = !isSplitPane &&
+          wrappedNavigator.scaffoldValue.primary == PaneAdaptedValue.Expanded &&
+          detailLocation is MainNavigationDetailLocation.Conversation
+
+        val context = LocalContext.current
+        val isDarkTheme = isSystemInDarkTheme()
+        val navBarColor = when {
+          isSplitPane -> SignalTheme.colors.colorSurface1.toArgb()
+          isConversationFullscreen -> Color.TRANSPARENT
+          else -> ContextCompat.getColor(context, CoreUiR.color.signal_colorSurface2)
+        }
+
+        LaunchedEffect(isDarkTheme, navBarColor) {
+          if (Build.VERSION.SDK_INT >= 26) {
+            enableEdgeToEdge(
+              navigationBarStyle = if (isDarkTheme) {
+                SystemBarStyle.dark(navBarColor)
+              } else {
+                SystemBarStyle.light(navBarColor, navBarColor)
+              }
+            )
+          } else {
+            enableEdgeToEdge()
+          }
+        }
+
         val anchors = remember(contentLayoutData, mainToolbarState, listPaneWidth, navigationType) {
           val halfPartitionWidth = contentLayoutData.partitionWidth / 2
 
@@ -478,69 +510,21 @@ class MainActivity :
           }
         }
 
-        val chatNavGraphState = ChatNavGraphState.remember(isSplitPane)
+        val convoTransitionState = ConversationTransitionState.remember(isSplitPane)
         val mutableInteractionSource = remember { MutableInteractionSource() }
-        MainNavigationDetailLocationEffect(mainNavigationViewModel, chatNavGraphState::writeGraphicsLayerToBitmap)
 
-        val chatsNavHostController = rememberDetailNavHostController(
-          onRequestFocus = rememberFocusRequester(
-            mainNavigationViewModel = mainNavigationViewModel,
-            currentListLocation = mainNavigationState.currentListLocation,
-            isTargetListLocation = { it in listOf(MainNavigationListLocation.CHATS, MainNavigationListLocation.ARCHIVE) }
-          )
-        ) {
-          chatNavGraphBuilder(chatNavGraphState)
+        LaunchedEffect(convoTransitionState) {
+          mainNavigationViewModel.setChatListSnapshotCaptureProvider { convoTransitionState.writeGraphicsLayerToBitmap() }
         }
 
-        val callsNavHostController = rememberDetailNavHostController(
-          onRequestFocus = rememberFocusRequester(
-            mainNavigationViewModel = mainNavigationViewModel,
-            currentListLocation = mainNavigationState.currentListLocation
-          ) { it == MainNavigationListLocation.CALLS }
-        ) {
-          callNavGraphBuilder(it)
-        }
-
-        val storiesNavHostController = rememberDetailNavHostController(
-          onRequestFocus = rememberFocusRequester(
-            mainNavigationViewModel = mainNavigationViewModel,
-            currentListLocation = mainNavigationState.currentListLocation
-          ) { it == MainNavigationListLocation.STORIES }
-        ) {
-          storiesNavGraphBuilder()
-        }
-
-        LaunchedEffect(Unit) {
-          suspend fun navigateToLocation(location: MainNavigationDetailLocation) {
-            when (location) {
-              is MainNavigationDetailLocation.Empty -> {
-                when (mainNavigationState.currentListLocation) {
-                  MainNavigationListLocation.CHATS, MainNavigationListLocation.ARCHIVE -> chatsNavHostController
-                  MainNavigationListLocation.CALLS -> callsNavHostController
-                  MainNavigationListLocation.STORIES -> storiesNavHostController
-                }.navigateToDetailLocation(location)
-              }
-
-              is MainNavigationDetailLocation.Conversation -> {
-                chatNavGraphState.writeGraphicsLayerToBitmap()
-                chatsNavHostController.navigateToDetailLocation(location)
-              }
-
-              is MainNavigationDetailLocation.Chats -> chatsNavHostController.navigateToDetailLocation(location)
-              is MainNavigationDetailLocation.CallLinkDetails -> callsNavHostController.navigateToDetailLocation(location)
-              is MainNavigationDetailLocation.Calls -> callsNavHostController.navigateToDetailLocation(location)
-              is MainNavigationDetailLocation.Stories -> storiesNavHostController.navigateToDetailLocation(location)
-            }
-          }
-
-          mainNavigationViewModel.earlyNavigationDetailLocationRequested?.let { navigateToLocation(it) }
-          mainNavigationViewModel.clearEarlyDetailLocation()
-
-          mainNavigationViewModel.detailLocation.collect { navigateToLocation(it) }
+        LaunchedEffect(isSplitPane) {
+          mainNavigationViewModel.onSplitPaneChanged(isSplitPane)
         }
 
         val scope = rememberCoroutineScope()
+
         BackHandler(paneExpansionState.currentAnchor == detailOnlyAnchor) {
+          mainNavigationViewModel.goTo(MainNavigationDetailLocation.Empty)
           scope.launch {
             paneExpansionState.animateTo(listOnlyAnchor)
           }
@@ -599,7 +583,7 @@ class MainActivity :
 
         AppScaffold(
           navigator = wrappedNavigator,
-          modifier = chatNavGraphState.writeContentToGraphicsLayer(),
+          modifier = convoTransitionState.writeContentToGraphicsLayer(),
           paneExpansionState = paneExpansionState,
           contentWindowInsets = WindowInsets(),
           snackbarHost = {
@@ -708,26 +692,54 @@ class MainActivity :
             }
           },
           primaryContent = {
-            when (mainNavigationState.currentListLocation) {
-              MainNavigationListLocation.CHATS, MainNavigationListLocation.ARCHIVE -> {
-                DetailsScreenNavHost(
-                  navHostController = chatsNavHostController,
-                  contentLayoutData = contentLayoutData
-                )
-              }
+            Box(
+              modifier = Modifier
+                .padding(end = contentLayoutData.detailPaddingEnd)
+                .clip(contentLayoutData.shape)
+                .background(color = MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
+            ) {
+              when (mainNavigationState.currentListLocation) {
+                MainNavigationListLocation.CHATS, MainNavigationListLocation.ARCHIVE -> {
+                  NavDisplay<NavKey>(
+                    backStack = mainNavigationViewModel.chatsBackStackEntries,
+                    onBack = { mainNavigationViewModel.popChatsDetailLocation() },
+                    transitionSpec = { TransitionSpecs.HorizontalSlide.transitionSpec },
+                    popTransitionSpec = { TransitionSpecs.HorizontalSlide.popTransitionSpec },
+                    predictivePopTransitionSpec = { TransitionSpecs.HorizontalSlide.predictivePopTransitionSpec },
+                    entryProvider = entryProvider { chatsNavEntries(convoTransitionState) }
+                  )
+                }
 
-              MainNavigationListLocation.CALLS -> {
-                DetailsScreenNavHost(
-                  navHostController = callsNavHostController,
-                  contentLayoutData = contentLayoutData
-                )
-              }
+                MainNavigationListLocation.CALLS -> {
+                  NavDisplay<NavKey>(
+                    backStack = mainNavigationViewModel.callsBackStackEntries,
+                    onBack = { mainNavigationViewModel.popCallsDetailLocation() },
+                    transitionSpec = { TransitionSpecs.HorizontalSlide.transitionSpec },
+                    popTransitionSpec = { TransitionSpecs.HorizontalSlide.popTransitionSpec },
+                    predictivePopTransitionSpec = { TransitionSpecs.HorizontalSlide.predictivePopTransitionSpec },
+                    entryDecorators = listOf(
+                      rememberSaveableStateHolderNavEntryDecorator(),
+                      rememberViewModelStoreNavEntryDecorator()
+                    ),
+                    entryProvider = entryProvider { callsNavEntries(isSplitPane) }
+                  )
+                }
 
-              MainNavigationListLocation.STORIES -> {
-                DetailsScreenNavHost(
-                  navHostController = storiesNavHostController,
-                  contentLayoutData = contentLayoutData
-                )
+                MainNavigationListLocation.STORIES -> {
+                  NavDisplay<NavKey>(
+                    backStack = mainNavigationViewModel.storiesBackStackEntries,
+                    onBack = { mainNavigationViewModel.popStoriesDetailLocation() },
+                    transitionSpec = { TransitionSpecs.HorizontalSlide.transitionSpec },
+                    popTransitionSpec = { TransitionSpecs.HorizontalSlide.popTransitionSpec },
+                    predictivePopTransitionSpec = { TransitionSpecs.HorizontalSlide.predictivePopTransitionSpec },
+                    entryDecorators = listOf(
+                      rememberSaveableStateHolderNavEntryDecorator(),
+                      rememberViewModelStoreNavEntryDecorator()
+                    ),
+                    entryProvider = entryProvider { storiesNavEntries() }
+                  )
+                }
               }
             }
           },
@@ -741,7 +753,7 @@ class MainActivity :
           } else {
             null
           },
-          animatorFactory = if (mainNavigationState.currentListLocation == MainNavigationListLocation.CHATS || mainNavigationState.currentListLocation == MainNavigationListLocation.ARCHIVE) {
+          animatorFactory = if (mainNavigationState.currentListLocation.isChatsTab) {
             noEnterTransitionFactory
           } else {
             AppScaffoldAnimationStateFactory.Default
@@ -912,7 +924,9 @@ class MainActivity :
     SplashScreenUtil.setSplashScreenThemeIfNecessary(this, SignalStore.settings.theme)
   }
 
-  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray, deviceId: Int) {
+  @Suppress("OVERRIDE_DEPRECATION")
+  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     Permissions.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
   }
 
@@ -965,7 +979,6 @@ class MainActivity :
       onSetToolbarColor = {
         toolbarViewModel.setToolbarColor(it)
       },
-      setStatusBarColor = {},
       lifecycleOwner = lifecycleOwner
     ).attach(recyclerView)
   }
@@ -975,7 +988,6 @@ class MainActivity :
       activity = this,
       views = listOf(chatFolders),
       viewStubs = listOf(),
-      setStatusBarColor = {},
       onSetToolbarColor = {
         toolbarViewModel.setToolbarColor(it)
       },
@@ -1032,11 +1044,34 @@ class MainActivity :
 
   private fun handleConversationIntent(intent: Intent) {
     if (ConversationIntents.isConversationIntent(intent)) {
+      if (!isTrustedConversationIntent(intent)) {
+        Log.w(TAG, "Received a conversation intent through an exported entry point. Ignoring its extras.")
+        intent.action = null
+        setIntent(intent)
+        return
+      }
+
+      val extras = intent.extras
+      if (extras == null) {
+        Log.w(TAG, "Received a conversation intent with no extras. Ignoring it.")
+        intent.action = null
+        setIntent(intent)
+        return
+      }
+
       mainNavigationViewModel.goTo(MainNavigationListLocation.CHATS)
-      mainNavigationViewModel.goTo(MainNavigationDetailLocation.Conversation(ConversationIntents.readArgsFromBundle(intent.extras!!)))
+      mainNavigationViewModel.goTo(MainNavigationDetailLocation.Conversation(ConversationIntents.readArgsFromBundle(extras)))
       intent.action = null
       setIntent(intent)
     }
+  }
+
+  /**
+   * While MainActivity isn't exporting, we have launcher aliases that are, so we verify that someone isn't launching us through those befre
+   * respecting various intent attributes.
+   */
+  private fun isTrustedConversationIntent(intent: Intent): Boolean {
+    return intent.component?.className == MainActivity::class.java.name
   }
 
   private fun handleGroupLinkInIntent(intent: Intent) {
@@ -1122,17 +1157,10 @@ class MainActivity :
   private fun onCameraClick(destination: MainNavigationListLocation, isForQuickRestore: Boolean) {
     val onGranted = {
       if (isForQuickRestore) {
-        startActivity(MediaSelectionActivity.cameraForQuickRestore(context = this@MainActivity))
-      } else if (SignalStore.internal.useNewMediaActivity) {
-        mediaSendLauncher.launch(
-          MediaSendActivityContract.Args(
-            isCameraFirst = false,
-            isStory = destination == MainNavigationListLocation.STORIES
-          )
-        )
+        startActivity(MediaSendLauncher.cameraForQuickRestore(context = this@MainActivity))
       } else {
         startActivity(
-          MediaSelectionActivity.camera(
+          MediaSendLauncher.camera(
             context = this@MainActivity,
             isStory = destination == MainNavigationListLocation.STORIES
           )
@@ -1140,24 +1168,7 @@ class MainActivity :
       }
     }
 
-    if (CameraXRemoteConfig.isSupported()) {
-      onGranted()
-    } else {
-      Permissions.with(this@MainActivity)
-        .request(Manifest.permission.CAMERA)
-        .ifNecessary()
-        .withRationaleDialog(getString(R.string.CameraXFragment_allow_access_camera), getString(R.string.CameraXFragment_to_capture_photos_and_video_allow_camera), CoreUiR.drawable.symbol_camera_24)
-        .withPermanentDenialDialog(
-          getString(R.string.CameraXFragment_signal_needs_camera_access_capture_photos),
-          null,
-          R.string.CameraXFragment_allow_access_camera,
-          R.string.CameraXFragment_to_capture_photos_videos,
-          supportFragmentManager
-        )
-        .onAllGranted(onGranted)
-        .onAnyDenied { Toast.makeText(this@MainActivity, R.string.CameraXFragment_signal_needs_camera_access_capture_photos, Toast.LENGTH_LONG).show() }
-        .execute()
-    }
+    onGranted()
   }
 
   inner class ToolbarCallback : MainToolbarCallback {
@@ -1176,16 +1187,16 @@ class MainActivity :
       toolbarViewModel.markAllMessagesRead()
     }
 
-    override fun onInviteFriendsClick() {
-      openSettings.launch(AppSettingsActivity.invite(this@MainActivity))
-    }
-
     override fun onFilterUnreadChatsClick() {
       toolbarViewModel.setChatFilter(ConversationFilter.UNREAD)
     }
 
     override fun onClearUnreadChatsFilterClick() {
       toolbarViewModel.setChatFilter(ConversationFilter.OFF)
+    }
+
+    override fun onOpenArchiveClick() {
+      mainNavigationViewModel.onArchiveSelected()
     }
 
     override fun onStarredMessagesClick() {
@@ -1227,11 +1238,11 @@ class MainActivity :
     }
 
     override fun onStoryPrivacyClick() {
-      startActivity(StorySettingsActivity.getIntent(this@MainActivity))
+      mainNavigationViewModel.goTo(MainNavigationDetailLocation.Stories.PrivacySettings)
     }
 
     override fun onStoryArchiveClick() {
-      startActivity(StoryArchiveActivity.createIntent(this@MainActivity))
+      mainNavigationViewModel.goTo(MainNavigationDetailLocation.Stories.Archive)
     }
 
     override fun onCloseSearchClick() {

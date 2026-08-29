@@ -5,6 +5,8 @@
 
 package org.thoughtcrime.securesms
 
+import arrow.core.Either
+import kotlinx.coroutines.runBlocking
 import okio.ByteString
 import org.signal.archive.proto.AccountData
 import org.signal.archive.proto.BackupDebugInfo
@@ -22,9 +24,7 @@ import org.thoughtcrime.securesms.backup.v2.local.SnapshotFileSystem
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.net.SignalNetwork
-import org.thoughtcrime.securesms.providers.BlobProvider
 import org.thoughtcrime.securesms.recipients.Recipient
-import org.whispersystems.signalservice.api.NetworkResult
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -56,13 +56,13 @@ class BackupPlugin : Plugin {
 
   private fun getSelectedRemoteBackup(): String {
     Log.d(TAG, "Downloading file...")
-    val tempBackupFile = BlobProvider.getInstance().forNonAutoEncryptingSingleSessionOnDisk(AppDependencies.application)
+    val tempBackupFile = AppDependencies.blobs.forNonAutoEncryptingSingleSessionOnDisk(AppDependencies.application)
 
     when (val result = BackupRepository.downloadBackupFile(tempBackupFile)) {
-      is NetworkResult.Success -> Log.i(TAG, "Download successful")
-      else -> {
-        Log.w(TAG, "Failed to download backup file", result.getCause())
-        return result.getCause().toString()
+      is Either.Right -> Log.i(TAG, "Download successful")
+      is Either.Left -> {
+        Log.w(TAG, "Failed to download backup file", result.value.cause)
+        return result.value.toString()
       }
     }
 
@@ -71,9 +71,9 @@ class BackupPlugin : Plugin {
       return "Failed to read forward secrecy metadata!"
     }
 
-    val svrBAuth = when (val result = BackupRepository.getSvrBAuth()) {
-      is NetworkResult.Success -> result.result
-      else -> return "Failed to read forward secrecy metadata!"
+    val svrBAuth = when (val result = runBlocking { AppDependencies.archiveService.getSvrBAuth() }) {
+      is Either.Right -> result.value
+      is Either.Left -> return "Failed to read forward secrecy metadata!"
     }
 
     val forwardSecrecyToken = when (val result = SignalNetwork.svrB.restore(svrBAuth, SignalStore.backup.messageBackupKey, forwardSecrecyMetadata)) {

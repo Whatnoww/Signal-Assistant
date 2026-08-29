@@ -1,41 +1,36 @@
 package org.thoughtcrime.securesms.storage
 
-import android.app.Application
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import io.mockk.verify
+import okio.ByteString
+import okio.ByteString.Companion.toByteString
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.BeforeClass
-import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import org.signal.core.models.ServiceId
 import org.signal.core.models.ServiceId.ACI
 import org.signal.core.models.ServiceId.PNI
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.database.RecipientTable
+import org.thoughtcrime.securesms.database.SignalDatabase
+import org.thoughtcrime.securesms.jobs.RetrieveProfileJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
+import org.thoughtcrime.securesms.recipients.Recipient
+import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.testutil.EmptyLogger
-import org.thoughtcrime.securesms.testutil.MockAppDependenciesRule
-import org.thoughtcrime.securesms.util.RemoteConfig
 import org.whispersystems.signalservice.api.storage.SignalContactRecord
 import org.whispersystems.signalservice.api.storage.StorageId
 import org.whispersystems.signalservice.internal.storage.protos.ContactRecord
 import java.util.UUID
 
-@RunWith(RobolectricTestRunner::class)
-@Config(application = Application::class)
 class ContactRecordProcessorTest {
-
-  @get:Rule
-  val appDependencies = MockAppDependenciesRule()
 
   lateinit var recipientTable: RecipientTable
 
@@ -45,16 +40,15 @@ class ContactRecordProcessorTest {
     every { SignalStore.account.isPrimaryDevice } returns true
     every { SignalStore.account.e164 } returns "+11234567890"
 
-    mockkObject(RemoteConfig)
-    every { RemoteConfig.useBinaryId } returns true
-
     recipientTable = mockk(relaxed = true)
   }
 
   @After
   fun tearDown() {
-    unmockkObject(RemoteConfig)
     unmockkObject(SignalStore)
+    unmockkObject(Recipient.Companion)
+    unmockkObject(RetrieveProfileJob.Companion)
+    unmockkObject(SignalDatabase.Companion)
   }
 
   @Test
@@ -413,6 +407,256 @@ class ContactRecordProcessorTest {
     assertEquals("Spidey Friend", result.proto.note)
   }
 
+  @Test
+  fun `merge, identityKeys conflict on primary, keepLocal`() {
+    // GIVEN
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        pniBinary = PNI_B.toByteStringWithoutPrefix(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_A
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        pniBinary = PNI_B.toByteStringWithoutPrefix(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_B
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN
+    assertEquals(IDENTITY_KEY_A, result.proto.identityKey)
+  }
+
+  @Test
+  fun `merge, identityKeys conflict on linked device, useRemote`() {
+    // GIVEN
+    every { SignalStore.account.isPrimaryDevice } returns false
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        pniBinary = PNI_B.toByteStringWithoutPrefix(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_A
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        pniBinary = PNI_B.toByteStringWithoutPrefix(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_B
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN
+    assertEquals(IDENTITY_KEY_B, result.proto.identityKey)
+  }
+
+  @Test
+  fun `merge, identityKeys conflict on linked device but has ACI, keepLocal`() {
+    // GIVEN
+    every { SignalStore.account.isPrimaryDevice } returns false
+    mockkObject(Recipient.Companion)
+    mockkObject(RetrieveProfileJob.Companion)
+    mockkObject(SignalDatabase.Companion)
+    every { Recipient.trustedPush(any(), any(), any()) } returns mockk(relaxed = true)
+    every { RetrieveProfileJob.enqueue(any<RecipientId>(), any()) } returns Unit
+    every { SignalDatabase.runPostSuccessfulTransaction(any<Runnable>()) } answers { firstArg<Runnable>().run() }
+
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_A
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_B
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN the profile fetch can repair this, so we keep our own key rather than deferring
+    assertEquals(IDENTITY_KEY_A, result.proto.identityKey)
+    verify { RetrieveProfileJob.enqueue(any<RecipientId>(), any()) }
+  }
+
+  @Test
+  fun `merge, identityKeys match on linked device, keepLocal`() {
+    // GIVEN
+    every { SignalStore.account.isPrimaryDevice } returns false
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_A
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_A
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN
+    assertEquals(IDENTITY_KEY_A, result.proto.identityKey)
+  }
+
+  @Test
+  fun `merge, local identityKey missing on primary, useRemote`() {
+    // GIVEN
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_B
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN
+    assertEquals(IDENTITY_KEY_B, result.proto.identityKey)
+  }
+
+  @Test
+  fun `merge, remote identityKey missing on linked device, keepLocal`() {
+    // GIVEN
+    every { SignalStore.account.isPrimaryDevice } returns false
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B,
+        identityKey = IDENTITY_KEY_A
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN
+    assertEquals(IDENTITY_KEY_A, result.proto.identityKey)
+  }
+
+  @Test
+  fun `merge, pniSignatureVerified but no PNI, clearsFlag`() {
+    // GIVEN
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        e164 = E164_B,
+        pniSignatureVerified = true
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN a verified PNI signature is meaningless without a PNI, so it must not be propagated
+    assertFalse(result.proto.pniSignatureVerified)
+  }
+
+  @Test
+  fun `merge, pniSignatureVerified with PNI, keepsFlag`() {
+    // GIVEN
+    val subject = ContactRecordProcessor(ACI_A, PNI_A, E164_A, recipientTable)
+
+    val local = buildRecord(
+      STORAGE_ID_A,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        pniBinary = PNI_B.toByteStringWithoutPrefix(),
+        e164 = E164_B
+      )
+    )
+
+    val remote = buildRecord(
+      STORAGE_ID_B,
+      record = ContactRecord(
+        aciBinary = ACI_B.toByteString(),
+        pniBinary = PNI_B.toByteStringWithoutPrefix(),
+        e164 = E164_B,
+        pniSignatureVerified = true
+      )
+    )
+
+    // WHEN
+    val result = subject.merge(remote, local, TestKeyGenerator(STORAGE_ID_C))
+
+    // THEN
+    assertTrue(result.proto.pniSignatureVerified)
+  }
+
   private fun buildRecord(id: StorageId = STORAGE_ID_A, record: ContactRecord): SignalContactRecord {
     return SignalContactRecord(id, record)
   }
@@ -436,6 +680,9 @@ class ContactRecordProcessorTest {
 
     const val E164_A = "+12221234567"
     const val E164_B = "+13331234567"
+
+    val IDENTITY_KEY_A: ByteString = byteArrayOf(1, 1, 1, 1).toByteString()
+    val IDENTITY_KEY_B: ByteString = byteArrayOf(2, 2, 2, 2).toByteString()
 
     @JvmStatic
     @BeforeClass

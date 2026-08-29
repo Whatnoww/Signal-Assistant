@@ -18,9 +18,9 @@ object EnterAepScreenEventHandler {
   }
 
   private fun applyBackupKeyChanged(state: EnterAepState, key: String): EnterAepState {
-    val newKey = AccountEntropyPool.removeIllegalCharacters(key)
+    val enteredText = AccountEntropyPool.removeIllegalCharacters(key)
       .take(AccountEntropyPool.LENGTH + 16)
-      .lowercase()
+    val newKey = AccountEntropyPool.formatForStorage(enteredText).lowercase()
 
     val isValid = AccountEntropyPool.isFullyValid(newKey)
     val isShort = newKey.length < AccountEntropyPool.LENGTH
@@ -44,6 +44,7 @@ object EnterAepScreenEventHandler {
     }
 
     return state.copy(
+      enteredText = enteredText,
       backupKey = newKey,
       isBackupKeyValid = isValid,
       aepValidationError = updatedError

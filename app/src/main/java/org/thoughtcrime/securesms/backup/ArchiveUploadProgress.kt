@@ -6,20 +6,24 @@
 package org.thoughtcrime.securesms.backup
 
 import androidx.annotation.WorkerThread
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
+import org.signal.core.models.database.AttachmentId
 import org.signal.core.util.bytes
 import org.signal.core.util.logging.Log
 import org.signal.core.util.throttleLatest
 import org.thoughtcrime.securesms.BuildConfig
-import org.thoughtcrime.securesms.attachments.AttachmentId
 import org.thoughtcrime.securesms.backup.v2.BackupRepository
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.dependencies.AppDependencies
@@ -46,6 +50,8 @@ object ArchiveUploadProgress {
 
   private val TAG = Log.tag(ArchiveUploadProgress::class)
 
+  private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
   private val _progress: MutableSharedFlow<Unit> = MutableSharedFlow(replay = 1)
 
   private var uploadProgress: ArchiveUploadProgressState = SignalStore.backup.archiveUploadState ?: ArchiveUploadProgressState(
@@ -54,6 +60,9 @@ object ArchiveUploadProgress {
 
   private val attachmentProgress: MutableMap<AttachmentId, AttachmentProgressDetails> = ConcurrentHashMap()
 
+  /** Whether the media upload in flight began as part of a backup export. Not persisted, so a restart mid-upload defers CDN recording to the next backup. */
+  private var mediaUploadStartedByBackup: Boolean = false
+
   private var debugAttachmentStartTime: Long = 0
   private val debugTotalAttachments: AtomicInteger = AtomicInteger(0)
   private val debugTotalBytes: AtomicLong = AtomicLong(0)
@@ -61,7 +70,7 @@ object ArchiveUploadProgress {
   /**
    * Observe this to get updates on the current upload progress.
    */
-  val progress: Flow<ArchiveUploadProgressState> = _progress
+  val progress: SharedFlow<ArchiveUploadProgressState> = _progress
     .throttleLatest(500.milliseconds) {
       uploadProgress.state == ArchiveUploadProgressState.State.None ||
         (uploadProgress.state == ArchiveUploadProgressState.State.UploadBackupFile && uploadProgress.backupFileUploadedBytes == 0L) ||
@@ -85,8 +94,10 @@ object ArchiveUploadProgress {
       if (pendingMediaUploadBytes <= 0) {
         Log.i(TAG, "No more pending bytes. Done!")
         Log.d(TAG, "Upload finished! " + buildDebugStats(debugAttachmentStartTime, debugTotalAttachments.get(), debugTotalBytes.get()))
-        if (uploadProgress.mediaTotalBytes > 0) {
+
+        if (uploadProgress.mediaTotalBytes > 0 && mediaUploadStartedByBackup) {
           Log.i(TAG, "We uploaded media as part of the backup. We should enqueue another backup now to ensure that CDN info is properly written.")
+          mediaUploadStartedByBackup = false
           BackupMessagesJob.enqueue()
         }
         SignalStore.backup.finishedInitialBackup = true
@@ -113,7 +124,12 @@ object ArchiveUploadProgress {
       updateState(notify = false) { updated }
     }
     .onStart { emit(uploadProgress) }
-    .flowOn(Dispatchers.IO)
+    .flowOn(Dispatchers.Default)
+    .shareIn(scope, SharingStarted.Eagerly, replay = 1)
+
+  init {
+    _progress.tryEmit(Unit)
+  }
 
   val inProgress
     get() = uploadProgress.state != ArchiveUploadProgressState.State.None && uploadProgress.state != ArchiveUploadProgressState.State.UserCanceled
@@ -190,6 +206,10 @@ object ArchiveUploadProgress {
   fun onAttachmentSectionStarted(totalAttachmentBytes: Long) {
     debugAttachmentStartTime = System.currentTimeMillis()
     attachmentProgress.clear()
+
+    // Only a backup walks the export/upload states on its way here
+    mediaUploadStartedByBackup = uploadProgress.state == ArchiveUploadProgressState.State.Export || uploadProgress.state == ArchiveUploadProgressState.State.UploadBackupFile
+
     updateState {
       ArchiveUploadProgressState(
         state = ArchiveUploadProgressState.State.UploadMedia,

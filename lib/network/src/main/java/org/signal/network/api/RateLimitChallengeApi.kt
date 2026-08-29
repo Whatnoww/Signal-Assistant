@@ -5,13 +5,13 @@
 
 package org.signal.network.api
 
-import org.whispersystems.signalservice.api.NetworkResult
-import org.whispersystems.signalservice.api.ratelimit.SubmitPushChallengePayload
-import org.whispersystems.signalservice.api.ratelimit.SubmitRecaptchaChallengePayload
+import com.fasterxml.jackson.annotation.JsonProperty
+import org.signal.network.NetworkResult
+import org.signal.network.websocket.WebSocketRequestMessage
+import org.signal.network.websocket.post
+import org.signal.network.websocket.put
+import org.whispersystems.signalservice.api.fromWebSocketRequest
 import org.whispersystems.signalservice.api.websocket.SignalWebSocket
-import org.whispersystems.signalservice.internal.post
-import org.whispersystems.signalservice.internal.put
-import org.whispersystems.signalservice.internal.websocket.WebSocketRequestMessage
 
 /**
  * Calls for requesting and submitting rate limit triggered challenges.
@@ -57,4 +57,20 @@ class RateLimitChallengeApi(private val authWebSocket: SignalWebSocket.Authentic
     val request = WebSocketRequestMessage.put("/v1/challenge", SubmitRecaptchaChallengePayload(challenge, token))
     return NetworkResult.fromWebSocketRequest(authWebSocket, request)
   }
+}
+
+private class SubmitPushChallengePayload(@JsonProperty val challenge: String) {
+  @JsonProperty
+  val type: String = "rateLimitPushChallenge"
+}
+
+private class SubmitRecaptchaChallengePayload(challenge: String, recaptchaToken: String) {
+  @JsonProperty
+  val type: String = "captcha"
+
+  @JsonProperty
+  val token: String = challenge
+
+  @JsonProperty
+  val captcha: String = recaptchaToken
 }

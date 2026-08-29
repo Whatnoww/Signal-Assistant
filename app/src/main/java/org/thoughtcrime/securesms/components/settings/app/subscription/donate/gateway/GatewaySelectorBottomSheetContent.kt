@@ -93,12 +93,14 @@ private fun Loading() {
 
 @Composable
 private fun Ready(state: GatewaySelectorState.Ready, onEvent: (GatewaySelectorBottomSheetEvent) -> Unit) {
+  Spacer(modifier = Modifier.size(38.dp))
+
   BadgeImage112(
     badge = state.inAppPayment.data.badge!!.let { Badges.fromDatabaseBadge(it) },
-    modifier = Modifier.size(112.dp)
+    modifier = Modifier.size(80.dp)
   )
 
-  Spacer(modifier = Modifier.size(12.dp))
+  Spacer(modifier = Modifier.size(16.dp))
 
   TitleAndSubtitle(state.inAppPayment)
 
@@ -236,8 +238,8 @@ private fun TitleAndSubtitle(inAppPayment: InAppPaymentTable.InAppPayment) {
   when (inAppPayment.type) {
     InAppPaymentType.UNKNOWN -> error("Unsupported type UNKNOWN")
     InAppPaymentType.ONE_TIME_GIFT -> OneTimeGiftTitleAndSubtitle(inAppPayment)
-    InAppPaymentType.ONE_TIME_DONATION -> RecurringDonationTitleAndSubtitle(inAppPayment)
-    InAppPaymentType.RECURRING_DONATION -> OneTimeDonationTitleAndSubtitle(inAppPayment)
+    InAppPaymentType.ONE_TIME_DONATION -> OneTimeDonationTitleAndSubtitle(inAppPayment)
+    InAppPaymentType.RECURRING_DONATION -> RecurringDonationTitleAndSubtitle(inAppPayment)
     InAppPaymentType.RECURRING_BACKUP -> error("This type is not supported")
   }
 }
@@ -330,37 +332,52 @@ private fun GatewaySelectorBottomSheetContentReadyOneTimeGiftDonationPreview() {
 
 @Composable
 @VisibleForTesting
-fun rememberGatewaySelectorBottomSheetContentPreviewState(type: InAppPaymentType): GatewaySelectorState.Ready {
+fun rememberGatewaySelectorBottomSheetContentPreviewState(
+  type: InAppPaymentType,
+  gatewayOrderStrategy: GatewayOrderStrategy = GatewayOrderStrategy.getStrategy(
+    self = Recipient(
+      isResolving = false,
+      e164Value = "+15555555555"
+    )
+  ),
+  availableGateways: Set<InAppPaymentData.PaymentMethodType> = setOf(
+    InAppPaymentData.PaymentMethodType.GOOGLE_PAY,
+    InAppPaymentData.PaymentMethodType.PAYPAL,
+    InAppPaymentData.PaymentMethodType.CARD,
+    InAppPaymentData.PaymentMethodType.SEPA_DEBIT,
+    InAppPaymentData.PaymentMethodType.IDEAL
+  )
+): GatewaySelectorState.Ready {
   return remember {
     GatewaySelectorState.Ready(
-      inAppPayment = InAppPaymentTable.InAppPayment(
-        id = InAppPaymentTable.InAppPaymentId(1),
-        type = type,
-        state = InAppPaymentTable.State.CREATED,
-        insertedAt = 1.milliseconds,
-        updatedAt = 1.milliseconds,
-        notified = true,
-        subscriberId = null,
-        endOfPeriod = 0.milliseconds,
-        data = InAppPaymentData(
-          badge = BadgeList.Badge(
-            name = type.name.lowercase()
-          ),
-          amount = FiatValue(currencyCode = "USD", amount = BigDecimal.TEN.toDecimalValue())
-        )
-      ),
-      gatewayOrderStrategy = GatewayOrderStrategy.getStrategy(
-        self = Recipient(
-          isResolving = false,
-          e164Value = "+15555555555"
-        )
-      ),
-      isGooglePayAvailable = true,
-      isPayPalAvailable = true,
-      isCreditCardAvailable = true,
-      isSEPADebitAvailable = true,
-      isIDEALAvailable = true,
+      inAppPayment = createInAppPaymentPreview(type),
+      gatewayOrderStrategy = gatewayOrderStrategy,
+      isGooglePayAvailable = InAppPaymentData.PaymentMethodType.GOOGLE_PAY in availableGateways,
+      isPayPalAvailable = InAppPaymentData.PaymentMethodType.PAYPAL in availableGateways,
+      isCreditCardAvailable = InAppPaymentData.PaymentMethodType.CARD in availableGateways,
+      isSEPADebitAvailable = InAppPaymentData.PaymentMethodType.SEPA_DEBIT in availableGateways,
+      isIDEALAvailable = InAppPaymentData.PaymentMethodType.IDEAL in availableGateways,
       sepaEuroMaximum = FiatMoney(BigDecimal.ONE, Currency.getInstance("USD"))
     )
   }
+}
+
+@VisibleForTesting
+fun createInAppPaymentPreview(type: InAppPaymentType): InAppPaymentTable.InAppPayment {
+  return InAppPaymentTable.InAppPayment(
+    id = InAppPaymentTable.InAppPaymentId(1),
+    type = type,
+    state = InAppPaymentTable.State.CREATED,
+    insertedAt = 1.milliseconds,
+    updatedAt = 1.milliseconds,
+    notified = true,
+    subscriberId = null,
+    endOfPeriod = 0.milliseconds,
+    data = InAppPaymentData(
+      badge = BadgeList.Badge(
+        name = type.name.lowercase()
+      ),
+      amount = FiatValue(currencyCode = "USD", amount = BigDecimal.TEN.toDecimalValue())
+    )
+  )
 }

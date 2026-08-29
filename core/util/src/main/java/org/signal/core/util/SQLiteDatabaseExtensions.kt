@@ -7,6 +7,7 @@ import androidx.core.content.contentValuesOf
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteQueryBuilder
 import androidx.sqlite.db.SupportSQLiteStatement
+import org.signal.core.models.database.DatabaseId
 import org.signal.core.util.SqlUtil.ForeignKeyViolation
 import org.signal.core.util.logging.Log
 import kotlin.time.Duration
@@ -31,6 +32,24 @@ inline fun <T : SupportSQLiteDatabase, R> T.withinTransaction(block: (T) -> R): 
   } finally {
     if (inTransaction()) {
       endTransaction()
+    }
+  }
+}
+
+/**
+ * Runs [block] with the FTS5 "secure-delete" option enabled on [ftsTable], guaranteeing it is turned back off afterwards.
+ *
+ * Secure delete is slow, so we keep it off by default, but can selectively enable it for smaller delete operations.
+ *
+ * https://www.sqlite.org/fts5.html#the_secure_delete_configuration_option
+ */
+inline fun <R> SupportSQLiteDatabase.withFtsSecureDelete(ftsTable: String, block: () -> R): R {
+  return this.withinTransaction {
+    execSQL("INSERT INTO $ftsTable ($ftsTable, rank) VALUES('secure-delete', 1)")
+    try {
+      block()
+    } finally {
+      execSQL("INSERT INTO $ftsTable ($ftsTable, rank) VALUES('secure-delete', 0)")
     }
   }
 }

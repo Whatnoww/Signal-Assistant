@@ -8,6 +8,7 @@ package org.signal.registration.screens.welcome
 import android.app.Application
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
@@ -42,6 +43,7 @@ class WelcomeScreenTest {
     composeTestRule.setContent {
       SignalTheme {
         WelcomeScreen(
+          state = WelcomeScreenState(),
           onEvent = { event ->
             emittedEvent = event
           }
@@ -65,6 +67,7 @@ class WelcomeScreenTest {
     composeTestRule.setContent {
       SignalTheme {
         WelcomeScreen(
+          state = WelcomeScreenState(isLinkAndSyncAvailable = true),
           onEvent = { event ->
             emittedEvent = event
           }
@@ -73,10 +76,10 @@ class WelcomeScreenTest {
     }
 
     // When
-    composeTestRule.onNodeWithTag(TestTags.WELCOME_GET_STARTED_BUTTON).performClick()
+    composeTestRule.onNodeWithTag(TestTags.WELCOME_LINK_DEVICE_BUTTON).performClick()
 
     // Then
-    assert(emittedEvent == WelcomeScreenEvents.Continue)
+    assert(emittedEvent == WelcomeScreenEvents.LinkDevice)
   }
 
   @Test
@@ -84,7 +87,7 @@ class WelcomeScreenTest {
     // Given
     composeTestRule.setContent {
       SignalTheme {
-        WelcomeScreen(onEvent = {})
+        WelcomeScreen(state = WelcomeScreenState(), onEvent = {})
       }
     }
 
@@ -104,6 +107,7 @@ class WelcomeScreenTest {
     composeTestRule.setContent {
       SignalTheme {
         WelcomeScreen(
+          state = WelcomeScreenState(),
           onEvent = { event ->
             emittedEvent = event
           }
@@ -127,6 +131,7 @@ class WelcomeScreenTest {
     composeTestRule.setContent {
       SignalTheme {
         WelcomeScreen(
+          state = WelcomeScreenState(),
           onEvent = { event ->
             emittedEvent = event
           }
@@ -143,11 +148,30 @@ class WelcomeScreenTest {
   }
 
   @Test
+  fun `during re-registration the restore or transfer option is hidden`() {
+    // Given
+    composeTestRule.setContent {
+      SignalTheme {
+        WelcomeScreen(
+          state = WelcomeScreenState(showRestoreOrTransfer = false),
+          onEvent = {}
+        )
+      }
+    }
+
+    // Then - the continue option remains but the restore/transfer option is not offered
+    composeTestRule.onNodeWithTag(TestTags.WELCOME_GET_STARTED_BUTTON).assertIsDisplayed()
+    assert(composeTestRule.onAllNodesWithTag(TestTags.WELCOME_RESTORE_OR_TRANSFER_BUTTON).fetchSemanticsNodes().isEmpty()) {
+      "Expected no restore/transfer option during re-registration"
+    }
+  }
+
+  @Test
   fun `screen displays welcome message`() {
     // Given
     composeTestRule.setContent {
       SignalTheme {
-        WelcomeScreen(onEvent = {})
+        WelcomeScreen(state = WelcomeScreenState(), onEvent = {})
       }
     }
 

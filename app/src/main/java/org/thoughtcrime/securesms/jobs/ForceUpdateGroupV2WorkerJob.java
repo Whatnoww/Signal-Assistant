@@ -15,7 +15,7 @@ import org.thoughtcrime.securesms.jobmanager.Job;
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.whispersystems.signalservice.api.groupsv2.NoCredentialForRedemptionTimeException;
-import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException;
+import org.signal.network.exceptions.PushNetworkException;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -76,6 +76,11 @@ final class ForceUpdateGroupV2WorkerJob extends BaseJob {
 
     if (group.isPresent() && group.get().isTerminated()) {
       Log.i(TAG, "Group is terminated, skipping force update.");
+      return;
+    }
+
+    if (group.isPresent() && !group.get().getHasV2GroupProperties()) {
+      Log.i(TAG, "Group is deleted, skipping force update.");
       return;
     }
 

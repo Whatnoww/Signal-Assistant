@@ -3,7 +3,6 @@
 package org.thoughtcrime.securesms.util
 
 import android.content.Context
-import org.signal.core.util.Util
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.database.MessageTypes
 import org.thoughtcrime.securesms.database.model.MessageRecord
@@ -83,6 +82,8 @@ fun MessageRecord.hasLinkPreview(): Boolean = isMms && (this as MmsMessageRecord
 
 fun MessageRecord.hasTextSlide(): Boolean = isMms && (this as MmsMessageRecord).slideDeck.textSlide != null && this.slideDeck.textSlide?.uri != null
 
+fun MessageRecord.hasUndownloadedTextSlide(): Boolean = isMms && (this as MmsMessageRecord).slideDeck.textSlide != null && this.slideDeck.textSlide?.uri == null
+
 fun MessageRecord.requireTextSlide(): TextSlide = requireNotNull((this as MmsMessageRecord).slideDeck.textSlide)
 
 fun MessageRecord.hasPoll(): Boolean = isMms && (this as MmsMessageRecord).poll != null
@@ -100,13 +101,14 @@ fun MessageRecord.hasBigImageLinkPreview(context: Context): Boolean {
 
   val linkPreview = (this as MmsMessageRecord).linkPreviews[0]
 
-  if (linkPreview.thumbnail.isPresent && !Util.isEmpty(linkPreview.description)) {
-    return true
+  if (!linkPreview.thumbnail.isPresent || StickerUrl.isValidShareLink(linkPreview.url)) {
+    return false
   }
 
+  val thumbnail = linkPreview.thumbnail.get()
   val minWidth = context.resources.getDimensionPixelSize(R.dimen.media_bubble_min_width_solo)
 
-  return linkPreview.thumbnail.isPresent && linkPreview.thumbnail.get().width >= minWidth && !StickerUrl.isValidShareLink(linkPreview.url)
+  return thumbnail.width >= minWidth && thumbnail.width > thumbnail.height
 }
 
 fun MessageRecord.hasGiftBadge(): Boolean {

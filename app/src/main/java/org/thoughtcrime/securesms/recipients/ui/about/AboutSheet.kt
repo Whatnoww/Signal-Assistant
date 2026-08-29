@@ -49,11 +49,11 @@ import org.signal.core.ui.compose.Previews
 import org.signal.core.ui.compose.SignalIcons
 import org.signal.core.util.getParcelableCompat
 import org.signal.core.util.isNotNullOrBlank
+import org.signal.emoji.Emojifier
 import org.thoughtcrime.securesms.AvatarPreviewActivity
 import org.thoughtcrime.securesms.R
 import org.thoughtcrime.securesms.avatar.AvatarImage
 import org.thoughtcrime.securesms.components.emoji.EmojiTextView
-import org.thoughtcrime.securesms.components.emoji.Emojifier
 import org.thoughtcrime.securesms.conversation.v2.UnverifiedProfileNameBottomSheet
 import org.thoughtcrime.securesms.groups.GroupId
 import org.thoughtcrime.securesms.groups.memberlabel.MemberLabel
@@ -312,7 +312,7 @@ private fun Content(
 
     if (!model.isSelf && model.systemContact) {
       AboutRow(
-        startIcon = ImageVector.vectorResource(id = R.drawable.symbol_person_circle_24),
+        startIcon = ImageVector.vectorResource(id = CoreUiR.drawable.symbol_person_circle_24),
         text = stringResource(id = R.string.AboutSheet__s_is_in_your_system_contacts, model.shortName),
         modifier = Modifier.fillMaxWidth()
       )

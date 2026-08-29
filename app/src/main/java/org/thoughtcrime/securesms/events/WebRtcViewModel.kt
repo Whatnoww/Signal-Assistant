@@ -124,11 +124,13 @@ class WebRtcViewModel(state: WebRtcServiceState) {
   val isAudioDeviceChangePending: Boolean = state.localDeviceState.isAudioDeviceChangePending
 
   val localParticipant: CallParticipant = createLocal(
-    state.localDeviceState.cameraState,
-    (if (state.videoState.localSink != null) state.videoState.localSink else BroadcastVideoSink())!!,
-    state.localDeviceState.isMicrophoneEnabled,
-    state.localDeviceState.handRaisedTimestamp
+    cameraState = state.localDeviceState.cameraState,
+    renderer = state.videoState.localSink ?: BroadcastVideoSink(),
+    microphoneEnabled = state.localDeviceState.isMicrophoneEnabled,
+    handRaisedTimestamp = state.localDeviceState.handRaisedTimestamp
   )
+
+  val isLocalScreenSharing: Boolean = state.localDeviceState.isScreenSharing
 
   val remoteMutedBy: CallParticipant? = state.localDeviceState.remoteMutedBy
 

@@ -4,7 +4,7 @@
   ~ SPDX-License-Identifier: AGPL-3.0-only
   -->
 <!-- smartling.instruction_comments_enabled = on -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
   <!-- Removed by excludeNonTranslatables <string name="app_name" translatable="false">Signal</string> -->
 
   <!-- Removed by excludeNonTranslatables <string name="install_url" translatable="false">https://signal.org/install</string> -->
@@ -22,6 +22,8 @@
   <!-- Removed by excludeNonTranslatables <string name="export_account_data_url" translatable="false">https://support.signal.org/hc/articles/5538911756954</string> -->
   <!-- Removed by excludeNonTranslatables <string name="pending_transfer_url" translatable="false">https://support.signal.org/hc/articles/360031949872#pending</string> -->
   <!-- Removed by excludeNonTranslatables <string name="donate_faq_url" translatable="false">https://support.signal.org/hc/articles/360031949872#donate</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="inactive_primary_support" translatable="false">https://support.signal.org/hc/articles/9021007554074</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="recovery_key_phishing_support_url" translatable="false">https://support.signal.org/hc/articles/9932566320410</string> -->
 
     <!-- First placeholder is productId, second placeholder is app package -->
     <string name="backup_subscription_management_url">https://play.google.com/store/account/subscriptions?sku=%1$s&amp;package=%2$s</string>
@@ -169,6 +171,8 @@
     <string name="BlockedUsersActivity__block_user">Želite blokirati uporabnika_co?</string>
     <string name="BlockedUserActivity__s_will_not_be_able_to">\"%1$s\" vas ne bo mogel_la klicati ali vam pošiljati sporočil.</string>
     <string name="BlockedUsersActivity__block">Blokiraj</string>
+    <!-- Subtitle shown under a blocked user. Placeholder is the time they were blocked-->
+    <string name="BlockedUsersActivity__blocked_on_s">Blokiran_a na %1$s</string>
 
     <!-- CreditCardFragment -->
     <!-- Title of fragment -->
@@ -275,79 +279,7 @@
     <!-- Unknown people row info dialog action to close the dialog -->
     <string name="CallInfoView__got_it">Razumem</string>
 
-    <!-- CameraFragment -->
-    <!-- Toasted when user device does not support video recording -->
-    <string name="CameraFragment__video_recording_is_not_supported_on_your_device">Vaša naprava ne podpira snemanja videa</string>
 
-    <!-- CameraXFragment -->
-    <string name="CameraXFragment_tap_for_photo_hold_for_video">Tapnite za fotografijo, zadržite za video</string>
-    <!-- Accessibility content description to describe the capture button when taking an image/video -->
-    <string name="CameraXFragment_capture_description">Zajemi</string>
-    <string name="CameraXFragment_change_camera_description">Zamenjaj kamero</string>
-    <string name="CameraXFragment_open_gallery_description">Odpri galerijo</string>
-    <!-- Button text asking for access to camera permissions -->
-    <string name="CameraXFragment_allow_access">Dovoli dostop</string>
-    <!-- Dialog title asking users for camera and microphone permission -->
-    <string name="CameraXFragment_allow_access_camera_microphone">Dovoli dostop do kamere in mikrofona</string>
-    <!-- Dialog title asking users for camera permission -->
-    <string name="CameraXFragment_allow_access_camera">Dovoli dostop do kamere</string>
-    <!-- Dialog title asking users for microphone permission -->
-    <string name="CameraXFragment_allow_access_microphone">Dovoli dostop do mikrofona</string>
-    <!-- Text explaining why Signal needs camera access in order to take photos -->
-    <string name="CameraXFragment_to_capture_photos_allow_camera">Za zajemanje fotografij dovolite Signalu dostop do kamere naprave.</string>
-    <!-- Text explaining why Signal needs camera access in order to take photos and videos -->
-    <string name="CameraXFragment_to_capture_photos_and_video_allow_camera">Za zajemanje fotografij in videov dovolite aplikaciji Signal dostop do kamere naprave.</string>
-    <!-- Text explaining why Signal needs camera and microphone access in order to take photos and videos -->
-    <string name="CameraXFragment_to_capture_photos_and_video_allow_camera_microphone">Za zajemanje fotografij in videov dovolite Signalu dostop do kamere in mikrofona naprave.</string>
-    <!-- Text explaining why Signal needs microphone access to take videos -->
-    <string name="CameraXFragment_to_capture_videos_with_sound">Za zajemanje videov z zvokom dovolite Signalu dostop do mikrofona naprave.</string>
-    <!-- Text explaining why Signal needs camera access to scan QR codes -->
-    <string name="CameraXFragment_to_scan_qr_code_allow_camera">Za skeniranje QR kode dovolite Signalu dostop do kamere.</string>
-    <!-- Toast dialog explaining why Signal needs camera permissions when capturing photos -->
-    <string name="CameraXFragment_signal_needs_camera_access_capture_photos">Signal potrebuje dostop do kamere za zajemanje fotografij</string>
-    <!-- Toast dialog explaining why Signal needs camera permissions when scanning QR codes -->
-    <string name="CameraXFragment_signal_needs_camera_access_scan_qr_code">Signal potrebuje dostop do kamere za optično branje QR kod</string>
-    <!-- Toast dialog explaining why Signal needs microphone permissions -->
-    <string name="CameraXFragment_signal_needs_microphone_access_video">Signal potrebuje dostop do mikrofona za zajemanje videoposnetkov</string>
-    <!-- Dialog description that explains the steps needed to give camera permission -->
-    <string name="CameraXFragment_to_capture_photos">Za zajemanje fotografij v Signalu:</string>
-    <!-- Dialog description that explains the steps needed to give camera and microphone permission -->
-    <string name="CameraXFragment_to_capture_photos_videos">Za zajemanje fotografij in videov v Signalu:</string>
-    <!-- Dialog description that explains the steps needed to give microphone permission -->
-    <string name="CameraXFragment_to_capture_videos">Za zajemanje videov z zvokom:</string>
-    <!-- Dialog description that explains the steps needed to give Signal camera permissions -->
-    <string name="CameraXFragment_to_scan_qr_codes">Za skeniranje QR kod:</string>
-    <!-- Error message shown when we try to take a photo, but fail -->
-    <string name="CameraXFragment_photo_capture_failed">Fotografije ni bilo mogoče zajeti. Poskusite znova.</string>
-    <!-- Error message shown when we try to take a photo, but fail when trying to process it (convert it into something the user can see). -->
-    <string name="CameraXFragment_photo_processing_failed">Obdelava fotografije ni uspela. Poskusite znova.</string>
-    <!-- Accessibility label for the switch camera button -->
-    <string name="CameraXFragment_switch_camera">Preklopi kamero</string>
-    <!-- Accessibility label for flash button when flash is off -->
-    <string name="CameraXFragment_flash_off">Bliskavica izklopljena</string>
-    <!-- Accessibility label for flash button when flash is on -->
-    <string name="CameraXFragment_flash_on">Bliskavica vklopljena</string>
-    <!-- Accessibility label for flash button when flash is set to auto -->
-    <string name="CameraXFragment_flash_auto">Samodejna bliskavica</string>
-    <!-- Accessibility label for the send button in media selection -->
-    <string name="CameraXFragment_send">Pošlji</string>
-
-    <!-- CameraContacts -->
-    <string name="CameraContacts_recent_contacts">Nedavni stiki</string>
-    <string name="CameraContacts_signal_contacts">Uporabniki_ce Signala</string>
-    <string name="CameraContacts_signal_groups">Skupine Signal</string>
-    <!-- A warning shown in a toast when  -->
-    <plurals name="CameraContacts_you_can_share_with_a_maximum_of_n_conversations">
-        <item quantity="one">Delite lahko z največ %1$d klepetom.</item>
-        <item quantity="two">Delite lahko z največ %1$d klepetoma.</item>
-        <item quantity="few">Delite lahko z največ %1$d klepeti.</item>
-        <item quantity="other">Delite lahko z največ %1$d klepeti.</item>
-    </plurals>
-    <string name="CameraContacts_select_signal_recipients">Izberite prejemnike Signal</string>
-    <string name="CameraContacts_no_signal_contacts">Ni uporabnikov_ic Signala</string>
-    <string name="CameraContacts_you_can_only_use_the_camera_button">Za pošiljanje fotografij uporabnikom_cam storitve Signal morate uporabiti gumb za kamero. </string>
-    <string name="CameraContacts_cant_find_who_youre_looking_for">Ne najdete uporabnika_ce, ki ga_jo iščete?</string>
-    <string name="CameraContacts_invite_a_contact_to_join_signal">Povabite prijatelja_ico k uporabi aplikacije Signal</string>
     <string name="CameraContacts__menu_search">Iskanje</string>
 
     <!-- Censorship Circumvention Megaphone -->
@@ -367,6 +299,16 @@
     <string name="ClientDeprecatedActivity_dont_update">Ne nadgradi</string>
     <string name="ClientDeprecatedActivity_warning">Opozorilo</string>
     <string name="ClientDeprecatedActivity_your_version_of_signal_has_expired_you_can_view_your_message_history">Različica aplikacije Signal na vaši napravi je potekla. Še vedno lahko pregledujete zgodovino svojih sporočil, ne morete pa jih pošiljati ali prejemati dokler je ne posodobite.</string>
+
+    <!-- ClockSkewActivity -->
+    <!-- Title of the full-screen dialog shown when the device clock is too far off from the real time -->
+    <string name="ClockSkewActivity__title">Nepravilen datum</string>
+    <!-- Body text explaining that the device clock is wrong and needs to be fixed -->
+    <string name="ClockSkewActivity__date_inaccurate_description">Datum v vaši napravi ni pravilen.\nPrilagodite uro in poskusite ponovno.</string>
+    <!-- Shows the user the current, inaccurate date and time reported by their device. Placeholder is the formatted date, time, and time zone. -->
+    <string name="ClockSkewActivity__time_prefix">Datum in ura v vaši napravi sta:\n%1$s</string>
+    <!-- Button that opens the system date and time settings -->
+    <string name="ClockSkewActivity__adjust_date_button">Prilagodi datum</string>
 
     <!-- CommunicationActions -->
     <string name="CommunicationActions_no_browser_found">Spletnega brskalnika ni bilo mogoče najti.</string>
@@ -462,6 +404,8 @@
     <!-- Conversation message shown when someone deletes their own message. Placeholder is the name of the person. -->
     <string name="ConversationItem_s_deleted_this_message">%1$s je izbrisal_a sporočilo</string>
     <string name="ConversationItem_you_deleted_this_message">Izbrisali ste to sporočilo</string>
+    <!-- Tappable text shown on a locally-deleted message tombstone, prompting the user to promote it to a delete-for-everyone -->
+    <string name="ConversationItem_delete_for_everyone_question">Želite izbrisati za vse?</string>
     <!-- Conversation message when a message has been deleted by an admin. The placeholder is the admin\'s name. -->
     <string name="ConversationItem_admin_s_deleted_this_message">Administrator_ka %1$s je izbrisal_a to sporočilo</string>
     <!-- Dialog error message shown when user can\'t download a message from someone else due to a permanent failure (e.g., unable to decrypt), placeholder is other\'s name -->
@@ -490,7 +434,6 @@
     <!-- Accessibility text associated with image button to send an edited message. -->
     <string name="ConversationActivity_send_edit">Pošlji urejeno</string>
     <string name="ConversationActivity_compose_message">Sestavi sporočilo</string>
-    <string name="ConversationActivity_sorry_there_was_an_error_setting_your_attachment">Oprostite, pri nastavljanju priponke je prišlo do napake.</string>
     <!-- Toast shown when user is unable to find the recipient when sending a message -->
     <string name="ConversationActivity_recipient_is_not_a_valid_sms_or_email_address_exclamation">Naslov prejemnika ni veljaven SMS oz. email naslov!</string>
     <string name="ConversationActivity_message_is_empty_exclamation">Sporočilo je prazno!</string>
@@ -552,7 +495,6 @@
     <string name="ConversationActivity_signal_needs_the_camera_permission_to_take_photos_or_video">Dostop do kamere je bil trajno onemogočen. Aplikacija Signal potrebuje dovoljenje za dostop do kamere za zajemanje videa in fotografij. Prosimo, pojdite v meni Nastavitve aplikacij, izberite \"Dovoljenja\" in omogočite dovoljenje pod postavko \"Kamera\".</string>
     <string name="ConversationActivity_signal_needs_camera_permissions_to_take_photos_or_video">Za zajemanje videa in fotografij potrebuje aplikacija Signal dostop do kamere.</string>
     <string name="ConversationActivity_enable_the_microphone_permission_to_capture_videos_with_sound">Omogoči dostop do mikrofona za zajemanje zvoka in videa.</string>
-    <string name="ConversationActivity_signal_needs_the_recording_permissions_to_capture_video">Dostop do mikrofona je bil onemogočen. Za snemanje videa potrebuje aplikacija Signal dovoljenje za dostop do mikrofona. Prosimo, nadaljujte v nastavitve aplikacij, izberite \"Dovoljenja\" in omogočite dovoljenje pod postavko \"Mikrofon\".</string>
     <string name="ConversationActivity_signal_needs_recording_permissions_to_capture_video">Za snemanje videa potrebuje Signal dostop do mikrofona.</string>
 
     <string name="ConversationActivity_quoted_contact_message">%1$s %2$s</string>
@@ -674,7 +616,7 @@
     <string name="ConversationFragment_delete">Izbriši</string>
     <!-- Dialog button for deleting one or more note-to-self messages on all linked devices. -->
     <string name="ConversationFragment_delete_everywhere">Izbriši povsod</string>
-    <string name="ConversationFragment_this_message_will_be_deleted_for_everyone_in_the_conversation">To sporočilo bo izbrisano za vse v tem klepetu, če uporabljajo novejšo različico Signala. Sodelujoči bodo lahko videli, da je bilo sporočilo izbrisano.</string>
+    <string name="ConversationFragment_this_message_will_be_deleted_for_everyone_in_the_conversation">To sporočilo bo izbrisano za vse v tem klepetu. Sodelujoči bodo lahko videli, da je bilo sporočilo izbrisano.</string>
     <string name="ConversationFragment_quoted_message_not_found">Izvorno sporočilo ni bilo najdeno</string>
     <string name="ConversationFragment_quoted_message_no_longer_available">Izvorno sporočilo ni več na voljo</string>
     <string name="ConversationFragment_failed_to_open_message">Odpiranje sporočila ni uspelo</string>
@@ -712,6 +654,8 @@
     <string name="ConversationFragment__update_build">Posodobite aplikacijo Signal</string>
     <!-- Action shown to allow a user to re-register as they are no longer registered -->
     <string name="ConversationFragment__reregister_signal">Ponovno se prijavite v Signal</string>
+    <!-- Action shown in the conversation input area to allow a user to re-link this device as it is no longer linked -->
+    <string name="ConversationFragment__relink_signal">Ponovno poveži</string>
     <!-- Label for a button displayed in the conversation toolbar to return to the previous screen. -->
     <string name="ConversationFragment__content_description_back_button">Nazaj.</string>
     <!-- Label for a button displayed in the conversation toolbar to open the main screen of the app. -->
@@ -749,7 +693,7 @@
     <!-- Description shown in the Signal release notes conversation header -->
     <string name="ConversationFragment_release_notes_description">Edini uradni klepet Signala Bodite na tekočem z novicami in obvestili o izdajah.</string>
     <!-- Label shown in place of the input in the Signal release notes conversation -->
-    <string name="ConversationFragment_the_only_official_chat_from_signal">The only official chat from Signal</string>
+    <string name="ConversationFragment_the_only_official_chat_from_signal">Edini uradni klepet Signala</string>
     <!-- Plural for group member count shown in conversation header. %1$d is the number of members -->
     <plurals name="ConversationFragment_group_member_count">
         <item quantity="one">%1$d član_ica</item>
@@ -763,6 +707,12 @@
     <string name="ConversationFragment_group_names">Imena skupin</string>
     <!-- Snackbar toast message shown when a profile cannot be downloaded and to try again. -->
     <string name="ConversationFragment_photo_failed">Fotografija ni bila prenesena. Poskusite znova.</string>
+    <!-- Title of the dialog shown when re-requesting an expired attachment from your primary device fails -->
+    <string name="ConversationFragment_attachment_backfill_failed_title">Medijev ni mogoče prenesti</string>
+    <!-- Body of the dialog shown when your phone didn\'t respond to a request to re-send an expired attachment -->
+    <string name="ConversationFragment_attachment_backfill_timeout">Preverite internetno povezavo te naprave in telefona. Odprite aplikacijo Signal v telefonu in poskusite znova prenesti.</string>
+    <!-- Body of the dialog shown when your phone no longer has the attachment you tried to download -->
+    <string name="ConversationFragment_attachment_backfill_not_found">Ta medij ni več na voljo v telefonu in ga ni mogoče prenesti.</string>
     <!-- Dialog for how to long to keep a messaged pinned for -->
     <string name="ConversationFragment__keep_pinned">Ohrani pripeto …</string>
     <!-- Dialog option to keep message pin for 24 hours -->
@@ -849,23 +799,38 @@
     <!-- Notice on chat list when no unread chats are available, centered on display -->
     <string name="ConversationListFragment__no_unread_chats">Ni neprebranih klepetov</string>
     <plurals name="ConversationListFragment_delete_selected_conversations">
-        <item quantity="one">Izbrišem izbrani klepet?</item>
-        <item quantity="two">Izbrišem izbrana klepeta?</item>
-        <item quantity="few">Izbrišem izbrane klepete?</item>
-        <item quantity="other">Izbrišem izbrane klepete?</item>
+        <item quantity="one">Želite izbrisati zgodovino sporočil v klepetu?</item>
+        <item quantity="two">Želite izbrisati zgodovino sporočil v klepetih?</item>
+        <item quantity="few">Želite izbrisati zgodovino sporočil v klepetih?</item>
+        <item quantity="other">Želite izbrisati zgodovino sporočil v klepetih?</item>
     </plurals>
+    <!-- Dialog message shown when deleting chats, none of which are groups -->
     <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations">
-        <item quantity="one">S tem boste trajno izbrisali izbrani klepet.</item>
-        <item quantity="two">S tem boste trajno izbrisali %1$d izbrana klepeta.</item>
-        <item quantity="few">S tem boste trajno izbrisali vse %1$d izbrane klepete.</item>
-        <item quantity="other">S tem boste trajno izbrisali vseh %1$d izbranih klepetov.</item>
+        <item quantity="one">Vsa sporočila v tem klepetu bodo izbrisana.</item>
+        <item quantity="two">Vsa sporočila v teh klepetih bodo izbrisana.</item>
+        <item quantity="few">Vsa sporočila v teh klepetih bodo izbrisana.</item>
+        <item quantity="other">Vsa sporočila v teh klepetih bodo izbrisana.</item>
     </plurals>
-    <!-- Dialog message shown when deleting one to many conversations from the chat list and the user has a linked device -->
+    <!-- Dialog message shown when deleting chats, with at least one group -->
+    <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_group">
+        <item quantity="one">Vsa sporočila v tem klepetu bodo izbrisana. Še vedno boste član_ica skupine.</item>
+        <item quantity="two">Vsa sporočila v teh klepetih bodo izbrisana. Še vedno boste član_ica skupin, katerih še niste zapustili.</item>
+        <item quantity="few">Vsa sporočila v teh klepetih bodo izbrisana. Še vedno boste član_ica skupin, katerih še niste zapustili.</item>
+        <item quantity="other">Vsa sporočila v teh klepetih bodo izbrisana. Še vedno boste član_ica skupin, katerih še niste zapustili.</item>
+    </plurals>
+    <!-- Dialog message shown when deleting chats, none of which are groups, and the user has a linked device -->
     <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_linked_device">
-        <item quantity="one">S tem boste izbrani klepet trajno izbrisali iz vseh naprav.</item>
-        <item quantity="two">S tem boste %1$d izbrana klepeta trajno izbrisali iz vseh naprav.</item>
-        <item quantity="few">S tem boste vse %1$d izbrane klepete trajno izbrisali iz vseh naprav.</item>
-        <item quantity="other">S tem boste vseh %1$d izbranih klepetov trajno izbrisali iz vseh naprav.</item>
+        <item quantity="one">Vsa sporočila v tem klepetu bodo izbrisana iz vseh vaših naprav.</item>
+        <item quantity="two">Vsa sporočila v teh klepetih bodo izbrisana iz vseh vaših naprav.</item>
+        <item quantity="few">Vsa sporočila v teh klepetih bodo izbrisana iz vseh vaših naprav.</item>
+        <item quantity="other">Vsa sporočila v teh klepetih bodo izbrisana iz vseh vaših naprav.</item>
+    </plurals>
+    <!-- Dialog message shown when deleting chats with at least one group, and the user has a linked device -->
+    <plurals name="ConversationListFragment_this_will_permanently_delete_all_n_selected_conversations_linked_device_group">
+        <item quantity="one">Vsa sporočila v tem klepetu bodo izbrisana iz vseh vaših naprav. Še vedno boste član_ica skupine.</item>
+        <item quantity="two">Vsa sporočila v teh klepetih bodo izbrisana iz vseh vaših naprav. Še vedno boste član_ica skupin, katerih še niste zapustili.</item>
+        <item quantity="few">Vsa sporočila v teh klepetih bodo izbrisana iz vseh vaših naprav. Še vedno boste član_ica skupin, katerih še niste zapustili.</item>
+        <item quantity="other">Vsa sporočila v teh klepetih bodo izbrisana iz vseh vaših naprav. Še vedno boste član_ica skupin, katerih še niste zapustili.</item>
     </plurals>
     <string name="ConversationListFragment_deleting">Brisanje</string>
     <plurals name="ConversationListFragment_deleting_selected_conversations">
@@ -1083,7 +1048,6 @@
     <string name="CustomDefaultPreference_none">Brez</string>
 
     <!-- AvatarSelectionBottomSheetDialogFragment -->
-    <string name="AvatarSelectionBottomSheetDialogFragment__taking_a_photo_requires_the_camera_permission">Za zajem fotografije morate aplikaciji dovoliti dostop do kamere.</string>
     <string name="AvatarSelectionBottomSheetDialogFragment__viewing_your_gallery_requires_the_storage_permission">Ogled galerije zahteva dovoljenje aplikaciji za dostop do sistemske shrambe.</string>
 
     <!-- DateUtils -->
@@ -1164,13 +1128,13 @@
 
     <!-- LinkDeviceFragment -->
     <!-- Description for how Signal will work with a linked device (eg desktop, iPad) -->
-    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Ta račun Signal uporabite v namiznem računalniku ali iPadu.</string>
+    <string name="LinkDeviceFragment__use_signal_on_desktop_ipad">Uporabi ta račun Signal v drugi napravi.</string>
     <!-- Button prompting users to link a new device to their account -->
     <string name="LinkDeviceFragment__link_a_new_device">Poveži z novo napravo</string>
     <!-- Text explaining that on linked devices, messages will be encrypted where %s will be replaced with an image-->
     <string name="LinkDeviceFragment__messages_and_chat_info_are_protected">%1$s Sporočila in informacije o klepetu so v vseh napravah zaščitene s šifriranjem od konca do konca</string>
     <!-- Bottom sheet title explaining how Signal works on a linked device -->
-    <string name="LinkDeviceFragment__signal_on_desktop_ipad">Signal na namizju ali iPadu</string>
+    <string name="LinkDeviceFragment__signal_on_desktop_ipad">Signal na povezani napravi</string>
     <!-- Bottom sheet description explaining that messages on linked devices are private -->
     <string name="LinkDeviceFragment__all_messaging_is_private">Vsa sporočila v povezanih napravah so zasebna</string>
     <!-- Bottom sheet description explaining that future messages on linked devices will be in sync with your phone but previous messages will not appear -->
@@ -1236,6 +1200,8 @@
     <string name="LinkDeviceFragment__edit_name">Uredi ime</string>
     <!-- Toast shown when the process of linking a device has been cancelled -->
     <string name="LinkDeviceFragment__linking_cancelled">Povezovanje je preklicano</string>
+    <!-- Snackbar shown when the user tries to link a new device but has already reached the maximum number of linked devices. Placeholder is the maximum count. -->
+    <string name="LinkDeviceFragment__you_can_only_have_d_linked_devices">Imate lahko le toliko povezanih naprav: %1$d.</string>
     <!-- Message shown in progress dialog telling users to avoid closing the app while messages are being synced -->
     <string name="LinkDeviceFragment__do_not_close">Ne zapirajte aplikacije</string>
     <!-- Dialog title shown when a device is unlinked -->
@@ -1282,6 +1248,8 @@
     <string name="AddLinkDeviceFragment__this_qr_code_not_valid">Koda QR ni veljavna. Prosimo prepričajte se, da skenirate kodo QR na napravi, ki jo želite povezati.</string>
     <!-- Button in dialog to retry linking a device with a qr code -->
     <string name="AddLinkDeviceFragment__retry">Ponovno</string>
+    <!-- Text shown in a dialog when the device being linked is too out-of-date to be linked to this account -->
+    <string name="AddLinkDeviceFragment__the_device_you_are_trying_to_link_is_out_of_date">Naprava, ki jo poskušate povezati, ni posodobljena. Posodobite napravo in poskusite znova.</string>
 
     <!-- LinkDeviceSyncBottomSheet -->
     <!-- Option in bottom sheet to transfer message history -->
@@ -1344,10 +1312,6 @@
         <item quantity="other">%1$d čakajočih vabil za članstvo.</item>
     </plurals>
     <string name="PendingGroupJoinRequestsReminder_view">Ogled</string>
-
-    <!-- GcmRefreshJob -->
-    <string name="GcmRefreshJob_Permanent_Signal_communication_failure">Trajna okvara pri komunikaciji aplikacije Signal!</string>
-    <string name="GcmRefreshJob_Signal_was_unable_to_register_with_Google_Play_Services">Registracija z Google Play Services ni bila uspešna. Podatkovna komunikacija je izklopljena, prosimo, poskusite s ponovno registracijo v meniju Nastavive &gt; Napredno.</string>
 
 
     <!-- GiphyActivity -->
@@ -1608,6 +1572,12 @@
     <string name="AddGroupDetailsFragment__remove">Odstrani</string>
     <string name="AddGroupDetailsFragment__sms_contact">Stik SMS</string>
     <string name="AddGroupDetailsFragment__remove_s_from_this_group">Želite odstraniti uporabnika_co %1$s iz skupine?</string>
+    <!-- Title of the dialog shown when tapping an existing group while creating a new group, confirming the user wants to leave and discard their in-progress group -->
+    <string name="AddGroupDetailsFragment__discard_group">Želite zavreči skupino?</string>
+    <!-- Body of the dialog shown when tapping an existing group while creating a new group. Placeholder is the name of the group being navigated to. -->
+    <string name="AddGroupDetailsFragment__if_you_continue_to_the_group_s_your_changes_wont_be_saved">Če nadaljujete v skupino »%1$s«, spremembe ne bodo shranjene.</string>
+    <!-- Label for the button that confirms discarding the in-progress group and navigating to an existing group -->
+    <string name="AddGroupDetailsFragment__discard">Zavrzi</string>
     <!-- Info message shown in the middle of the screen, displayed when adding group details to an MMS Group -->
     <string name="AddGroupDetailsFragment__youve_selected_a_contact_that_doesnt_support">Izbrali ste stik, ki ne podpira skupin Signal, zato bo to skupina MMS. Po meri poimenovane MMS skupine in fotografije bodo vidne le vam.</string>
     <!-- Info message shown in the middle of the screen, displayed when adding group details to an MMS Group after SMS Phase 0 -->
@@ -1700,12 +1670,6 @@
     <string name="RestoreActivity__no_longer_registered_title">Ta naprava ni več registrirana</string>
     <!-- Dialog message -->
     <string name="RestoreActivity__no_longer_registered_message">To je verjetno zato, ker ste registrirali svoj račun Signal v drugi napravi.</string>
-
-    <!-- GroupMentionSettingDialog -->
-    <string name="GroupMentionSettingDialog_notify_me_for_mentions">Obveščaj me o omembah</string>
-    <string name="GroupMentionSettingDialog_receive_notifications_when_youre_mentioned_in_muted_chats">Želite prejeti obvestilo, ko je vaše ime omenjeno v klepetih, ki ste jih utišali?</string>
-    <string name="GroupMentionSettingDialog_always_notify_me">Vedno me obveščaj</string>
-    <string name="GroupMentionSettingDialog_dont_notify_me">Ne obveščaj me</string>
 
     <!-- ManageProfileFragment -->
     <!-- Explanation text about usernames etc displayed underneath buttons to view and edit username etc -->
@@ -2027,9 +1991,6 @@
 
     <!-- MediaPickerActivity -->
     <string name="MediaPickerActivity__menu_open_camera">Odpri kamero</string>
-
-    <!-- MediaSendActivity -->
-    <string name="MediaSendActivity_camera_unavailable">Kamera ni dostopna.</string>
 
     <!-- MediaRepository -->
     <string name="MediaRepository_all_media">Vsa večpredstavnostna sporočila</string>
@@ -2869,6 +2830,10 @@
     <string name="CallOverflowPopupWindow__lower_hand">Nižje</string>
     <!-- A negative button for a dialog confirming the user wants to lower their hand (withdraw a raised hand) -->
     <string name="CallOverflowPopupWindow__cancel">Prekliči</string>
+    <!-- A clickable button to share your screen in a call -->
+    <string name="CallOverflowPopupWindow__share_screen">Deli ekran</string>
+    <!-- A clickable button to stop sharing your screen in a call -->
+    <string name="CallOverflowPopupWindow__stop_screen_share">Zaustavi deljenje zaslona</string>
     <!-- A button to take you to a list of participants with raised hands -->
     <string name="CallOverflowPopupWindow__view">Ogled</string>
 
@@ -3013,6 +2978,8 @@
 
     <!-- CallToastPopupWindow -->
     <string name="CallToastPopupWindow__swipe_to_view_screen_share">Za ogled delitve zaslona podrsajte</string>
+    <!-- Hint shown to teach the user they can swipe between the grid view and the active speaker view -->
+    <string name="CallToastPopupWindow__swipe_to_view_speaker">Podrsajte, da se prikaže govorec</string>
 
     <!-- ProxyBottomSheetFragment -->
     <string name="ProxyBottomSheetFragment_proxy_server">Proksi strežnik</string>
@@ -3110,13 +3077,6 @@
     <!--    A clickable piece of text that will pre-fill a request for support email in the user\'s email app.-->
     <string name="RegistrationActivity_support_bottom_sheet_cta_contact_support_substring">Obrnite se na Podporo</string>
 
-    <!-- RegistrationLockV2Dialog -->
-    <string name="RegistrationLockV2Dialog_turn_on_registration_lock">Želite vklopiti zaklep registracije?</string>
-    <string name="RegistrationLockV2Dialog_turn_off_registration_lock">Želite izklopiti zaklep registracije?</string>
-    <string name="RegistrationLockV2Dialog_if_you_forget_your_signal_pin_when_registering_again">Če se ob ponovni registraciji na Signal ne boste spomnili svojega PINa, se bo vaš račun zaklenil za 7 dni.</string>
-    <string name="RegistrationLockV2Dialog_turn_on">Vklopi</string>
-    <string name="RegistrationLockV2Dialog_turn_off">Izklopi</string>
-
     <!-- RevealableMessageView -->
     <string name="RevealableMessageView_view_photo">Ogled fotografije</string>
     <string name="RevealableMessageView_view_video">Ogled videa</string>
@@ -3131,6 +3091,8 @@
 
     <!-- Search -->
     <string name="SearchFragment_no_results">Iskanje po \'%1$s\' ni vrnilo nobenega rezultata.</string>
+    <!-- Text shown when no search results are found.   -->
+    <string name="SearchFragment_no_results_empty">Ni rezultatov</string>
 
     <!-- ShakeToReport -->
   <!-- Removed by excludeNonTranslatables <string name="ShakeToReport_shake_detected" translatable="false">Shake detected</string> -->
@@ -3304,6 +3266,10 @@
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_info" translatable="false">Info</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_warning" translatable="false">Warn</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_error" translatable="false">Error</string> -->
+    <!-- Title of dialog shown when debug log prefix generation is unusually slow -->
+  <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_slow_log_title" translatable="false">Slow log generation</string> -->
+    <!-- Body of dialog shown when debug log prefix generation is unusually slow. %1$d is duration in seconds. -->
+  <!-- Removed by excludeNonTranslatables <string name="SubmitDebugLogActivity_slow_log_message" translatable="false">Generating the debug log header took %1$d seconds. We should figure out what\&apos;s slowing things down.</string> -->
 
     <!-- SupportEmailUtil -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_support_email" translatable="false">support@signal.org</string> -->
@@ -3316,6 +3282,7 @@
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_locale" translatable="false">Locale:</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_challenge_received" translatable="false">Challenge Received:</string> -->
   <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_registered" translatable="false">Registered:</string> -->
+  <!-- Removed by excludeNonTranslatables <string name="SupportEmailUtil_backups" translatable="false">Backups:</string> -->
 
     <!-- ThreadRecord -->
     <string name="ThreadRecord_group_updated">Skupina je posodobljena</string>
@@ -3489,7 +3456,7 @@
     <!-- Title for a dialog where a user chooses how long they\'d like to mute notifications for -->
     <string name="MuteDialog_mute_notifications">Izklop obvestil</string>
     <!-- Dialog option that, when pressed, will open a time picker to let the user choose how long they\'d like to mute notifications for -->
-    <string name="MuteDialog__mute_until">Utišaj do …</string>
+    <string name="MuteDialog__mute_until">Dokler …</string>
 
     <!-- MuteUntilTimePickerBottomSheet -->
     <!-- Title for a dialog where a user chooses how long they\'d like to mute notifications for -->
@@ -3603,6 +3570,8 @@
     <string name="NotificationChannel_calls">Klici</string>
     <!-- Notification channel name for notifications involving failures of some sort (eg donations, message sends, etc.) -->
     <string name="NotificationChannel_failures">Napake</string>
+    <!-- Notification channel name for internal-only app issue notifications. Only ever shown to internal users. -->
+    <string name="NotificationChannel_internal_issues">Notranje težave</string>
     <string name="NotificationChannel_backups">Varnostne kopije</string>
     <string name="NotificationChannel_locked_status">Stanje zaklepa</string>
     <string name="NotificationChannel_app_updates">Posodobitve aplikacije</string>
@@ -3676,11 +3645,11 @@
     <!-- Dialog title shown when attempting to save media that has been offloaded from the device by the storage optimization feature. -->
     <string name="AttachmentSaver__cant_save_media">Ni mogoče shraniti medijev</string>
     <!-- Dialog message explaining that media cannot be saved because it has been offloaded from the device by the storage optimization feature. -->
-    <string name="AttachmentSaver__media_offloaded_message">Ta medij je bil odstranjen iz vaše naprave, ker je vklopljena možnost »Optimiziraj shranjevanje v napravi«. Predmete lahko prenesete enega po enega ali pa izklopite »Optimiziraj shranjevanje v napravi«, da prenesete vse medije v svojo napravo.</string>
+    <string name="AttachmentSaver__media_offloaded_message">Ta medij je bil odstranjen iz vaše naprave, ker je vklopljena možnost »Optimiziraj shrambo Signal«. Predmete lahko prenesete enega po enega ali pa izklopite »Optimiziraj shrambo Signal«, da prenesete vse medije v svojo napravo.</string>
     <!-- Dialog title shown when attempting to save multiple media items, some of which have been offloaded from the device by the storage optimization feature. -->
     <string name="AttachmentSaver__cant_save_all_items">Ni mogoče shraniti vseh predmetov</string>
     <!-- Dialog message explaining that some selected media cannot be saved because it has been offloaded from the device by the storage optimization feature. -->
-    <string name="AttachmentSaver__some_media_offloaded_message">Nekateri izbrani mediji so bili odstranjeni iz vaše naprave, ker je vklopljena možnost »Optimiziraj shranjevanje v napravi«. Predmete lahko shranite enega po enega ali pa izklopite »Optimiziraj shranjevanje v napravi«, da prenesete vse medije v svojo napravo.</string>
+    <string name="AttachmentSaver__some_media_offloaded_message">Nekateri izbrani mediji so bili odstranjeni iz vaše naprave, ker je vklopljena možnost »Optimiziraj shrambo Signal«. Predmete lahko shranite enega po enega ali pa izklopite »Optimiziraj shrambo Signal«, da prenesete vse medije v svojo napravo.</string>
     <!-- Button label in the offloaded media dialog that navigates to the storage settings screen. -->
     <string name="AttachmentSaver__view_storage_settings">Ogled nastavitev shrambe</string>
 
@@ -3741,12 +3710,20 @@
     <string name="TransferControlView__processing">V obdelavi …</string>
     <!-- Status update label used while the device is transmitting data over the network. Will take the form of "1.0 MB/2.0 MB" -->
     <string name="TransferControlView__download_progress_s_s">%1$s/%2$s</string>
+    <!-- Accessibility description for the button that starts downloading an attachment -->
+    <string name="TransferControlView__download">Prenesi</string>
+    <!-- Accessibility description for the button that starts uploading an attachment -->
+    <string name="TransferControlView__upload">Naloži</string>
 
     <!-- UnauthorizedReminder -->
     <!-- Message shown in a reminder banner when the user\'s device is no longer registered -->
     <string name="UnauthorizedReminder_this_is_likely_because_you_registered_your_phone_number_with_Signal_on_a_different_device">Ta naprava ni več registrirana. To je verjetno zato, ker ste registrirali svojo telefonsko številko pri Signalu na drugi napravi.</string>
     <!-- Action in reminder banner that will take user to re-register -->
     <string name="UnauthorizedReminder_reregister_action">Ponovno registrirajte napravo</string>
+    <!-- Message shown in a reminder banner when this linked device is no longer linked to a primary device -->
+    <string name="UnauthorizedReminder_this_device_is_no_longer_linked_relink_to_continue_messaging">Ta naprava ni več povezana. Za pošiljanje sporočil ponovno povežite Signal s svojim telefonom.</string>
+    <!-- Action in reminder banner that will take the user to re-link this device -->
+    <string name="UnauthorizedReminder_relink_action">Ponovno poveži napravo</string>
 
     <!-- Push notification when the app is forcibly logged out by the server. -->
     <string name="LoggedOutNotification_you_have_been_logged_out">V tej napravi ste bili odjavljeni iz Signala.</string>
@@ -4249,11 +4226,11 @@
     <!-- Bottom sheet title when encryption is auto-verified -->
     <string name="EncryptionVerifiedSheet__title_success">Šifriranje je bilo za ta klepet samodejno preverjeno</string>
     <!-- Bottom sheet body when encryption is auto-verified -->
-    <string name="EncryptionVerifiedSheet__body_success">Za stike, s katerimi ste povezani prek telefonske številke, lahko Signal samodejno potrdi, ali je povezava varna, z uporabo postopka, imenovanega preglednost ključa. Za dodatno varnost ročno preverite celovito šifriranje, tako da primerjate številke na prejšnjem zaslonu ali skenirate kodo na njegovi/-ni napravi.</string>
+    <string name="EncryptionVerifiedSheet__body_success">Za ljudi, s katerimi ste povezani prek telefonske številke, lahko Signal samodejno potrdi, ali je povezava varna, z uporabo postopka, imenovanega preglednost ključa. Za dodatno varnost ročno preverite celovito šifriranje, tako da primerjate številke na prejšnjem zaslonu ali skenirate kodo na njegovi/-ni napravi.</string>
     <!-- Bottom sheet title when encryption is no longer auto-verified -->
-    <string name="EncryptionVerifiedSheet__title_no_longer_unavailable">Samodejno preverjanje ni več na voljo za ta klepet</string>
+    <string name="EncryptionVerifiedSheet__title_no_longer_unavailable">Samodejno preverjanje ni na voljo za ta klepet</string>
     <!-- Bottom sheet body when encryption is no longer auto-verified. Placeholder is the name of the person. -->
-    <string name="EncryptionVerifiedSheet__body_no_longer_unavailable">Signal ne more več samodejno preveriti šifriranja za ta klepet. To je verjetno zato, ker je %1$s spremenil/-a svojo telefonsko številko. Ročno preverite celovito šifriranje, tako da primerjate številke na prejšnjem zaslonu ali skenirate kodo na njegovi/-ni napravi.</string>
+    <string name="EncryptionVerifiedSheet__body_no_longer_unavailable">Signal ne more samodejno preveriti šifriranja za ta klepet. To je verjetno zato, ker je %1$s spremenil/-a svojo telefonsko številko ali nastavitve zasebnosti telefonske številke. Ročno preverite celovito šifriranje, tako da primerjate številke na prejšnjem zaslonu ali skenirate kodo na njegovi/-ni napravi.</string>
     <!-- Bottom sheet title when encryption cannot be auto-verified -->
     <string name="EncryptionVerifiedSheet__title_unavailable">Samodejno preverjanje ni na voljo za ta klepet</string>
     <!-- Bottom sheet body when encryption cannot be auto-verified -->
@@ -4345,6 +4322,13 @@
   <!-- Removed by excludeNonTranslatables <string name="HelpFragment__debug_log" translatable="false">Debug Log:</string> -->
     <string name="HelpFragment__could_not_upload_logs">Sistemska zabeležba ni bila prenešena</string>
     <string name="HelpFragment__please_be_as_descriptive_as_possible">Pri opisu napake bodite čim bolj natančni, da bomo lažje razumeli za kaj gre.</string>
+    <!-- Error shown under the "tell us what\'s going on" field when the entered description is shorter than the required minimum length. The placeholder is the minimum number of characters. -->
+    <plurals name="HelpFragment__must_be_at_least_n_characters">
+        <item quantity="one">Mora vsebovati vsaj %1$d znak</item>
+        <item quantity="two">Mora vsebovati vsaj %1$d znaka</item>
+        <item quantity="few">Mora vsebovati vsaj %1$d znake</item>
+        <item quantity="other">Mora vsebovati vsaj %1$d znakov</item>
+    </plurals>
     <string-array name="HelpFragment__categories_6">
         <item>Izberite možnost</item>
         <item>Nekaj ne deluje</item>
@@ -4367,15 +4351,6 @@
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recents">Nedavno</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__this_message">To sporočilo</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__recently_used">Nedavno uporabljeno</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__smileys_and_people">Smeški &amp; Ljudje</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__nature">Narava</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__food">Hrana</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__activities">Dejavnosti</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__places">Kraji</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__objects">Objekti</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__symbols">Simboli</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__flags">Zastave</string>
-    <string name="ReactWithAnyEmojiBottomSheetDialogFragment__emoticons">Emotikoni</string>
     <string name="ReactWithAnyEmojiBottomSheetDialogFragment__no_results_found">Ni rezultatov</string>
 
     <!-- GifQuickSearchOption -->
@@ -4393,10 +4368,10 @@
     <string name="arrays__use_default">Uporabi prednastavljeno</string>
     <string name="arrays__use_custom">Uporabi po meri</string>
 
-    <string name="arrays__mute_for_one_hour">Utišaj za 1 uro</string>
-    <string name="arrays__mute_for_eight_hours">Utišaj za 8 ur</string>
-    <string name="arrays__mute_for_one_day">Utišaj za 1 dan</string>
-    <string name="arrays__mute_for_seven_days">Utišaj za 7 dni</string>
+    <string name="arrays__mute_for_one_hour">1 ura</string>
+    <string name="arrays__mute_for_eight_hours">8 ur</string>
+    <string name="arrays__mute_for_one_day">1 dan</string>
+    <string name="arrays__mute_for_seven_days">1 teden</string>
     <string name="arrays__always">Za vedno</string>
 
     <string name="arrays__settings_default">Sistemsko privzeto</string>
@@ -4453,6 +4428,10 @@
     <!-- Legacy preference menu item to choose the interval of inactivity before lockout -->
     <string name="preferences__inactivity_timeout_interval">Časovni interval za zaklep aplikacije</string>
     <string name="preferences__notifications">Obvestila</string>
+    <!-- Preference item menu to enable notifications -->
+    <string name="preferences__enable_notifications">Vklop obvestil</string>
+    <!-- Preference header for call notifications -->
+    <string name="preferences__call_notifications">Obvestila o klicih</string>
     <string name="preferences__led_color">Barva LED</string>
     <string name="preferences__led_color_unknown">Neznano</string>
     <string name="preferences__pref_led_blink_title">Utripanje LED</string>
@@ -4540,12 +4519,10 @@
     <string name="preferences__system_default">Privzeta sistemska</string>
     <string name="preferences__language">Jezik</string>
     <string name="preferences__signal_messages_and_calls">Sporočila in klici Signal</string>
-    <string name="preferences__advanced_pin_settings">Napredne nastavite PIN</string>
     <!-- Title of toolbar for the advanced pin settings screen -->
     <string name="preferences__advanced_pin_settings_title">Napredne nastavite PIN</string>
     <string name="preferences__free_private_messages_and_calls">Brezplačna zasebna sporočila in klici uporabnikom_cam aplikacije Signal</string>
     <string name="preferences__submit_debug_log">Oddaj sistemsko zabeležbo</string>
-    <string name="preferences__delete_account">Izbris računa</string>
     <string name="preferences__support_wifi_calling">\'WiFi calling\' združljivostni način</string>
     <string name="preferences__enable_if_your_device_supports_sms_mms_delivery_over_wifi">Aktivirajte, če dostava SMS/MMS sporočil na vaši napravi poteka preko povezave WiFi (samo, če imate vklopljeno WiFi klicanje/WiFi Calling)</string>
     <string name="preferences__incognito_keyboard">Inkognito tipkovnica</string>
@@ -4613,9 +4590,19 @@
     <string name="preferences_data_and_storage__never">Nikoli</string>
     <string name="preferences_data_and_storage__wifi_and_mobile_data">WiFi in mobilni podatki</string>
     <string name="preferences_data_and_storage__mobile_data_only">Samo mobilni podatki</string>
-    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">Poraba manj podatkov pri klicih lahko izboljša zanesljivost klicov v slabih omrežjih</string>
+    <string name="preference_data_and_storage__using_less_data_may_improve_calls_on_bad_networks">Poraba manj podatkov pri klicih lahko izboljša zanesljivost klicev v slabih omrežjih.</string>
     <string name="preferences_notifications__in_chat_sounds">Zvoki znotraj klepeta</string>
     <string name="preferences_notifications__show">Prikaži</string>
+    <!-- Preference item to set notification settings when chats are muted -->
+    <string name="preferences_notifications__while_muted">Med utišanjem</string>
+    <!-- Option in settings to turn on reaction notifications -->
+    <string name="preferences_notifications__reaction">Obvestila o odzivih</string>
+    <!-- Body option in settings to turn on reaction notifications    -->
+    <string name="preferences_notifications__notify_reaction">Prikaži obvestila o odzivih na poslana sporočila</string>
+    <!-- Option in settings to turn on unread reminders -->
+    <string name="preferences_notifications__unread">Opomniki za neprebrana sporočila</string>
+    <!-- Body option to turn on unread reminders -->
+    <string name="preferences_notifications__notify_unread">Občasno me obvesti o neprebranih sporočilih v utišanih klepetih</string>
     <string name="preferences_notifications__ringtone">Zvonjenje</string>
     <string name="preferences_chats__message_text_size">Velikost črk v sporočilu</string>
     <!-- Option in settings that will provide a shortcut to notification system settings to control the priority of Signal notifications -->
@@ -5151,8 +5138,6 @@
     <string name="RegistrationLockFragment__enter_the_pin_you_created">Vnesite PIN, ki ste ga ustvarili za zaklep svojega računa. Tu ne gre za SMS potrditveno kodo.</string>
     <!-- Info text shown above a pin entry text box describing what pin they should be entering. -->
     <string name="RegistrationLockFragment__enter_the_pin_you_created_for_your_account">Vnesite PIN, ki ste ga ustvarili za svoj račun.</string>
-    <!-- Button label to prompt the user to switch between an alphanumeric and numeric-only keyboards -->
-    <string name="RegistrationLockFragment__switch_keyboard">Preklopi tipkovnico</string>
     <string name="RegistrationLockFragment__incorrect_pin_try_again">Napačen PIN. Poskusite znova.</string>
     <string name="RegistrationLockFragment__forgot_pin">Ste pozabili PIN?</string>
     <string name="RegistrationLockFragment__incorrect_pin">Napačen PIN</string>
@@ -5240,8 +5225,6 @@
     <!-- Text label button to skip restoring -->
     <string name="registration_activity__skip_restore">Preskoči obnovitev</string>
     <string name="preferences_chats__chat_backups">Varnostno kopiranje klepetov</string>
-    <string name="preferences_chats__transfer_account">Prenos računa</string>
-    <string name="preferences_chats__transfer_account_to_a_new_android_device">Prenos računa na novo androidno napravo</string>
     <!-- Title for dialog to enter in the backup passphrase -->
     <string name="RegistrationActivity_enter_backup_passphrase">Vnesite geslo varnostne kopije</string>
     <string name="RegistrationActivity_restore">Obnovi</string>
@@ -5329,19 +5312,9 @@
     <string name="preferences_app_protection__screen_lock_inactivity_timeout">Časovni interval pred zaklepom aplikacije</string>
     <!-- Snackbar text shown when trying to enable screen lock but the user does not have a password or biometrics enabled -->
     <string name="preferences_app_protection__to_use_screen_lock">Za uporabo zaklepanja zaslona nastavite PIN kodo, vzorec ali geslo v tej napravi.</string>
-    <string name="preferences_app_protection__signal_pin">Signal PIN</string>
-    <string name="preferences_app_protection__create_a_pin">Ustvari PIN</string>
-    <string name="preferences_app_protection__change_your_pin">Sprememba PINa</string>
-    <string name="preferences_app_protection__pin_reminders">Opomniki za PIN</string>
-    <string name="preferences_app_protection__turn_off">Izklopi</string>
-    <string name="preferences_app_protection__confirm_pin">Potrdite PIN</string>
-    <string name="preferences_app_protection__confirm_your_signal_pin">Potrdite svoj PIN Signal</string>
-    <string name="preferences_app_protection__make_sure_you_memorize_or_securely_store_your_pin">Prosimo, dobro si zapomnite ali zapišite svoj PIN, saj ni obnovljiv. Če ga boste pozabili, lahko izgubite svoje podatke ob ponovni registraciji v račun Signal.</string>
-    <string name="preferences_app_protection__incorrect_pin_try_again">Napačen PIN. Poskusite znova.</string>
     <string name="preferences_app_protection__failed_to_enable_registration_lock">Neuspešen vklop zaklepa registracije.</string>
     <string name="preferences_app_protection__failed_to_disable_registration_lock">Neuspešen izklop zaklepa registracije.</string>
     <string name="AppProtectionPreferenceFragment_none">Brez</string>
-    <string name="preferences_app_protection__registration_lock">Zaklep registracije</string>
     <string name="RegistrationActivity_you_must_enter_your_registration_lock_PIN">Vnesti morate kodo PIN za prijavo v omrežje</string>
     <string name="RegistrationActivity_your_pin_has_at_least_d_digits_or_characters">Vaš PIN vsebuje vsaj %1$d številk ali znakov</string>
     <string name="RegistrationActivity_too_many_attempts">Preveč poskusov</string>
@@ -5389,22 +5362,34 @@
     <!-- Name to use for a user across the UI when they are unregistered and have no other name available -->
     <string name="Recipient_deleted_account">Izbrisan račun</string>
 
-    <!-- Option in settings that will take use to re-register if they are no longer registered -->
-    <string name="preferences_account_reregister">Ponovno se prijavite</string>
-    <!-- Option in settings that will take user to our website or playstore to update their expired build -->
-    <string name="preferences_account_update_signal">Posodobite aplikacijo Signal</string>
-    <!-- Option in settings shown when user is no longer registered or expired client that will WIPE ALL THEIR DATA -->
-    <string name="preferences_account_delete_all_data">Izbris vseh podatkov</string>
-    <!-- Title for confirmation dialog confirming user wants to delete all their data -->
-    <string name="preferences_account_delete_all_data_confirmation_title">Želite izbrisati vse podatke?</string>
-    <!-- Message in confirmation dialog to delete all data explaining how it works, and that the app will be closed after deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_message">To bo ponastavilo aplikacijo in izbrisalo sporočila. Aplikacija se bo zaprla, ko bo postopek končan.</string>
-    <!-- Confirmation action to proceed with application data deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_proceed">Nadaljuj</string>
-    <!-- Confirmation action to cancel application data deletion -->
-    <string name="preferences_account_delete_all_data_confirmation_cancel">Prekliči</string>
     <!-- Error message shown when we fail to delete the data for some unknown reason -->
     <string name="preferences_account_delete_all_data_failed">Brisanje podatkov ni uspelo</string>
+
+    <!-- LinkedDeviceAccountSettingsFragment -->
+    <!-- Title of an informational card shown on the account settings screen of a linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_is_a_linked_device">To je povezana naprava</string>
+    <!-- Body of an informational card explaining that account settings must be managed from the primary device -->
+    <string name="LinkedDeviceAccountSettingsFragment__to_manage_your_account_settings">Za upravljanje nastavitev računa odprite Signal v primarni napravi.</string>
+    <!-- Title of a settings row that deletes all Signal data from this linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__delete_app_data">Izbris podatkov aplikacije</string>
+    <!-- Subtitle of the delete app data row explaining what it does -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_will_remove_all_data">To bo odstranilo vse podatke iz aplikacije Signal v tej napravi.</string>
+    <!-- Title of the confirmation dialog shown when deleting app data from a linked device -->
+    <string name="LinkedDeviceAccountSettingsFragment__delete_app_data_question">Želite izbrisati podatke aplikacije?</string>
+    <!-- Message of the confirmation dialog explaining that only this device\'s data is deleted, not the account -->
+    <string name="LinkedDeviceAccountSettingsFragment__this_will_delete_all_data_and_messages">To bo izbrisalo vse podatke in sporočila iz aplikacije Signal v tej napravi. Vaš račun v Signalu in podatki v primarni napravi ali drugih povezanih napravah ne bodo izbrisani. Aplikacija se bo zaprla, ko bo postopek končan.</string>
+
+    <!-- LinkedDeviceAccountLearnMoreBottomSheet -->
+    <!-- Emphasized lead-in phrase shown in bold at the start of the learn more sheet body. Must appear verbatim within LinkedDeviceAccountLearnMoreBottomSheet__linked_devices_let_you_access. -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__linked_devices">Povezane naprave</string>
+    <!-- Body text of the linked devices learn more sheet. The leading \"Linked Devices\" is shown in bold. -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__linked_devices_let_you_access">Preko povezanih naprav lahko varno dostopate do računa Signal in sporočil v katerikoli dodatni napravi.</string>
+    <!-- Bullet point describing what devices can be linked -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__you_can_link_a_desktop">Povežete lahko namizni računalnik, tablico ali dodatni telefon</string>
+    <!-- Bullet point describing that the primary device manages linked devices -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__your_primary_device_manages">Primarna naprava upravlja s povezanimi napravami, povežete pa jih lahko do 5.</string>
+    <!-- Bullet point describing that some settings are only available on the primary device -->
+    <string name="LinkedDeviceAccountLearnMoreBottomSheet__some_account_settings">Nekatere nastavitve računa lahko upravljate le v primarni napravi, vključno z nastavitvami računa in varnostnimi kopijami.</string>
 
     <!-- TransferOrRestoreFragment -->
     <string name="TransferOrRestoreFragment__transfer_or_restore_account">Prenesi ali obnovi račun</string>
@@ -5915,18 +5900,6 @@
     <!-- GroupDescriptionDialog -->
     <string name="GroupDescriptionDialog__group_description">Opis skupine</string>
 
-    <!-- QualitySelectorBottomSheetDialog -->
-    <!-- Label for our standard quality media conversion. -->
-    <string name="QualitySelectorBottomSheetDialog__standard">Standardna</string>
-    <!-- Description for our standard quality media conversion. -->
-    <string name="QualitySelectorBottomSheetDialog__faster_less_data">Hitreje, manj podatkov</string>
-    <!-- Label for our high quality media conversion. This has better quality than standard. -->
-    <string name="QualitySelectorBottomSheetDialog__high">Visoka</string>
-    <!-- Label for our high quality media conversion. This has better quality than standard. -->
-    <string name="QualitySelectorBottomSheetDialog__slower_more_data">Počasneje, več podatkov</string>
-    <!-- Title heading for our media conversion quality selector. -->
-    <string name="QualitySelectorBottomSheetDialog__media_quality">Kvaliteta medisjkih datotek</string>
-
     <!-- AppSettingsFragment -->
     <!-- String alerting user that something is wrong with their backups subscription -->
     <string name="AppSettingsFragment__renew_your_signal_backups_subscription">Podaljšajte naročnino na Varne varnostne kopije Signal</string>
@@ -5944,14 +5917,6 @@
     <string name="AppSettingsFragment__copied_backups_subscriber_id_to_clipboard">Številka naročnika varnostne kopije je bila prekopirana v odložišče</string>
     <!-- String displayed in a toast when a subscriber id is not present for a given type -->
     <string name="AppSettingsFragment__no_subscriber_id_set">Številka naročnika ni nastavljena</string>
-
-    <!-- AccountSettingsFragment -->
-    <string name="AccountSettingsFragment__account">Račun</string>
-    <string name="AccountSettingsFragment__youll_be_asked_less_frequently">Sčasoma boste opozorjeni manjkrat</string>
-    <string name="AccountSettingsFragment__require_your_signal_pin">Zahteva za vnos PIN kode Signal za ponovno prijavo vaše telefonske številke v sistem Signal.</string>
-    <string name="AccountSettingsFragment__change_phone_number">Sprememba telefonske številke</string>
-    <!-- Account setting that allows user to request and export their signal account data -->
-    <string name="AccountSettingsFragment__request_account_data">Podatki vašega računa</string>
 
     <!-- ExportAccountDataFragment -->
     <!-- Part of requesting account data flow, this is the section title for requesting that account data -->
@@ -6001,6 +5966,41 @@
     <string name="ChangeNumber__your_phone_number_has_changed_to_s">Vaša telefonska številka je bila spremenjena v %1$s</string>
     <!-- Confirmation button to dismiss number changed dialog -->
     <string name="ChangeNumber__okay">Okej</string>
+
+    <!-- ChangeNumberPostRegistrationWaitSheet: title of the sheet shown when the user tries to change number too soon after registering -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__title">Sprememba številke ni mogoča</string>
+    <!-- ChangeNumberPostRegistrationWaitSheet: explanation body shown above the wait-time line -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__body">Ker ste nedavno registrirali ta račun, trenutno telefonsko številke ne morete spremeniti. Kratka čakalna doba nam pomaga zaščititi vaš račun.</string>
+    <!-- ChangeNumberPostRegistrationWaitSheet: remaining-wait line when wait is one hour or more, %1$d is the number of hours, rounded up -->
+    <plurals name="ChangeNumberPostRegistrationWaitSheet__try_again_in_hours">
+        <item quantity="one">Poskusite znova čez %1$d uro.</item>
+        <item quantity="two">Poskusite znova čez %1$d uri.</item>
+        <item quantity="few">Poskusite znova čez %1$d ure.</item>
+        <item quantity="other">Poskusite znova čez %1$d ur.</item>
+    </plurals>
+    <!-- ChangeNumberPostRegistrationWaitSheet: remaining-wait line when wait is under one hour, %1$d is the number of minutes, rounded up -->
+    <plurals name="ChangeNumberPostRegistrationWaitSheet__try_again_in_minutes">
+        <item quantity="one">Poskusite znova čez %1$d minuto.</item>
+        <item quantity="two">Poskusite znova čez %1$d minuti.</item>
+        <item quantity="few">Poskusite znova čez %1$d minute.</item>
+        <item quantity="other">Poskusite znova čez %1$d minut.</item>
+    </plurals>
+    <!-- ChangeNumberPostRegistrationWaitSheet: dismiss button -->
+    <string name="ChangeNumberPostRegistrationWaitSheet__ok">V redu</string>
+    <!-- ChangeNumberEnterCodeFragment: rate-limit dialog message when retry-after is one hour or more, %1$d is hours rounded up -->
+    <plurals name="ChangeNumberEnterCodeFragment__too_many_attempts_try_again_in_hours">
+        <item quantity="one">Preveč neuspešnih poskusov. Poskusite znova čez %1$d uro.</item>
+        <item quantity="two">Preveč neuspešnih poskusov. Poskusite znova čez %1$d uri.</item>
+        <item quantity="few">Preveč neuspešnih poskusov. Poskusite znova čez %1$d ure.</item>
+        <item quantity="other">Preveč neuspešnih poskusov. Poskusite znova čez %1$d ur.</item>
+    </plurals>
+    <!-- ChangeNumberEnterCodeFragment: rate-limit dialog message when retry-after is under one hour, %1$d is minutes rounded up -->
+    <plurals name="ChangeNumberEnterCodeFragment__too_many_attempts_try_again_in_minutes">
+        <item quantity="one">Preveč neuspešnih poskusov. Poskusite znova čez %1$d minuto.</item>
+        <item quantity="two">Preveč neuspešnih poskusov. Poskusite znova čez %1$d minuti.</item>
+        <item quantity="few">Preveč neuspešnih poskusov. Poskusite znova čez %1$d minute.</item>
+        <item quantity="other">Preveč neuspešnih poskusov. Poskusite znova čez %1$d minut.</item>
+    </plurals>
 
     <!-- ChangeNumberEnterPhoneNumberFragment -->
     <string name="ChangeNumberEnterPhoneNumberFragment__change_number">Sprememba številke</string>
@@ -6227,14 +6227,48 @@
     <!-- NotificationsSettingsFragment -->
     <string name="NotificationsSettingsFragment__messages">Sporočila</string>
     <string name="NotificationsSettingsFragment__calls">Klici</string>
-    <string name="NotificationsSettingsFragment__notify_when">Obvesti me ko …</string>
+    <!-- Notification header for sounds -->
+    <string name="NotificationsSettingsFragment__sounds">Zvoki</string>
     <string name="NotificationsSettingsFragment__contact_joins_signal">Oseba iz imenika se pridruži Signalu</string>
+    <!-- Notification body to get notified when someone joins Signal -->
+    <string name="NotificationsSettingsFragment__notify_contact">Prikaži obvestilo, ko se telefonski stik pridruži Signalu</string>
+    <!-- Option to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset">Ponastavi nastavitve obvestil</string>
+    <!-- Option body to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset_notifications">Ponastavite nastavitve obvestil na privzete, vključno z nastavitvami po meri za vaše klepete</string>
+    <!-- Dialog to reset their notification settings -->
+    <string name="NotificationsSettingsFragment__reset_body">Želite ponastaviti vse nastavitve obvestil na privzete za vse klepete?</string>
+    <!-- Confirmation button to reset dialog -->
+    <string name="NotificationsSettingsFragment__reset_confirm">Ponastavi</string>
     <!-- Notification preference header -->
     <string name="NotificationsSettingsFragment__notification_profiles">Profili za obvestila</string>
     <!-- Notification preference option header -->
     <string name="NotificationsSettingsFragment__profiles">Profili</string>
     <!-- Notification preference summary text -->
     <string name="NotificationsSettingsFragment__create_a_profile_to_receive_notifications_only_from_people_and_groups_you_choose">Ustvarite profil za prejemanje obvestil le od uporabnikov_ic in skupin po vaši izbiri.</string>
+
+    <!-- Header to describe screen that shows while muted settings -->
+    <string name="MutedNotificationsFragment__while">Med utišanjem</string>
+    <!-- Title for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls">Klici</string>
+    <!-- Description for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls_body_global">Zazvoni ali prikaži obvestilo, ko se začne klic v utišanih klepetih.</string>
+    <!-- Title for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions">Omembe</string>
+    <!-- Description for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions_body_global">Obvesti me, ko me nekdo omeni v utišanih klepetih.</string>
+    <!-- Title for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies">Odgovori</string>
+    <!-- Description for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies_body_global">Obvesti me, ko nekdo odgovori na moje sporočilo v utišanih klepetih.</string>
+    <!-- Description for toggle row to control call settings while muted -->
+    <string name="MutedNotificationsFragment__calls_body">Zazvoni ali prikaži obvestilo, ko se začne klic v tem utišanem klepetu.</string>
+    <!-- Description for toggle row to control mentions settings while muted -->
+    <string name="MutedNotificationsFragment__mentions_body">Obvesti me, ko me nekdo omeni v tem utišanem klepetu.</string>
+    <!-- Description for toggle row to control replies settings while muted -->
+    <string name="MutedNotificationsFragment__replies_body">Obvesti me, ko nekdo odgovori na moje sporočilo v tem utišanem klepetu.</string>
+    <!-- Description for toggle row to control unread reminders while muted -->
+    <string name="MutedNotificationsFragment__unread_body">Occasionally notify when there are unread messages while this chat is muted.</string>
 
     <!-- NotificationProfilesFragment -->
     <!-- Title for notification profiles screen that shows all existing profiles; Title with hyphenation. Translation can use soft hyphen - Unicode U+00AD -->
@@ -6300,6 +6334,8 @@
     <string name="HelpSettingsFragment__support_center">Center za podporo</string>
     <string name="HelpSettingsFragment__contact_us">Kontaktirajte nas</string>
     <string name="HelpSettingsFragment__version">Različica</string>
+    <!-- Displayed when copying help screen text to the clipboard -->
+    <string name="HelpSettingsFragment__copied_to_clipboard">Kopirano v odložišče</string>
     <string name="HelpSettingsFragment__debug_log">Sistemska zabeležba</string>
     <!--    Header for the screen that displays the licenses of the open-source software dependencies of the Signal app-->
     <string name="HelpSettingsFragment__licenses">Licence</string>
@@ -6315,12 +6351,14 @@
     <string name="DataAndStorageSettingsFragment__sent_media_quality">Kvaliteta poslanih medijskih datotek</string>
     <string name="DataAndStorageSettingsFragment__sending_high_quality_media_will_use_more_data">Pošiljanje medijskih datotek boljše kvalitete porabi več podatkov.</string>
     <!-- Disclaimer shown under the media auto-download settings. Placeholder is a formatted size like "100 KB". -->
-    <string name="DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded">Voice messages and stickers (under %1$s) are always auto-downloaded.</string>
-    <!-- Setting option that can be selected to default media to be sent as high quality by default -->
-    <string name="DataAndStorageSettingsFragment__high">Visoka</string>
-    <!-- Setting option that can be selected to default media to be sent as standard quality by default -->
-    <string name="DataAndStorageSettingsFragment__standard">Standardna</string>
+    <string name="DataAndStorageSettingsFragment__voice_messages_and_stickers_under_size_are_always_auto_downloaded">Glasovna sporočila in nalepke (pod %1$s) se vedno samodejno prenesejo.</string>
     <string name="DataAndStorageSettingsFragment__calls">Klici</string>
+    <!-- Title of a toggle that keeps Signal connected in the background via a persistent foreground service instead of using FCM push messages -->
+    <string name="DataAndStorageSettingsFragment__stay_connected_in_background">Ostanite povezani v ozadju</string>
+    <!-- Body of a confirmation dialog shown when a user tries to enable the "Stay connected in background" setting -->
+    <string name="DataAndStorageSettingsFragment__staying_connected_while_in_the_background_will_likely_result_in_increased_battery_usage">Ostati povezan v ozadju bo verjetno povzročilo večjo porabo baterije. To ni nujno za večino naprav. Omogočite le, če ste imeli težave z obvestili.</string>
+    <!-- Button label that enables the "Stay connected in background" setting from a confirmation dialog -->
+    <string name="DataAndStorageSettingsFragment__enable">Omogoči</string>
 
     <!-- ChatColorSelectionFragment -->
     <!-- Text shown on a circle button to indicate the app will automatically select a color for conversation bubbles for this chat. -->
@@ -6465,6 +6503,8 @@
     <string name="ConversationSettingsFragment__end_group">Zaključi skupino</string>
     <!-- Banner shown at the top of group settings when the group has been ended -->
     <string name="ConversationSettingsFragment__this_group_was_ended">Ta skupina je zaključena.</string>
+    <!-- Subhead under a legacy group\'s name, joining the member count and the "Legacy Group" label. %1$s is the member count, %2$s is the label -->
+    <string name="ConversationSettingsFragment__s_dot_s">%1$s · %2$s</string>
     <!-- Archive chat option in group conversation settings screen -->
     <string name="ConversationSettingsFragment__archive_chat">Arhiviraj klepet</string>
     <!-- Delete chat option in group conversation settings screen -->
@@ -6590,13 +6630,15 @@
     <!-- AvatarPickerFragment -->
     <string name="AvatarPickerFragment__avatar_preview">Predogled avatarja</string>
     <string name="AvatarPickerFragment__camera">Kamera</string>
-    <string name="AvatarPickerFragment__take_a_picture">Ustvari fotografijo</string>
-    <string name="AvatarPickerFragment__choose_a_photo">Izberi fotografijo</string>
     <string name="AvatarPickerFragment__photo">Slika</string>
     <!-- Button label during avatar selection/creation that when tapped lets you generate an avatar from typed in text. -->
     <string name="AvatarPickerFragment__text">Besedilo</string>
     <string name="AvatarPickerFragment__save">Shrani</string>
     <string name="AvatarPickerFragment__clear_avatar">Izbriši avatar</string>
+    <!-- Content description for the edit icon displayed over the currently selected avatar. -->
+    <string name="AvatarPickerFragment__edit_avatar">Edit avatar</string>
+    <!-- Accessibility label describing the menu shown when long pressing one of your saved avatars. -->
+    <string name="AvatarPickerFragment__avatar_options">Avatar options</string>
     <string name="AvatarPickerRepository__failed_to_save_avatar">Shranjevanje avatarja ni uspelo</string>
 
     <!-- TextAvatarCreationFragment -->
@@ -6660,57 +6702,11 @@
     <!-- Positive dialog action when sending a story via an add to group story button -->
     <string name="MediaReviewFragment__add_to_story">Dodaj k zgodbi</string>
     <string name="MediaReviewFragment__add_a_message">Dodaj sporočilo</string>
-    <!-- Hint text inside of a compose box that is shown when the user is adding media while quoting a message. -->
-    <string name="MediaReviewFragment__add_a_reply">Dodaj odgovor</string>
     <string name="MediaReviewFragment__send_to">Poslano uporabniku_ci</string>
-    <string name="MediaReviewFragment__view_once_message">Datoteka za enkratni ogled</string>
-    <string name="MediaReviewFragment__one_or_more_items_were_too_large">En ali več predmetov je bilo prevelikih</string>
-    <string name="MediaReviewFragment__one_or_more_items_were_invalid">En ali več predmetov je bilo neveljavnih</string>
-    <string name="MediaReviewFragment__too_many_items_selected">Preveč izbranih predmetov</string>
-    <!-- Small notification presented to the user when they set their video to view-once mode -->
-    <string name="MediaReviewFragment__video_set_to_view_once">Videoposnetek je nastavljen za enkratni ogled</string>
-    <!-- Small notification presented to the user when they set their photo to view-once mode -->
-    <string name="MediaReviewFragment__photo_set_to_view_once">Fotografija je nastavljena za enkratni ogled</string>
-    <!-- Small notification presented to the user when they set their video to be sent in high visual quality. -->
-    <string name="MediaReviewFragment__video_set_to_high_quality">Videoposnetek je nastavljen na visoko kakovost</string>
-    <!-- Small notification presented to the user when they set their video to be sent in standard (lower than high) visual quality. -->
-    <string name="MediaReviewFragment__video_set_to_standard_quality">Videoposnetek je nastavljen na standardno kakovost</string>
-    <!-- Small notification presented to the user when they set their still image to be sent in high visual quality. -->
-    <string name="MediaReviewFragment__photo_set_to_high_quality">Fotografija je nastavljena na visoko kakovost</string>
-    <!-- Small notification presented to the user when they set their still image to be sent in standard (lower than high) visual quality. -->
-    <string name="MediaReviewFragment__photo_set_to_standard_quality">Fotografija je nastavljena na standardno kakovost</string>
-    <!-- Accessibility label describing the add media button on the Media review screen -->
-    <string name="MediaReviewFragment__add_media_accessibility_label">Dodajanje medija</string>
-    <!-- Accessibility label describing the brush and pen button on the Media review screen -->
-    <string name="MediaReviewFragment__brush_pen_accessibility_label">Čopič in pero</string>
-    <!-- Accessibility label describing the crop and rotate button on the Media review screen -->
-    <string name="MediaReviewFragment__crop_rotate_accessibility_label">Obreži in zavrti</string>
-    <!-- Accessibility label describing the change media quality button on the Media review screen -->
-    <string name="MediaReviewFragment__change_media_quality_accessibility_label">Sprememba kakovosti medija</string>
-    <!-- Accessibility label describing the save media button on the Media review screen -->
-    <string name="MediaReviewFragment__save_media_accessibility_label">Shranjevanje medija</string>
-    <!-- Accessibility label describing the toggle emoji keyboard button on the Media review screen -->
-    <string name="MediaReviewFragment__emoji_toggle_accessibility_label">Vklop tipkovnice emoji</string>
     <!-- Accessibility label describing the toggle view once button on the Media review screen -->
     <string name="MediaReviewFragment__view_once_toggle_accessibility_label">Preklopi Enkratni ogled</string>
-    <!-- Accessibility label describing the send media button on the Media review screen -->
-    <string name="MediaReviewFragment__send_media_accessibility_label">Pošlji medij</string>
     <!-- Accessibility label describing the finish adding a message button on the Media review screen dialog -->
     <string name="MediaReviewFragment__finish_adding_a_message_accessibility_label">Dokončanje dodajanja sporočila</string>
-    <!-- Small notification presented to the user when they set multiple media items to be sent in high visual quality. -->
-    <plurals name="MediaReviewFragment__items_set_to_high_quality">
-        <item quantity="one">%1$d medij je nastavljen na visoko kakovost</item>
-        <item quantity="two">%1$d medija sta nastavljena na visoko kakovost</item>
-        <item quantity="few">%1$d mediji so nastavljeni na visoko kakovost</item>
-        <item quantity="other">%1$d medijev je nastavljenih na visoko kakovost</item>
-    </plurals>
-    <!-- Small notification presented to the user when they set multiple media items to be sent in standard (lower than high) visual quality. -->
-    <plurals name="MediaReviewFragment__items_set_to_standard_quality">
-        <item quantity="one">%1$d medij je nastavljen na standardno kakovost</item>
-        <item quantity="two">%1$d medija sta nastavljena na standardno kakovost</item>
-        <item quantity="few">%1$d mediji so nastavljeni na standardno kakovost</item>
-        <item quantity="other">%1$d medijev je nastavljenih na standardno kakovost</item>
-    </plurals>
 
     <string name="ImageEditorHud__cancel">Prekliči</string>
     <string name="ImageEditorHud__draw">Riši</string>
@@ -6728,27 +6724,9 @@
 
     <string name="MediaCountIndicatorButton__send">Pošlji</string>
 
-    <string name="MediaReviewSelectedItem__tap_to_remove">Tapni za odstranitev</string>
-    <string name="MediaReviewSelectedItem__tap_to_select">Tapnite za izbor</string>
-
     <string name="MediaReviewImagePageFragment__discard">Zavrzi</string>
     <string name="MediaReviewImagePageFragment__discard_changes">Želite zavreči spremembe?</string>
     <string name="MediaReviewImagePageFragment__youll_lose_any_changes">Vse spremembe, narejene na tej fotografiji, bodo izgubljene.</string>
-
-    <!-- The title of a dialog notifying that a user was found matching a scanned QR code. The placeholder is a username. Usernames are always latin characters. -->
-    <string name="MediaCaptureFragment_username_dialog_title">Najden_a: %1$s</string>
-    <!-- The body of a dialog notifying that a user was found matching a scanned QR code, prompting the user to start a chat with them. The placeholder is a username. Usernames are always latin characters. -->
-    <string name="MediaCaptureFragment_username_dialog_body">Začni klepetati s/z \"%1$s\"</string>
-    <!-- The label of a dialog asking the user if they would like to start a chat with a specific user. -->
-    <string name="MediaCaptureFragment_username_dialog_go_to_chat_button">Pojdi na klepet</string>
-
-    <!-- The title of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_device_link_dialog_title">Poveži z napravo?</string>
-    <!-- The body of a dialog notifying that the user scanned a QR code that could be used to link a Signal device. -->
-    <string name="MediaCaptureFragment_it_looks_like_youre_trying">Zdi se, da poskušate povezati napravo Signal. Tapnite Nadaljuj in nato \"Poveži novo napravo\" ter znova preberite QR kodo.</string>
-    <!-- The label of a dialog asking the user if they would like to continue to the linked device settings screen. -->
-    <string name="MediaCaptureFragment_device_link_dialog_continue">Nadaljuj</string>
-
 
     <string name="BadgesOverviewFragment__my_badges">Moje značke</string>
     <string name="BadgesOverviewFragment__featured_badge">Izpostavljene značke</string>
@@ -7223,7 +7201,7 @@
     <!-- Donation receipts amount title -->
     <string name="DonationReceiptDetailsFragment__amount">Količina</string>
     <!-- Donation receipts thanks -->
-    <string name="DonationReceiptDetailsFragment__thank_you_for_supporting">Hvala, ker podpirate Signal. S svojim prispevkom pomagate pri uresničevanju poslanstva razvoja odprtokodne tehnologije zasebnosti, ki varuje svobodo izražanja in omogoča varno globalno komunikacijo za milijone ljudi po vsem svetu. Če ste prebivalec Združenih držav Amerike, hranite to potrdilo za svojo davčno evidenco. Tehnološka fundacija Signal je neprofitna organizacija, ki je v Združenih državah Amerike oproščena plačila davkov v skladu z oddelkom 501c3 zakonika o notranjih prihodkih. Naša zvezna davčna številka je 82–4506840.</string>
+    <string name="DonationReceiptDetailsFragment__thank_you_for_supporting" tools:ignore="TypographyDashes">Hvala, ker podpirate Signal. S svojim prispevkom prispevate k uresničevanju poslanstva zaščite svobode izražanja in omogočanja varne globalne komunikacije za milijone ljudi po vsem svetu z odprtokodno tehnologijo zasebnosti. Če prebivate v Združenih državah Amerike, to potrdilo shranite za davčno evidenco. Signal Technology Foundation je neprofitna organizacija v Združenih državah Amerike, ki je oproščena davka v skladu s členom 501c3 zakonika o notranjih prihodkih. Naša zvezna davčna številka je 82-4506840. Signal v zameno za ta prispevek ni zagotovil nobenega blaga ali storitev.</string>
     <!-- Donation reciepts screen empty state title -->
     <string name="DonationReceiptListFragment__no_receipts">Ni prejemnikov</string>
 
@@ -8604,8 +8582,23 @@
     <!-- Button of a megaphone that will snooze the reminder to upgrade to the new local backups type -->
     <string name="UseNewOnDeviceBackups__not_now">Ne zdaj</string>
 
+    <!-- Title of a megaphone shown to prompt the user to open Signal on their primary device -->
+    <string name="InactivePrimary__title">Odprite Signal v svoji napravi</string>
+    <!-- Body of a megaphone shown to prompt the user to open Signal on their primary device -->
+    <string name="InactivePrimary__body">Da bo vaš račun še naprej aktiven, odprite Signal v svoji primarni napravi.</string>
+    <!-- Button of a megaphone shown to prompt the user to open Signal on their primary device that will navigate to a support page -->
+    <string name="InactivePrimary__learn_more">Več o tem</string>
+    <!-- Button of a megaphone shown to prompt the user to open Signal on their primary device that will snooze the megaphone -->
+    <string name="InactivePrimary__got_it">Razumem</string>
+
     <!-- Text describing how to restore a backup displayed on the on-device backups screen -->
     <string name="OnDeviceBackupsScreen__to_restore_a_backup">"Za obnovo varnostne kopije morate najprej namestiti novo kopijo Signala. Nato odprite aplikacijo, tapnite »Obnovi varnostno kopijo« in poiščite mapo varnostne kopije."</string>
+    <!-- Body of a dialog shown when turning on on-device backups while "Optimize Signal storage" is enabled, warning that optimized media won\'t be included -->
+    <string name="OnDeviceBackupsScreen__you_have_optimize_signal_storage_on">Vklopljeno imate možnost »Optimiziraj pomnilnik Signal«. Če želite v varnostno kopijo na svoji napravi shraniti vse medije, izklopite to nastavitev.</string>
+    <!-- Dialog action that takes the user to the "Optimize Signal storage" setting -->
+    <string name="OnDeviceBackupsScreen__view_setting">Prikaži nastavitve</string>
+    <!-- Dialog action to proceed with turning on on-device backups without turning off "Optimize Signal storage" -->
+    <string name="OnDeviceBackupsScreen__continue_without_turning_off">Nadaljuj brez izklopa</string>
 
     <!-- Title of a megaphone shown to prompt the user to verify their recovery key -->
     <string name="VerifyBackupKey__title">Potrdite svoj obnovitveni ključ</string>
@@ -8988,13 +8981,19 @@
     <!-- Setting description for syncing automated chat limit trimming (deleting messages automatically by length or date) to linked devices -->
     <string name="ManageStorageSettingsFragment_apply_limits_description">Če je omejitev klepeta omogočena, se izbrišejo tudi sporočila iz povezanih naprav.</string>
     <!-- Setting section title header for storage optimization -->
-    <string name="ManageStorageSettingsFragment__on_device_storage">Shranjevanje v napravi</string>
+    <string name="ManageStorageSettingsFragment__on_device_storage">Shramba Signal</string>
     <!-- Setting row title for storage optimization -->
-    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimizacija shranjevanja v napravi</string>
+    <string name="ManageStorageSettingsFragment__optimize_on_device_storage">Optimizirajte shrambo Signal</string>
     <!-- Setting row explanation for storage optimization -->
     <string name="ManageStorageSettingsFragment__unused_media_will_be_offloaded">Neuporabljeni mediji bodo preneseni, vendar jih lahko kadarkoli prenesete iz varnostne kopije.</string>
     <!-- Dialog message for paid tier pending dialog -->
     <string name="ManageStorageSettingsFragment__storage_optimization_can_only_be_used">Optimizacijo shranjevanja je mogoče uporabljati samo s plačljivo ravnjo Varne varnostne kopije Signal. Vaša naročnina na varnostno kopiranje je še vedno v obdelavi in še ni aktivna. Poskusite pozneje.</string>
+    <!-- Title of a dialog shown when turning on "Optimize Signal storage" while on-device backups are enabled -->
+    <string name="ManageStorageSettingsFragment__media_will_be_removed_from_your_on_device_backup">Mediji bodo odstranjeni iz varnostne kopije v vaši napravi</string>
+    <!-- Body of a dialog shown when turning on "Optimize Signal storage" while on-device backups are enabled -->
+    <string name="ManageStorageSettingsFragment__turning_on_optimize_signal_storage_will_offload">Z vklopom možnosti »Optimiziraj pomnilnik Signal« bodo stari mediji odstranjeni iz vaše naprave. Kadarkoli je lahko ponovno prenesete. Prav tako bodo stari mediji odstranjeni iz varnostne kopije v vaši napravi.</string>
+    <!-- Dialog action to confirm turning on "Optimize Signal storage" -->
+    <string name="ManageStorageSettingsFragment__turn_on">Vklopi</string>
 
     <!-- UpgradeToEnableOptimizedStorageSheet -->
     <!-- Title on a bottom sheet, detailing that the user must upgrade to enable storage optimization -->
@@ -9049,13 +9048,6 @@
     <!-- Body of bottom sheet shown when opening a terminated group -->
     <string name="TerminatedGroupBottomSheet__you_can_no_longer_send_and_receive">V tej skupini ne boste več mogli pošiljati in prejemati sporočil ali klicev.</string>
 
-    <!-- Educational bottom sheet dialog title shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_title">Brisanje je zdaj sinhronizirano v vseh napravah</string>
-    <!-- Educational bottom sheet dialog message shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_message">Ko izbrišete sporočila ali klepete, se izbrišejo iz telefona in vseh povezanih naprav.</string>
-    <!-- Educational bottom sheet confirm/dismiss button text shown to notify about delete syncs causing deletes to happen across all devices -->
-    <string name="DeleteSyncEducation_acknowledge_button">OK</string>
-
     <!-- NoManualBackupBottomSheet -->
     <!-- Title for bottom sheet, placeholder is number of days. -->
     <plurals name="NoManualBackupBottomSheet__no_backup_for_d_days">
@@ -9083,6 +9075,8 @@
     <string name="BackupsSettingsFragment__subscription_canceled">Naročnina je prekinjena</string>
     <!-- Subtitle for row for no backup ever created -->
     <string name="BackupsSettingsFragment_automatic_backups_with_signals">Samodejno varnostno kopiranje s Signalovo varno storitvijo šifriranega shranjevanja od konca do konca.</string>
+    <!-- Subtitle shown on a linked device when backups are off, directing the user to set them up on their phone -->
+    <string name="BackupsSettingsFragment__automatic_backups_get_started_on_your_phone">Samodejno varnostno kopiranje s Signalovo varno storitvijo šifriranega shranjevanja od konca do konca. Začnite v telefonu.</string>
     <!-- Subtitle for row for backups that are active but subscription not found -->
     <string name="BackupsSettingsFragment_subscription_not_found_on_this_device">"Naročnina ni bila najdena v tej napravi."</string>
     <!-- Action button label to set up backups -->
@@ -9100,7 +9094,7 @@
     <!-- Displayed as a label when remote backups are off -->
     <string name="RemoteBackupsSettingsFragment__off">Izklopljeno</string>
     <!-- Text shown in a popup indicating that the user needs to enter their screen lock -->
-    <string name="RemoteBackupsSettingsFragment__authenticatino_required">Zahtevano je preverjanje pristnosti</string>
+    <string name="RemoteBackupsSettingsFragment__authentication_required">Zahtevano je preverjanje pristnosti</string>
     <!-- Row label to launch payment history screen -->
     <string name="RemoteBackupsSettingsFragment__payment_history">Zgodovina plačil</string>
     <!-- Section header for backup information -->
@@ -9188,6 +9182,16 @@
     <string name="RemoteBackupsSettingsFragment__s_at_s">%1$s ob %2$s</string>
     <!-- Subtext describing when a backup has never taken place. -->
     <string name="RemoteBackupsSettingsFragment__never">Nikoli</string>
+    <!-- Subtext on a linked device describing when the primary device last backed up. Placeholder is the formatted date and time. -->
+    <string name="RemoteBackupsSettingsFragment__your_phone_s">Vaš telefon · %1$s</string>
+    <!-- Message shown on a linked device with a free backup plan explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_upgrade_your_subscription_on_your_primary_device">Naročnino na Varne varnostne kopije lahko upravljate ali nadgradite v primarni napravi.</string>
+    <!-- Message shown on a linked device with a paid backup plan explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_cancel_your_subscription_on_your_primary_device">V primarni napravi lahko upravljate ali prekličete naročnino na Varne varnostne kopije Signal.</string>
+    <!-- Message shown on a linked device with a canceled backup subscription explaining that the subscription is managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_renew_your_subscription_on_your_primary_device">Naročnino na Varne varnostne kopije lahko upravljate ali obnovite v svoji primarni napravi.</string>
+    <!-- Message shown on a linked device when backups are off or the subscription was not found, explaining that backups are managed on the primary device -->
+    <string name="RemoteBackupsSettingsFragment__you_can_manage_or_upgrade_backups_on_your_primary_device">Varne varnostne kopije lahko upravljate ali nadgradite v primarni napravi.</string>
     <!-- Button label to perform a backup immediately -->
     <string name="RemoteBackupsSettingsFragment__back_up_now">Izdelaj varnostno kopijo</string>
     <!-- Dialog title when confirming whether to turn off and deleting backups -->
@@ -9485,19 +9489,37 @@
     <!-- Dialog title for confirming you need to disable optimized storage and download media to rotate AEP key -->
     <string name="MessageBackupsKeyRecordScreen__download_media">Prenesi medije</string>
     <!-- Dialog body for confirming you need to disable optimized storage and download media to rotate AEP key -->
-    <string name="MessageBackupsKeyRecordScreen__to_create_a_new_backup_key">Če želite ustvariti novi obnovitveni ključ za varnostno kopijo, morate izklopiti možnost »Optimiziraj shranjevanje« in počakati, da se prenesejo vsi mediji. Ko je prenos končan, lahko ustvarite nov ključ.</string>
+    <string name="MessageBackupsKeyRecordScreen__to_create_a_new_backup_key">Če želite ustvariti novi obnovitveni ključ za varnostno kopijo, morate izklopiti možnost »Optimiziraj shrambo Signal« in počakati, da se prenesejo vsi mediji. Ko je prenos končan, lahko ustvarite nov ključ.</string>
     <!-- Action label to turn off optimized storage and download media -->
     <string name="MessageBackupsKeyRecordScreen__turn_off_and_download">Izklopite in prenesite</string>
     <!-- Bottom Sheet title for creating a new AEP key -->
     <string name="MessageBackupsKeyRecordScreen__create_a_new_backup_key">Ustvarite nov obnovitveni ključ</string>
     <!-- Bottom Sheet body for creating a new AEP key -->
-    <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Ustvarjanje novega ključa je potrebno le, če vaš ključ pozna še kdo drug. Ponovno boste morali naložiti varnostno kopijo, vključno z medijskimi datotekami. Če uporabljate »Optimiziraj shranjevanje«, boste morali najprej prenesti medijske vsebine, ki so bile odstranjene iz naprave.</string>
+    <string name="MessageBackupsKeyRecordScreen__creating_a_new_key_is_only_necessary">Ustvarjanje novega ključa je potrebno le, če vaš ključ pozna še kdo drug. Ponovno boste morali naložiti varnostno kopijo, vključno z medijskimi datotekami. Če uporabljate »Optimiziraj shrambo Signal«, boste morali najprej prenesti medijske vsebine, ki so bile odstranjene iz naprave.</string>
     <!-- Dialog title shown when user attempts to exit backup setup before completion -->
     <string name="MessageBackupsKeyRecordScreen__exit_backup_setup">Želite zapreti nastavitev varnostnega kopiranja?</string>
     <!-- Dialog body warning user that backup setup is incomplete -->
     <string name="MessageBackupsKeyRecordScreen__you_have_not_finished_setting_up_backups">Niste dokončali nastavitve varnostnega kopiranja in varnostna kopija ni bila ustvarjena. Varnostne kopije lahko omogočite v nastavitvah.</string>
     <!-- Dialog confirmation button to exit backup setup -->
     <string name="MessageBackupsKeyRecordScreen__exit_backup_setup_confirm">Izhod iz nastavitve varnostnega kopiranja</string>
+    <!-- Screen title when saving your recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__save_your_recovery_key">Shranite obnovitveni ključ</string>
+    <!-- Screen subtitle for the recovery key screen -->
+    <string name="MessageBackupsKeyRecordScreen__your_recovery_key">Obnovitveni ključ je 64-mestna koda, s katero lahko obnovite varnostno kopijo. Če pozabite ključ, računa ne boste mogli obnoviti.</string>
+    <!-- Hint text to see the full recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__see_full_key">Prikaži celoten ključ</string>
+    <!-- Bottom sheet caption to confirm your recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__confirm_that_your_recovery">Potrdite, da ste pravilno shranili obnovitveni ključ. V naslednjem koraku boste pozvani, da vnesete shranjeno geslo.</string>
+    <!-- Button to confirm the recovery key -->
+    <string name="MessageBackupsKeyRecordScreen__confirm_recovery">Potrdi obnovitveni ključ</string>
+    <!-- Toast shown when the key is confirmed -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_confirmed">Obnovitveni ključ je potrjen</string>
+    <!-- Dialog title shown when the recovery key fails to confirm -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_error">Napaka pri potrjevanju obnovitvenega ključa</string>
+    <!-- Dialog body shown when the recovery key fails to confirm -->
+    <string name="MessageBackupsKeyRecordScreen__recover_key_error_body">Obnovitvenega ključa nismo mogli potrditi. Poskrbite, da je shranjen v upravitelja gesel ali ga shranite ročno.</string>
+    <!-- Button option to save the key manually -->
+    <string name="MessageBackupsKeyRecordScreen__save_key_manually">Shrani ključ ročno</string>
 
     <!-- BackupKeyDisplayFragment -->
     <!-- Dialog title when exiting before confirming new key -->
@@ -9748,11 +9770,11 @@
     <!-- RestoreLocalBackupActivity: Label for the button that opens the contact support form -->
     <string name="RestoreLocalBackupActivity__contact_support">Obrnite se na službo za podporo</string>
 
-    <!-- RestoreLocalBackupActivity: Title for the dialog shown when the restored backup belongs to a different account -->
+    <!-- RestoreLocalBackupActivity: Title for the dialog shown when on-device backups could not be automatically re-enabled -->
     <string name="RestoreLocalBackupActivity__turn_on_on_device_backups">Želite vklopiti varnostne kopije v napravi?</string>
 
-    <!-- RestoreLocalBackupActivity: Body for the dialog shown when the restored backup belongs to a different account, prompting the user to re-enable on-device backups -->
-    <string name="RestoreLocalBackupActivity__to_continue_using_on_device_backups">Če želite še naprej uporabljati varnostne kopije v napravi, jih morate omogočiti za ta račun in shraniti nov obnovitveni ključ. To lahko kadarkoli storite v Nastavitvah &gt; Varnostne kopije.</string>
+    <!-- RestoreLocalBackupActivity: Body for the dialog shown when on-device backups could not be automatically re-enabled, prompting the user to re-enable on-device backups -->
+    <string name="RestoreLocalBackupActivity__to_continue_using_on_device_backups">Če želite še naprej uporabljati varnostne kopije v napravi, jih morate omogočiti za ta račun. To lahko kadarkoli storite v Nastavitvah &gt; Varnostne kopije.</string>
 
     <!-- RestoreLocalBackupActivity: Confirm button label for the dialog prompting the user to re-enable on-device backups -->
     <string name="RestoreLocalBackupActivity__turn_on_now">Vklopi</string>
@@ -10240,8 +10262,30 @@
     <!-- Body for screen shown to let the user know that displaying their member label will take priority over their about text. -->
     <string name="MemberLabelsAboutOverride__body">V tej skupini bo vaša vloga člana prikazana poleg vaše fotografije namesto vaše strani »O meni«.</string>
 
-    <!-- Label for internal-only section showing groups with same members -->
-  <!-- Removed by excludeNonTranslatables <string name="AddGroupDetailsFragment__groups_with_same_members" translatable="false">Groups with same members (Labs)</string> -->
+    <!-- Header for the section shown when creating a group that lists existing groups with the exact same members. Includes the number of such groups. -->
+    <plurals name="AddGroupDetailsFragment__d_groups_with_same_members">
+        <item quantity="one">%1$d skupina z enakimi člani</item>
+        <item quantity="two">%1$d skupini z enakimi člani</item>
+        <item quantity="few">%1$d skupine z enakimi člani</item>
+        <item quantity="other">%1$d skupin z enakimi člani</item>
+    </plurals>
+
+    <!-- Header for a section showing all group member -->
+    <string name="MemberSearchFragment__search_members">Iskanje članov</string>
+    <!-- Header for a section showing all group members who are contacts -->
+    <string name="MemberSearchFragment__search_contacts">Iskanje stikov</string>
+    <!-- Header for a section showing all group member who are admins -->
+    <string name="MemberSearchFragment__search_admins">Išči med administratorji</string>
+    <!-- Dialog title to filter search by -->
+    <string name="MemberSearchFragment__filter">Filtriraj glede na:</string>
+    <!-- Dialog option for all group members -->
+    <string name="MemberSearchFragment__filter_all_members">Vsi člani</string>
+    <!-- Dialog option for group admins -->
+    <string name="MemberSearchFragment__filter_admins">Skrbniki_ce</string>
+    <!-- Dialog option for your contacts -->
+    <string name="MemberSearchFragment__filter_contacts">Stiki</string>
+    <!-- Button to invite members via a group link -->
+    <string name="MemberSearchFragment__invite_via">Povabi prek povezave skupine</string>
 
     <!-- Title of the sheet shown when a local backup restore could not be completed -->
     <string name="CouldNotCompleteBackupRestoreSheet__title">Ne moremo obnoviti varnostne kopije</string>
@@ -10251,6 +10295,115 @@
 
     <!-- Body of the sheet shown when a local backup restore could not be completed, explaining how to try again -->
     <string name="CouldNotCompleteBackupRestoreSheet__body_retry">Za ponovni poskus odstranite in ponovno namestite Signal v tej napravi ter izberite »Obnovi ali prenesi«.</string>
+
+    <!-- Title of the sheet shown when the server reports a verification code was requested for the user\'s phone number -->
+    <string name="VerificationCodeRequestedBottomSheet__title">Zahtevana je bila potrditvena koda</string>
+    <!-- First paragraph of the body of the verification code requested sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__body_1">Potrditvene kode ne delite z nikomer. Signal vas ne bo nikoli kontaktiral v zvezi z njo. Če ste prejeli sporočilo nekoga, ki se pretvarja, da je Signal, gre za prevaro.</string>
+    <!-- Second paragraph of the body of the verification code requested sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__body_2">To sporočilo lahko prezrete, če ste kodo zahtevali sami.</string>
+    <!-- Button on the verification code requested sheet that opens the safety tips screen -->
+    <string name="VerificationCodeRequestedBottomSheet__safety_tips">Varnostni nasveti</string>
+    <!-- Button on the verification code requested sheet that dismisses the sheet -->
+    <string name="VerificationCodeRequestedBottomSheet__ok">V redu</string>
+    <!-- Subtitle on the verification code requested sheet showing the time the code was requested followed by the relative day. %1$s is the time (e.g. "3:25 PM"), %2$s is the relative day (e.g. "Today", "Yesterday", "Jan 15") -->
+    <string name="VerificationCodeRequestedBottomSheet__time_with_day">%1$s %2$s</string>
+
+    <!-- Title of the safety tips screen within the verification code requested sheet -->
+    <string name="SafetyTipsBottomSheet__title">Varnostni nasveti</string>
+    <!-- Title of the first safety tip: don\'t respond to chats claiming to be Signal -->
+    <string name="SafetyTipsBottomSheet__tip_1_title">Ne odgovarjajte na sporočila Signala</string>
+    <!-- Body of the first safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_1_body">Signal vas nikoli ne bo kontaktiral in vprašal za vašo registracijsko kodo, PIN kodo ali obnovitveni ključ. Nikoli ne odgovarjajte na sporočilo, ki se pretvarja, da je Signal.</string>
+    <!-- Title of the second safety tip: keep your verification code safe -->
+    <string name="SafetyTipsBottomSheet__tip_2_title">Ohranite svojo potrditveno kodo varno</string>
+    <!-- Body of the second safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_2_body">Če ste prejeli potrditveno kodo, ki je niste zahtevali, je možno, da nekdo poskuša dostopati do vašega računa. Ne delite svoje kode.</string>
+    <!-- Title of the third safety tip: enable registration lock -->
+    <string name="SafetyTipsBottomSheet__tip_3_title">V nastavitvah računa vklopite zaklep registracije</string>
+    <!-- Body of the third safety tip -->
+    <string name="SafetyTipsBottomSheet__tip_3_body">Svoj račun zaščitite tako, da ob registraciji v Signal poleg potrditvene kode zahtevate še vaš Signalov PIN.</string>
+    <!-- Button on the safety tips screen that opens account settings -->
+    <string name="SafetyTipsBottomSheet__open_account_settings">Odpri nastavitve računa</string>
+
+    <!-- Title of a warning sheet shown when the user copies or pastes their recovery key, urging them not to share it -->
+    <string name="RecoveryKeyWarningSheetContent__do_not_share_your_recovery_key">Ne delite svojega obnovitvenega ključa</string>
+    <!-- Bolded lead-in to the warning sheet body; combined with RecoveryKeyWarningSheetContent__for_your_recovery_key_never_respond to form a full sentence -->
+    <string name="RecoveryKeyWarningSheetContent__signal_will_never_message_you">Signal vas ne bo nikoli kontaktiral</string>
+    <!-- Remainder of the warning sheet body following the bolded lead-in RecoveryKeyWarningSheetContent__signal_will_never_message_you -->
+    <string name="RecoveryKeyWarningSheetContent__for_your_recovery_key_never_respond">za vaš obnovitveni ključ. Nikoli ne odgovarjajte na sporočilo, ki se pretvarja, da je Signal. Obnovitveni ključ shranite na varno mesto in ga nikoli ne delite z nikomer.</string>
+    <!-- Button dismissing the recovery key warning sheet after the user has copied their key -->
+    <string name="RecoveryKeyWarningSheetContent__got_it">Razumem</string>
+    <!-- Button opening a help article with more information about recovery key safety -->
+    <string name="RecoveryKeyWarningSheetContent__learn_more">Več o tem</string>
+    <!-- Inline link opening a help article with more information about recovery key safety -->
+    <string name="RecoveryKeyWarningSheetContent__learn_more_period">Več o tem.</string>
+    <!-- Button declining to paste/share the recovery key, dismissing the warning sheet -->
+    <string name="RecoveryKeyWarningSheetContent__do_not_share_key">Ne deli ključa</string>
+    <!-- Button indicating the user wants to proceed with sharing/pasting the recovery key, which shows a final confirmation -->
+    <string name="RecoveryKeyWarningSheetContent__share_key">Deli kjluč</string>
+
+    <!-- Title of the final confirmation dialog shown before pasting a recovery key -->
+    <string name="RecoveryKeyWarningDialog__do_not_share_recovery_key">Ne delite obnovitvenega ključa</string>
+    <!-- First sentence of the final confirmation dialog body warning against sharing the recovery key -->
+    <string name="RecoveryKeyWarningDialog__do_not_share_your_recovery_key_with_anyone">Ne delite svojega obnovitvenega ključa z nikomer. Tako bi lahko prevzeli vaš račun.</string>
+    <!-- Bolded middle sentence of the final confirmation dialog body -->
+    <string name="RecoveryKeyWarningDialog__signal_will_never_message_you_for_your_recovery_key">Signal vas ne bo nikoli kontaktiral za vaš obnovitveni ključ.</string>
+    <!-- Final sentence of the final confirmation dialog body -->
+    <string name="RecoveryKeyWarningDialog__never_respond_to_a_chat">Nikoli ne odgovarjajte na sporočilo, ki se pretvarja, da je Signal.</string>
+    <!-- Button confirming the user wants to paste the recovery key -->
+    <string name="RecoveryKeyWarningDialog__paste_key">Prilepi ključ</string>
+    <!-- Button declining to paste the recovery key -->
+    <string name="RecoveryKeyWarningDialog__dont_share">Ne deli</string>
+
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, last two are the summaries for mentions and replies -->
+    <string name="UnreadReminderJob__calls_and_unread_full_summary">You have %1$s and %2$s including %3$s and %4$s.</string>
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, third is a summary of mentions or replies -->
+    <string name="UnreadReminderJob__calls_and_unread_summary">You have %1$s and %2$s including %3$s.</string>
+    <!-- Notification body for unread reminders. First two placeholders are the number of unread messages and calls, third is a list of recipients who sent them -->
+    <string name="UnreadReminderJob__calls_and_unread_author">You have %1$s and %2$s from %3$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a summary of unread mentions or replies -->
+    <string name="UnreadReminderJob__unread_one_summary">You have %1$s, including %2$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a summary of unread mentions, third replies -->
+    <string name="UnreadReminderJob__unread_both_summary">You have %1$s, including %2$s and %3$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is a list of people who sent them -->
+    <string name="UnreadReminderJob__calls_or_unread_author">You have %1$s from %2$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages or unread calls -->
+    <string name="UnreadReminderJob__calls_or_unread">You have %1$s.</string>
+    <!-- Notification body for unread reminders. First placeholder is unread messages, second is unread calls. -->
+    <string name="UnreadReminderJob__calls_and_unread">You have %1$s and %2$s.</string>
+    <!-- Notification placeholder for unread calls -->
+    <plurals name="UnreadReminderJob__calls">
+        <item quantity="one">%1$d missed call</item>
+        <item quantity="two">%1$d missed calls</item>
+        <item quantity="few">%1$d missed calls</item>
+        <item quantity="other">%1$d missed calls</item>
+    </plurals>
+    <!-- Notification placeholder for unread messages -->
+    <plurals name="UnreadReminderJob__messages">
+        <item quantity="one">%1$d neprebrano sporočilo</item>
+        <item quantity="two">%1$d neprebrani sporočili</item>
+        <item quantity="few">%1$d neprebrana sporočila</item>
+        <item quantity="other">%1$d neprebranih sporočil</item>
+    </plurals>
+    <!-- Notification placeholder for a single recipient who sent unread messages -->
+    <string name="UnreadReminderJob__authors_one">%1$s</string>
+    <!-- Notification placeholder for two recipients who sent unread messages -->
+    <string name="UnreadReminderJob__authors_two">%1$s in %2$s</string>
+    <!-- Notification placeholder for three or more recipients who sent unread messages -->
+    <string name="UnreadReminderJob__authors_many">%1$s and others</string>
+    <!-- Notification placeholder that sums up a single unread mention. Placeholder is the name of the person who sent the message -->
+    <string name="UnreadReminderJob__mentions_one">a mention of you by %1$s</string>
+    <!-- Notification placeholder that sums up unread mentions from two people. First placeholder is the number of mentions, second and third are the names of the people who sent them -->
+    <string name="UnreadReminderJob__mentions_two">%1$d mentions of you by %2$s and %3$s</string>
+    <!-- Notification placeholder that sums up unread mentions from three or more people. First placeholder is the number of mentions, second is the name of one person who sent them -->
+    <string name="UnreadReminderJob__mentions_many">%1$d mentions of you by %2$s and others</string>
+    <!-- Notification placeholder that sums up a single unread reply. Placeholder is the name of the person who sent the message -->
+    <string name="UnreadReminderJob__replies_one">a reply from %1$s</string>
+    <!-- Notification placeholder that sums up unread replies from two people. First placeholder is the number of replies, second and third are the names of the people who sent them -->
+    <string name="UnreadReminderJob__replies_two">%1$d replies from %2$s and %3$s</string>
+    <!-- Notification placeholder that sums up unread replies from three or more people. First placeholder is the number of replies, second is the name of one person who sent them -->
+    <string name="UnreadReminderJob__replies_many">%1$d replies from %2$s and others</string>
 
     <!-- EOF -->
 </resources>

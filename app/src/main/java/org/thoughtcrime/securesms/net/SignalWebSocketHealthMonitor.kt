@@ -13,12 +13,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.signal.core.util.AppForegroundObserver
+import org.signal.core.util.SleepTimer
 import org.signal.core.util.logging.Log
+import org.thoughtcrime.securesms.clockskew.ClockSkewDetector
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.keyvalue.SignalStore
-import org.thoughtcrime.securesms.util.AppForegroundObserver
 import org.thoughtcrime.securesms.util.TextSecurePreferences
-import org.whispersystems.signalservice.api.util.SleepTimer
 import org.whispersystems.signalservice.api.websocket.HealthMonitor
 import org.whispersystems.signalservice.api.websocket.SignalWebSocket
 import org.whispersystems.signalservice.api.websocket.WebSocketConnectionState
@@ -39,6 +40,8 @@ class SignalWebSocketHealthMonitor(
 
     private val KEEP_ALIVE_SEND_CADENCE: Duration = OkHttpWebSocketConnection.KEEPALIVE_FREQUENCY_SECONDS.seconds
     private val KEEP_ALIVE_SEND_CADENCE_BACKGROUND: Duration = 60.seconds
+
+    private const val ALERT_IDLE_PRIMARY_DEVICE = "idle-primary-device"
   }
 
   private val executor: Executor = Executors.newSingleThreadExecutor()
@@ -133,6 +136,27 @@ class SignalWebSocketHealthMonitor(
         SignalStore.misc.isClientDeprecated = true
         webSocket?.forceNewWebSocket()
       }
+    }
+  }
+
+  override fun onReceivedAlerts(alerts: Array<out String>, isIdentifiedWebSocket: Boolean) {
+    if (!isIdentifiedWebSocket) {
+      return
+    }
+    executor.execute {
+      SignalStore.account.hasInactivePrimaryDeviceAlert = SignalStore.account.isLinkedDevice && alerts.contains(ALERT_IDLE_PRIMARY_DEVICE)
+    }
+  }
+
+  override fun onServerTimestamp(serverTimestamp: Long, isIdentifiedWebSocket: Boolean) {
+    if (!isIdentifiedWebSocket) {
+      return
+    }
+    executor.execute {
+      if (!SignalStore.account.isRegistered) {
+        return@execute
+      }
+      ClockSkewDetector.onServerTimeReceived(serverTimestamp)
     }
   }
 

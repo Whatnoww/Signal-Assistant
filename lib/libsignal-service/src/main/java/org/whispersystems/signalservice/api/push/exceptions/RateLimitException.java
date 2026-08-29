@@ -6,6 +6,7 @@
 
 package org.whispersystems.signalservice.api.push.exceptions;
 
+import org.signal.network.exceptions.NonSuccessfulResponseCodeException;
 
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ public class RateLimitException extends NonSuccessfulResponseCodeException {
   }
 
   public RateLimitException(int status, String message, Optional<Long> retryAfterMilliseconds) {
-    super(status, message);
+    super(status, retryAfterMilliseconds.map(ms -> message + " retry-after: " + ms).orElse(message));
     this.retryAfterMilliseconds = retryAfterMilliseconds;
   }
 

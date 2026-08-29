@@ -35,6 +35,7 @@ import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.hasGroupContex
 import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.hasSignedGroupChange
 import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.hasStarted
 import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.isExpirationUpdate
+import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.isGroupV2Update
 import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.isMediaMessage
 import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.isValid
 import org.thoughtcrime.securesms.messages.SignalServiceProtoUtil.signedGroupChange
@@ -53,6 +54,7 @@ import org.whispersystems.signalservice.api.push.DistributionId
 import org.whispersystems.signalservice.api.push.SignalServiceAddress
 import org.whispersystems.signalservice.internal.push.CallMessage
 import org.whispersystems.signalservice.internal.push.Content
+import org.whispersystems.signalservice.internal.push.DataMessage
 import org.whispersystems.signalservice.internal.push.Envelope
 import org.whispersystems.signalservice.internal.push.GroupContextV2
 import org.whispersystems.signalservice.internal.push.TypingMessage
@@ -148,25 +150,16 @@ open class MessageContentProcessor(private val context: Context) {
     @Throws(BadGroupIdException::class)
     private fun shouldIgnore(content: Content, senderRecipient: Recipient, threadRecipient: Recipient): Boolean {
       if (content.dataMessage != null) {
-        val message = content.dataMessage!!
-        return if (threadRecipient.isGroup && threadRecipient.isBlocked) {
-          true
-        } else if (threadRecipient.isGroup) {
-          if (threadRecipient.isUnknownGroup) {
-            return senderRecipient.isBlocked
-          }
-
-          val isTextMessage = message.body != null
-          val isMediaMessage = message.isMediaMessage
-          val isExpireMessage = message.isExpirationUpdate
-          val isGv2Update = message.hasSignedGroupChange
-          val isContentMessage = !isGv2Update && !isExpireMessage && (isTextMessage || isMediaMessage)
-          val isGroupActive = threadRecipient.isActiveGroup
-
-          isContentMessage && !isGroupActive || senderRecipient.isBlocked && !isGv2Update
+        return shouldIgnoreDataMessage(content.dataMessage!!, senderRecipient, threadRecipient)
+      } else if (content.editMessage != null) {
+        val editDataMessage = content.editMessage!!.dataMessage
+        return if (editDataMessage != null) {
+          shouldIgnoreDataMessage(editDataMessage, senderRecipient, threadRecipient)
         } else {
           senderRecipient.isBlocked
         }
+      } else if (content.decryptionErrorMessage != null) {
+        return senderRecipient.isBlocked
       } else if (content.callMessage != null) {
         return senderRecipient.isBlocked
       } else if (content.typingMessage != null) {
@@ -192,6 +185,27 @@ open class MessageContentProcessor(private val context: Context) {
         }
       }
       return false
+    }
+
+    private fun shouldIgnoreDataMessage(message: DataMessage, senderRecipient: Recipient, threadRecipient: Recipient): Boolean {
+      return if (threadRecipient.isGroup && threadRecipient.isBlocked) {
+        true
+      } else if (threadRecipient.isGroup) {
+        if (threadRecipient.isUnknownGroup) {
+          return senderRecipient.isBlocked
+        }
+
+        val isTextMessage = message.body != null
+        val isMediaMessage = message.isMediaMessage
+        val isExpireMessage = message.isExpirationUpdate
+        val isGv2Update = message.isGroupV2Update
+        val isContentMessage = !isGv2Update && !isExpireMessage && (isTextMessage || isMediaMessage)
+        val isGroupActive = threadRecipient.isActiveGroup
+
+        isContentMessage && !isGroupActive || senderRecipient.isBlocked && !isGv2Update
+      } else {
+        senderRecipient.isBlocked
+      }
     }
 
     @Throws(BadGroupIdException::class)
@@ -234,10 +248,11 @@ open class MessageContentProcessor(private val context: Context) {
       senderRecipient: Recipient,
       groupSecretParams: GroupSecretParams? = null,
       serverGuid: String? = null,
-      batchCache: BatchCache? = null
+      batchCache: BatchCache? = null,
+      receivedTime: Long? = null
     ): Gv2PreProcessResult {
       val preUpdateGroupRecord = batchCache?.groupRecordCache[groupId] ?: SignalDatabase.groups.getGroup(groupId)
-      val groupUpdateResult = updateGv2GroupFromServerOrP2PChange(context, timestamp, groupV2, preUpdateGroupRecord, groupSecretParams, serverGuid)
+      val groupUpdateResult = updateGv2GroupFromServerOrP2PChange(context, timestamp, groupV2, preUpdateGroupRecord, groupSecretParams, serverGuid, receivedTime)
       if (groupUpdateResult == null) {
         log(timestamp, "Ignoring GV2 message for group we are not currently in $groupId")
         return Gv2PreProcessResult.IGNORE
@@ -266,6 +281,11 @@ open class MessageContentProcessor(private val context: Context) {
             Log.w(TAG, "Ignoring message from ${senderRecipient.id} because it has disallowed content, and they're not an admin in an announcement-only group.")
             return Gv2PreProcessResult.IGNORE
           }
+        } else if (content.editMessage?.dataMessage != null) {
+          if (content.editMessage!!.dataMessage!!.hasDisallowedAnnouncementOnlyContent) {
+            Log.w(TAG, "Ignoring edit message from ${senderRecipient.id} because it has disallowed content, and they're not an admin in an announcement-only group.")
+            return Gv2PreProcessResult.IGNORE
+          }
         } else if (content.typingMessage != null) {
           Log.w(TAG, "Ignoring typing indicator from ${senderRecipient.id} because they're not an admin in an announcement-only group.")
           return Gv2PreProcessResult.IGNORE
@@ -285,13 +305,14 @@ open class MessageContentProcessor(private val context: Context) {
       groupV2: GroupContextV2,
       localRecord: Optional<GroupRecord>,
       groupSecretParams: GroupSecretParams? = null,
-      serverGuid: String? = null
+      serverGuid: String? = null,
+      receivedTime: Long? = null
     ): GroupUpdateResult? {
       return try {
         val signedGroupChange: ByteArray? = if (groupV2.hasSignedGroupChange) groupV2.signedGroupChange else null
         val updatedTimestamp = if (signedGroupChange != null) timestamp else timestamp + 1
         if (groupV2.revision != null) {
-          GroupManager.updateGroupFromServer(context, groupV2.groupMasterKey, localRecord, groupSecretParams, groupV2.revision!!, updatedTimestamp, signedGroupChange, serverGuid)
+          GroupManager.updateGroupFromServer(context, groupV2.groupMasterKey, localRecord, groupSecretParams, groupV2.revision!!, updatedTimestamp, signedGroupChange, serverGuid, receivedTime)
         } else {
           warn(timestamp, "Ignore group update message without a revision")
           null
@@ -470,7 +491,6 @@ open class MessageContentProcessor(private val context: Context) {
 
       content.syncMessage != null -> {
         SignalStore.account.isMultiDevice = true
-        SignalStore.misc.lastSyncMessageSeenTimeMs = System.currentTimeMillis()
 
         SyncMessageProcessor.process(
           context,
@@ -479,7 +499,8 @@ open class MessageContentProcessor(private val context: Context) {
           envelope,
           content,
           metadata,
-          if (processingEarlyContent) null else EarlyMessageCacheEntry(envelope, content, metadata, serverDeliveredTimestamp)
+          if (processingEarlyContent) null else EarlyMessageCacheEntry(envelope, content, metadata, serverDeliveredTimestamp),
+          batchCache
         )
       }
 
@@ -534,7 +555,8 @@ open class MessageContentProcessor(private val context: Context) {
           envelope,
           content,
           metadata,
-          if (processingEarlyContent) null else EarlyMessageCacheEntry(envelope, content, metadata, serverDeliveredTimestamp)
+          if (processingEarlyContent) null else EarlyMessageCacheEntry(envelope, content, metadata, serverDeliveredTimestamp),
+          batchCache
         )
       }
 

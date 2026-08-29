@@ -16,30 +16,38 @@ jobs:
     runs-on: ubuntu-latest-8-cores
 
     steps:
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # gh api repos/actions/checkout/commits/v6 --jq '.sha'
       with:
         submodules: true
         ref: ${{ github.event.pull_request.base.sha }}
 
-    - name: set up JDK 17
-      uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
+    - name: set up JDK 21
+      uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5
       # gh api repos/actions/setup-java/commits/v5 --jq '.sha'
       with:
         distribution: temurin
-        java-version: 17
-        cache: gradle
+        java-version: 21
+
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6
+      # gh api repos/gradle/actions/commits/v6 --jq '.sha'
+      with:
+        # PR-only workflow: always read from the cache, never write.
+        cache-read-only: true
+        # Required to read the Gradle configuration cache persisted by 8.** builds.
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
     - name: Install NDK
       run: echo "y" | ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --install "ndk;${{ env.NDK_VERSION }}"
 
     - name: Validate Gradle Wrapper
-      uses: gradle/actions/wrapper-validation@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6
+      uses: gradle/actions/wrapper-validation@3f131e8634966bd73d06cc69884922b02e6faf92 # v6
       # gh api repos/gradle/actions/commits/v6 --jq '.sha'
 
     - name: Cache base apk
       id: cache-base
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
       # gh api repos/actions/cache/commits/v5 --jq '.sha'
       with:
         path: diffuse-base.apk
@@ -53,7 +61,7 @@ jobs:
       if: steps.cache-base.outputs.cache-hit != 'true'
       run: mv app/build/outputs/apk/playProd/release/*arm64*.apk diffuse-base.apk
 
-    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # gh api repos/actions/checkout/commits/v6 --jq '.sha'
       with:
         submodules: true

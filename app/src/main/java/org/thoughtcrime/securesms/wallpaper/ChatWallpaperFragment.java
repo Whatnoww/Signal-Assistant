@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.Fragment;
@@ -28,9 +30,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.components.AvatarImageView;
 import org.thoughtcrime.securesms.conversation.colors.ColorizerView;
-import org.thoughtcrime.securesms.util.DisplayMetricsUtil;
+import org.signal.core.util.DisplayMetricsUtil;
 import org.thoughtcrime.securesms.util.Projection;
 import org.signal.core.ui.util.ThemeUtil;
+import org.thoughtcrime.securesms.util.SystemWindowInsetsSetter;
 import org.thoughtcrime.securesms.util.ViewUtil;
 import org.thoughtcrime.securesms.util.navigation.SafeNavigation;
 
@@ -66,6 +69,14 @@ public class ChatWallpaperFragment extends Fragment {
     View               sendButton           = view.findViewById(R.id.chat_wallpaper_preview_bottom_bar_plus);
 
     dimInNightMode = view.findViewById(R.id.chat_wallpaper_dark_theme_dims_wallpaper);
+
+    ScrollView scrollView = view.findViewById(R.id.chat_wallpaper_scroll);
+
+    toolbar.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+    SystemWindowInsetsSetter.attach(toolbar, getViewLifecycleOwner(), WindowInsetsCompat.Type.statusBars());
+
+    scrollView.setClipToPadding(false);
+    SystemWindowInsetsSetter.attach(scrollView, getViewLifecycleOwner(), WindowInsetsCompat.Type.navigationBars());
 
     toolbar.setTitle(R.string.preferences__chat_color_and_wallpaper);
     toolbar.setNavigationOnClickListener(nav -> {

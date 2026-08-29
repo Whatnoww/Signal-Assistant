@@ -1,6 +1,7 @@
 package org.thoughtcrime.securesms.jobs
 
 import org.signal.core.util.logging.Log
+import org.signal.network.exceptions.PushNetworkException
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.RecipientRecord
 import org.thoughtcrime.securesms.dependencies.AppDependencies
@@ -13,7 +14,6 @@ import org.thoughtcrime.securesms.recipients.Recipient
 import org.whispersystems.signalservice.api.crypto.UntrustedIdentityException
 import org.whispersystems.signalservice.api.messages.multidevice.BlockedListMessage
 import org.whispersystems.signalservice.api.messages.multidevice.SignalServiceSyncMessage
-import org.whispersystems.signalservice.api.push.exceptions.PushNetworkException
 import org.whispersystems.signalservice.api.push.exceptions.ServerRejectedException
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -51,10 +51,10 @@ class MultiDeviceBlockedUpdateJob private constructor(parameters: Parameters) : 
     }
 
     val blocked: List<RecipientRecord> = SignalDatabase.recipients.getBlocked()
-    val blockedGroups = blocked.mapNotNull { it.groupId?.decodedId }
+    val blockedGroups = blocked.mapNotNull { record -> record.groupId?.decodedId?.let { BlockedListMessage.Group(it, record.blockedAt) } }
     val blockedIndividuals = blocked
       .filter { it.aci != null || it.e164 != null }
-      .map { BlockedListMessage.Individual(it.aci, it.e164) }
+      .map { BlockedListMessage.Individual(it.aci, it.e164, it.blockedAt) }
 
     AppDependencies.signalServiceMessageSender.sendSyncMessage(
       SignalServiceSyncMessage.forBlocked(BlockedListMessage(blockedIndividuals, blockedGroups))

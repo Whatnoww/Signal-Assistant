@@ -14,7 +14,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.thoughtcrime.securesms.attachments.AttachmentId
+import org.signal.core.models.database.AttachmentId
 import org.thoughtcrime.securesms.attachments.Cdn
 import org.thoughtcrime.securesms.attachments.DatabaseAttachment
 import org.thoughtcrime.securesms.database.AttachmentTable
@@ -210,9 +210,15 @@ class AttachmentUtilTest {
   }
 
   @Test
-  fun `long text always permitted`() {
-    val attachment = attachment(contentType = "text/x-signal-plain")
+  fun `long text within 64 KiB cap permitted`() {
+    val attachment = attachment(size = MessageUtil.MAX_TOTAL_BODY_SIZE_BYTES.toLong(), contentType = "text/x-signal-plain")
     assertTrue(AttachmentUtil.isAutoDownloadPermitted(context, attachment))
+  }
+
+  @Test
+  fun `long text exceeding 64 KiB cap rejected`() {
+    val attachment = attachment(size = MessageUtil.MAX_TOTAL_BODY_SIZE_BYTES.toLong() + 1, contentType = "text/x-signal-plain")
+    assertFalse(AttachmentUtil.isAutoDownloadPermitted(context, attachment))
   }
 
   @Test
@@ -485,6 +491,7 @@ class AttachmentUtilTest {
       archiveCdn = null,
       thumbnailRestoreState = AttachmentTable.ThumbnailRestoreState.NONE,
       archiveTransferState = AttachmentTable.ArchiveTransferState.NONE,
+      archiveThumbnailTransferState = AttachmentTable.ArchiveTransferState.NONE,
       uuid = null,
       quoteTargetContentType = null,
       metadata = null
