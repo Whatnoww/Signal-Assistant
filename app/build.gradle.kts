@@ -136,15 +136,8 @@ ktlint {
 }
 
 //Whatnoww added - Load Github token
-val localProps = Properties().apply {
-  val f = rootProject.file("local.properties")
-  if (f.exists()) {
-    FileInputStream(f).use { load(it) }
-  }
-}
-
-val githubToken: String = localProps.getProperty("GITHUB_TOKEN") ?: ""
-val responseXml: String = localProps.getProperty("RESPONSE_XML") ?: ""
+val githubToken: String = localProperties?.getProperty("GITHUB_TOKEN") ?: ""
+val responseXml: String = localProperties?.getProperty("RESPONSE_XML") ?: ""
 
 // ktlint only scans convention source dirs, so the shared dirs added to the compile tasks are
 // otherwise skipped. Add them to the base test/androidTest ktlint tasks so ktlintCheck/format cover them.
