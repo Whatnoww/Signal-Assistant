@@ -13,10 +13,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.runBlocking
-import org.greenrobot.eventbus.EventBus
 import org.signal.core.models.database.AttachmentId
 import org.signal.core.util.Base64.decodeBase64OrThrow
 import org.signal.core.util.PendingIntentFlags
+import org.signal.core.util.eventbus.EventBus
 import org.signal.core.util.isNotNullOrBlank
 import org.signal.core.util.logging.Log
 import org.signal.libsignal.protocol.InvalidMacException
@@ -50,6 +50,7 @@ import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.logsubmit.SubmitDebugLogActivity
 import org.thoughtcrime.securesms.mms.MmsException
 import org.thoughtcrime.securesms.mms.PartAuthority
+import org.thoughtcrime.securesms.net.SignalNetwork
 import org.thoughtcrime.securesms.notifications.NotificationChannels
 import org.thoughtcrime.securesms.notifications.NotificationIds
 import org.thoughtcrime.securesms.service.BackupMediaRestoreService
@@ -372,7 +373,7 @@ class RestoreAttachmentJob private constructor(
 
       val progressListener = object : SignalServiceAttachment.ProgressListener {
         override fun onAttachmentProgress(progress: AttachmentTransferProgress) {
-          EventBus.getDefault().postSticky(PartProgressEvent(attachment, PartProgressEvent.Type.NETWORK, progress))
+          EventBus.default.postSticky(PartProgressEvent(attachment, PartProgressEvent.Type.NETWORK, progress))
         }
 
         override fun shouldCancel(): Boolean {
@@ -382,7 +383,7 @@ class RestoreAttachmentJob private constructor(
 
       ArchiveRestoreProgress.onDownloadStart(attachmentId)
       val decryptingStream = if (useArchiveCdn) {
-        val cdnCredentials = runBlocking { AppDependencies.archiveService.getCdnReadCredentials(ArchiveService.CredentialType.MEDIA, pointer.cdnNumber) }.successOrThrow().headers
+        val cdnCredentials = runBlocking { SignalNetwork.archiveService.getCdnReadCredentials(ArchiveService.CredentialType.MEDIA, pointer.cdnNumber) }.successOrThrow().headers
 
         messageReceiver
           .retrieveArchivedAttachment(

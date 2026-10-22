@@ -37,6 +37,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.signal.core.models.recipients.RecipientId;
 import org.signal.core.ui.permissions.Permissions;
 import org.signal.core.ui.view.Stub;
 import org.signal.core.util.ExpiringProfileCredentialUtil;
@@ -57,14 +58,10 @@ import org.thoughtcrime.securesms.components.ThumbnailView;
 import org.thoughtcrime.securesms.components.location.SignalMapView;
 import org.thoughtcrime.securesms.components.location.SignalPlace;
 import org.thoughtcrime.securesms.conversation.MessageSendType;
-import org.thoughtcrime.securesms.database.MediaTable;
 import org.thoughtcrime.securesms.database.SignalDatabase;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.giph.ui.GiphyActivity;
 import org.thoughtcrime.securesms.maps.PlacePickerActivity;
-import org.thoughtcrime.securesms.mediapreview.MediaIntentFactory;
-import org.thoughtcrime.securesms.mediapreview.MediaPreviewCache;
-import org.thoughtcrime.securesms.mediapreview.MediaPreviewFragment;
 import org.thoughtcrime.securesms.mediasend.MediaSendLauncher;
 import org.thoughtcrime.securesms.payments.CanNotSendPaymentDialog;
 import org.thoughtcrime.securesms.payments.PaymentsAddressException;
@@ -73,12 +70,11 @@ import org.thoughtcrime.securesms.payments.preferences.PaymentsActivity;
 import org.thoughtcrime.securesms.payments.preferences.RecipientHasNotEnabledPaymentsDialog;
 import org.thoughtcrime.securesms.payments.preferences.model.PayeeParcelable;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.sms.MessageSender;
 import org.thoughtcrime.securesms.util.MediaUtil;
 import org.thoughtcrime.securesms.util.ProfileUtil;
 import org.thoughtcrime.securesms.util.RemoteConfig;
-import org.thoughtcrime.securesms.util.ViewUtil;
+import org.signal.core.ui.util.ViewUtil;
 import org.thoughtcrime.securesms.util.concurrent.AssertedSuccessListener;
 
 import java.io.IOException;
@@ -125,7 +121,6 @@ public class AttachmentManager {
       this.removableMediaView = root.findViewById(R.id.removable_media_view);
 
       removableMediaView.setRemoveClickListener(new RemoveButtonListener());
-      thumbnail.setOnClickListener(new ThumbnailClickListener());
       documentView.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.signal_background_secondary), PorterDuff.Mode.MULTIPLY);
     }
 
@@ -375,43 +370,6 @@ public class AttachmentManager {
     } catch (ActivityNotFoundException anfe) {
       Log.w(TAG, "couldn't complete ACTION_GET_CONTENT intent, no activity found. falling back.");
       Toast.makeText(fragment.requireContext(), R.string.AttachmentManager_cant_open_media_selection, Toast.LENGTH_LONG).show();
-    }
-  }
-
-  private void previewImageDraft(final @NonNull Slide slide) {
-    if (MediaPreviewFragment.isContentTypeSupported(slide.getContentType()) && slide.getUri() != null) {
-      MediaIntentFactory.MediaPreviewArgs args = new MediaIntentFactory.MediaPreviewArgs(
-          MediaIntentFactory.NOT_IN_A_THREAD,
-          MediaIntentFactory.UNKNOWN_TIMESTAMP,
-          MediaIntentFactory.NOT_IN_A_THREAD,
-          RecipientId.UNKNOWN,
-          RecipientId.UNKNOWN,
-          true,
-          slide.getUri(),
-          slide.getUri(),
-          slide.getContentType(),
-          slide.asAttachment().size,
-          slide.getCaption().orElse(null),
-          null,
-          false,
-          false,
-          false,
-          false,
-          MediaTable.Sorting.Newest,
-          slide.isVideoGif(),
-          new MediaIntentFactory.SharedElementArgs(),
-          false);
-      context.startActivity(MediaIntentFactory.create(context, args));
-    }
-  }
-
-  private class ThumbnailClickListener implements View.OnClickListener {
-    @Override
-    public void onClick(View v) {
-      if (slide.isPresent()) {
-        MediaPreviewCache.INSTANCE.setDrawable(((ThumbnailView) v).getImageDrawable());
-        previewImageDraft(slide.get());
-      }
     }
   }
 

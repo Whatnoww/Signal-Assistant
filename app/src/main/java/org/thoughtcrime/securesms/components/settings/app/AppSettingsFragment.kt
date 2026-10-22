@@ -331,8 +331,8 @@ private fun AppSettingsContent(
 
               if (state.hasExpiredGiftBadge) {
                 Icon(
-                  painter = painterResource(R.drawable.symbol_info_fill_24),
-                  tint = colorResource(R.color.signal_accent_primary),
+                  painter = painterResource(CoreUiR.drawable.symbol_info_fill_24),
+                  tint = colorResource(CoreUiR.color.signal_accent_primary),
                   contentDescription = null
                 )
               }
@@ -363,7 +363,7 @@ private fun AppSettingsContent(
 
         item {
           Rows.TextRow(
-            text = stringResource(R.string.preferences__appearance),
+            text = stringResource(AppSettingsR.string.preferences__appearance),
             icon = painterResource(R.drawable.symbol_appearance_24),
             onClick = {
               callbacks.navigate(AppSettingsRoute.AppearanceRoute.Appearance)
@@ -373,7 +373,7 @@ private fun AppSettingsContent(
 
         item {
           Rows.TextRow(
-            text = stringResource(R.string.preferences_chats__chats),
+            text = stringResource(AppSettingsR.string.preferences_chats__chats),
             icon = painterResource(R.drawable.symbol_chat_24),
             onClick = {
               callbacks.navigate(AppSettingsRoute.ChatsRoute.Chats)
@@ -433,7 +433,7 @@ private fun AppSettingsContent(
 
         item {
           Rows.TextRow(
-            text = stringResource(R.string.preferences__data_and_storage),
+            text = stringResource(AppSettingsR.string.preferences__data_and_storage),
             icon = painterResource(R.drawable.symbol_data_24),
             onClick = {
               callbacks.navigate(AppSettingsRoute.DataAndStorageRoute.DataAndStorage)
@@ -502,7 +502,7 @@ private fun AppSettingsContent(
 
         item {
           Rows.TextRow(
-            text = stringResource(R.string.preferences__help),
+            text = stringResource(AppSettingsR.string.preferences__help),
             icon = painterResource(R.drawable.symbol_help_24),
             onClick = {
               callbacks.navigate(AppSettingsRoute.HelpRoute.Settings())
@@ -586,6 +586,7 @@ private fun BioRow(
   callbacks: Callbacks
 ) {
   val hasUsername by rememberUpdatedState(self.username.isNotBlank())
+  val hasPhoneNumber by rememberUpdatedState(self.e164.isNotBlank())
 
   Row(
     verticalAlignment = Alignment.CenterVertically,
@@ -629,21 +630,23 @@ private fun BioRow(
         )
       }
 
-      val prettyPhoneNumber = if (LocalInspectionMode.current) {
-        self.e164
-      } else {
-        remember(self.e164) {
-          SignalE164Util.prettyPrint(self.e164)
+      if (hasPhoneNumber) {
+        val prettyPhoneNumber = if (LocalInspectionMode.current) {
+          self.e164
+        } else {
+          remember(self.e164) {
+            SignalE164Util.prettyPrint(self.e164)
+          }
         }
-      }
 
-      Text(
-        text = prettyPhoneNumber,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        style = TextStyle(
-          textDirection = TextDirection.ContentOrLtr
+        Text(
+          text = prettyPhoneNumber,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          style = TextStyle(
+            textDirection = TextDirection.ContentOrLtr
+          )
         )
-      )
+      }
 
       if (hasUsername) {
         Text(
@@ -771,6 +774,27 @@ private fun BioRowPreview() {
           profileName = ProfileName.fromParts("Miles", "Morales ❤\uFE0F"),
           isSelf = true,
           e164Value = "+15555555555",
+          usernameValue = "miles.98",
+          aboutEmoji = "❤\uFE0F",
+          about = "About",
+          isResolving = false
+        )
+      ),
+      callbacks = EmptyCallbacks
+    )
+  }
+}
+
+@DayNightPreviews
+@Composable
+private fun BioRowNoPhoneNumberPreview() {
+  Previews.Preview {
+    BioRow(
+      self = BioRecipientState(
+        Recipient(
+          systemContactName = "Miles Morales",
+          profileName = ProfileName.fromParts("Miles", "Morales ❤\uFE0F"),
+          isSelf = true,
           usernameValue = "miles.98",
           aboutEmoji = "❤\uFE0F",
           about = "About",

@@ -1,242 +1,133 @@
 package org.thoughtcrime.securesms.components.settings.app.chats
 
 import android.net.Uri
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import org.signal.core.util.ThrottledDebouncer
-import org.thoughtcrime.securesms.backup.LocalExportProgress
-import org.thoughtcrime.securesms.components.settings.app.chats.folders.ChatFoldersRepository
-import org.thoughtcrime.securesms.dependencies.AppDependencies
-import org.thoughtcrime.securesms.jobs.LocalBackupJob
-import org.thoughtcrime.securesms.keyvalue.SignalStore
-import org.thoughtcrime.securesms.util.BackupUtil
-import org.thoughtcrime.securesms.util.ConversationUtil
-import org.thoughtcrime.securesms.util.RemoteConfig
-import org.thoughtcrime.securesms.util.TextSecurePreferences
-import org.thoughtcrime.securesms.util.UriUtils // JW: added
+import kotlinx.coroutines.withContext
+import org.signal.appsettings.backups.BackupCreationProgress
+import org.signal.appsettings.chats.ChatExportState
+import org.signal.appsettings.chats.ChatsSettingsEvents
+import org.signal.appsettings.chats.ChatsSettingsState
+import org.signal.core.ui.compose.EventDrivenViewModel
+import org.signal.core.util.concurrent.SignalDispatchers
+import org.signal.core.util.logging.Log
+import org.thoughtcrime.securesms.backup.toBackupCreationProgress
 
-class ChatsSettingsViewModel @JvmOverloads constructor(
-  private val repository: ChatsSettingsRepository = ChatsSettingsRepository()
-) : ViewModel() {
+class ChatsSettingsViewModel : EventDrivenViewModel<ChatsSettingsEvents>(TAG) {
 
-  private val refreshDebouncer = ThrottledDebouncer(500L)
+  companion object {
+    private val TAG = Log.tag(ChatsSettingsViewModel::class)
+  }
 
-  private val store = MutableStateFlow(
+  private val _state = MutableStateFlow(
     ChatsSettingsState(
-      generateLinkPreviews = SignalStore.settings.isLinkPreviewsEnabled,
-      useAddressBook = SignalStore.settings.isPreferSystemContactPhotos,
-      keepMutedChatsArchived = SignalStore.settings.shouldKeepMutedChatsArchived(),
-      useSystemEmoji = SignalStore.settings.isPreferSystemEmoji,
-      enterKeySends = SignalStore.settings.isEnterKeySends,
-      localBackupsEnabled = SignalStore.settings.isBackupEnabled && BackupUtil.canUserAccessBackupDirectory(AppDependencies.application),
+      generateLinkPreviews = ChatsSettingsRepository.isLinkPreviewsEnabled(),
+      useAddressBook = ChatsSettingsRepository.isPreferSystemContactPhotos(),
+      keepMutedChatsArchived = ChatsSettingsRepository.isKeepMutedChatsArchived(),
+      useSystemEmoji = ChatsSettingsRepository.isPreferSystemEmoji(),
+      enterKeySends = ChatsSettingsRepository.isEnterKeySends(),
+      localBackupsEnabled = ChatsSettingsRepository.isLocalBackupsEnabled(),
       folderCount = 0,
-      userUnregistered = TextSecurePreferences.isUnauthorizedReceived(AppDependencies.application) || !SignalStore.account.isRegistered,
-      clientDeprecated = SignalStore.misc.isClientDeprecated,
-      isPlaintextExportEnabled = RemoteConfig.localPlaintextExport,
-      chatExportState = ChatExportState.None
-      // JW: added
-      ,
-      chatBackupsLocation = TextSecurePreferences.isBackupLocationRemovable(AppDependencies.application),
-      chatBackupsLocationApi30 = UriUtils.getFullPathFromTreeUri(AppDependencies.application, SignalStore.settings.signalBackupDirectory),
-      chatBackupZipfile = TextSecurePreferences.isRawBackupInZipfile(AppDependencies.application),
-      chatBackupZipfilePlain = TextSecurePreferences.isPlainBackupInZipfile(AppDependencies.application),
-      keepViewOnceMessages = TextSecurePreferences.isKeepViewOnceMessages(AppDependencies.application),
-      ignoreRemoteDelete = TextSecurePreferences.isIgnoreRemoteDelete(AppDependencies.application),
-      ignoreAdminDelete = TextSecurePreferences.isIgnoreAdminDelete(AppDependencies.application),
-      deleteMediaOnly = TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application),
-      googleMapType = TextSecurePreferences.getGoogleMapType(AppDependencies.application),
-      whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application),
-      generateLinkPreviewImages = TextSecurePreferences.sendLinkPreviewImages(AppDependencies.application)
+      userUnregistered = ChatsSettingsRepository.isUserUnregistered(),
+      clientDeprecated = ChatsSettingsRepository.isClientDeprecated(),
+      isPlaintextExportEnabled = ChatsSettingsRepository.isPlaintextExportEnabled(),
+      plaintextExportProgress = ChatsSettingsRepository.observePlaintextExportProgress().value.toBackupCreationProgress(),
+      chatExportState = ChatExportState.None,
+      shouldAutoplayStickersAndGifs = ChatsSettingsRepository.isAutoplayStickersAndGifsEnabled()
     )
   )
 
-  val state: StateFlow<ChatsSettingsState> = store
+  val state: StateFlow<ChatsSettingsState> = _state.asStateFlow()
 
   init {
-    viewModelScope.launch {
-      LocalExportProgress.plaintextProgress.collect { progress ->
-        store.update {
-          it.copy(
-            plaintextExportProgress = progress,
-            chatExportState = when {
-              progress.succeeded != null && it.plaintextExportProgress.succeeded == null -> ChatExportState.Success
-              progress.canceled != null -> ChatExportState.None
-              else -> it.chatExportState
-            }
-          )
-        }
-      }
+    ChatsSettingsRepository.observePlaintextExportProgress()
+      .onEach { onEvent(ChatsSettingsEvents.PlaintextExportProgressChanged(it.toBackupCreationProgress())) }
+      .launchIn(viewModelScope)
+  }
+
+  override suspend fun processEvent(event: ChatsSettingsEvents) {
+    when (event) {
+      ChatsSettingsEvents.Refresh -> refresh()
+      is ChatsSettingsEvents.PlaintextExportProgressChanged -> applyPlaintextExportProgress(event.progress)
+      is ChatsSettingsEvents.GenerateLinkPreviewsChanged -> setGenerateLinkPreviewsEnabled(event.enabled)
+      is ChatsSettingsEvents.UseAddressBookChanged -> setUseAddressBook(event.enabled)
+      is ChatsSettingsEvents.KeepMutedChatsArchivedChanged -> setKeepMutedChatsArchived(event.enabled)
+      is ChatsSettingsEvents.UseSystemEmojiChanged -> setUseSystemEmoji(event.enabled)
+      is ChatsSettingsEvents.EnterKeySendsChanged -> setEnterKeySends(event.enabled)
+      ChatsSettingsEvents.ExportChatHistoryAuthenticated -> _state.update { it.copy(chatExportState = ChatExportState.ConfirmExport) }
+      ChatsSettingsEvents.CancelInFlightExportClicked -> cancelChatExport()
+      is ChatsSettingsEvents.ExportConfirmed -> _state.update { it.copy(chatExportState = ChatExportState.ChooseAFolder, includeMediaInExport = event.withMedia) }
+      is ChatsSettingsEvents.ExportFolderSelected -> startChatExportToFolder(event.uri)
+      ChatsSettingsEvents.StartExportCanceled,
+      ChatsSettingsEvents.ExportCompletionConfirmed -> _state.update { it.copy(chatExportState = ChatExportState.None, includeMediaInExport = false) }
+      is ChatsSettingsEvents.AutoplayStickersAndGifsChanged -> setAutoplayStickersAndGifsEnabled(event.enabled)
+      ChatsSettingsEvents.ChatFoldersClicked -> error("Handled in the fragment.")
     }
   }
 
-  fun requestChatExportType() {
-    store.update { it.copy(chatExportState = ChatExportState.ConfirmExport) }
-  }
-
-  fun setExportTypeAndGoToSelectFolder(includeMediaInExport: Boolean) {
-    store.update { it.copy(chatExportState = ChatExportState.ChooseAFolder, includeMediaInExport = includeMediaInExport) }
-  }
-
-  fun startChatExportToFolder(uri: Uri) {
-    store.update { it.copy(chatExportState = ChatExportState.None) }
-    LocalBackupJob.enqueuePlaintextArchive(uri.toString(), store.value.includeMediaInExport)
-  }
-
-  fun clearChatExportFlow() {
-    store.update { it.copy(chatExportState = ChatExportState.None, includeMediaInExport = false) }
-  }
-
-  fun cancelChatExport() {
-    store.update { it.copy(chatExportState = ChatExportState.Canceling) }
-    AppDependencies.jobManager.cancelAllInQueue(LocalBackupJob.PLAINTEXT_ARCHIVE_QUEUE)
-  }
-
-  fun setGenerateLinkPreviewsEnabled(enabled: Boolean) {
-    store.update { it.copy(generateLinkPreviews = enabled) }
-    SignalStore.settings.isLinkPreviewsEnabled = enabled
-    repository.syncLinkPreviewsState()
-  }
-
-  fun setUseAddressBook(enabled: Boolean) {
-    store.update { it.copy(useAddressBook = enabled) }
-    refreshDebouncer.publish { ConversationUtil.refreshRecipientShortcuts() }
-    SignalStore.settings.isPreferSystemContactPhotos = enabled
-    repository.syncPreferSystemContactPhotos()
-  }
-
-  fun setKeepMutedChatsArchived(enabled: Boolean) {
-    store.update { it.copy(keepMutedChatsArchived = enabled) }
-    SignalStore.settings.setKeepMutedChatsArchived(enabled)
-    repository.syncKeepMutedChatsArchivedState()
-  }
-
-  fun setUseSystemEmoji(enabled: Boolean) {
-    store.update { it.copy(useSystemEmoji = enabled) }
-    SignalStore.settings.isPreferSystemEmoji = enabled
-  }
-
-  fun setEnterKeySends(enabled: Boolean) {
-    store.update { it.copy(enterKeySends = enabled) }
-    SignalStore.settings.isEnterKeySends = enabled
-  }
-
-  fun refresh() {
-    viewModelScope.launch(Dispatchers.IO) {
-      val count = ChatFoldersRepository.getFolderCount()
-      val backupsEnabled = SignalStore.settings.isBackupEnabled && BackupUtil.canUserAccessBackupDirectory(AppDependencies.application)
-
-      if (store.value.localBackupsEnabled != backupsEnabled) {
-        store.update {
-          it.copy(
-            folderCount = count,
-            localBackupsEnabled = backupsEnabled
-          )
+  private fun applyPlaintextExportProgress(progress: BackupCreationProgress) {
+    _state.update {
+      it.copy(
+        plaintextExportProgress = progress,
+        chatExportState = when (progress) {
+          is BackupCreationProgress.Succeeded if it.plaintextExportProgress !is BackupCreationProgress.Succeeded -> ChatExportState.Success
+          is BackupCreationProgress.Canceled -> ChatExportState.None
+          else -> it.chatExportState
         }
-      } else {
-        store.update {
-          it.copy(
-            folderCount = count
-          )
-        }
-      }
+      )
     }
-    // JW: added. This is required to update the UI for settings that are not in the Signal store but in the shared preferences.
-    store.update { getState().copy() }
   }
 
-  // JW: added
-  fun setChatBackupLocation(enabled: Boolean) {
-    TextSecurePreferences.setBackupLocationRemovable(AppDependencies.application, enabled)
-    TextSecurePreferences.setBackupLocationChanged(AppDependencies.application, true) // Used in BackupUtil.getAllBackupsNewestFirst()
-    refresh()
+  private fun startChatExportToFolder(uri: Uri) {
+    _state.update { it.copy(chatExportState = ChatExportState.None) }
+    ChatsSettingsRepository.startPlaintextExport(uri, _state.value.includeMediaInExport)
   }
 
-  // JW: added
-  fun setChatBackupLocationApi30(value: String) {
-    refresh()
+  private fun cancelChatExport() {
+    _state.update { it.copy(chatExportState = ChatExportState.Canceling) }
+    ChatsSettingsRepository.cancelPlaintextExport()
   }
 
-  // JW: added
-  fun setChatBackupZipfile(enabled: Boolean) {
-    TextSecurePreferences.setRawBackupZipfile(AppDependencies.application, enabled)
-    refresh()
+  private fun setGenerateLinkPreviewsEnabled(enabled: Boolean) {
+    _state.update { it.copy(generateLinkPreviews = enabled) }
+    ChatsSettingsRepository.setLinkPreviewsEnabled(enabled)
   }
 
-  // JW: added
-  fun setChatBackupZipfilePlain(enabled: Boolean) {
-    TextSecurePreferences.setPlainBackupZipfile(AppDependencies.application, enabled)
-    refresh()
+  private fun setAutoplayStickersAndGifsEnabled(enabled: Boolean) {
+    _state.update { it.copy(shouldAutoplayStickersAndGifs = enabled) }
+    ChatsSettingsRepository.setAutoplayStickersAndGifsEnabled(enabled)
   }
 
-  // JW: added
-  fun keepViewOnceMessages(enabled: Boolean) {
-    TextSecurePreferences.setKeepViewOnceMessages(AppDependencies.application, enabled)
-    refresh()
+  private fun setUseAddressBook(enabled: Boolean) {
+    _state.update { it.copy(useAddressBook = enabled) }
+    ChatsSettingsRepository.setPreferSystemContactPhotos(enabled)
   }
 
-  // JW: added
-  fun setIgnoreRemoteDelete(enabled: Boolean) {
-    TextSecurePreferences.setIgnoreRemoteDelete(AppDependencies.application, enabled)
-    refresh()
+  private fun setKeepMutedChatsArchived(enabled: Boolean) {
+    _state.update { it.copy(keepMutedChatsArchived = enabled) }
+    ChatsSettingsRepository.setKeepMutedChatsArchived(enabled)
   }
 
-  // JW: added
-  fun setIgnoreAdminDelete(enabled: Boolean) {
-    TextSecurePreferences.setIgnoreAdminDelete(AppDependencies.application, enabled)
-    refresh()
+  private fun setUseSystemEmoji(enabled: Boolean) {
+    _state.update { it.copy(useSystemEmoji = enabled) }
+    ChatsSettingsRepository.setPreferSystemEmoji(enabled)
   }
 
-  // JW: added
-  fun setDeleteMediaOnly(enabled: Boolean) {
-    TextSecurePreferences.setDeleteMediaOnly(AppDependencies.application, enabled)
-    refresh()
+  private fun setEnterKeySends(enabled: Boolean) {
+    _state.update { it.copy(enterKeySends = enabled) }
+    ChatsSettingsRepository.setEnterKeySends(enabled)
   }
 
-  // JW: added
-  fun setGoogleMapType(mapType: String) {
-    TextSecurePreferences.setGoogleMapType(AppDependencies.application, mapType)
-    refresh()
-  }
+  private suspend fun refresh() {
+    val (count, backupsEnabled) = withContext(SignalDispatchers.Default) {
+      ChatsSettingsRepository.getFolderCount() to ChatsSettingsRepository.isLocalBackupsEnabled()
+    }
 
-  // JW: added
-  fun setWhoCanAddYouToGroups(adder: String) {
-    TextSecurePreferences.setWhoCanAddYouToGroups(AppDependencies.application, adder)
-    refresh()
+    _state.update { it.copy(folderCount = count, localBackupsEnabled = backupsEnabled) }
   }
-
-  fun setGenerateLinkPreviewImagesChanged(enabled: Boolean) {
-    TextSecurePreferences.setSendLinkPreview_Images(AppDependencies.application, enabled)
-    refresh()
-  }
-
-  // JW: added
-  private fun getState() = ChatsSettingsState(
-    generateLinkPreviews = SignalStore.settings.isLinkPreviewsEnabled,
-    useAddressBook = SignalStore.settings.isPreferSystemContactPhotos,
-    keepMutedChatsArchived = SignalStore.settings.shouldKeepMutedChatsArchived(),
-    useSystemEmoji = SignalStore.settings.isPreferSystemEmoji,
-    enterKeySends = SignalStore.settings.isEnterKeySends,
-    localBackupsEnabled = SignalStore.settings.isBackupEnabled,
-    folderCount = ChatFoldersRepository.getFolderCount(),
-    userUnregistered = TextSecurePreferences.isUnauthorizedReceived(AppDependencies.application) || !SignalStore.account.isRegistered,
-    clientDeprecated = SignalStore.misc.isClientDeprecated,
-    isPlaintextExportEnabled = RemoteConfig.localPlaintextExport,
-    chatExportState = ChatExportState.None,
-    chatBackupsLocationApi30 = UriUtils.getFullPathFromTreeUri(AppDependencies.application, SignalStore.settings.signalBackupDirectory),
-    chatBackupsLocation = TextSecurePreferences.isBackupLocationRemovable(AppDependencies.application),
-    chatBackupZipfile = TextSecurePreferences.isRawBackupInZipfile(AppDependencies.application),
-    chatBackupZipfilePlain = TextSecurePreferences.isPlainBackupInZipfile(AppDependencies.application),
-    keepViewOnceMessages = TextSecurePreferences.isKeepViewOnceMessages(AppDependencies.application),
-    ignoreRemoteDelete = TextSecurePreferences.isIgnoreRemoteDelete(AppDependencies.application),
-    ignoreAdminDelete = TextSecurePreferences.isIgnoreAdminDelete(AppDependencies.application),
-    deleteMediaOnly = TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application),
-    googleMapType = TextSecurePreferences.getGoogleMapType(AppDependencies.application),
-    whoCanAddYouToGroups = TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application),
-    generateLinkPreviewImages = TextSecurePreferences.sendLinkPreviewImages(AppDependencies.application)
-  )
 }

@@ -26,6 +26,7 @@ import io.mockk.runs
 import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
+import okio.ByteString.Companion.toByteString
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -34,7 +35,10 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.signal.core.models.ServiceId.ACI
+import org.signal.core.models.ServiceId.PNI
+import org.signal.core.models.recipients.RecipientId
 import org.signal.libsignal.net.ChallengeOption
+import org.signal.libsignal.protocol.IdentityKeyPair
 import org.signal.libsignal.protocol.UntrustedIdentityException
 import org.signal.network.service.MessageService
 import org.thoughtcrime.securesms.attachments.Attachment
@@ -54,11 +58,11 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.jobmanager.JobTracker
 import org.thoughtcrime.securesms.keyvalue.MiscellaneousValues
+import org.thoughtcrime.securesms.keyvalue.RateLimitValues
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.mms.OutgoingMessage
 import org.thoughtcrime.securesms.ratelimit.ProofRequiredExceptionHandler
 import org.thoughtcrime.securesms.recipients.Recipient
-import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.service.ExpiringMessageManager
 import org.thoughtcrime.securesms.testutil.MockAppDependenciesRule
@@ -71,7 +75,6 @@ import org.whispersystems.signalservice.api.crypto.EnvelopeContent
 import org.whispersystems.signalservice.api.messages.SignalServiceMessageLimits
 import org.whispersystems.signalservice.internal.push.Content
 import org.whispersystems.signalservice.internal.push.DataMessage
-import org.whispersystems.signalservice.internal.push.PniSignatureMessage
 import java.io.IOException
 import java.util.Optional
 import java.util.UUID
@@ -105,6 +108,7 @@ class IndividualSendJobV2Test {
   private val recipientId: RecipientId = RecipientId.from(2L)
 
   private lateinit var misc: MiscellaneousValues
+  private lateinit var rateLimit: RateLimitValues
 
   private lateinit var recipient: Recipient
   private lateinit var self: Recipient
@@ -127,6 +131,10 @@ class IndividualSendJobV2Test {
     misc = mockk(relaxUnitFun = true)
     every { misc.isClientDeprecated } returns false
     every { SignalStore.misc } returns misc
+
+    rateLimit = mockk(relaxUnitFun = true)
+    every { rateLimit.needsRecaptcha() } returns false
+    every { SignalStore.rateLimit } returns rateLimit
 
     every { signalStore.account.aci } returns selfAci
     every { signalStore.account.requireAci() } returns selfAci
@@ -348,6 +356,39 @@ class IndividualSendJobV2Test {
   }
 
   @Test
+  fun `Given a first send to a recipient we are not yet sharing our profile with, when run, then the sent message includes our profile key`() {
+    val profileKey = ByteArray(32) { 7 }
+    var profileSharing = false
+
+    every { RecipientUtil.shareProfileIfFirstSecureMessage(recipient) } answers { profileSharing = true }
+    every { outgoingMessage.toDataMessage() } answers {
+      DataMessage(timestamp = sentTime, profileKey = if (profileSharing) profileKey.toByteString() else null).right()
+    }
+
+    val sentSlot = slot<EnvelopeContent>()
+    coEvery {
+      messageService.sendMessage(
+        serviceId = any(),
+        envelopeContent = capture(sentSlot),
+        timestamp = any(),
+        sealedSenderAccess = any(),
+        story = any(),
+        isOnline = any(),
+        urgent = any(),
+        onEncrypted = any()
+      )
+    } returns MessageService.SendSuccess(
+      envelopeContent = EnvelopeContent.encrypted(Content(dataMessage = dataMessage), ContentHint.RESENDABLE, Optional.empty()),
+      sentSealedSender = false,
+      devices = listOf(1)
+    ).right()
+
+    createAndRunJob()
+
+    assertThat(sentSlot.captured.content.get().dataMessage!!.profileKey).isNotNull().isEqualTo(profileKey.toByteString())
+  }
+
+  @Test
   fun `Given a successful send and an expiring message, when run, then start expiration timer`() {
     every { outgoingMessage.expiresIn } returns 60_000L
     every { outgoingMessage.isExpirationUpdate } returns false
@@ -512,7 +553,9 @@ class IndividualSendJobV2Test {
   @Test
   fun `Given a send needs PNI signature, when send succeeds, then write a pending PNI signature record`() {
     every { recipient.needsPniSignature } returns true
-    every { AppDependencies.signalServiceMessageSender.createPniSignatureMessage() } returns PniSignatureMessage()
+    every { signalStore.account.pni } returns PNI.from(UUID.randomUUID())
+    every { signalStore.account.pniIdentityKeyOrNull } returns IdentityKeyPair.generate()
+    every { signalStore.account.aciIdentityKey } returns IdentityKeyPair.generate()
     stubSuccessfulSend()
 
     createAndRunJob()
@@ -616,17 +659,6 @@ class IndividualSendJobV2Test {
     val result = createAndRunJob()
 
     assertThat(result.isRetry).isTrue()
-  }
-
-  @Test
-  fun `Given ServerRejected, when run, then return failure`() {
-    coEvery {
-      messageService.sendMessage(any(), any(), any(), any(), any(), any(), any(), any())
-    } returns MessageService.SendError.ServerRejected().left()
-
-    val result = createAndRunJob()
-
-    assertThat(result.isFailure).isTrue()
   }
 
   @Test

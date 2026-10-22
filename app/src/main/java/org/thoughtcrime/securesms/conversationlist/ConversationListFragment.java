@@ -61,9 +61,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+import org.signal.core.models.recipients.RecipientId;
 import org.signal.core.ui.BottomSheetUtil;
 import org.signal.core.ui.WindowSizeClassExtensionsKt;
 import org.signal.core.ui.compose.Snackbars;
@@ -75,6 +73,8 @@ import org.signal.core.util.Stopwatch;
 import org.signal.core.util.concurrent.LifecycleDisposable;
 import org.signal.core.util.concurrent.SignalExecutors;
 import org.signal.core.util.concurrent.SimpleTask;
+import org.signal.core.util.eventbus.EventBus;
+import org.signal.core.util.eventbus.ThreadMode;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.MainFragment;
 import org.thoughtcrime.securesms.MainNavigator;
@@ -87,7 +87,7 @@ import org.thoughtcrime.securesms.backup.v2.ArchiveRestoreProgressState;
 import org.thoughtcrime.securesms.backup.v2.ui.BackupAlert;
 import org.thoughtcrime.securesms.backup.v2.ui.BackupAlertBottomSheet;
 import org.thoughtcrime.securesms.backup.v2.ui.BackupAlertDelegate;
-import org.thoughtcrime.securesms.badges.models.Badge;
+import org.signal.core.models.badges.Badge;
 import org.thoughtcrime.securesms.badges.self.expired.ExpiredOneTimeBadgeBottomSheetDialogFragment;
 import org.thoughtcrime.securesms.badges.self.expired.MonthlyDonationCanceledBottomSheetDialogFragment;
 import org.thoughtcrime.securesms.banner.Banner;
@@ -143,7 +143,8 @@ import org.thoughtcrime.securesms.groups.SelectionLimits;
 import org.thoughtcrime.securesms.jobs.RefreshOwnProfileJob;
 import org.thoughtcrime.securesms.keyvalue.AccountValues;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
-import org.thoughtcrime.securesms.main.MainNavigationListLocation;
+import org.thoughtcrime.securesms.main.MainListRoute;
+import org.thoughtcrime.securesms.main.MainNavigationEvents;
 import org.thoughtcrime.securesms.main.MainNavigationViewModel;
 import org.thoughtcrime.securesms.main.MainSnackbarHostKey;
 import org.thoughtcrime.securesms.main.MainToolbarMode;
@@ -154,7 +155,6 @@ import org.thoughtcrime.securesms.notifications.MarkReadReceiver;
 import org.thoughtcrime.securesms.profiles.manage.UsernameEditFragment;
 import org.thoughtcrime.securesms.ratelimit.RecaptchaProofBottomSheetFragment;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.thoughtcrime.securesms.recipients.RecipientId;
 import org.thoughtcrime.securesms.search.MessageResult;
 import org.thoughtcrime.securesms.search.SearchFilter;
 import org.thoughtcrime.securesms.search.SearchFilterBottomSheet;
@@ -167,8 +167,7 @@ import org.thoughtcrime.securesms.util.RemoteConfig;
 import org.thoughtcrime.securesms.util.SignalLocalMetrics;
 import org.thoughtcrime.securesms.util.SignalProxyUtil;
 import org.thoughtcrime.securesms.util.SnapToTopDataObserver;
-import org.thoughtcrime.securesms.util.TextSecurePreferences;
-import org.thoughtcrime.securesms.util.ViewUtil;
+import org.signal.core.ui.util.ViewUtil;
 import org.thoughtcrime.securesms.util.adapter.mapping.PagingMappingAdapter;
 import org.thoughtcrime.securesms.verify.SelfVerificationFailureSheet;
 import org.whispersystems.signalservice.api.websocket.WebSocketConnectionState;
@@ -443,7 +442,11 @@ public class ConversationListFragment extends MainFragment implements Conversati
     initializeVoiceNotePlayer();
     initializeBanners();
     maybeScheduleRefreshProfileJob();
-    ConversationListFragmentExtensionsKt.listenToEventBusWhileResumed(this, mainNavigationViewModel.getDetailLocation());
+    ConversationListFragmentExtensionsKt.listenToEventBusWhileResumed(
+        this,
+        mainNavigationViewModel.getDetailLocation(),
+        () -> EventBus.getDefault().subscribeSticky(MessageSender.MessageSentEvent.class, ThreadMode.MAIN, this::onMessageSent)
+    );
 
     String query = contactSearchViewModel.getQuery().getValue();
     if (query != null) {
@@ -452,7 +455,7 @@ public class ConversationListFragment extends MainFragment implements Conversati
 
     if (SignalStore.account().isRegistered() &&
         SignalStore.registration().isRegistrationComplete() &&
-        !TextSecurePreferences.isUnauthorizedReceived(requireContext()) &&
+        !SignalStore.account().isUnauthorizedReceived() &&
         SignalStore.settings().getAutomaticVerificationEnabled() &&
         SignalStore.misc().getHasKeyTransparencyFailure() &&
         !SignalStore.misc().getHasSeenKeyTransparencyFailure()) {
@@ -465,7 +468,7 @@ public class ConversationListFragment extends MainFragment implements Conversati
     requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), chatListBackHandler);
 
     lifecycleDisposable.bindTo(getViewLifecycleOwner());
-    lifecycleDisposable.add(mainNavigationViewModel.getTabClickEventsObservable().filter(tab -> tab == MainNavigationListLocation.CHATS)
+    lifecycleDisposable.add(mainNavigationViewModel.getTabClickEventsObservable().filter(tab -> tab == MainListRoute.Chats)
                                                    .subscribe(unused -> {
                                                      Log.d(TAG, "Scroll to top please");
                                                      LinearLayoutManager layoutManager            = (LinearLayoutManager) list.getLayoutManager();
@@ -702,7 +705,7 @@ public class ConversationListFragment extends MainFragment implements Conversati
   @Override
   public void onShowArchiveClick() {
     if (viewModel.currentSelectedConversations().isEmpty()) {
-      mainNavigationViewModel.goTo(MainNavigationListLocation.ARCHIVE);
+      mainNavigationViewModel.onEvent(new MainNavigationEvents.GoToList(MainListRoute.Archive));
     }
   }
 
@@ -765,7 +768,7 @@ public class ConversationListFragment extends MainFragment implements Conversati
           } else if (event instanceof MainToolbarViewModel.Event.Chats.ClearFilter) {
             onClearFilterClick();
           } else if (event instanceof MainToolbarViewModel.Event.Chats.CloseArchive) {
-            mainNavigationViewModel.goTo(MainNavigationListLocation.CHATS);
+            mainNavigationViewModel.onEvent(new MainNavigationEvents.GoToList(MainListRoute.Chats));
           }
         })
     );
@@ -1465,8 +1468,7 @@ public class ConversationListFragment extends MainFragment implements Conversati
     return true;
   }
 
-  @Subscribe(threadMode = ThreadMode.MAIN, sticky = true)
-  public void onEvent(MessageSender.MessageSentEvent event) {
+  private void onMessageSent(MessageSender.MessageSentEvent event) {
     EventBus.getDefault().removeStickyEvent(event);
     closeSearchIfOpen();
   }
@@ -1872,8 +1874,15 @@ public class ConversationListFragment extends MainFragment implements Conversati
       float absoluteDx = Math.abs(dX);
 
       if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+        View itemView = viewHolder.itemView;
+
+        if (!itemView.isAttachedToWindow()) {
+          itemView.setTranslationX(0);
+          ViewCompat.setElevation(itemView, 0);
+          return;
+        }
+
         Resources resources       = getResources();
-        View      itemView        = viewHolder.itemView;
         float     percentDx       = absoluteDx / viewHolder.itemView.getWidth();
         int       color           = ArgbEvaluatorCompat.getInstance().evaluate(Math.min(1f, percentDx * (1 / 0.25f)), archiveColorStart, archiveColorEnd);
         float     scaleStartPoint = DimensionUnit.DP.toPixels(48f);

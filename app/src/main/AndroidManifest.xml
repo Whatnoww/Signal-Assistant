@@ -208,7 +208,7 @@
         </activity>
 
         <activity
-            android:name=".stickers.preview.StickerPackPreviewActivity"
+            android:name=".stickers.preview.StickerPackPreviewActivityV2"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
@@ -487,7 +487,7 @@
             android:exported="false"
             android:launchMode="singleTop"
             android:enableOnBackInvokedCallback="true"
-            android:theme="@style/TextSecure.DarkNoActionBar"
+            android:theme="@style/Theme.Signal.DayNight.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden|adjustNothing" />
 
         <activity
@@ -623,22 +623,6 @@
             android:theme="@style/Theme.Signal.DayNight.NoActionBar" />
 
         <activity
-            android:name=".registration.ui.RegistrationActivity"
-            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
-            android:exported="false"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.Signal.DayNight.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
-
-        <activity
-            android:name=".restore.RestoreActivity"
-            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
-            android:exported="false"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.Signal.DayNight.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
-
-        <activity
             android:name=".revealable.ViewOnceMessageActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:excludeFromRecents="true"
@@ -653,6 +637,13 @@
             android:theme="@style/Signal.DayNight.NoActionBar" />
 
         <activity
+            android:name=".stickers.search.StickerSearchActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
+            android:exported="false"
+            android:theme="@style/TextSecure.DarkNoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".logsubmit.SubmitDebugLogActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:exported="false"
@@ -665,6 +656,15 @@
             android:label="@string/AndroidManifest__media_preview"
             android:launchMode="singleTask"
             android:theme="@style/Theme.Signal.DayNight.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+
+        <activity
+            android:name=".mediaviewer.MediaViewerActivity"
+            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
+            android:exported="false"
+            android:label="@string/AndroidManifest__media_preview"
+            android:launchMode="singleTask"
+            android:theme="@style/Signal.DayNight.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
 
         <activity
@@ -762,26 +762,10 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity
-            android:name=".scribbles.ImageEditorStickerSelectActivity"
-            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
-            android:exported="false"
-            android:theme="@style/Signal.DayNight.NoActionBar" />
-
-        <activity
             android:name=".profiles.edit.CreateProfileActivity"
             android:exported="false"
             android:theme="@style/TextSecure.LightRegistrationTheme"
             android:windowSoftInputMode="stateVisible|adjustResize" />
-
-        <activity
-            android:name=".registration.ui.restore.RemoteRestoreActivity"
-            android:exported="false"
-            android:theme="@style/Signal.DayNight.NoActionBar" />
-
-        <activity
-            android:name=".registration.ui.restore.local.RestoreLocalBackupActivity"
-            android:exported="false"
-            android:theme="@style/Signal.DayNight.NoActionBar" />
 
         <activity
             android:name=".profiles.manage.EditProfileActivity"
@@ -820,20 +804,16 @@
             android:exported="false"
             android:theme="@style/TextSecure.DialogActivity" />
 
-        <activity
-            android:name=".contactshare.ContactShareEditActivity"
-            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
-            android:exported="false"
-            android:theme="@style/TextSecure.LightTheme" />
 
         <activity
-            android:name=".contactshare.ContactNameEditActivity"
+            android:name=".contactshare.ContactShareActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:exported="false"
-            android:theme="@style/Theme.Signal.DayNight.NoActionBar" />
+            android:theme="@style/Theme.Signal.DayNight.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".contactshare.SharedContactDetailsActivity"
+            android:name=".contactshare.SharedContactDetailsActivityV2"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:exported="false"
             android:theme="@style/Theme.Signal.DayNight.NoActionBar" />
@@ -1480,6 +1460,10 @@
             android:exported="false" />
 
         <receiver
+            android:name=".service.UnreadReminderManager$UnreadReminderAlarm"
+            android:exported="false" />
+
+        <receiver
             android:name="org.signal.core.util.ClearClipboardAlarmReceiver"
             android:exported="false" />
 
@@ -1550,6 +1534,14 @@
         </receiver>
 
         <receiver
+            android:name=".service.ArchiveCredentialRefreshListener"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name="org.signal.core.util.ForegroundServiceUtil$Receiver"
             android:exported="false" />
 
@@ -1566,6 +1558,15 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".notifications.RestoreNotificationsReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 

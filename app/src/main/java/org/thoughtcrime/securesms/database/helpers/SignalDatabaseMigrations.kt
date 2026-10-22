@@ -3,7 +3,7 @@ package org.thoughtcrime.securesms.database.helpers
 import android.app.Application
 import android.content.Context
 import android.database.sqlite.SQLiteException
-import org.signal.core.util.areForeignKeyConstraintsEnabled
+import org.signal.core.database.areForeignKeyConstraintsEnabled
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.helpers.migration.SignalDatabaseMigration
@@ -179,6 +179,10 @@ import org.thoughtcrime.securesms.database.helpers.migration.V323_AddStickerPack
 import org.thoughtcrime.securesms.database.helpers.migration.V324_MoveGroupV1StorageIdsToUnknownIds
 import org.thoughtcrime.securesms.database.helpers.migration.V325_AddBlockedAtToRecipientTable
 import org.thoughtcrime.securesms.database.helpers.migration.V326_AddUnreadReminderColumn
+import org.thoughtcrime.securesms.database.helpers.migration.V327_AddLastUnreadReminderColumn
+import org.thoughtcrime.securesms.database.helpers.migration.V328_AddSharedNameToRecipientTable
+import org.thoughtcrime.securesms.database.helpers.migration.V329_AddStickerFavoriteColumns
+import org.thoughtcrime.securesms.database.helpers.migration.V330_AddHiddenPackColumns
 import org.thoughtcrime.securesms.database.SQLiteDatabase as SignalSqliteDatabase
 
 /**
@@ -365,10 +369,14 @@ object SignalDatabaseMigrations {
     323 to V323_AddStickerPackStorageSync,
     324 to V324_MoveGroupV1StorageIdsToUnknownIds,
     325 to V325_AddBlockedAtToRecipientTable,
-    326 to V326_AddUnreadReminderColumn
+    326 to V326_AddUnreadReminderColumn,
+    327 to V327_AddLastUnreadReminderColumn,
+    328 to V328_AddSharedNameToRecipientTable,
+    329 to V329_AddStickerFavoriteColumns,
+    330 to V330_AddHiddenPackColumns
   )
 
-  const val DATABASE_VERSION = 326
+  const val DATABASE_VERSION = 330
 
   @JvmStatic
   fun migrate(context: Application, db: SignalSqliteDatabase, oldVersion: Int, newVersion: Int) {

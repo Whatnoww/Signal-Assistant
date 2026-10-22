@@ -18,8 +18,89 @@
     <!-- Title for dialog shown when a required permission has not been granted -->
     <string name="Permissions_permission_required">권한 필요</string>
 
+    <!-- ListDetailPane -->
+    <!-- Content description for the draggable divider between the list and detail panes on large screens -->
+    <string name="ListDetailPane__accessibility_pane_divider">창 크기 조절하기</string>
+    <!-- Accessibility action label for moving the divider between the list and detail panes to its next position -->
+    <string name="ListDetailPane__accessibility_move_pane_divider">구분선 이동하기</string>
+
     <!-- StorageUtil -->
     <!-- Format string for displaying a storage path as volume/filename -->
     <string name="StorageUtil__s_s">%1$s/%2$s</string>
 
+    <!-- DevicePinAuthEducationSheet -->
+    <!-- Body of bottom sheet explaining that users should use their device pin or biometrics and not their Signal pin -->
+    <string name="LinkDeviceFragment__tap_continue_and_enter_phone">계속을 탭하고 휴대폰 잠금을 풀어 확인하세요. Signal PIN을 입력하지 마세요.</string>
+    <!-- Button that dismisses the bottom sheet -->
+    <string name="LinkDeviceFragment__continue">계속</string>
+
+    <!-- Accessibility label for a close (X) icon button that dismisses the current screen, dialog, banner, or menu -->
+    <string name="CloseButton__content_description">닫기</string>
+    <!-- Accessibility label for a button displayed in the toolbar to return to the previous screen. -->
+    <string name="DefaultTopAppBar__navigate_up_content_description">위로 탐색</string>
+
+    <!-- Menu option that adds a sticker to the user\'s favorite stickers. -->
+    <string name="StickerFavorites__add_to_favorites">즐겨찾기에 추가하기</string>
+    <!-- Menu option that removes a sticker from the user\'s favorite stickers. -->
+    <string name="StickerFavorites__remove_from_favorites">즐겨찾기에서 삭제하기</string>
+    <!-- Title of the confirmation dialog shown before removing a sticker from the user\'s favorite stickers. -->
+    <string name="StickerFavorites__remove_from_favorites_question">즐겨찾기에서 삭제할까요?</string>
+    <!-- Body of the confirmation dialog shown before removing a sticker from the user\'s favorite stickers. -->
+    <string name="StickerFavorites__you_cant_send_it_or_add_it_to_favorites_again">You can\'t send it or add it to Favorites again unless you have the pack installed, a link, or sticker message.</string>
+    <!-- Button in the confirmation dialog that removes a sticker from the user\'s favorite stickers. Verb, imperative. -->
+    <string name="StickerFavorites__remove">삭제</string>
+    <!-- Text shown when no preference label has been selected -->
+    <string name="preferences__none">None</string>
+    <string name="preferences_off">Off</string>
+    <string name="preferences_on">On</string>
+    <string name="ExpireTimerSettingsFragment__set">Set</string>
+    <string name="CustomExpireTimerSelectorView__seconds">seconds</string>
+    <string name="CustomExpireTimerSelectorView__minutes">minutes</string>
+    <string name="CustomExpireTimerSelectorView__hours">hours</string>
+    <string name="CustomExpireTimerSelectorView__days">days</string>
+    <string name="CustomExpireTimerSelectorView__weeks">weeks</string>
+    <!-- expiration -->
+    <string name="expiration_off">Off</string>
+
+    <plurals name="expiration_seconds">
+        <item quantity="other">%1$d seconds</item>
+    </plurals>
+
+    <string name="expiration_seconds_abbreviated">%1$ds</string>
+
+    <plurals name="expiration_minutes">
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
+    <string name="expiration_minutes_abbreviated">%1$dm</string>
+
+    <plurals name="expiration_hours">
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+
+    <string name="expiration_hours_abbreviated">%1$dh</string>
+
+    <plurals name="expiration_days">
+        <item quantity="other">%1$d days</item>
+    </plurals>
+
+    <string name="expiration_days_abbreviated">%1$dd</string>
+
+    <plurals name="expiration_weeks">
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+
+    <string name="expiration_weeks_abbreviated">%1$dw</string>
+    <string name="expiration_combined">%1$s %2$s</string>
+
+    <!-- LearnMoreTextView -->
+    <string name="LearnMoreTextView_learn_more">Learn more</string>
+
+    <string name="SpanUtil__read_more">Read more</string>
+
+    <!-- Dialogs -->
+    <!-- Content description for the button in a time picker dialog that switches from the clock face to typing the time -->
+    <string name="Dialogs__switch_to_text_input">Switch to text input</string>
+    <!-- Content description for the button in a time picker dialog that switches from typing the time back to the clock face -->
+    <string name="Dialogs__switch_to_clock">Switch to clock</string>
 </resources>

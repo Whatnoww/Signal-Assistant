@@ -7,6 +7,7 @@ import okio.ByteString.Companion.toByteString
 import org.signal.core.models.ServiceId
 import org.signal.core.models.ServiceId.ACI
 import org.signal.core.models.database.StickerRecord
+import org.signal.core.models.recipients.RecipientId
 import org.signal.core.util.Base64
 import org.signal.core.util.Hex
 import org.signal.core.util.UuidUtil
@@ -24,6 +25,7 @@ import org.thoughtcrime.securesms.attachments.TombstoneAttachment
 import org.thoughtcrime.securesms.calls.links.CallLinks
 import org.thoughtcrime.securesms.contactshare.Contact
 import org.thoughtcrime.securesms.contactshare.ContactModelMapper
+import org.thoughtcrime.securesms.contactshare.quoteText
 import org.thoughtcrime.securesms.crypto.ProfileKeyUtil
 import org.thoughtcrime.securesms.database.AttachmentTable
 import org.thoughtcrime.securesms.database.MessageTable
@@ -93,7 +95,7 @@ import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.from
 import org.thoughtcrime.securesms.polls.Poll
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.Recipient.HiddenState
-import org.thoughtcrime.securesms.recipients.RecipientId
+import org.thoughtcrime.securesms.recipients.RecipientIds
 import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.stickers.StickerLocator
 import org.thoughtcrime.securesms.util.EarlyMessageCacheEntry
@@ -103,7 +105,6 @@ import org.thoughtcrime.securesms.util.MessageConstraintsUtil
 import org.thoughtcrime.securesms.util.RemoteConfig
 import org.thoughtcrime.securesms.util.SignalLocalMetrics
 import org.thoughtcrime.securesms.util.SignalTrace
-import org.thoughtcrime.securesms.util.TextSecurePreferences
 import org.thoughtcrime.securesms.util.hasGiftBadge
 import org.thoughtcrime.securesms.util.isStory
 import org.whispersystems.signalservice.api.crypto.EnvelopeMetadata
@@ -421,7 +422,7 @@ object DataMessageProcessor {
 
     SignalDatabase.messages.beginTransaction()
     return try {
-      val authorRecipientId = RecipientId.from(authorServiceId)
+      val authorRecipientId = RecipientIds.from(authorServiceId)
       val parentStoryId: ParentStoryId
       var quoteModel: QuoteModel? = null
       var expiresIn: Duration = 0L.seconds
@@ -623,7 +624,10 @@ object DataMessageProcessor {
 
       null
     } else {
-      warn(envelope.clientTimestamp!!, "[handleRemoteDelete] Invalid remote delete! deleteTime: ${envelope.serverTimestamp!!}, targetTime: ${targetMessage.serverTimestamp}, deleteAuthor: $senderRecipientId, targetAuthor: ${targetMessage.fromRecipient.id}")
+      warn(
+        envelope.clientTimestamp!!,
+        "[handleRemoteDelete] Invalid remote delete! deleteTime: ${envelope.serverTimestamp!!}, targetTime: ${targetMessage.serverTimestamp}, deleteAuthor: $senderRecipientId, targetAuthor: ${targetMessage.fromRecipient.id}"
+      )
       null
     }
   }
@@ -755,7 +759,7 @@ object DataMessageProcessor {
 
     SignalDatabase.messages.beginTransaction()
     return try {
-      val storyAuthorRecipientId = RecipientId.from(authorServiceId)
+      val storyAuthorRecipientId = RecipientIds.from(authorServiceId)
       val selfId = Recipient.self().id
       val parentStoryId: ParentStoryId
       var quoteModel: QuoteModel? = null
@@ -877,7 +881,7 @@ object DataMessageProcessor {
     val giftBadge: DataMessage.GiftBadge = message.giftBadge!!
     check(giftBadge.receiptCredentialPresentation != null)
 
-    notifyTypingStoppedFromIncomingMessage(context, senderRecipient, threadRecipientId, metadata.sourceDeviceId)
+    notifyTypingStoppedFromIncomingMessage(senderRecipient, threadRecipientId, metadata.sourceDeviceId)
 
     val token = ReceiptCredentialPresentation(giftBadge.receiptCredentialPresentation!!.toByteArray()).serialize()
     val dbGiftBadge = GiftBadge.Builder()
@@ -928,7 +932,7 @@ object DataMessageProcessor {
   ): InsertResult? {
     log(envelope.clientTimestamp!!, "Media message.")
 
-    notifyTypingStoppedFromIncomingMessage(context, senderRecipient, threadRecipient.id, metadata.sourceDeviceId)
+    notifyTypingStoppedFromIncomingMessage(senderRecipient, threadRecipient.id, metadata.sourceDeviceId)
 
     val insertResult: InsertResult?
     val viewOnce: Boolean = if (TextSecurePreferences.isKeepViewOnceMessages(context)) false else (message.isViewOnce == true) // JW
@@ -941,7 +945,8 @@ object DataMessageProcessor {
       val mentions: List<Mention> = getMentions(message.bodyRanges.take(BODY_RANGE_PROCESSING_LIMIT))
       val sticker: Attachment? = getStickerAttachment(envelope.clientTimestamp!!, message)
       val attachments: List<Attachment> = message.attachments.toPointersWithinLimit()
-      val messageRanges: BodyRangeList? = if (message.bodyRanges.isNotEmpty()) message.bodyRanges.asSequence().take(BODY_RANGE_PROCESSING_LIMIT).filter { Util.allAreNull(it.mentionAci, it.mentionAciBinary) }.toList().toBodyRangeList() else null
+      val messageRanges: BodyRangeList? =
+        if (message.bodyRanges.isNotEmpty()) message.bodyRanges.asSequence().take(BODY_RANGE_PROCESSING_LIMIT).filter { Util.allAreNull(it.mentionAci, it.mentionAciBinary) }.toList().toBodyRangeList() else null
 
       handlePossibleExpirationUpdate(envelope, metadata, senderRecipient, threadRecipient, groupId, message.expireTimerDuration, message.expireTimerVersion, receivedTime)
 
@@ -1041,7 +1046,7 @@ object DataMessageProcessor {
 
     handlePossibleExpirationUpdate(envelope, metadata, senderRecipient, threadRecipient, groupId, message.expireTimerDuration, message.expireTimerVersion, receivedTime)
 
-    notifyTypingStoppedFromIncomingMessage(context, senderRecipient, threadRecipient.id, metadata.sourceDeviceId)
+    notifyTypingStoppedFromIncomingMessage(senderRecipient, threadRecipient.id, metadata.sourceDeviceId)
 
     val textMessage = IncomingMessage(
       type = MessageType.NORMAL,
@@ -1181,7 +1186,15 @@ object DataMessageProcessor {
 
     handlePossibleExpirationUpdate(envelope, metadata, senderRecipient, threadRecipient, groupId, message.expireTimerDuration, message.expireTimerVersion, receivedTime)
 
-    val messageId = handlePollValidation(envelope = envelope, targetSentTimestamp = targetSentTimestamp, senderRecipient = senderRecipient, earlyMessageCacheEntry = earlyMessageCacheEntry, targetAuthor = senderRecipient, threadRecipient = threadRecipient, batchCache = batchCache)
+    val messageId = handlePollValidation(
+      envelope = envelope,
+      targetSentTimestamp = targetSentTimestamp,
+      senderRecipient = senderRecipient,
+      earlyMessageCacheEntry = earlyMessageCacheEntry,
+      targetAuthor = senderRecipient,
+      threadRecipient = threadRecipient,
+      batchCache = batchCache
+    )
     if (messageId == null) {
       return null
     }
@@ -1501,15 +1514,20 @@ object DataMessageProcessor {
       AppDependencies.messageNotifier.updateNotification(context, ConversationId.fromMessageRecord(targetMessage))
       MessageId(targetMessage.id)
     } else {
-      warn(envelope.clientTimestamp!!, "[handleAdminRemoteDelete] Invalid admin delete! deleteTime: ${envelope.serverTimestamp!!}, targetTime: ${targetMessage.serverTimestamp}, deleteAuthor: ${senderRecipient.id}, targetAuthor: ${targetMessage.fromRecipient.id}, isAdmin: ${groupRecord.isAdmin(senderRecipient)}")
+      warn(
+        envelope.clientTimestamp!!,
+        "[handleAdminRemoteDelete] Invalid admin delete! deleteTime: ${envelope.serverTimestamp!!}, targetTime: ${targetMessage.serverTimestamp}, deleteAuthor: ${senderRecipient.id}, targetAuthor: ${targetMessage.fromRecipient.id}, isAdmin: ${
+          groupRecord.isAdmin(senderRecipient)
+        }"
+      )
       null
     }
   }
 
-  fun notifyTypingStoppedFromIncomingMessage(context: Context, senderRecipient: Recipient, threadRecipientId: RecipientId, device: Int) {
+  fun notifyTypingStoppedFromIncomingMessage(senderRecipient: Recipient, threadRecipientId: RecipientId, device: Int) {
     val threadId = SignalDatabase.threads.getThreadIdIfExistsFor(threadRecipientId)
 
-    if (threadId > 0 && TextSecurePreferences.isTypingIndicatorsEnabled(context)) {
+    if (threadId > 0 && SignalStore.settings.isTypingIndicatorsEnabled) {
       debug("Typing stopped on thread $threadId due to an incoming message.")
       AppDependencies.typingStatusRepository.onTypingStopped(threadId, senderRecipient, device, true)
     }
@@ -1562,9 +1580,9 @@ object DataMessageProcessor {
       val targetMessageAttachments = SignalDatabase.attachments.getAttachmentsForMessage(quotedMessage.id)
       val mentions: List<Mention> = SignalDatabase.mentions.getMentionsForMessage(quotedMessage.id)
 
-      // We want our thumbnail attachment to be the first "thumbnailable" item from the target message.
-      // That means we want to pick the earliest image/video that has data.
+      // The quote's thumbnail is the earliest image/video with data from the target message, but not from the target's own quote attachments to prevent propagating thumbnails.
       thumbnailAttachment = targetMessageAttachments
+        .filterNot { it.quote }
         .sortedBy { it.displayOrder }
         .sortedBy {
           if (MediaUtil.isImageType(it.contentType) || MediaUtil.isVideoType(it.contentType)) {
@@ -1577,6 +1595,8 @@ object DataMessageProcessor {
 
       if (quotedMessage.isViewOnce) {
         thumbnailAttachment = TombstoneAttachment.forQuote()
+      } else if (quotedMessage.sharedContacts.isNotEmpty()) {
+        thumbnailAttachment = null
       } else if (thumbnailAttachment == null) {
         thumbnailAttachment = quotedMessage
           .linkPreviews
@@ -1589,7 +1609,12 @@ object DataMessageProcessor {
         quotedMessage = SignalDatabase.payments.updateMessageWithPayment(quotedMessage) as MmsMessageRecord
       }
 
-      val body = if (quotedMessage.isPaymentNotification) quotedMessage.getDisplayBody(context).toString() else quotedMessage.body
+      val sharedContact = quotedMessage.sharedContacts.firstOrNull()
+      val body = when {
+        quotedMessage.isPaymentNotification -> quotedMessage.getDisplayBody(context).toString()
+        sharedContact != null -> sharedContact.quoteText(context)
+        else -> quotedMessage.body
+      }
 
       return QuoteModel(
         id = quote.id!!,
@@ -1627,6 +1652,7 @@ object DataMessageProcessor {
     }
 
     if (threadRecipient.isGroup) {
+      // e.g. a download that failed mid-playback. Refreshing would drop it out from under the user.
       val groupRecord = SignalDatabase.groups.getGroup(threadRecipient.id).orNull()
       if (groupRecord != null && !groupRecord.members.contains(senderRecipient.id)) {
         warn(timestamp, "Sender is not in the group! Thread: ${quotedMessage.threadId} Sender: ${senderRecipient.id}")
@@ -1735,7 +1761,7 @@ object DataMessageProcessor {
     val packId: String = Hex.toStringCondensed(sticker.packId!!.toByteArray())
     val packKey: String = Hex.toStringCondensed(sticker.packKey!!.toByteArray())
     val stickerId: Int = sticker.stickerId!!
-    val emoji: String? = sticker.emoji
+    val emoji: String? = sticker.emoji?.takeIf { EmojiUtil.isEmoji(it) }
 
     val stickerLocator = StickerLocator(packId, packKey, stickerId, emoji)
     val stickerRecord: StickerRecord? = SignalDatabase.stickers.getSticker(stickerLocator.packId, stickerLocator.stickerId, false)

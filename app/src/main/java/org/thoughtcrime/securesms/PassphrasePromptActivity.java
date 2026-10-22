@@ -33,7 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager; // JW
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -48,7 +47,7 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.signal.core.util.ThreadUtil;
-import org.signal.core.util.ServiceUtil; // JW
+import org.signal.core.ui.biometrics.BiometricDeviceAuthentication;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.components.AnimatingToggle;
 import org.thoughtcrime.securesms.crypto.InvalidPassphraseException;
@@ -199,8 +198,6 @@ public class PassphrasePromptActivity extends PassphraseActivity {
       MasterSecret masterSecret = MasterSecretUtil.getMasterSecret(this, passphrase);
 
       setMasterSecret(masterSecret);
-      InputMethodManager imm = ServiceUtil.getInputMethodManager(this); // JW
-      imm.hideSoftInputFromWindow(passphraseText.getWindowToken(), 0); // JW
     } catch (InvalidPassphraseException ipe) {
       passphraseText.setText("");
       passphraseText.setError(
@@ -246,11 +243,9 @@ public class PassphrasePromptActivity extends PassphraseActivity {
     learnMoreText           = findViewById(R.id.learn_more_text);
     biometricManager        = BiometricManager.from(this);
     biometricPrompt         = new BiometricPrompt(this, new BiometricAuthenticationListener());
-    BiometricPrompt.PromptInfo biometricPromptInfo = new BiometricPrompt.PromptInfo
-                                                                        .Builder()
-                                                                        .setAllowedAuthenticators(BiometricDeviceAuthentication.ALLOWED_AUTHENTICATORS)
-                                                                        .setTitle(getString(R.string.PassphrasePromptActivity_unlock_signal))
-                                                                        .build();
+    BiometricPrompt.PromptInfo biometricPromptInfo = BiometricDeviceAuthentication.createPromptInfoBuilder()
+                                                                                  .setTitle(getString(R.string.PassphrasePromptActivity_unlock_signal))
+                                                                                  .build();
     biometricAuth = new BiometricDeviceAuthentication(biometricManager, biometricPrompt, biometricPromptInfo);
     setSupportActionBar(toolbar);
     getSupportActionBar().setTitle("");
@@ -279,9 +274,6 @@ public class PassphrasePromptActivity extends PassphraseActivity {
       passphraseAuthContainer.setVisibility(View.VISIBLE);
       unlockView.setVisibility(View.GONE);
       lockScreenButton.setVisibility(View.GONE);
-      passphraseText.requestFocus(); // JW
-      InputMethodManager imm = ServiceUtil.getInputMethodManager(this); // JW
-      imm.showSoftInput(passphraseText, InputMethodManager.SHOW_IMPLICIT); // JW
     }
   }
 
