@@ -52,6 +52,8 @@ dependencies {
 
   implementation("com.annimon:stream:1.1.8") // JW
 
+  implementation("com.annimon:stream:1.1.8") // JW
+
   testImplementation(testLibs.junit.junit)
   testImplementation(testLibs.assertk)
   testImplementation(testLibs.kotlinx.coroutines.test)

@@ -12,7 +12,7 @@ import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.util.FileUtilsJW;
 import org.signal.core.ui.util.StorageUtil;
-import org.thoughtcrime.securesms.util.TextSecurePreferences;
+import org.thoughtcrime.securesms.keyvalue.SignalStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,13 +30,13 @@ public class PlaintextBackupExporter {
   }
 
   public static File getPlaintextExportFile(Context context) throws NoExternalStorageException {
-    Boolean isBackupLocationRemovable = TextSecurePreferences.isBackupLocationRemovable(context);
+    Boolean isBackupLocationRemovable = SignalStore.misc().getBackupLocationRemovable();
     Uri uri = SignalStore.settings().getSignalBackupDirectory();
     return new File(StorageUtil.getBackupPlaintextDirectory(uri, isBackupLocationRemovable), FILENAME);
   }
 
   private static File getPlaintextZipFile(Context context) throws NoExternalStorageException {
-    Boolean isBackupLocationRemovable = TextSecurePreferences.isBackupLocationRemovable(context);
+    Boolean isBackupLocationRemovable = SignalStore.misc().getBackupLocationRemovable();
     Uri uri = SignalStore.settings().getSignalBackupDirectory();
     return new File(StorageUtil.getBackupPlaintextDirectory(uri, isBackupLocationRemovable), ZIPFILENAME);
   }
@@ -100,7 +100,7 @@ public class PlaintextBackupExporter {
 
     writer.close();
 
-    if (TextSecurePreferences.isPlainBackupInZipfile(context)) {
+    if (SignalStore.misc().getPlainBackupInZipfile()) {
       File test = new File(getPlaintextZipFile(context).getAbsolutePath());
       if (test.exists()) {
         test.delete();

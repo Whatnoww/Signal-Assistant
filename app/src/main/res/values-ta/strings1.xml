@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">சாட் காப்புப்பிரதிகள்</string>
   <string name="arrays__import_export_orig">இறக்குமதி / ஏற்றுமதி</string>
   <string name="import_fragment__import_system_sms_database">தொலைபேசியிலுள்ள SMS-களை இறக்குமதி செய்</string>
   <string name="import_fragment__import_the_database_from_the_default_system">இயல்புநிலை கணினி தூதர் பயன்பாடு தரவுத்தளத்தை இறக்குமதி செய்க</string>

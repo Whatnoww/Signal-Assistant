@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">Copias de seguridad de los chats</string>
   <!--arrays.xml-->
   <string name="arrays__import_export_orig">Importar/exportar</string>
   <!--ImportFragment-->

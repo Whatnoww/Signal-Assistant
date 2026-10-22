@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">Cadangan obrolan</string>
   <string name="arrays__import_export_orig">Impor / ekspor</string>
   <string name="import_fragment__import_system_sms_database">Impor sistem basis data SMS</string>
   <string name="import_fragment__import_the_database_from_the_default_system">Impor basis data dari aplikasi pengiriman pesan standar di sistem</string>

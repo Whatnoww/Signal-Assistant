@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">Säkerhetskopior av chattar</string>
   <!--arrays.xml-->
   <string name="arrays__import_export_orig">Importera/exportera</string>
   <!--ImportFragment-->

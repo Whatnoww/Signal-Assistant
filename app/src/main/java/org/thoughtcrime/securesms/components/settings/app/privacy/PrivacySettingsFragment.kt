@@ -22,8 +22,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import org.signal.core.ui.biometrics.BiometricDeviceAuthentication
 import org.signal.core.ui.biometrics.BiometricDeviceLockContract
-import org.signal.core.ui.util.ExpirationUtil
-import org.signal.core.ui.util.SpanUtil
 import org.signal.core.util.ServiceUtil
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.PassphraseChangeActivity
@@ -41,13 +39,14 @@ import org.thoughtcrime.securesms.crypto.MasterSecretUtil
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.service.KeyCachingService
 import org.thoughtcrime.securesms.util.CommunicationActions
+import org.thoughtcrime.securesms.util.ExpirationUtil
+import org.thoughtcrime.securesms.util.SpanUtil
 import org.thoughtcrime.securesms.util.adapter.mapping.LayoutFactory
 import org.thoughtcrime.securesms.util.adapter.mapping.MappingAdapter
 import org.thoughtcrime.securesms.util.navigation.safeNavigate
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import org.signal.appsettings.R as AppSettingsR
 
 private val TAG = Log.tag(PrivacySettingsFragment::class.java)
 
@@ -117,7 +116,7 @@ class PrivacySettingsFragment : DSLSettingsFragment(R.string.preferences__privac
     return configure {
       if (state.hasPhoneNumber) {
         clickPref(
-          title = DSLSettingsText.from(AppSettingsR.string.preferences_app_protection__phone_number),
+          title = DSLSettingsText.from(R.string.preferences_app_protection__phone_number),
           summary = DSLSettingsText.from(R.string.preferences_app_protection__choose_who_can_see),
           onClick = {
             Navigation.findNavController(requireView())
@@ -195,12 +194,12 @@ class PrivacySettingsFragment : DSLSettingsFragment(R.string.preferences__privac
               KeyCachingService.getMasterSecret(context),
               MasterSecretUtil.UNENCRYPTED_PASSPHRASE
             )
-            SignalStore.settings.setPassphraseDisabled(true)
+            SignalStore.settings.passphraseDisabled = true
             val intent = Intent(context, KeyCachingService::class.java)
             intent.action = KeyCachingService.DISABLE_ACTION
             requireActivity().startService(intent)
           }
-          TextSecurePreferences.setProtectionMethod(activity, !state.isProtectionMethodPassphrase)
+          SignalStore.misc.protectionMethodPassphrase = !state.isProtectionMethodPassphrase
           viewModel.setNoLock()
         }
       )
@@ -223,7 +222,7 @@ class PrivacySettingsFragment : DSLSettingsFragment(R.string.preferences__privac
                     KeyCachingService.getMasterSecret(context),
                     MasterSecretUtil.UNENCRYPTED_PASSPHRASE
                   )
-                  SignalStore.settings.setPassphraseDisabled(true)
+                  SignalStore.settings.passphraseDisabled = true
                   val intent = Intent(activity, KeyCachingService::class.java)
                   intent.action = KeyCachingService.DISABLE_ACTION
                   requireActivity().startService(intent)
@@ -283,7 +282,7 @@ class PrivacySettingsFragment : DSLSettingsFragment(R.string.preferences__privac
         val isKeyguardSecure = ServiceUtil.getKeyguardManager(requireContext()).isKeyguardSecure
 
         clickPref(
-          title = DSLSettingsText.from(AppSettingsR.string.preferences_app_protection__screen_lock),
+          title = DSLSettingsText.from(R.string.preferences_app_protection__screen_lock),
           summary = DSLSettingsText.from(getScreenLockInactivityTimeoutSummary(isKeyguardSecure && state.screenLock, state.screenLockActivityTimeout)),
           onClick = {
             Navigation.findNavController(requireView()).safeNavigate(R.id.action_privacySettingsFragment_to_screenLockSettingsFragment)

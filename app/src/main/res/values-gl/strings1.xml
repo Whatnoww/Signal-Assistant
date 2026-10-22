@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">Copias de seguranza das conversas</string>
   <string name="arrays__import_export_orig">Importar/exportar</string>
   <string name="import_fragment__import_system_sms_database">Importar base de datos de SMS do sistema</string>
   <string name="import_fragment__import_the_database_from_the_default_system">Importa a base de datos da aplicación de mensaxaría do sistema</string>

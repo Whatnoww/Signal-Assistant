@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">Txaten babeskopiak</string>
   <string name="arrays__import_export_orig">Inportatu / esportatu</string>
   <string name="import_fragment__import_system_sms_database">Inportatu sistemaren SMS datubasea</string>
   <string name="import_fragment__import_the_database_from_the_default_system">Inportatu sistemako mezulari aplikazio lehenetsiaren datu-basea.</string>

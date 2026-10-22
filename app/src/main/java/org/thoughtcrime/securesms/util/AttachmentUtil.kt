@@ -17,7 +17,6 @@ import org.thoughtcrime.securesms.database.SignalDatabase.Companion.attachments
 import org.thoughtcrime.securesms.database.SignalDatabase.Companion.messages
 import org.thoughtcrime.securesms.database.SignalDatabase.Companion.threads
 import org.thoughtcrime.securesms.database.model.MessageRecord
-import org.thoughtcrime.securesms.dependencies.AppDependencies // JW: added
 import org.thoughtcrime.securesms.jobmanager.impl.NotInCallConstraint
 import org.thoughtcrime.securesms.jobs.MultiDeviceDeleteSyncJob.Companion.enqueueAttachmentDelete
 import org.thoughtcrime.securesms.keyvalue.SignalStore
@@ -102,7 +101,7 @@ object AttachmentUtil {
       // JW: changed
       deletedMessageRecord = messages.getMessageRecordOrNull(mmsId)
 
-      if (!TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application)) {
+      if (!SignalStore.misc.deleteMediaOnly) {
         messages.deleteMessage(mmsId)
         return deletedMessageRecord
       } else {
@@ -141,7 +140,7 @@ object AttachmentUtil {
         if (attachmentCount <= 1) {
           var deletedMessageRecord = messages.getMessageRecordOrNull(mmsId)
           // JW: changed
-          if (!TextSecurePreferences.isDeleteMediaOnly(AppDependencies.application)) {        
+          if (!SignalStore.misc.deleteMediaOnly) {        
             if (deletedMessageRecord != null) {
               messages.deleteMessage(mmsId, deletedMessageRecord.threadId, notify = false, updateThread = false)
               touchedThreadIds += deletedMessageRecord.threadId

@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">ការបម្រុងទុកការជជែក</string>
   <string name="arrays__import_export_orig">នាំចូុល /  នាំចេញ</string>
   <string name="import_fragment__import_system_sms_database">នាំចូលប្រព័ន្ធមូលដ្ឋានទិន្នន័យ​ SMS</string>
   <string name="import_fragment__import_the_database_from_the_default_system">នាំចូលមូលដ្ឋានទិន្នន័យពីកម្មវិធីផ្ញើសារលំនាំដើម</string>

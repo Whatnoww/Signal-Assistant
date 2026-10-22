@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">聊天備份</string>
   <!--arrays.xml-->
   <string name="arrays__import_export_orig">匯入／匯出</string>
   <string name="import_fragment__import_system_sms_database">匯入裝置上的手機簡訊</string>

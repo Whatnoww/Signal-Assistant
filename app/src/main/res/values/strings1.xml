@@ -34,6 +34,7 @@
   <string name="preferences_chats__delete_media_only">Delete media only</string>
   <string name="preferences_chats__delete_media_only_summary">Delete only media, not the message itself, when media is deleted in the All media screen</string>
   <!--backup location-->
+  <string name="preferences_chats__chat_backups">Chat backups</string>
   <string name="preferences_chats__chat_backups_removable">Backup location</string>
   <string name="preferences_chats__chat_backups_location_tap_to_change">Backup location (tap to change)</string>
   <string name="preferences_chats__backup_chats_to_removable_storage">Backup chats to removable storage (if available)</string>

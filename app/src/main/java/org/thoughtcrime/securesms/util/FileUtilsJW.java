@@ -11,7 +11,6 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
 
 import org.signal.core.util.logging.Log;
-import org.thoughtcrime.securesms.backup.BackupPassphrase;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 
 import java.io.File;
@@ -74,7 +73,7 @@ public class FileUtilsJW {
     String password = "";
     Boolean chatBackupsEnabled = SignalStore.settings().isBackupEnabled();
     if (chatBackupsEnabled) {
-      password = BackupPassphrase.get(context);
+      password = SignalStore.backup().getV1BackupPassphrase();
       if (password == null) {
         Log.w(TAG, "createEncryptedZipfile: empty zipfile password");
         password = "";

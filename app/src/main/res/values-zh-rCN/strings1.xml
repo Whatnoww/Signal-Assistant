@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">聊天备份</string>
   <!--arrays.xml-->
   <string name="arrays__import_export_orig">导入/导出</string>
   <!--ImportFragment-->
@@ -16,7 +17,6 @@
   <string name="ExportFragment_export_to_sd_card">导出到SD卡？</string>
   <string name="ExportFragment_this_will_export_your_encrypted_keys_settings_and_messages">这会将您的密钥、设置和信息加密后导出到SD卡。</string>
   <string name="ExportFragment_exporting_keys_settings_and_messages">正在导出加密后的密钥、设置和信息…</string>
-
   <!--database_upgrade_activity-->
   <string name="export_fragment__export_encrypted_backup">导出加密的备份</string>
   <string name="export_fragment__export_an_encrypted_backup_to_the_sd_card">将加密的备份导出到SD卡。</string>

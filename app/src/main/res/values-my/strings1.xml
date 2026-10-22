@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">ချက်(တ်) အရန်သိမ်းဆည်းမှုများ</string>
   <string name="arrays__import_export_orig">တင်သွင်း / ပို့</string>
   <string name="import_fragment__import_system_sms_database">ဖုန်းစနစ်၏ SMS အချက်အလက်များကို ထည့်သွင်းသည် </string>
   <string name="import_fragment__import_the_database_from_the_default_system">မူရင်းစနစ် မက်ဆင်ဂျာ app မှအချက်အလက်များကို တင်ပို့သည် </string>

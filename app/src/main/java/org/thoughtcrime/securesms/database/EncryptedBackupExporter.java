@@ -19,20 +19,20 @@ package org.thoughtcrime.securesms.database;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import org.signal.core.util.Base64;
 import org.signal.core.util.logging.Log;
 import org.signal.core.util.NoExternalStorageException;
 import org.signal.core.ui.util.StorageUtil;
 
-import org.thoughtcrime.securesms.backup.BackupPassphrase;
 import org.thoughtcrime.securesms.crypto.AppAttachmentSecretStore;
 import org.thoughtcrime.securesms.crypto.DatabaseSecret;
 import org.thoughtcrime.securesms.crypto.DatabaseSecretProvider;
+import org.thoughtcrime.securesms.keyvalue.PlainTextKeyValueStore;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.thoughtcrime.securesms.util.FileUtilsJW;
 
@@ -40,7 +40,6 @@ import org.signal.core.util.crypto.AttachmentSecret;
 import org.signal.core.util.crypto.AttachmentSecretProvider;
 import org.signal.core.util.crypto.KeyStoreHelper;
 import org.signal.core.util.JsonUtils;
-import org.thoughtcrime.securesms.util.TextSecurePreferences;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -66,6 +65,8 @@ public class EncryptedBackupExporter {
   private static final String backupKeyFile = "backupkey.txt";
   private static final String exportDirectory = "SignalExport";
   private static final String secretsExportDirectory = "SignalSecrets";
+  private static final String LOG_ENCRYPTED_SECRET   = "pref_log_encrypted_secret";
+  private static final String LOG_UNENCRYPTED_SECRET = "pref_log_unencrypted_secret";
 
   public static void exportToSd(Context context) throws NoExternalStorageException, IOException {
     verifyExternalStorageForExport(context);
@@ -73,10 +74,10 @@ public class EncryptedBackupExporter {
     DatabaseSecret dbs = DatabaseSecretProvider.getOrCreateDatabaseSecret(context);
     AttachmentSecret ats = asp.getOrCreateAttachmentSecret();
     byte[] lgs = getOrCreateLogSecret(context);
-    String bks = BackupPassphrase.get(context);
+    String bks = SignalStore.backup().getV1BackupPassphrase();
     exportDirectory(context, "");
     exportSecrets(context, dbs, ats, lgs, bks);
-    if (TextSecurePreferences.isRawBackupInZipfile(context)) {
+    if (SignalStore.misc().getRawBackupInZipfile()) {
       File test = new File(getEncryptedZipfileName(context));
       if (test.exists()) {
         test.delete();
@@ -88,9 +89,9 @@ public class EncryptedBackupExporter {
 
   public static void importFromSd(Context context) throws NoExternalStorageException, IOException {
     // Store in a boolean because settings might change after restore
-    boolean rawBackupInZipfile = TextSecurePreferences.isRawBackupInZipfile(context);
+    boolean rawBackupInZipfile = SignalStore.misc().getRawBackupInZipfile();
     Uri uri = SignalStore.settings().getSignalBackupDirectory();
-    Boolean isBackupLocationRemovable = TextSecurePreferences.isBackupLocationRemovable(context);
+    Boolean isBackupLocationRemovable = SignalStore.misc().getBackupLocationRemovable();
     // Extract the zipfile
     if (rawBackupInZipfile) {
       FileUtilsJW.extractEncryptedZipfile(context, getEncryptedZipfileName(context), StorageUtil.getRawBackupDirectory(uri, isBackupLocationRemovable).getAbsolutePath());
@@ -168,7 +169,7 @@ public class EncryptedBackupExporter {
       overwriteLogSecret(context, lgs);
     }
     if (bks != null) {
-	    BackupPassphrase.set(context, bks);
+      SignalStore.backup().setV1BackupPassphrase(bks);
     }
   }
 
@@ -192,7 +193,7 @@ public class EncryptedBackupExporter {
     String basedir = Environment.getExternalStorageDirectory().getAbsolutePath();
     try {
       Uri uri = SignalStore.settings().getSignalBackupDirectory();
-      Boolean isBackupLocationRemovable = TextSecurePreferences.isBackupLocationRemovable(context);
+      Boolean isBackupLocationRemovable = SignalStore.misc().getBackupLocationRemovable();
       basedir = StorageUtil.getRawBackupDirectory(uri, isBackupLocationRemovable).getAbsolutePath();
     } catch (NoExternalStorageException e) {
       Log.w(TAG, "getExportBaseDirectory failed: " + e.toString());
@@ -433,36 +434,24 @@ public class EncryptedBackupExporter {
 
   // JW: store an existing DatabaseSecret in the settingsfile.
   private static void overwriteDatabaseSecret(@NonNull Context context, @NonNull DatabaseSecret databaseSecret) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(databaseSecret.asBytes());
-      TextSecurePreferences.setDatabaseEncryptedSecret(context, encryptedSecret.serialize());
-    } else {
-      TextSecurePreferences.setDatabaseUnencryptedSecret(context, databaseSecret.asString());
-    }
+    KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(databaseSecret.asBytes());
+    PlainTextKeyValueStore.setDatabaseEncryptedSecret(encryptedSecret.serialize());
   }
 
   private static void overwriteAttachmentSecret(@NonNull Context context, @NonNull AttachmentSecret attachmentSecret) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(attachmentSecret.serialize().getBytes());
-      TextSecurePreferences.setAttachmentEncryptedSecret(context, encryptedSecret.serialize());
-    } else {
-      TextSecurePreferences.setAttachmentUnencryptedSecret(context, attachmentSecret.serialize());
-    }
+    KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(attachmentSecret.serialize().getBytes());
+    PlainTextKeyValueStore.setAttachmentEncryptedSecret(encryptedSecret.serialize());
   }
 
   private static void overwriteLogSecret(@NonNull Context context, @NonNull byte[] lgs) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(lgs);
-      TextSecurePreferences.setLogEncryptedSecret(context, encryptedSecret.serialize());
-    } else {
-      TextSecurePreferences.setLogUnencryptedSecret(context, Base64.encodeWithPadding(lgs));
-    }
+    KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(lgs);
+    setLogEncryptedSecret(context, encryptedSecret.serialize());
   }
 
   // LogSecretProvider class functions. Copied here because they are all private
   static byte[] getOrCreateLogSecret(@NonNull Context context) {
-    String unencryptedSecret = TextSecurePreferences.getLogUnencryptedSecret(context);
-    String encryptedSecret   = TextSecurePreferences.getLogEncryptedSecret(context);
+    String unencryptedSecret = getLogUnencryptedSecret(context);
+    String encryptedSecret   = getLogEncryptedSecret(context);
 
     if      (unencryptedSecret != null) return parseUnencryptedSecret(unencryptedSecret);
     else if (encryptedSecret != null)   return parseEncryptedSecret(encryptedSecret);
@@ -478,12 +467,8 @@ public class EncryptedBackupExporter {
   }
 
   private static byte[] parseEncryptedSecret(String secret) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.SealedData.fromString(secret);
-      return KeyStoreHelper.unseal(encryptedSecret);
-    } else {
-      throw new AssertionError("OS downgrade not supported. KeyStore sealed data exists on platform < M!");
-    }
+    KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.SealedData.fromString(secret);
+    return KeyStoreHelper.unseal(encryptedSecret);
   }
 
   private static byte[] createAndStoreSecret(@NonNull Context context) {
@@ -491,19 +476,16 @@ public class EncryptedBackupExporter {
     byte[]       secret = new byte[32];
     random.nextBytes(secret);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(secret);
-      TextSecurePreferences.setLogEncryptedSecret(context, encryptedSecret.serialize());
-    } else {
-      TextSecurePreferences.setLogUnencryptedSecret(context, Base64.encodeWithPadding(secret));
-    }
+    KeyStoreHelper.SealedData encryptedSecret = KeyStoreHelper.seal(secret);
+    setLogEncryptedSecret(context, encryptedSecret.serialize());
+
     return secret;
   }
 
   private static String getEncryptedZipfileName(Context context) {
     try {
       Uri uri = SignalStore.settings().getSignalBackupDirectory();
-      Boolean isBackupLocationRemovable = TextSecurePreferences.isBackupLocationRemovable(context);
+      Boolean isBackupLocationRemovable = SignalStore.misc().getBackupLocationRemovable();
       String backupPath = StorageUtil.getRawBackupDirectory(uri, isBackupLocationRemovable).getAbsolutePath();
       return backupPath + File.separator + "SignalExport.zip";
     } catch (NoExternalStorageException e) {
@@ -516,5 +498,32 @@ public class EncryptedBackupExporter {
   private static void deleteRawBackupFiles(Context context) {
     FileUtilsJW.secureDeleteRecursive(new File(getExportSecretsDirectory(context)));
     FileUtilsJW.deleteRecursive(new File(getExportDirectoryPath(context)));
+  }
+
+  public static void setStringPreference(Context context, String key, String value) {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+    SharedPreferences.Editor editor = preferences.edit();
+    editor.putString(key, value).apply();
+  }
+
+  public static String getStringPreference(Context context, String key, String defaultValue) {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+    return preferences.getString(key, defaultValue);
+  }
+
+  public static void setLogEncryptedSecret(Context context, String base64Secret) {
+    setStringPreference(context, LOG_ENCRYPTED_SECRET, base64Secret);
+  }
+
+  public static String getLogEncryptedSecret(Context context) {
+    return getStringPreference(context, LOG_ENCRYPTED_SECRET, null);
+  }
+
+  public static void setLogUnencryptedSecret(Context context, String base64Secret) {
+    setStringPreference(context, LOG_UNENCRYPTED_SECRET, base64Secret);
+  }
+
+  public static String getLogUnencryptedSecret(Context context) {
+    return getStringPreference(context, LOG_UNENCRYPTED_SECRET, null);
   }
 }

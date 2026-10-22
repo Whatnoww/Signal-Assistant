@@ -54,7 +54,6 @@ import org.thoughtcrime.securesms.util.ImageCompressionUtil;
 import org.thoughtcrime.securesms.util.LinkUtil;
 import org.thoughtcrime.securesms.util.MediaUtil;
 import org.thoughtcrime.securesms.util.OkHttpUtil;
-import org.thoughtcrime.securesms.util.TextSecurePreferences; // JW: added
 import org.whispersystems.signalservice.api.SignalServiceMessageReceiver;
 import org.whispersystems.signalservice.api.groupsv2.GroupLinkNotActiveException;
 import org.whispersystems.signalservice.api.messages.SignalServiceStickerManifest;
@@ -261,7 +260,7 @@ public class LinkPreviewRepository {
                 mediaConfig.getImageQualitySetting()
             );
 
-            if (result != null && TextSecurePreferences.sendLinkPreviewImages(AppDependencies.getApplication())) { // JW: only send preview images if the option is active
+            if (result != null && SignalStore.misc().getSendLinkPreviewImages()) { // JW: only send preview images if the option is active
               thumbnail = Optional.of(bytesToAttachment(result.getData(), result.getWidth(), result.getHeight(), result.getMimeType()));
               break;
             }

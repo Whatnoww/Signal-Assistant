@@ -31,10 +31,6 @@ public class TextSecurePreferences {
   // false (default) means the backup location is not changed by the user, true means it is changed.
   // This is used to determine at first app start to locate the app backup.
   public static final String BACKUP_LOCATION_CHANGED = "pref_backup_location_changed";
-  // added to use encrypted zipfiles to store raw backups
-  public static final String BACKUP_STORE_ZIPFILE_PREF = "pref_backup_zipfile";
-  // added to use encrypted zipfiles to store plaintext backups
-  public static final String BACKUP_STORE_ZIPFILE_PLAIN_PREF = "pref_backup_zipfile_plain";
 
   public static void setBackupLocationRemovable(Context context, boolean value) {
     setBooleanPreference(context, BACKUP_LOCATION_REMOVABLE_PREF, value);
@@ -50,21 +46,5 @@ public class TextSecurePreferences {
 
   public static boolean isBackupLocationChanged(Context context) {
     return getBooleanPreference(context, BACKUP_LOCATION_CHANGED, false);
-  }
-
-  public static boolean isRawBackupInZipfile(Context context) {
-    return getBooleanPreference(context, BACKUP_STORE_ZIPFILE_PREF, false);
-  }
-
-  public static void setRawBackupZipfile(Context context, boolean value) {
-    setBooleanPreference(context, BACKUP_STORE_ZIPFILE_PREF, value);
-  }
-
-  public static boolean isPlainBackupInZipfile(Context context) {
-    return getBooleanPreference(context, BACKUP_STORE_ZIPFILE_PLAIN_PREF, false);
-  }
-
-  public static void setPlainBackupZipfile(Context context, boolean value) {
-    setBooleanPreference(context, BACKUP_STORE_ZIPFILE_PLAIN_PREF, value);
   }
 }

@@ -60,25 +60,22 @@ class PrivacySettingsViewModel(
 
   // JW: added
   fun setPassphraseEnabled(enabled: Boolean) {
-    SignalStore.settings.setPassphraseDisabled(!enabled)
-    SignalStore.settings.setScreenLockEnabled(!enabled)
-    sharedPreferences.edit().putBoolean("pref_enable_passphrase_temporary", enabled).apply()
+    SignalStore.settings.passphraseDisabled = !enabled
+    SignalStore.settings.screenLockEnabled = !enabled
     refresh()
   }
 
   // JW: added
   fun setOnlyScreenlockEnabled(enabled: Boolean) {
-    SignalStore.settings.setPassphraseDisabled(true)
-    SignalStore.settings.setScreenLockEnabled(enabled)
-    sharedPreferences.edit().putBoolean("pref_enable_passphrase_temporary", false).apply()
+    SignalStore.settings.passphraseDisabled = true
+    SignalStore.settings.screenLockEnabled = enabled
     refresh()
   }
 
   // JW: added
   fun setNoLock() {
-    SignalStore.settings.setPassphraseDisabled(true)
-    SignalStore.settings.setScreenLockEnabled(false)
-    sharedPreferences.edit().putBoolean("pref_enable_passphrase_temporary", false).apply()
+    SignalStore.settings.passphraseDisabled = true
+    SignalStore.settings.screenLockEnabled = false
     refresh()
   }
 
@@ -86,10 +83,7 @@ class PrivacySettingsViewModel(
   fun isPassphraseSelected(): Boolean {
     // Because this preference may be undefined when this app is first ran we also check if there is a passphrase
     // defined, if so, we assume passphrase protection:
-    val myContext = AppDependencies.application
-
-    return TextSecurePreferences.isProtectionMethodPassphrase(myContext) ||
-      TextSecurePreferences.getBooleanPreference(myContext, "pref_enable_passphrase_temporary", false) && !SignalStore.settings.getPassphraseDisabled()
+    return SignalStore.misc.protectionMethodPassphrase || !SignalStore.settings.passphraseDisabled
   }
 
   fun refresh() {
@@ -113,7 +107,7 @@ class PrivacySettingsViewModel(
       universalExpireTimer = SignalStore.settings.universalExpireTimer
       // JW: added
       ,
-      isProtectionMethodPassphrase = TextSecurePreferences.isProtectionMethodPassphrase(AppDependencies.application)
+      isProtectionMethodPassphrase =  SignalStore.misc.protectionMethodPassphrase
     )
   }
 

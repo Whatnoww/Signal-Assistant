@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
+  <string name="preferences_chats__chat_backups">Vestluste varukoopiad</string>
   <!--arrays.xml-->
   <string name="arrays__import_export_orig">Impordi / ekspordi</string>
   <string name="import_fragment__import_system_sms_database">Impordi süsteemi SMS-andmebaas</string>

@@ -41,10 +41,10 @@ import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.R;
 import org.thoughtcrime.securesms.components.location.SignalMapView;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
+import org.thoughtcrime.securesms.keyvalue.SignalStore; // JW: added
 import org.thoughtcrime.securesms.util.DynamicNoActionBarTheme;
 import org.thoughtcrime.securesms.util.DynamicTheme;
 import org.thoughtcrime.securesms.util.MediaUtil;
-import org.thoughtcrime.securesms.util.TextSecurePreferences; // JW: added
 import org.thoughtcrime.securesms.util.views.SimpleProgressDialog;
 
 import java.io.IOException;
@@ -123,21 +123,21 @@ public final class PlacePickerActivity extends AppCompatActivity {
     btnMapTypeNormal.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(@NonNull View v) {
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        TextSecurePreferences.setGoogleMapType(getApplicationContext(), "normal");
+        SignalStore.misc().setGoogleMapType("normal");
       }
     });
 
     btnMapTypeSatellite.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(@NonNull View v) {
         googleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        TextSecurePreferences.setGoogleMapType(getApplicationContext(), "satellite");
+        SignalStore.misc().setGoogleMapType("satellite");
       }
     });
 
     btnMapTypeTerrain.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(@NonNull View v) {
         googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        TextSecurePreferences.setGoogleMapType(getApplicationContext(), "terrain");
+        SignalStore.misc().setGoogleMapType("terrain");
       }
     });
 
@@ -210,7 +210,7 @@ public final class PlacePickerActivity extends AppCompatActivity {
 
   // JW: get the maptype
   public int getGoogleMapType() {
-    switch (TextSecurePreferences.getGoogleMapType(getApplicationContext())) {
+    switch (SignalStore.misc().getGoogleMapType())  {
       case "hybrid":    return GoogleMap.MAP_TYPE_HYBRID;
       case "satellite": return GoogleMap.MAP_TYPE_SATELLITE;
       case "terrain":   return GoogleMap.MAP_TYPE_TERRAIN;

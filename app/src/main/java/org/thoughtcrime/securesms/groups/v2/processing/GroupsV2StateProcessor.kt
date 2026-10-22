@@ -9,7 +9,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import org.signal.core.models.ServiceId
 import org.signal.core.models.ServiceId.ACI
-import org.signal.core.models.recipients.RecipientId
 import org.signal.core.util.UuidUtil
 import org.signal.core.util.groups.GroupNotAMemberException
 import org.signal.core.util.logging.Log
@@ -19,7 +18,6 @@ import org.signal.libsignal.zkgroup.VerificationFailedException
 import org.signal.libsignal.zkgroup.groups.GroupMasterKey
 import org.signal.libsignal.zkgroup.groups.GroupSecretParams
 import org.signal.network.NetworkResult
-import org.signal.network.exceptions.NonSuccessfulResponseCodeException
 import org.signal.storageservice.storage.protos.groups.local.DecryptedGroup
 import org.signal.storageservice.storage.protos.groups.local.DecryptedGroupChange
 import org.thoughtcrime.securesms.database.GroupTable
@@ -45,7 +43,7 @@ import org.thoughtcrime.securesms.mms.IncomingMessage
 import org.thoughtcrime.securesms.mms.MmsException
 import org.thoughtcrime.securesms.mms.OutgoingMessage
 import org.thoughtcrime.securesms.recipients.Recipient
-import org.thoughtcrime.securesms.recipients.RecipientIds
+import org.thoughtcrime.securesms.recipients.RecipientId
 import org.thoughtcrime.securesms.storage.StorageSyncHelper
 import org.whispersystems.signalservice.api.groupsv2.DecryptedGroupUtil
 import org.whispersystems.signalservice.api.groupsv2.GroupChangeReconstruct
@@ -213,13 +211,7 @@ class GroupsV2StateProcessor private constructor(
       } else {
         Log.i(TAG, "$logPrefix Server says we're not a member. Force applying P2P group change because it adds or removes us.")
         when (val forcedP2pUpdateResult = updateViaPeerGroupChange(timestamp, serverGuid, signedGroupChange, currentLocalState, forceApply = true, receivedTime = receivedTime)) {
-          is InternalUpdateResult.Updated -> {
-            if (forcedP2pUpdateResult.updatedLocalState.needsServerSnapshot) {
-              Log.i(TAG, "$logPrefix Scheduling server update for force applied P2P group change")
-              AppDependencies.jobManager.add(RequestGroupV2InfoJob(groupId))
-            }
-            return GroupUpdateResult.updated(forcedP2pUpdateResult.updatedLocalState)
-          }
+          is InternalUpdateResult.Updated -> return GroupUpdateResult.updated(forcedP2pUpdateResult.updatedLocalState)
           InternalUpdateResult.NoUpdateNeeded -> return GroupUpdateResult.CONSISTENT_OR_AHEAD
           is InternalUpdateResult.NotAMember, is InternalUpdateResult.UpdateFailed -> Log.w(TAG, "$logPrefix Unable to apply P2P group change when not a member: $forcedP2pUpdateResult")
         }
@@ -289,12 +281,7 @@ class GroupsV2StateProcessor private constructor(
   ): InternalUpdateResult {
     val updatedGroupState = try {
       if (forceApply) {
-        val forcedState = DecryptedGroupUtil.applyWithoutRevisionCheck(currentLocalState, signedGroupChange)
-        if (GroupProtoUtil.isMember(serviceIds.aci, forcedState.members)) {
-          forcedState.newBuilder().needsServerSnapshot(true).build()
-        } else {
-          forcedState
-        }
+        DecryptedGroupUtil.applyWithoutRevisionCheck(currentLocalState, signedGroupChange)
       } else {
         DecryptedGroupUtil.apply(currentLocalState, signedGroupChange)
       }
@@ -323,7 +310,7 @@ class GroupsV2StateProcessor private constructor(
     groupRecord: Optional<GroupRecord> = SignalDatabase.groups.getGroup(groupId),
     receivedTime: Long? = null
   ): InternalUpdateResult {
-    val currentLocalState: DecryptedGroup? = groupRecord.filter { it.hasV2GroupProperties }.map { it.requireV2GroupProperties().decryptedGroup }.orNull()?.let { if (it.isEmptyPlaceholder()) null else it }
+    var currentLocalState: DecryptedGroup? = groupRecord.filter { it.hasV2GroupProperties }.map { it.requireV2GroupProperties().decryptedGroup }.orNull()?.let { if (it.isEmptyPlaceholder()) null else it }
 
     if (targetRevision == LATEST && (currentLocalState == null || currentLocalState.revision == RESTORE_PLACEHOLDER_REVISION)) {
       Log.i(TAG, "$logPrefix Latest revision only, update to latest directly")
@@ -331,26 +318,6 @@ class GroupsV2StateProcessor private constructor(
     }
 
     Log.i(TAG, "$logPrefix Paging from server targetRevision: ${if (targetRevision == LATEST) "latest" else targetRevision}")
-
-    if (currentLocalState != null && canPageFromLocalRevision(currentLocalState)) {
-      val result = updateViaServerChangeLogs(
-        targetRevision = targetRevision,
-        timestamp = timestamp,
-        serverGuid = serverGuid,
-        groupRecord = groupRecord,
-        receivedTime = receivedTime,
-        initialLocalState = currentLocalState,
-        initialLogsNeededFrom = currentLocalState.revision,
-        initialIncludeFirstState = false,
-        allowJoinedAtFallback = true
-      )
-
-      if (result !is InternalUpdateResult.NotAMember) {
-        return result
-      }
-
-      Log.i(TAG, "$logPrefix Unable to page from local revision, falling back to joined at revision")
-    }
 
     val joinedAtResult = groupsApi.getGroupJoinedAt(groupsV2Authorization.getAuthorizationForToday(serviceIds, groupSecretParams))
 
@@ -366,50 +333,17 @@ class GroupsV2StateProcessor private constructor(
 
     val joinedAtRevision = joinedAtResult.result
 
-    val includeFirstState = currentLocalState == null ||
-      currentLocalState.revision < 0 ||
-      currentLocalState.revision <= joinedAtRevision ||
-      currentLocalState.isPlaceholderGroup ||
-      currentLocalState.needsServerSnapshot ||
-      !GroupProtoUtil.isMember(serviceIds.aci, currentLocalState.members)
-
-    val logsNeededFrom = if (currentLocalState != null) max(currentLocalState.revision, joinedAtRevision) else joinedAtRevision
-
-    return updateViaServerChangeLogs(
-      targetRevision = targetRevision,
-      timestamp = timestamp,
-      serverGuid = serverGuid,
-      groupRecord = groupRecord,
-      receivedTime = receivedTime,
-      initialLocalState = currentLocalState,
-      initialLogsNeededFrom = logsNeededFrom,
-      initialIncludeFirstState = includeFirstState,
-      allowJoinedAtFallback = false
-    )
-  }
-
-  /**
-   * Returns [InternalUpdateResult.NotAMember] only when [allowJoinedAtFallback] is set and the server rejects the first page, so the caller can retry from joined at.
-   */
-  private fun updateViaServerChangeLogs(
-    targetRevision: Int,
-    timestamp: Long,
-    serverGuid: String?,
-    groupRecord: Optional<GroupRecord>,
-    receivedTime: Long?,
-    initialLocalState: DecryptedGroup?,
-    initialLogsNeededFrom: Int,
-    initialIncludeFirstState: Boolean,
-    allowJoinedAtFallback: Boolean
-  ): InternalUpdateResult {
-    var currentLocalState = initialLocalState
     val sendEndorsementExpiration = groupRecord.map { it.groupSendEndorsementExpiration }.orElse(0L)
+
+    var includeFirstState = currentLocalState == null ||
+      currentLocalState.revision < 0 ||
+      currentLocalState.revision == joinedAtRevision ||
+      currentLocalState.isPlaceholderGroup ||
+      !GroupProtoUtil.isMember(serviceIds.aci, currentLocalState.members)
 
     val profileKeys = ProfileKeySet()
     val addMessagesForAllUpdates = currentLocalState == null || currentLocalState.revision != RESTORE_PLACEHOLDER_REVISION
-    var includeFirstState = initialIncludeFirstState
-    var logsNeededFrom = initialLogsNeededFrom
-    var canFallBackToJoinedAt = allowJoinedAtFallback
+    var logsNeededFrom = if (currentLocalState != null) max(currentLocalState.revision, joinedAtRevision) else joinedAtRevision
     var hasMore = true
     var runningTimestamp = timestamp
     var performCdsLookup = false
@@ -418,16 +352,7 @@ class GroupsV2StateProcessor private constructor(
     while (hasMore) {
       Log.i(TAG, "$logPrefix Requesting change logs from server, currentRevision=${currentLocalState?.revision ?: "null"} logsNeededFrom=$logsNeededFrom includeFirstState=$includeFirstState sendEndorsementExpiration=${sendEndorsementExpiration > 0}")
 
-      val (remoteGroupStateDiff, pagingData) = try {
-        getGroupChangeLogs(currentLocalState, logsNeededFrom, includeFirstState, sendEndorsementExpiration)
-      } catch (e: NonSuccessfulResponseCodeException) {
-        if (canFallBackToJoinedAt && (e is NotInGroupException || e is GroupNotFoundException)) {
-          Log.w(TAG, "$logPrefix Not able to request change logs from revision $logsNeededFrom", e)
-          return InternalUpdateResult.from(e)
-        }
-        throw e
-      }
-      canFallBackToJoinedAt = false
+      val (remoteGroupStateDiff, pagingData) = getGroupChangeLogs(currentLocalState, logsNeededFrom, includeFirstState, sendEndorsementExpiration)
       val applyGroupStateDiffResult: AdvanceGroupStateResult = GroupStatePatcher.applyGroupStateDiff(remoteGroupStateDiff, targetRevision)
       val updatedGroupState: DecryptedGroup? = applyGroupStateDiffResult.updatedGroupState
 
@@ -533,13 +458,6 @@ class GroupsV2StateProcessor private constructor(
     }
 
     return revision <= groupRecord.get().requireV2GroupProperties().groupRevision
-  }
-
-  private fun canPageFromLocalRevision(localState: DecryptedGroup): Boolean {
-    return localState.revision >= 0 &&
-      !localState.isPlaceholderGroup &&
-      !localState.needsServerSnapshot &&
-      GroupProtoUtil.isMember(serviceIds.aci, localState.members)
   }
 
   private fun DecryptedGroup.isEmptyPlaceholder(): Boolean {
@@ -729,7 +647,7 @@ class GroupsV2StateProcessor private constructor(
         .mapNotNull { it.change }
         .firstOrNull { it.terminateGroup }
         ?.let { ServiceId.parseOrNull(it.editorServiceIdBytes) }
-        ?.let { RecipientIds.from(it) }
+        ?.let { RecipientId.from(it) }
     } else {
       null
     }
@@ -795,7 +713,7 @@ class GroupsV2StateProcessor private constructor(
 
     // JW: Check if the person is allowed to add you to a group
     private fun mayThisPersonAddYouToAGroup(addedBy: Recipient): Boolean {
-      when (TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application)) {
+      when (SignalStore.misc.whoCanAddYouToGroups) {
         "anyone"             -> return true
         "nonblocked"         -> return !addedBy.isBlocked
         "onlycontacts"       -> return addedBy.isProfileSharing && !addedBy.isBlocked // check for blocked is not necessary but defensive programming if something changes here
@@ -1081,7 +999,7 @@ class GroupsV2StateProcessor private constructor(
 
       val serviceIds = SignalStore.account.getServiceIds()
       val outgoing = editor.isEmpty || aci == editor.get()
-      val extraCheck: Boolean = if (SignalStore.account.isLinkedDevice) true else (!TextSecurePreferences.whoCanAddYouToGroups(AppDependencies.application).equals("nonblocked") || !Recipient.resolved(RecipientId.from(editor.get())).isBlocked) // JW
+      val extraCheck: Boolean = if (SignalStore.account.isLinkedDevice) true else (!SignalStore.misc.whoCanAddYouToGroups.equals("nonblocked") || !Recipient.resolved(RecipientId.from(editor.get())).isBlocked) // JW
 
       val updateDescription = GV2UpdateDescription(
         gv2ChangeDescription = decryptedGroupV2Context,
@@ -1121,7 +1039,7 @@ class GroupsV2StateProcessor private constructor(
 
           val isNotifiable = isGroupAdd || isGroupTerminate
 
-          val groupMessage = IncomingMessage.groupUpdate(RecipientIds.from(editor.get()), timestamp, groupId, updateDescription, isNotifiable, serverGuid, receivedTime)
+          val groupMessage = IncomingMessage.groupUpdate(RecipientId.from(editor.get()), timestamp, groupId, updateDescription, isNotifiable, serverGuid, receivedTime)
           val insertResult = SignalDatabase.messages.insertMessageInbox(groupMessage)
 
           if (insertResult.isPresent) {

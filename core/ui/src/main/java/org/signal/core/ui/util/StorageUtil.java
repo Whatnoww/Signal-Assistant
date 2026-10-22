@@ -11,7 +11,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.RequiresApi; // JW: added
 import androidx.core.content.ContextCompat;
 
 import org.signal.core.ui.CoreUiDependencies;
@@ -28,7 +28,6 @@ import java.util.Objects;
 // JW: added
 import com.annimon.stream.Stream;
 import java.nio.file.Path;
-import org.signal.core.ui.util.TextSecurePreferences;
 
 public class StorageUtil {
 

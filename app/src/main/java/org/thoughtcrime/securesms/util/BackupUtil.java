@@ -24,7 +24,6 @@ import org.signal.core.ui.util.StorageUtil;
 import org.thoughtcrime.securesms.dependencies.AppDependencies;
 import org.thoughtcrime.securesms.keyvalue.SignalStore;
 import org.signal.core.ui.permissions.Permissions;
-import org.thoughtcrime.securesms.util.TextSecurePreferences; // JW: added
 
 import java.io.File;
 import java.security.SecureRandom;
@@ -242,17 +241,16 @@ public class BackupUtil {
     // This code is used at first app start when restoring a backup that is located
     // on the removable storage.
     if (files.length == 0) {
-      Context context = AppDependencies.getApplication();
       // This code should run only at the initial app start. In that case isBackupLocationChanged
       // defaults to false.
-      if (!TextSecurePreferences.isBackupLocationChanged(context)) {
-        TextSecurePreferences.setBackupLocationRemovable(context, true);
-        TextSecurePreferences.setBackupLocationChanged(context, true); // Set this so we know it has been changed in the future
+      if (!SignalStore.misc().getBackupLocationChanged()) {
+        SignalStore.misc().setBackupLocationRemovable(true);
+        SignalStore.misc().setBackupLocationChanged(true); // Set this so we know it has been changed in the future
         backupDirectory = StorageUtil.getBackupDirectory();
         files   = backupDirectory.listFiles();
         if (files.length == 0) { // No backup in removable storage, reset preferences to default values
-          TextSecurePreferences.setBackupLocationRemovable(context, false);
-          TextSecurePreferences.setBackupLocationChanged(context, false);
+          SignalStore.misc().setBackupLocationRemovable(false);
+          SignalStore.misc().setBackupLocationChanged(false);
         }
       }
     }
