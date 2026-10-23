@@ -15,7 +15,7 @@ import org.thoughtcrime.securesms.database.model.GroupRecord;
 import org.thoughtcrime.securesms.database.whatsapp.WaDbOpenHelper;
 import org.thoughtcrime.securesms.mms.MmsException;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.thoughtcrime.securesms.recipients.RecipientId;
+import org.signal.core.models.recipients.RecipientId;
 
 import java.io.IOException;
 import java.util.HashSet;
