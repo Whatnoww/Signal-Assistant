@@ -8,6 +8,7 @@ import org.signal.core.models.ServiceId
 import org.signal.core.models.ServiceId.ACI
 import org.signal.core.models.ServiceId.PNI
 import org.signal.core.models.backup.MediaRootBackupKey
+import org.signal.core.models.recipients.RecipientId
 import org.signal.core.util.Base64
 import org.signal.core.util.Hex
 import org.signal.core.util.Util
@@ -112,7 +113,7 @@ import org.thoughtcrime.securesms.payments.MobileCoinPublicAddress
 import org.thoughtcrime.securesms.polls.Poll
 import org.thoughtcrime.securesms.ratelimit.RateLimitUtil
 import org.thoughtcrime.securesms.recipients.Recipient
-import org.thoughtcrime.securesms.recipients.RecipientId
+import org.thoughtcrime.securesms.recipients.RecipientIds
 import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.service.webrtc.links.CallLinkCredentials
 import org.thoughtcrime.securesms.service.webrtc.links.CallLinkRoomId
@@ -654,7 +655,7 @@ object SyncMessageProcessor {
   }
 
   private fun updateGroupReceiptStatus(sent: Sent, messageId: Long, groupString: GroupId) {
-    val messageRecipientIds: Map<RecipientId, Boolean> = sent.serviceIdsToUnidentifiedStatus.mapKeys { RecipientId.from(it.key) }
+    val messageRecipientIds: Map<RecipientId, Boolean> = sent.serviceIdsToUnidentifiedStatus.mapKeys { RecipientIds.from(it.key) }
     val members: List<RecipientId> = SignalDatabase.groups.getGroupMembers(groupString, GroupTable.MemberSet.FULL_MEMBERS_EXCLUDING_SELF).map { it.id }
     val localReceipts: Map<RecipientId, Int> = SignalDatabase.groupReceipts.getGroupReceiptInfo(messageId).associate { it.recipientId to it.status }
 
@@ -672,7 +673,7 @@ object SyncMessageProcessor {
   }
 
   private fun updateGroupReceiptStatusForDistributionList(sent: Sent, messageId: Long, distributionListId: DistributionListId) {
-    val messageRecipientIds: Map<RecipientId, Boolean> = sent.serviceIdsToUnidentifiedStatus.mapKeys { RecipientId.from(it.key) }
+    val messageRecipientIds: Map<RecipientId, Boolean> = sent.serviceIdsToUnidentifiedStatus.mapKeys { RecipientIds.from(it.key) }
     val members: List<RecipientId> = SignalDatabase.distributionLists.getMembers(distributionListId)
     val localReceipts: Map<RecipientId, Int> = SignalDatabase.groupReceipts.getGroupReceiptInfo(messageId).associate { it.recipientId to it.status }
 
@@ -761,7 +762,7 @@ object SyncMessageProcessor {
       val recipient: Recipient = getSyncMessageDestination(sent)
       var quoteModel: QuoteModel? = null
       var expiresInMillis = 0L
-      val storyAuthorRecipient: RecipientId = RecipientId.from(authorServiceId)
+      val storyAuthorRecipient: RecipientId = RecipientIds.from(authorServiceId)
       val storyMessageId: Long = SignalDatabase.messages.getStoryId(storyAuthorRecipient, sentTimestamp).id
       val story: MmsMessageRecord = SignalDatabase.messages.getMessageRecord(storyMessageId).withAttachments() as MmsMessageRecord
       val threadRecipientId: RecipientId? = SignalDatabase.threads.getRecipientForThreadId(story.threadId)?.id
@@ -1282,7 +1283,7 @@ object SyncMessageProcessor {
       return
     }
 
-    var recipientId: RecipientId? = ServiceId.parseOrNull(outgoingPayment.recipientServiceId)?.let { RecipientId.from(it) }
+    var recipientId: RecipientId? = ServiceId.parseOrNull(outgoingPayment.recipientServiceId)?.let { RecipientIds.from(it) }
 
     var timestamp: Long = mobileCoin.ledgerBlockTimestamp ?: 0L
     if (timestamp == 0L) {
@@ -1376,7 +1377,7 @@ object SyncMessageProcessor {
     val timestamp = callLogEvent.timestamp
     val callId = callLogEvent.callId?.let { CallId(it) }
     val peer: RecipientId? = callLogEvent.conversationId?.let { byteString ->
-      ACI.parseOrNull(byteString)?.let { RecipientId.from(it) }
+      ACI.parseOrNull(byteString)?.let { RecipientIds.from(it) }
         ?: GroupId.pushOrNull(byteString.toByteArray())?.let { SignalDatabase.recipients.getByGroupId(it).orNull() }
         ?: CallLinkRoomId.fromBytes(byteString.toByteArray()).let { SignalDatabase.recipients.getByCallLinkRoomId(it).orNull() }
     }
@@ -1481,7 +1482,7 @@ object SyncMessageProcessor {
     }
 
     val aci = ACI.parseOrThrow(callEvent.conversationId!!)
-    val recipientId = RecipientId.from(aci)
+    val recipientId = RecipientIds.from(aci)
 
     log(envelopeTimestamp, "Synchronize call event call: $callId")
 

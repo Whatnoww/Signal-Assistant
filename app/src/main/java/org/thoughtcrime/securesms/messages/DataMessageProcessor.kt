@@ -7,6 +7,7 @@ import okio.ByteString.Companion.toByteString
 import org.signal.core.models.ServiceId
 import org.signal.core.models.ServiceId.ACI
 import org.signal.core.models.database.StickerRecord
+import org.signal.core.models.recipients.RecipientId
 import org.signal.core.util.Base64
 import org.signal.core.util.Hex
 import org.signal.core.util.UuidUtil
@@ -94,7 +95,7 @@ import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.from
 import org.thoughtcrime.securesms.polls.Poll
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.recipients.Recipient.HiddenState
-import org.thoughtcrime.securesms.recipients.RecipientId
+import org.thoughtcrime.securesms.recipients.RecipientIds
 import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.stickers.StickerLocator
 import org.thoughtcrime.securesms.util.EarlyMessageCacheEntry
@@ -421,7 +422,7 @@ object DataMessageProcessor {
 
     SignalDatabase.messages.beginTransaction()
     return try {
-      val authorRecipientId = RecipientId.from(authorServiceId)
+      val authorRecipientId = RecipientIds.from(authorServiceId)
       val parentStoryId: ParentStoryId
       var quoteModel: QuoteModel? = null
       var expiresIn: Duration = 0L.seconds
@@ -758,7 +759,7 @@ object DataMessageProcessor {
 
     SignalDatabase.messages.beginTransaction()
     return try {
-      val storyAuthorRecipientId = RecipientId.from(authorServiceId)
+      val storyAuthorRecipientId = RecipientIds.from(authorServiceId)
       val selfId = Recipient.self().id
       val parentStoryId: ParentStoryId
       var quoteModel: QuoteModel? = null
@@ -1650,6 +1651,7 @@ object DataMessageProcessor {
     }
 
     if (threadRecipient.isGroup) {
+      // e.g. a download that failed mid-playback. Refreshing would drop it out from under the user.
       val groupRecord = SignalDatabase.groups.getGroup(threadRecipient.id).orNull()
       if (groupRecord != null && !groupRecord.members.contains(senderRecipient.id)) {
         warn(timestamp, "Sender is not in the group! Thread: ${quotedMessage.threadId} Sender: ${senderRecipient.id}")
@@ -1758,7 +1760,7 @@ object DataMessageProcessor {
     val packId: String = Hex.toStringCondensed(sticker.packId!!.toByteArray())
     val packKey: String = Hex.toStringCondensed(sticker.packKey!!.toByteArray())
     val stickerId: Int = sticker.stickerId!!
-    val emoji: String? = sticker.emoji
+    val emoji: String? = sticker.emoji?.takeIf { EmojiUtil.isEmoji(it) }
 
     val stickerLocator = StickerLocator(packId, packKey, stickerId, emoji)
     val stickerRecord: StickerRecord? = SignalDatabase.stickers.getSticker(stickerLocator.packId, stickerLocator.stickerId, false)

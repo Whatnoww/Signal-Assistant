@@ -33,7 +33,7 @@ val staticIps = Properties().apply { file("static-ips.properties").reader().use 
 staticIps.stringPropertyNames().forEach { rootProject.extra[it] = staticIps.getProperty(it) }
 
 val canonicalVersionCode = 1770
-val canonicalVersionName = "8.33.0"
+val canonicalVersionName = "8.33.0.0-JW"
 val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 
@@ -42,6 +42,9 @@ val abiCodes: Map<String, Int> = mapOf("armeabi-v7a" to 1, "arm64-v8a" to 2, "x8
 
 // We don't want versions to ever end in 0 so that they don't conflict with nightly versions
 val possibleHotfixVersions = (0 until maxHotfixVersions).toList().filter { it % 10 != 0 }
+
+// Nightly tags look like v8.33.0-nightly-1767-3: the canonical version code of the tagged commit, then a build number from 0 to 9 that resets with it.
+val nightlyTagRegex = Regex("^v\\d+\\.\\d+\\.\\d+-nightly-(\\d+)-(\\d)$")
 
 val debugKeystorePropertiesProvider: Provider<Properties> = providers.of(PropertiesFileValueSource::class.java) {
   parameters.file.set(rootProject.layout.projectDirectory.file("keystore.debug.properties"))
@@ -134,6 +137,10 @@ wire {
 ktlint {
   version.set("1.5.0")
 }
+
+//Whatnoww added - Load Github token
+val githubToken: String = localProperties?.getProperty("GITHUB_TOKEN") ?: ""
+val responseXml: String = localProperties?.getProperty("RESPONSE_XML") ?: ""
 
 // ktlint only scans convention source dirs, so the shared dirs added to the compile tasks are
 // otherwise skipped. Add them to the base test/androidTest ktlint tasks so ktlintCheck/format cover them.
@@ -313,6 +320,9 @@ android {
     buildConfigField("String", "STRIPE_PUBLISHABLE_KEY", "\"pk_live_6cmGZopuTsV8novGgJJW9JpC00vLIgtQ1D\"")
     buildConfigField("boolean", "TRACING_ENABLED", "false")
     buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true") // JW
+    //Whatnoww added config field
+    buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
+    buildConfigField("String", "RESPONSE_XML", "\"$responseXml\"")
 
     ndk {
       abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
@@ -707,6 +717,7 @@ dependencies {
   ktlintRuleset(libs.ktlint.twitter.compose)
   coreLibraryDesugaring(libs.android.tools.desugar)
 
+  implementation(project(":core:database"))
   implementation(project(":core:models"))
   implementation(project(":core:models-jvm"))
   implementation(project(":core:serialization"))
@@ -805,7 +816,6 @@ dependencies {
   implementation(libs.glide.glide)
   implementation(libs.roundedimageview)
   implementation(libs.materialish.progress)
-  implementation(libs.greenrobot.eventbus)
   implementation(libs.google.zxing.android.integration)
   implementation(libs.google.zxing.core)
   implementation(libs.google.flexbox)
@@ -845,6 +855,7 @@ dependencies {
   implementation(project(":feature:media-send"))
   implementation(project(":feature:media-viewer"))
 
+
   "spinnerImplementation"(project(":lib:spinner"))
 
   "canaryImplementation"(libs.square.leakcanary)
@@ -872,6 +883,7 @@ dependencies {
   testImplementation(testLibs.conscrypt.openjdk.uber)
   testImplementation(testLibs.mockk)
   testImplementation(testFixtures(project(":core:ui")))
+  testImplementation(testFixtures(project(":lib:emoji")))
   testImplementation(testFixtures(project(":lib:libsignal-service")))
   testImplementation(testLibs.espresso.core)
   testImplementation(testLibs.kotlinx.coroutines.test)
@@ -930,43 +942,14 @@ fun getGitHash(): String {
 
 fun getNightlyTagForCurrentCommit(): String? {
   return "\"000000\"" // JW
-/*
-  val output = providers.exec {
-    commandLine("git", "tag", "--points-at", "HEAD")
-  }.standardOutput.asText.get().trim()
-
-  return if (output.isNotEmpty()) {
-    val tags = output.split("\n").toList()
-    tags.firstOrNull { it.contains("nightly") } ?: tags[0]
-  } else {
-    null
-  }
-*/
 }
 
-fun getNightlyBuildNumber(tag: String?): Int {
+fun getNightlyVersionCode(tag: String): Int {
   return 0 // JW
-/*
-  if (tag == null) {
-    return 0
-  }
-
-  val match = Regex("-(\\d{3})$").find(tag)
-  return match?.groupValues?.get(1)?.toIntOrNull() ?: 0
-*/
 }
 
 fun getLastCommitDateTimeUtc(): String {
   return "\"000000\"" // JW
-/*
-  val timestamp = providers.exec {
-    commandLine("git", "log", "-1", "--pretty=format:%ct")
-  }.standardOutput.asText.get().trim().toLong()
-  val instant = Instant.ofEpochSecond(timestamp)
-  val formatter = DateTimeFormatter.ofPattern("MMM d '@' HH:mm 'UTC'", Locale.US)
-    .withZone(ZoneOffset.UTC)
-  return formatter.format(instant)
-*/
 }
 
 fun getMapsKey(): String {
