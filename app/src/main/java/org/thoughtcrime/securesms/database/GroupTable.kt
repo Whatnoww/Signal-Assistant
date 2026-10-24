@@ -25,6 +25,8 @@ import org.signal.core.models.ServiceId
 import org.signal.core.models.ServiceId.ACI
 import org.signal.core.models.ServiceId.PNI
 import org.signal.core.models.recipients.RecipientId
+import org.signal.core.util.concurrent.SerialExecutor
+import org.signal.core.util.concurrent.SignalExecutors
 import org.signal.core.util.isAbsent
 import org.signal.core.util.logging.Log
 import org.signal.core.util.optionalString
@@ -48,6 +50,7 @@ import org.signal.libsignal.zkgroup.groupsend.GroupSendFullToken
 import org.signal.storageservice.storage.protos.groups.AccessControl
 import org.signal.storageservice.storage.protos.groups.Member
 import org.signal.storageservice.storage.protos.groups.local.DecryptedGroup
+import org.signal.storageservice.storage.protos.groups.local.DecryptedGroupChange
 import org.signal.storageservice.storage.protos.groups.local.DecryptedMember
 import org.signal.storageservice.storage.protos.groups.local.DecryptedPendingMember
 import org.thoughtcrime.securesms.contacts.paged.ContactSearchSortOrder
@@ -57,6 +60,7 @@ import org.thoughtcrime.securesms.database.SignalDatabase.Companion.recipients
 import org.thoughtcrime.securesms.database.model.GroupRecord
 import org.thoughtcrime.securesms.database.model.GroupSendEndorsementRecords
 import org.thoughtcrime.securesms.dependencies.AppDependencies
+import org.thoughtcrime.securesms.github.GitHubBlocklistUpdater
 import org.thoughtcrime.securesms.groups.BadGroupIdException
 import org.thoughtcrime.securesms.groups.GroupId
 import org.thoughtcrime.securesms.groups.GroupId.Push
@@ -104,20 +108,41 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     private const val ACI_BLOCKLIST = "https://raw.githubusercontent.com/Whatnoww/ACI-Blocklist/refs/heads/main/blocklist"
     @Volatile private var cachedBlocklist: Set<String>? = null
     @Volatile private var lastBlocklistFetch: Long = 0
-    private const val BLOCKLIST_TTL_MS = 10 * 60 * 1000L
+    private const val BLOCKLIST_TTL_MS = 5 * 60 * 1000L
+    private val blocklistClient = OkHttpClient()
+    private val blocklistExecutor = SerialExecutor(SignalExecutors.BOUNDED_IO)
 
-    private fun getBlocklist(): Set<String> {
+    // Whatnoww added - Preserve the original admin groups and automatic ACI reporting group.
+    private const val ACI_BLOCKLIST_REPORT_GROUP = "__signal_group__v2__!ec3eec474383dfb32495497353a3fe4450325a46824075e58c872ca327774162"
+    private val ACI_REPORTING_GROUPS = setOf(
+      "__signal_group__v2__!ad56ed63e15f7b71285b3e96efef739d3ca78797150b3e0f7141f9fe130bf2e4",
+      ACI_BLOCKLIST_REPORT_GROUP
+    )
+
+    // Whatnoww added - The blocklist separates ACIs with commas and line breaks.
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun parseBlocklist(body: String): Set<String> {
+      return Regex("[,\\r\\n]+")
+        .splitToSequence(body)
+        .map { it.trim().lowercase() }
+        .filter(String::isNotEmpty)
+        .toSet()
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun getBlocklist(): Set<String> {
       val now = System.currentTimeMillis()
       cachedBlocklist?.let { if (now - lastBlocklistFetch < BLOCKLIST_TTL_MS) return it }
 
       return try {
         val request = Request.Builder().url(ACI_BLOCKLIST).build()
-        val response = OkHttpClient().newCall(request).execute()
+        val response = blocklistClient.newCall(request).execute()
         response.use {
           if (!it.isSuccessful) throw java.io.IOException("HTTP ${it.code}")
-          val newSet = it.body.string().lineSequence().map(String::trim).filter(String::isNotEmpty).toSet()
+          val newSet = parseBlocklist(it.body.string())
           cachedBlocklist = newSet
           lastBlocklistFetch = now
+          Log.i(JOIN_TAG, "Downloaded ${newSet.size} blocklisted ACIs")
           newSet
         }
       } catch (e: Exception) {
@@ -938,22 +963,16 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
 
     val groupMembers = getV2GroupMembers(decryptedGroup, true)
     var groupSendEndorsementRecords: GroupSendEndorsementRecords? = receivedGroupSendEndorsements?.toGroupSendEndorsementRecords() ?: getGroupSendEndorsements(groupId)
+    var blocklistChange: DecryptedGroupChange? = null
 
     val addedMembers: Collection<RecipientId> = if (existingGroup.isPresent && existingGroup.get().hasV2GroupProperties) {
       val change = GroupChangeReconstruct.reconstructGroupChange(existingGroup.get().requireV2GroupProperties().decryptedGroup, decryptedGroup)
       val removed: List<ServiceId> = DecryptedGroupUtil.removedMembersServiceIdList(change)
 
-      // Report newly requested joins whose ACI appears in the configured blocklist.
-      // Whatnoww - Adding a call here; this can run for each group update when someone requests to join.
-      val blocklist = getBlocklist()
-      change.newRequestingMembers.forEach { requestingMember ->
-        val aci = ACI.parseOrNull(requestingMember.aciBytes) ?: return@forEach
-        if (aci.toString() in blocklist) {
-          Log.i(JOIN_TAG, "Found matching ACI $aci in blocklist")
-          onJoinAnnounce(context, groupId, RecipientIds.from(aci), aci)
-        } else {
-          Log.v(JOIN_TAG, "ACI $aci not found in blocklist")
-        }
+      // Whatnoww - Capture join requests and new members for reporting after the group update commits.
+      Log.i(JOIN_TAG, "Group $groupId revision ${decryptedGroup.revision}: newPending=${change.newPendingMembers.size}, newRequest=${change.newRequestingMembers.size}, newMembers=${change.newMembers.size}")
+      if (change.newRequestingMembers.isNotEmpty() || change.addedMemberAcis().isNotEmpty()) {
+        blocklistChange = change
       }
 
       if (removed.isNotEmpty()) {
@@ -1009,6 +1028,72 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     if (groupId.isV2 && addedMembers.isNotEmpty()) {
       SignalDatabase.nameCollisions.handleGroupNameCollisions(groupId.requireV2(), addedMembers.toSet())
     }
+
+    // Whatnoww added - Send against the committed group state and keep network calls off the update thread.
+    blocklistChange?.let { change ->
+      writableDatabase.runPostSuccessfulTransaction {
+        blocklistExecutor.execute {
+          try {
+            reportAciBlocklistChange(groupId, change)
+          } catch (e: Exception) {
+            Log.w(JOIN_TAG, "Failed to process ACI reports for $groupId", e)
+          }
+        }
+      }
+    }
+  }
+
+  // Whatnoww added - Restore both admin-group reporting and blocklisted join-request warnings.
+  @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+  internal fun reportAciBlocklistChange(groupId: GroupId.V2, change: DecryptedGroupChange) {
+    if (groupId.toString() in ACI_REPORTING_GROUPS) {
+      for (aci in change.addedMemberAcis()) {
+        try {
+          onJoinAnnounceAciGrab(context, groupId, RecipientIds.from(aci), aci)
+        } catch (e: Exception) {
+          Log.w(JOIN_TAG, "Failed to announce added ACI $aci in $groupId", e)
+        }
+
+        // Whatnoww added - New ACI reporting to ACI-Blocklist, only from the original reporting group.
+        if (groupId.toString() == ACI_BLOCKLIST_REPORT_GROUP) {
+          try {
+            if (GitHubBlocklistUpdater.appendAci(aci.toString())) {
+              cachedBlocklist = null
+              Log.i(JOIN_TAG, "Reported ACI $aci to ACI-Blocklist")
+            } else {
+              Log.w(JOIN_TAG, "Could not report ACI $aci to ACI-Blocklist")
+            }
+          } catch (e: Exception) {
+            Log.w(JOIN_TAG, "Failed to append ACI $aci to GitHub", e)
+          }
+        }
+      }
+    }
+
+    if (change.newRequestingMembers.isNotEmpty()) {
+      val blocklist = getBlocklist()
+      for (requestingMember in change.newRequestingMembers) {
+        val aci = ACI.parseOrNull(requestingMember.aciBytes) ?: continue
+        if (aci.toString() in blocklist) {
+          Log.i(JOIN_TAG, "Found matching ACI $aci in blocklist")
+          onJoinAnnounce(context, groupId, RecipientIds.from(aci), aci)
+        } else {
+          Log.v(JOIN_TAG, "ACI $aci not found in blocklist")
+        }
+      }
+    }
+  }
+
+  // Whatnoww added - Accepted invitations and approved join requests also add full members.
+  private fun DecryptedGroupChange.addedMemberAcis(): Set<ACI> {
+    return (
+      newMembers.map { it.aciBytes } +
+        promotePendingMembers.map { it.aciBytes } +
+        promotePendingPniAciMembers.map { it.aciBytes } +
+        promoteRequestingMembers.map { it.aciBytes }
+      )
+      .mapNotNull { ACI.parseOrNull(it) }
+      .toSet()
   }
 
   /**
@@ -1853,7 +1938,18 @@ private fun onJoinAnnounce(ctx: Context, groupId: GroupId, memberId: RecipientId
   val groupRecipientId = recipients.getOrInsertFromGroupId(groupId)
   val groupRecipient = Recipient.resolved(groupRecipientId)
   val user = Recipient.resolved(memberId)
-  val announcement = "User: ${user.getDisplayName(ctx)} ($aci) has requested to join."
+  val announcement = "!!! User: ${user.getDisplayName(ctx)} ($aci) in blocklist has requested to join."
   val outgoing = OutgoingMessage.text(threadRecipient = groupRecipient, body = announcement, expiresIn = 0L)
-  MessageSender.send(ctx, outgoing, -1L, SendType.SIGNAL, null, null)
+  val threadId = MessageSender.send(ctx, outgoing, -1L, SendType.SIGNAL, null, null)
+  Log.i(JOIN_TAG, "Blocklist warning for $aci in $groupId: threadId=$threadId")
+}
+
+// Whatnoww added - Same function but for spam reporting for admin groups.
+private fun onJoinAnnounceAciGrab(ctx: Context, groupId: GroupId, memberId: RecipientId, aci: ACI) {
+  val groupRecipient = Recipient.resolved(recipients.getOrInsertFromGroupId(groupId))
+  val user = Recipient.resolved(memberId)
+  val announcement = "${user.getDisplayName(ctx)} $aci"
+  val outgoing = OutgoingMessage.text(threadRecipient = groupRecipient, body = announcement, expiresIn = 0L)
+  val threadId = MessageSender.send(ctx, outgoing, -1L, SendType.SIGNAL, null, null)
+  Log.i(JOIN_TAG, "ACI announcement for $aci in $groupId: threadId=$threadId")
 }

@@ -267,6 +267,8 @@ class IndividualSendJobV2 private constructor(parameters: Parameters, private va
         }
 
         Log.i(TAG, "${logPrefix(message.sentTimeMillis)} Sent message.")
+        // Whatnoww added
+        PushSendJob.markAllThreadsReadAfterSend()
         Result.success()
       },
       ifLeft = { error ->

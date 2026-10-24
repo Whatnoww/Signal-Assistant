@@ -17,6 +17,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.coVerifyOrder // Whatnoww added
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
@@ -202,6 +203,8 @@ class IndividualSendJobV2Test {
     every { RemoteConfig.defaultMaxBackoff } returns 60_000L
 
     mockkObject(PushSendJob.Companion)
+    // Whatnoww added
+    every { PushSendJob.markAllThreadsReadAfterSend() } just runs
     every { PushSendJob.markAttachmentsUploaded(any<Long>(), any<OutgoingMessage>()) } just runs
     every { PushSendJob.notifyMediaMessageDeliveryFailed(any(), any<Long>()) } just runs
 
@@ -353,6 +356,13 @@ class IndividualSendJobV2Test {
     verify { threads.updateSilently(threadId, false) }
     verify { messageLog.insertIfPossible(recipientId, sentTime, any(), ContentHint.RESENDABLE, MessageId(messageId), any()) }
     verify { ConversationShortcutRankingUpdateJob.enqueueForOutgoingIfNecessary(recipient) }
+    // Whatnoww added
+    coVerifyOrder {
+      messageService.sendMessage(any(), any(), any(), any(), any(), any(), any(), any())
+      messages.markAsSent(messageId, true)
+      PushSendJob.markAllThreadsReadAfterSend()
+    }
+    verify(exactly = 1) { PushSendJob.markAllThreadsReadAfterSend() }
   }
 
   @Test
@@ -714,6 +724,8 @@ class IndividualSendJobV2Test {
     val result = createAndRunJob()
 
     assertThat(result.isRetry).isTrue()
+    // Whatnoww added
+    verify(exactly = 0) { PushSendJob.markAllThreadsReadAfterSend() }
   }
 
   @Test

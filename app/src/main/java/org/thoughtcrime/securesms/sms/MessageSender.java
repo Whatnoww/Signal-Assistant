@@ -65,7 +65,6 @@ import org.signal.core.models.media.Media;
 import org.thoughtcrime.securesms.mms.MmsException;
 import org.thoughtcrime.securesms.mms.OutgoingMessage;
 import org.thoughtcrime.securesms.mms.QuoteModel;
-import org.thoughtcrime.securesms.notifications.MarkReadReceiver;
 import org.thoughtcrime.securesms.recipients.Recipient;
 import org.thoughtcrime.securesms.recipients.RecipientUtil;
 import org.signal.core.util.ParcelUtil;
@@ -247,9 +246,6 @@ public class MessageSender {
       threadTable.update(allocatedThreadId, true, true);
 
       AppDependencies.getMessageNotifier().updateNotification(AppDependencies.getApplication());
-      //Whatnoww added - Mark everything as read which should clear some notifications.
-      var messageIds = SignalDatabase.threads().setAllThreadsRead();
-      MarkReadReceiver.process(messageIds);
 
       return allocatedThreadId;
     } catch (MmsException e) {

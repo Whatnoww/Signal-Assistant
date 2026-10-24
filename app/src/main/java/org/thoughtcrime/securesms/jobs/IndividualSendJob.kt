@@ -145,6 +145,8 @@ class IndividualSendJob private constructor(parameters: Parameters, private val 
       enqueueForOutgoingIfNecessary(recipient)
 
       log(TAG, message.sentTimeMillis.toString(), "Sent message: $messageId")
+      // Whatnoww added
+      markAllThreadsReadAfterSend()
     } catch (uue: UnregisteredUserException) {
       warn(TAG, "Failure", uue)
 

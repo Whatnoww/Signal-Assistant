@@ -42,6 +42,7 @@ import org.thoughtcrime.securesms.mms.OutgoingMessage
 import org.thoughtcrime.securesms.mms.PartAuthority
 import org.thoughtcrime.securesms.net.NotPushRegisteredException
 import org.thoughtcrime.securesms.net.SignalNetwork
+import org.thoughtcrime.securesms.notifications.MarkReadReceiver // Whatnoww added
 import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.forConversation
 import org.thoughtcrime.securesms.notifications.v2.ConversationId.Companion.fromThreadAndReply
 import org.thoughtcrime.securesms.recipients.Recipient
@@ -70,6 +71,19 @@ abstract class PushSendJob protected constructor(parameters: Parameters) : BaseJ
 
   companion object {
     private val TAG = Log.tag(PushSendJob::class.java)
+
+    // Whatnoww added
+    @JvmStatic
+    fun markAllThreadsReadAfterSend() {
+      // Keep the global read updates from competing with this message's encryption and send.
+      try {
+        MarkReadReceiver.process(threads.setAllThreadsRead())
+        AppDependencies.messageNotifier.updateNotification(AppDependencies.application)
+      } catch (e: RuntimeException) {
+        // Read-state cleanup must not fail or retry a message that has already been sent.
+        Log.w(TAG, "Failed to mark all conversations read after sending.", e)
+      }
+    }
 
     @JvmStatic
     fun enqueueCompressingAndUploadAttachmentsChains(jobManager: JobManager, message: OutgoingMessage): Set<String> {

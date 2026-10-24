@@ -528,6 +528,8 @@ public final class PushGroupSendJob extends PushSendJob {
       if (message.getStoryType().isStory()) {
         AppDependencies.getExpireStoriesManager().scheduleIfNecessary();
       }
+      // Whatnoww added
+      markAllThreadsReadAfterSend();
     } else if (!existingIdentityMismatches.isEmpty()) {
       Log.w(TAG, "Failing because there were " + existingIdentityMismatches.size() + " identity mismatches.");
       database.markAsSentFailed(messageId);
