@@ -15,6 +15,14 @@ Use a token with Contents read and write access to that repository. `GITHUB_TOKE
 
 An incoming message whose entire body is exactly `!groups` receives a reply in the same eligible chat. For 1:1 chats, the recipient must be a registered phone contact or an accepted Signal-only contact (profile sharing enabled), and Signal must consider the message request accepted. Having a group in common or a previous outgoing message alone does not qualify someone as a contact. Hidden/removed contacts, blocked chats, unaccepted groups, inactive groups and announcement groups where self cannot post are skipped. Eligibility is checked before downloading commands and again immediately before sending. The existing automatic group-leaving behavior is unchanged. Case, extra words, leading/trailing spaces and newlines do not match. Attachments, quotes, stories, reactions, edits, duplicates and messages from self do not trigger replies. A missing commands token or URL disables this feature. The XML is fetched on demand with ETags; a validated atomic disk cache provides a fallback when GitHub is unavailable. The message uses the chat's disappearing-message timer and Signal's ordinary sending pipeline, including long-text attachments when necessary.
 
+## Cache and background edits
+
+When a cached response exists, the app sends it immediately without waiting for GitHub or Signal group-link checks. If the cache needs revalidation, a separate background job waits until that original message has sent, checks for updates and edits the same reply only if its text or formatting changed. It also catches new/outdated group links. An unchanged response produces no edit or duplicate message. Deleted or manually edited replies are left alone; contact and group eligibility is checked again before any automatic edit.
+
+GitHub checks use a one-minute freshness window, followed by an ETag conditional request. Repeated commands inside that window do not contact GitHub. Failed attempts are throttled for the same interval, while the last good response remains available. A successful link write updates the cache immediately. The disk cache survives app restarts and is revalidated in the background on its first use. With no cache, the first request must download and resolve the response before sending.
+
+Remote edits, including `<active>0</active>`, are detected on a command-triggered background refresh after the freshness window expires. An already-sent cached reply is retained if the refreshed command is disabled; future requests use the disabled configuration. No periodic polling or webhook is required. Code can call `GitHubAutoReply.invalidateCache()` to expire freshness immediately, or `refreshFromGithub(context)` to force a conditional fetch. Publishing link updates still fetches the latest file before writing to preserve concurrent edits.
+
 ## Group entries
 
 ```xml

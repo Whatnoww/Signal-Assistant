@@ -5,10 +5,13 @@
 
 package org.thoughtcrime.securesms.jobs
 
+import android.content.Context
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.addStyle
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
+import org.thoughtcrime.securesms.dependencies.AppDependencies
+import org.thoughtcrime.securesms.github.CommandReply
 import org.thoughtcrime.securesms.github.CommandStyle
 import org.thoughtcrime.securesms.github.GitHubAutoReply
 import org.thoughtcrime.securesms.jobmanager.Job
@@ -45,60 +48,21 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     val recipient = SignalDatabase.threads.getRecipientForThreadId(request.threadId) ?: return
     if (!canReply(recipient, request.threadId)) return
 
-    val reply = GitHubAutoReply.getReplyFor(context, request.body) ?: return
-    if (reply.text.isBlank()) return
-    if (reply.text.toByteArray(Charsets.UTF_8).size > MessageUtil.MAX_TOTAL_BODY_SIZE_BYTES) {
-      Log.w(TAG, "Command reply exceeds Signal's maximum message size.")
-      return
-    }
+    val cached = GitHubAutoReply.getCachedReplyFor(context, request.body)
+    val reply = cached ?: GitHubAutoReply.getReplyFor(context, request.body) ?: return
     // Recheck after the network work, in case the request was removed or the chat was blocked/left.
     val latestRequest = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
     if (latestRequest.isRemoteDelete || latestRequest.body != request.body || Recipient.resolved(request.fromRecipient.id).isBlocked) return
     val latestRecipient = Recipient.resolved(recipient.id)
     if (!canReply(latestRecipient, request.threadId)) return
 
-    val ranges = BodyRangeList.Builder()
-    reply.styles.forEach { range ->
-      val style = when (range.style) {
-        CommandStyle.BOLD -> BodyRangeList.BodyRange.Style.BOLD
-        CommandStyle.ITALIC -> BodyRangeList.BodyRange.Style.ITALIC
-        CommandStyle.STRIKETHROUGH -> BodyRangeList.BodyRange.Style.STRIKETHROUGH
-        CommandStyle.MONOSPACE -> BodyRangeList.BodyRange.Style.MONOSPACE
-        CommandStyle.SPOILER -> BodyRangeList.BodyRange.Style.SPOILER
+    val outgoing = sendReply(context, reply, latestRecipient, request.threadId) ?: return
+    if (cached != null && GitHubAutoReply.needsRefresh(request.body)) {
+      val inserted = SignalDatabase.messages.getMessageFor(outgoing.sentTimeMillis, Recipient.self().id)
+      if (inserted != null && inserted.threadId == request.threadId && inserted.isOutgoing) {
+        AppDependencies.jobManager.add(GitHubAutoReplyRefreshJob(requestId, inserted.id, reply.contentHash()))
       }
-      ranges.addStyle(style, range.start, range.length)
     }
-    val split = MessageUtil.getSplitMessage(context, reply.text)
-    MessageSender.send(
-      context,
-      OutgoingMessage(
-        threadRecipient = latestRecipient,
-        sentTimeMillis = System.currentTimeMillis(),
-        body = split.body,
-        attachments = split.textSlide.map { listOf(it.asAttachment()) }.orElse(emptyList()),
-        bodyRanges = ranges.build(),
-        expiresIn = latestRecipient.expiresInSeconds.seconds.inWholeMilliseconds,
-        isSecure = true
-      ),
-      request.threadId,
-      MessageSender.SendType.SIGNAL,
-      null,
-      null
-    )
-  }
-
-  internal fun canReply(recipient: Recipient, threadId: Long): Boolean {
-    if (recipient.isBlocked || recipient.isSelf || recipient.isHidden) return false
-    if (!recipient.isGroup) {
-      // Accepted Signal-only contacts use profile sharing; mutual group membership alone is insufficient.
-      return recipient.isIndividual && recipient.isRegistered &&
-        (recipient.isSystemContact || recipient.isProfileSharing) &&
-        RecipientUtil.isMessageRequestAccepted(threadId, recipient)
-    }
-    if (!recipient.isPushGroup || !recipient.isActiveGroup) return false
-    if (!RecipientUtil.isMessageRequestAccepted(threadId, recipient)) return false
-    val group = SignalDatabase.groups.getGroup(recipient.id).orElse(null) ?: return false
-    return group.isActive && (!group.isAnnouncementGroup || group.isAdmin(Recipient.self()))
   }
 
   override fun onShouldRetry(e: Exception): Boolean = false
@@ -116,5 +80,51 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
   companion object {
     const val KEY = "GitHubAutoReplyJob"
     private val TAG = Log.tag(GitHubAutoReplyJob::class)
+
+    internal fun canReply(recipient: Recipient, threadId: Long): Boolean {
+      if (recipient.isBlocked || recipient.isSelf || recipient.isHidden) return false
+      if (!recipient.isGroup) {
+        // Accepted Signal-only contacts use profile sharing; mutual group membership alone is insufficient.
+        return recipient.isIndividual && recipient.isRegistered &&
+          (recipient.isSystemContact || recipient.isProfileSharing) &&
+          RecipientUtil.isMessageRequestAccepted(threadId, recipient)
+      }
+      if (!recipient.isPushGroup || !recipient.isActiveGroup) return false
+      if (!RecipientUtil.isMessageRequestAccepted(threadId, recipient)) return false
+      val group = SignalDatabase.groups.getGroup(recipient.id).orElse(null) ?: return false
+      return group.isActive && (!group.isAnnouncementGroup || group.isAdmin(Recipient.self()))
+    }
+
+    internal fun sendReply(context: Context, reply: CommandReply, recipient: Recipient, threadId: Long, messageToEdit: Long = 0): OutgoingMessage? {
+      if (reply.text.isBlank()) return null
+      if (reply.text.toByteArray(Charsets.UTF_8).size > MessageUtil.MAX_TOTAL_BODY_SIZE_BYTES) {
+        Log.w(TAG, "Command reply exceeds Signal's maximum message size.")
+        return null
+      }
+      val ranges = BodyRangeList.Builder()
+      reply.styles.forEach { range ->
+        val style = when (range.style) {
+          CommandStyle.BOLD -> BodyRangeList.BodyRange.Style.BOLD
+          CommandStyle.ITALIC -> BodyRangeList.BodyRange.Style.ITALIC
+          CommandStyle.STRIKETHROUGH -> BodyRangeList.BodyRange.Style.STRIKETHROUGH
+          CommandStyle.MONOSPACE -> BodyRangeList.BodyRange.Style.MONOSPACE
+          CommandStyle.SPOILER -> BodyRangeList.BodyRange.Style.SPOILER
+        }
+        ranges.addStyle(style, range.start, range.length)
+      }
+      val split = MessageUtil.getSplitMessage(context, reply.text)
+      val outgoing = OutgoingMessage(
+        threadRecipient = recipient,
+        sentTimeMillis = System.currentTimeMillis(),
+        body = split.body,
+        attachments = split.textSlide.map { listOf(it.asAttachment()) }.orElse(emptyList()),
+        bodyRanges = ranges.build(),
+        expiresIn = recipient.expiresInSeconds.seconds.inWholeMilliseconds,
+        isSecure = true,
+        messageToEdit = messageToEdit
+      )
+      MessageSender.send(context, outgoing, threadId, MessageSender.SendType.SIGNAL, null, null)
+      return outgoing
+    }
   }
 }

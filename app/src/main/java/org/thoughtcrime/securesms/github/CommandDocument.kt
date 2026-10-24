@@ -5,6 +5,7 @@
 
 package org.thoughtcrime.securesms.github
 
+import okio.ByteString.Companion.encodeUtf8
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -16,7 +17,13 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 /** Text and styles are separate so future media attachments need not change command matching/rendering. */
-internal data class CommandReply(val text: String, val styles: List<CommandStyleRange>, val linkUpdates: List<CommandLinkUpdate>)
+internal data class CommandReply(val text: String, val styles: List<CommandStyleRange>, val linkUpdates: List<CommandLinkUpdate>) {
+  fun contentHash(): String {
+    val canonicalStyles = styles.sortedWith(compareBy({ it.start }, { it.length }, { it.style.name }))
+      .joinToString(";") { "${it.style}:${it.start}:${it.length}" }
+    return "$text\u0000$canonicalStyles".encodeUtf8().sha256().hex()
+  }
+}
 internal data class CommandStyleRange(val style: CommandStyle, val start: Int, val length: Int)
 internal enum class CommandStyle {
   BOLD,

@@ -12,6 +12,7 @@ import org.json.JSONObject
 import org.signal.core.util.logging.Log
 import org.thoughtcrime.securesms.BuildConfig
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 /** Commands run on GitHubAutoReplyJob's serial background queue, never on the incoming-message thread. */
@@ -19,7 +20,12 @@ object GitHubAutoReply {
   private val TAG = Log.tag(GitHubAutoReply::class)
   private const val CACHE_FILE_NAME = "github-commands.json"
   private val client = OkHttpClient.Builder().callTimeout(20, TimeUnit.SECONDS).build()
-  private var snapshot: CommandsSnapshot? = null
+  private val cache = CommandsCache()
+  private val refreshLock = Any()
+  private val cacheLoadLock = Any()
+  private var cacheLoaded = false
+  private val renderedReplies = ConcurrentHashMap<String, Pair<String, CommandReply>>()
+  private val refreshingInputs = ConcurrentHashMap<String, Boolean>()
 
   fun isCommandCandidate(input: String?): Boolean = isConfigured() && CommandDocument.isCommandCandidate(input)
 
@@ -27,54 +33,84 @@ object GitHubAutoReply {
 
   private fun repository() = GitHubCommandsRepository(BuildConfig.RESPONSE_XML, BuildConfig.GITHUB_TOKEN_COMMANDS, client)
 
-  @Synchronized
-  fun refreshFromGithub(context: Context): Boolean {
+  fun refreshFromGithub(context: Context): Boolean = synchronized(refreshLock) { refresh(context, force = true) }
+
+  private fun refresh(context: Context, force: Boolean = false): Boolean {
     if (!isConfigured()) return false
-    if (snapshot == null) snapshot = readCache(context)
+    loadCache(context)
     return try {
-      val previous = snapshot
-      val updated = repository().fetch(previous)
-      snapshot = updated
-      if (updated != previous) writeCache(context, updated)
-      updated != previous
+      val changed = cache.refresh(force) { previous -> repository().fetch(previous) }
+      if (changed) writeCache(context, cache.snapshot!!)
+      changed
     } catch (e: Exception) {
       Log.w(TAG, "Unable to refresh commands; retaining cache (${failureDetail(e)}).")
       false
     }
   }
 
+  /** Keep the last good response, but force the next background check to revalidate it. */
+  fun invalidateCache() = cache.invalidate()
+
+  internal fun needsRefresh(input: String): Boolean = refreshingInputs.containsKey(input) || cache.needsRefresh() || renderedReplies[input]?.first != cache.snapshot?.sha
+
+  /** Fast path: no GitHub or Signal network requests, including when another job is refreshing. */
+  internal fun getCachedReplyFor(context: Context, input: String): CommandReply? {
+    if (!isCommandCandidate(input)) return null
+    loadCache(context)
+    val saved = cache.snapshot ?: return null
+    return try {
+      val configured = CommandDocument.parse(saved.xml).render(input) { CommandLinkState() } ?: return null
+      renderedReplies[input]?.takeIf { it.first == saved.sha }?.second ?: configured
+    } catch (e: Exception) {
+      Log.w(TAG, "Unable to render cached command response (${e.javaClass.simpleName}).")
+      null
+    }
+  }
+
+  private fun loadCache(context: Context) = synchronized(cacheLoadLock) {
+    if (!cacheLoaded) {
+      cache.restore(readCache(context))
+      cacheLoaded = true
+    }
+  }
+
   /** Compatibility API for callers that only need plain text. */
-  @Synchronized
   fun getResponseFor(context: Context, input: String): String? = getReplyFor(context, input)?.text
 
-  @Synchronized
-  internal fun getReplyFor(context: Context, input: String): CommandReply? {
+  internal fun getReplyFor(context: Context, input: String): CommandReply? = synchronized(refreshLock) {
     if (!isCommandCandidate(input)) return null
-    refreshFromGithub(context)
-    val cached = snapshot ?: run {
-      Log.w(TAG, "No downloaded or cached commands XML is available; skipping reply.")
-      return null
-    }
-    val resolver = CommandGroupLinkResolver(context)
-    val reply = try {
-      CommandDocument.parse(cached.xml).render(input, resolver::resolve)
-    } catch (e: Exception) {
-      Log.w(TAG, "Unable to render command response (${e.javaClass.simpleName}).")
-      return null
-    } ?: return null
-
-    if (reply.linkUpdates.isNotEmpty()) {
-      try {
-        repository().publish(reply.linkUpdates)?.let { updated ->
-          snapshot = updated
-          writeCache(context, updated)
-        }
-      } catch (e: Exception) {
-        // A repository outage or conflict must not prevent sending the current links.
-        Log.w(TAG, "Unable to publish refreshed group links (${failureDetail(e)}).")
+    if (!needsRefresh(input)) return getCachedReplyFor(context, input)
+    refreshingInputs[input] = true
+    try {
+      refresh(context)
+      val cached = cache.snapshot ?: run {
+        Log.w(TAG, "No downloaded or cached commands XML is available; skipping reply.")
+        return null
       }
+      val resolver = CommandGroupLinkResolver(context)
+      val reply = try {
+        CommandDocument.parse(cached.xml).render(input, resolver::resolve)
+      } catch (e: Exception) {
+        Log.w(TAG, "Unable to render command response (${e.javaClass.simpleName}).")
+        return null
+      } ?: return null
+
+      if (reply.linkUpdates.isNotEmpty()) {
+        try {
+          repository().publish(reply.linkUpdates)?.let { updated ->
+            cache.replace(updated)
+            writeCache(context, updated)
+          }
+        } catch (e: Exception) {
+          // A repository outage or conflict must not prevent sending the current links.
+          Log.w(TAG, "Unable to publish refreshed group links (${failureDetail(e)}).")
+        }
+      }
+      renderedReplies[input] = (cache.snapshot?.sha ?: cached.sha) to reply
+      return reply
+    } finally {
+      refreshingInputs.remove(input)
     }
-    return reply
   }
 
   private fun readCache(context: Context): CommandsSnapshot? {
