@@ -3,6 +3,9 @@ package org.thoughtcrime.securesms.crypto.storage
 import android.content.Context
 import io.mockk.every
 import io.mockk.mockk
+// Whatnoww changed: Added static mocking imports for identity acceptance tests. mackkStatic and unmockkStatic
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
@@ -11,6 +14,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+// Whatnoww changed: Added the recipient ID import for identity acceptance tests.
+import org.signal.core.models.recipients.RecipientId
 import org.signal.core.models.ServiceId
 import org.signal.libsignal.protocol.IdentityKey
 import org.signal.libsignal.protocol.IdentityKeyPair
@@ -18,6 +23,9 @@ import org.signal.libsignal.protocol.SignalProtocolAddress
 import org.signal.libsignal.protocol.ecc.ECKeyPair
 import org.signal.libsignal.protocol.ecc.ECPublicKey
 import org.signal.libsignal.protocol.state.IdentityKeyStore
+// Whatnoww changed: Added database and recipient lookup imports for identity acceptance tests.
+import org.thoughtcrime.securesms.database.SignalDatabase
+import org.thoughtcrime.securesms.recipients.RecipientIds
 import org.thoughtcrime.securesms.database.IdentityTable
 import org.thoughtcrime.securesms.database.model.IdentityStoreRecord
 import org.thoughtcrime.securesms.keyvalue.AccountValues
@@ -88,8 +96,49 @@ class SignalBaseIdentityKeyStoreTest {
 
       assertFalse(subject.isTrustedIdentity(address, IdentityKey(ECKeyPair.generate().publicKey), IdentityKeyStore.Direction.RECEIVING))
       assertTrue(subject.isTrustedIdentity(address, selfIdentityKey.publicKey, IdentityKeyStore.Direction.RECEIVING))
+      // Whatnoww changed: Also check that automatic acceptance preserves self-identity checks when sending.
+      // Next two lines
+      assertFalse(subject.isTrustedIdentity(address, IdentityKeyPair.generate().publicKey, IdentityKeyStore.Direction.SENDING))
+      assertTrue(subject.isTrustedIdentity(address, selfIdentityKey.publicKey, IdentityKeyStore.Direction.SENDING))
     } finally {
       unmockkObject(SignalStore)
+    }
+  }
+
+  // Whatnoww changed: Added regression coverage for automatic acceptance and cached approvals.
+  // LLM regression test below
+  @Test
+  fun `sending accepts a pending changed identity and clears previous verification`() {
+    val serviceId = ServiceId.parseOrThrow(ADDRESS)
+    val recipientId = RecipientId.from(42)
+    val identityKey = IdentityKeyPair.generate().publicKey
+    val mockDb = mockk<IdentityTable>(relaxed = true)
+    val account = mockk<AccountValues> {
+      every { requireAci() } returns ServiceId.ACI.from(UUID.randomUUID())
+      every { pni } returns null
+      every { e164 } returns null
+    }
+    every { mockDb.getIdentityStoreRecord(ADDRESS) } returns IdentityStoreRecord(
+      ADDRESS, identityKey, IdentityTable.VerifiedStatus.UNVERIFIED, false, System.currentTimeMillis(), false
+    )
+    every { mockDb.writableDatabase } returns mockk(relaxed = true)
+    mockkObject(SignalStore, SignalDatabase.Companion)
+    mockkStatic(RecipientIds::class)
+    every { SignalStore.account } returns account
+    every { SignalDatabase.identities } returns mockDb
+    every { RecipientIds.from(serviceId) } returns recipientId
+
+    try {
+      val subject = SignalBaseIdentityKeyStore(mockk<Context>(), mockDb)
+      assertTrue(subject.isTrustedIdentity(SignalProtocolAddress(ADDRESS, 1), identityKey, IdentityKeyStore.Direction.SENDING))
+      verify(exactly = 1) { mockDb.setVerified(ADDRESS, recipientId, identityKey, IdentityTable.VerifiedStatus.DEFAULT) }
+      verify(exactly = 1) { mockDb.setApproval(ADDRESS, recipientId, true) }
+      // Repeated sends use the accepted cache entry without writing approval again.
+      assertTrue(subject.isTrustedIdentity(SignalProtocolAddress(ADDRESS, 1), identityKey, IdentityKeyStore.Direction.SENDING))
+      verify(exactly = 1) { mockDb.setApproval(ADDRESS, recipientId, true) }
+    } finally {
+      unmockkObject(SignalStore, SignalDatabase.Companion)
+      unmockkStatic(RecipientIds::class)
     }
   }
 

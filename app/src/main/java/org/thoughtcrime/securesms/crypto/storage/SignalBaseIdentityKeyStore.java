@@ -88,17 +88,20 @@ public class SignalBaseIdentityKeyStore {
         Log.w(TAG, "Received different identity key for self, ignoring" + " | Existing: " + identityRecord.getIdentityKey().hashCode() + ", New: " + identityKey.hashCode());
       } else if (identityKeyChanged) {
         Log.i(TAG, "Replacing existing identity for " + address + " | Existing: " + identityRecord.getIdentityKey().hashCode() + ", New: " + identityKey.hashCode());
-        VerifiedStatus verifiedStatus;
-
-        if (identityRecord.getVerifiedStatus() == VerifiedStatus.VERIFIED ||
-            identityRecord.getVerifiedStatus() == VerifiedStatus.UNVERIFIED)
-        {
-          verifiedStatus = VerifiedStatus.UNVERIFIED;
-        } else {
-          verifiedStatus = VerifiedStatus.DEFAULT;
-        }
-
-        cache.save(address.getName(), recipientId, identityKey, verifiedStatus, false, System.currentTimeMillis(), nonBlockingApproval);
+        // Whatnoww changed: Automatically accept replacement keys without keeping manual verification.
+        // Original:
+        // VerifiedStatus verifiedStatus;
+        //
+        // if (identityRecord.getVerifiedStatus() == VerifiedStatus.VERIFIED ||
+        //     identityRecord.getVerifiedStatus() == VerifiedStatus.UNVERIFIED)
+        // {
+        //   verifiedStatus = VerifiedStatus.UNVERIFIED;
+        // } else {
+        //   verifiedStatus = VerifiedStatus.DEFAULT;
+        // }
+        //
+        // cache.save(address.getName(), recipientId, identityKey, verifiedStatus, false, System.currentTimeMillis(), nonBlockingApproval);
+        cache.save(address.getName(), recipientId, identityKey, VerifiedStatus.DEFAULT, false, System.currentTimeMillis(), true);
         IdentityUtil.markIdentityUpdate(context, recipientId);
         AppDependencies.getProtocolStore().aci().sessions().archiveSiblingSessions(address);
         SignalDatabase.senderKeyShared().deleteAllFor(recipientId);
@@ -135,11 +138,21 @@ public class SignalBaseIdentityKeyStore {
       return identityKey.equals(SignalStore.account().getAciIdentityKey().getPublicKey());
     }
 
-    IdentityStoreRecord record = cache.get(address.getName());
-
+    // Whatnoww changed: Read the identity under the session lock in the SENDING branch below.
+    // Original: IdentityStoreRecord record = cache.get(address.getName());
     switch (direction) {
       case SENDING:
-        return isTrustedForSending(identityKey, record);
+        // Whatnoww changed: Save and accept changed identities before checking send trust.
+        // Original: return isTrustedForSending(identityKey, record);
+        try (SignalSessionLock.Lock unused = ReentrantSessionLock.INSTANCE.acquire()) {
+          IdentityStoreRecord record = cache.get(address.getName());
+          if (record != null && !identityKey.equals(record.getIdentityKey())) {
+            // Persist the replacement and archive old sessions before allowing session setup to continue.
+            IdentityUtil.saveIdentity(address.getName(), identityKey);
+          }
+          acceptPendingIdentity(address.getName());
+          return isTrustedForSending(identityKey, cache.get(address.getName()));
+        }
       case RECEIVING:
         return true;
       default:
@@ -159,7 +172,9 @@ public class SignalBaseIdentityKeyStore {
 
   public @NonNull Optional<IdentityRecord> getIdentityRecord(@NonNull Recipient recipient) {
     if (recipient.getHasServiceId()) {
-      IdentityStoreRecord record = cache.get(recipient.requireServiceId().toString());
+      // Whatnoww changed: Accept pending changes when loading identity records.
+      // Original: IdentityStoreRecord record = cache.get(recipient.requireServiceId().toString());
+      IdentityStoreRecord record = acceptPendingIdentity(recipient.requireServiceId().toString());
       return Optional.ofNullable(record).map(r -> r.toIdentityRecord(recipient.getId()));
     } else {
       if (recipient.isRegistered()) {
@@ -186,7 +201,9 @@ public class SignalBaseIdentityKeyStore {
 
     for (Recipient recipient : recipients) {
       if (recipient.getHasServiceId()) {
-        IdentityStoreRecord record = cache.get(recipient.requireServiceId().toString());
+        // Whatnoww changed: Accept pending changes for group and conversation pre-send checks.
+        // Original: IdentityStoreRecord record = cache.get(recipient.requireServiceId().toString());
+        IdentityStoreRecord record = acceptPendingIdentity(recipient.requireServiceId().toString());
 
         if (record != null) {
           records.add(record.toIdentityRecord(recipient.getId()));
@@ -229,6 +246,23 @@ public class SignalBaseIdentityKeyStore {
 
   public void invalidate(@NonNull String addressName) {
     cache.invalidate(addressName);
+  }
+
+  // Whatnoww changed: Added automatic acceptance for previously stored identity changes.
+  /** Accept previously stored changes too, so conversation pre-send checks do not require a dialog. */
+  private @Nullable IdentityStoreRecord acceptPendingIdentity(@NonNull String addressName) {
+    try (SignalSessionLock.Lock unused = ReentrantSessionLock.INSTANCE.acquire()) {
+      IdentityStoreRecord record = cache.get(addressName);
+      if (record != null && (record.getVerifiedStatus() == VerifiedStatus.UNVERIFIED || !record.getNonblockingApproval())) {
+        RecipientId recipientId = RecipientIds.from(ServiceId.parseOrThrow(addressName));
+        if (record.getVerifiedStatus() == VerifiedStatus.UNVERIFIED) {
+          cache.setVerified(addressName, recipientId, record.getIdentityKey(), VerifiedStatus.DEFAULT);
+        }
+        cache.setApproval(addressName, recipientId, true);
+        return cache.get(addressName);
+      }
+      return record;
+    }
   }
 
   private boolean isTrustedForSending(@NonNull IdentityKey identityKey, @Nullable IdentityStoreRecord identityRecord) {
