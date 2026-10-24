@@ -38,7 +38,7 @@ object GitHubAutoReply {
       if (updated != previous) writeCache(context, updated)
       updated != previous
     } catch (e: Exception) {
-      Log.w(TAG, "Unable to refresh commands; retaining cache (${e.javaClass.simpleName}).")
+      Log.w(TAG, "Unable to refresh commands; retaining cache (${failureDetail(e)}).")
       false
     }
   }
@@ -51,7 +51,10 @@ object GitHubAutoReply {
   internal fun getReplyFor(context: Context, input: String): CommandReply? {
     if (!isCommandCandidate(input)) return null
     refreshFromGithub(context)
-    val cached = snapshot ?: return null
+    val cached = snapshot ?: run {
+      Log.w(TAG, "No downloaded or cached commands XML is available; skipping reply.")
+      return null
+    }
     val resolver = CommandGroupLinkResolver(context)
     val reply = try {
       CommandDocument.parse(cached.xml).render(input, resolver::resolve)
@@ -68,7 +71,7 @@ object GitHubAutoReply {
         }
       } catch (e: Exception) {
         // A repository outage or conflict must not prevent sending the current links.
-        Log.w(TAG, "Unable to publish refreshed group links (${e.javaClass.simpleName}).")
+        Log.w(TAG, "Unable to publish refreshed group links (${failureDetail(e)}).")
       }
     }
     return reply
@@ -100,4 +103,7 @@ object GitHubAutoReply {
   }
 
   private fun cacheFile(context: Context) = AtomicFile(File(context.filesDir, CACHE_FILE_NAME))
+
+  // Only our controlled HTTP error text is logged; arbitrary exceptions may include private URLs.
+  private fun failureDetail(e: Exception): String = if (e is GitHubCommandsHttpException) e.message.orEmpty() else e.javaClass.simpleName
 }

@@ -16,6 +16,7 @@ import java.io.IOException
 import java.util.Base64
 
 internal data class CommandsSnapshot(val xml: String, val sha: String, val etag: String?)
+internal class GitHubCommandsHttpException(val statusCode: Int, operation: String) : IOException("$operation failed: HTTP $statusCode")
 
 /** GitHub Contents API reads private files and updates them with optimistic concurrency via SHA. */
 internal class GitHubCommandsRepository(
@@ -31,7 +32,7 @@ internal class GitHubCommandsRepository(
     }.build()
     client.newCall(request).execute().use { response ->
       if (response.code == 304 && previous != null) return previous
-      if (!response.isSuccessful) throw IOException("Commands download failed: HTTP ${response.code}")
+      if (!response.isSuccessful) throw GitHubCommandsHttpException(response.code, "Commands download")
       val json = JSONObject(response.body.string())
       require(json.getString("encoding") == "base64") { "Expected a base64-encoded commands file" }
       val xml = Base64.getMimeDecoder().decode(json.getString("content")).toString(Charsets.UTF_8)
@@ -60,7 +61,7 @@ internal class GitHubCommandsRepository(
           val sha = JSONObject(response.body.string()).getJSONObject("content").getString("sha")
           return CommandsSnapshot(xml, sha, null)
         }
-        if (response.code != 409) throw IOException("Commands update failed: HTTP ${response.code}")
+        if (response.code != 409) throw GitHubCommandsHttpException(response.code, "Commands update")
       }
     }
     throw IOException("Commands file changed concurrently; link update deferred")
@@ -81,10 +82,13 @@ internal class GitHubCommandsRepository(
       }
       require(source.host == "raw.githubusercontent.com" && source.pathSegments.size >= 4) { "Expected GitHub Contents API or raw.githubusercontent.com URL" }
       val parts = source.pathSegments
+      // GitHub's Raw button also produces /OWNER/REPO/refs/heads/BRANCH/PATH URLs.
+      val branchIndex = if (parts[2] == "refs" && parts.getOrNull(3) == "heads") 4 else 2
+      require(parts.size > branchIndex + 1 && parts[branchIndex].isNotEmpty()) { "Raw GitHub URL requires a branch and file path" }
       return "https://api.github.com".toHttpUrl().newBuilder()
         .addPathSegment("repos").addPathSegment(parts[0]).addPathSegment(parts[1]).addPathSegment("contents")
-        .apply { parts.drop(3).forEach { addPathSegment(it) } }
-        .addQueryParameter("ref", parts[2])
+        .apply { parts.drop(branchIndex + 1).forEach { addPathSegment(it) } }
+        .addQueryParameter("ref", parts[branchIndex])
         .build()
     }
   }

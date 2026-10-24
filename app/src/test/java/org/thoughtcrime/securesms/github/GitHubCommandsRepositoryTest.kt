@@ -17,6 +17,7 @@ import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -123,14 +124,48 @@ class GitHubCommandsRepositoryTest {
     assertEquals(URL, GitHubCommandsRepository.contentsUrl("https://raw.githubusercontent.com/owner/repo/main/commands.xml").toString())
   }
 
+  @Test
+  fun `GitHub Raw button refs heads URL downloads the correct branch and file`() {
+    val repository = repository("https://raw.githubusercontent.com/owner/repo/refs/heads/main/commands.xml") { request ->
+      assertEquals(URL, request.url.toString())
+      assertEquals("Bearer test-token", request.header("Authorization"))
+      response(request, 200, fileJson(XML, "sha"))
+    }
+    assertEquals(XML, repository.fetch().xml)
+  }
+
+  @Test
+  fun `refs heads raw URL preserves nested file path`() {
+    assertEquals(
+      "https://api.github.com/repos/owner/repo/contents/config/commands.xml?ref=main",
+      GitHubCommandsRepository.contentsUrl("https://raw.githubusercontent.com/owner/repo/refs/heads/main/config/commands.xml").toString()
+    )
+  }
+
+  @Test
+  fun `raw refs heads URL missing a file is rejected`() {
+    assertThrows(IllegalArgumentException::class.java) {
+      GitHubCommandsRepository.contentsUrl("https://raw.githubusercontent.com/owner/repo/refs/heads/main")
+    }
+  }
+
+  @Test
+  fun `HTTP download failure preserves status for diagnostics`() {
+    val error = assertThrows(GitHubCommandsHttpException::class.java) {
+      repository { request -> response(request, 404) }.fetch()
+    }
+    assertEquals(404, error.statusCode)
+    assertEquals("Commands download failed: HTTP 404", error.message)
+  }
+
   @Test(expected = IllegalArgumentException::class)
   fun `token cannot be sent to a non GitHub host`() {
     GitHubCommandsRepository.contentsUrl("https://example.com/commands.xml")
   }
 
-  private fun repository(handler: (Request) -> Response): GitHubCommandsRepository {
+  private fun repository(sourceUrl: String = URL, handler: (Request) -> Response): GitHubCommandsRepository {
     val client = OkHttpClient.Builder().addInterceptor { handler(it.request()) }.build()
-    return GitHubCommandsRepository(URL, "test-token", client)
+    return GitHubCommandsRepository(sourceUrl, "test-token", client)
   }
 
   private fun response(request: Request, code: Int, body: String = "", etag: String? = null): Response = Response.Builder()

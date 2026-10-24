@@ -16,6 +16,7 @@ import org.thoughtcrime.securesms.jobmanager.JsonJobData
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint
 import org.thoughtcrime.securesms.mms.OutgoingMessage
 import org.thoughtcrime.securesms.recipients.Recipient
+import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.sms.MessageSender
 import org.thoughtcrime.securesms.util.MessageUtil
 import java.util.concurrent.TimeUnit
@@ -42,7 +43,7 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     if (request.isOutgoing || request.isRemoteDelete || request.fromRecipient.isSelf || request.fromRecipient.isBlocked) return
     if (!GitHubAutoReply.isCommandCandidate(request.body)) return
     val recipient = SignalDatabase.threads.getRecipientForThreadId(request.threadId) ?: return
-    if (!canReply(recipient)) return
+    if (!canReply(recipient, request.threadId)) return
 
     val reply = GitHubAutoReply.getReplyFor(context, request.body) ?: return
     if (reply.text.isBlank()) return
@@ -54,7 +55,7 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     val latestRequest = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
     if (latestRequest.isRemoteDelete || latestRequest.body != request.body || Recipient.resolved(request.fromRecipient.id).isBlocked) return
     val latestRecipient = Recipient.resolved(recipient.id)
-    if (!canReply(latestRecipient)) return
+    if (!canReply(latestRecipient, request.threadId)) return
 
     val ranges = BodyRangeList.Builder()
     reply.styles.forEach { range ->
@@ -86,12 +87,18 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     )
   }
 
-  private fun canReply(recipient: Recipient): Boolean {
-    if (recipient.isBlocked || recipient.isSelf) return false
-    if (!recipient.isGroup) return recipient.isRegistered
+  internal fun canReply(recipient: Recipient, threadId: Long): Boolean {
+    if (recipient.isBlocked || recipient.isSelf || recipient.isHidden) return false
+    if (!recipient.isGroup) {
+      // Accepted Signal-only contacts use profile sharing; mutual group membership alone is insufficient.
+      return recipient.isIndividual && recipient.isRegistered &&
+        (recipient.isSystemContact || recipient.isProfileSharing) &&
+        RecipientUtil.isMessageRequestAccepted(threadId, recipient)
+    }
     if (!recipient.isPushGroup || !recipient.isActiveGroup) return false
+    if (!RecipientUtil.isMessageRequestAccepted(threadId, recipient)) return false
     val group = SignalDatabase.groups.getGroup(recipient.id).orElse(null) ?: return false
-    return !group.isAnnouncementGroup || group.isAdmin(Recipient.self())
+    return group.isActive && (!group.isAnnouncementGroup || group.isAdmin(Recipient.self()))
   }
 
   override fun onShouldRetry(e: Exception): Boolean = false
