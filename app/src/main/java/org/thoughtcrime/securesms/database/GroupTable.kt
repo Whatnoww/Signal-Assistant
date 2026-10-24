@@ -115,7 +115,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
         val response = OkHttpClient().newCall(request).execute()
         response.use {
           if (!it.isSuccessful) throw java.io.IOException("HTTP ${it.code}")
-          val newSet = it.body?.string().orEmpty().lineSequence().map(String::trim).filter(String::isNotEmpty).toSet()
+          val newSet = it.body.string().lineSequence().map(String::trim).filter(String::isNotEmpty).toSet()
           cachedBlocklist = newSet
           lastBlocklistFetch = now
           newSet
@@ -950,7 +950,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
         val aci = ACI.parseOrNull(requestingMember.aciBytes) ?: return@forEach
         if (aci.toString() in blocklist) {
           Log.i(JOIN_TAG, "Found matching ACI $aci in blocklist")
-          onJoinAnnounce(context, groupId, RecipientId.from(aci), aci)
+          onJoinAnnounce(context, groupId, RecipientIds.from(aci), aci)
         } else {
           Log.v(JOIN_TAG, "ACI $aci not found in blocklist")
         }
