@@ -30,7 +30,7 @@ Remote edits, including `<active>0</active>`, are detected on a command-triggere
 ## Group entries
 
 ```xml
-<category name="Tech related">
+<category name="Example category">
   <group>
     <groupid>__signal_group__v2__!YOUR_GROUP_ID_HEX</groupid>
     <description>Example group</description>
