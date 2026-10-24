@@ -140,6 +140,7 @@ ktlint {
 
 //Whatnoww added - Load Github token
 val githubToken: String = localProperties?.getProperty("GITHUB_TOKEN") ?: ""
+val githubTokenCommands: String = localProperties?.getProperty("GITHUB_TOKEN_COMMANDS") ?: ""
 val responseXml: String = localProperties?.getProperty("RESPONSE_XML") ?: ""
 
 // ktlint only scans convention source dirs, so the shared dirs added to the compile tasks are
@@ -322,6 +323,7 @@ android {
     buildConfigField("boolean", "LINK_DEVICE_UX_ENABLED", "true") // JW
     //Whatnoww added config field
     buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
+    buildConfigField("String", "GITHUB_TOKEN_COMMANDS", "\"$githubTokenCommands\"")
     buildConfigField("String", "RESPONSE_XML", "\"$responseXml\"")
 
     ndk {

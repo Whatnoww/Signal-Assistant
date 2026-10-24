@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 Signal Messenger, LLC
+ * Whatnoww added file
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 

@@ -52,11 +52,13 @@ import org.thoughtcrime.securesms.database.model.databaseprotos.PollTerminate
 import org.thoughtcrime.securesms.database.model.toBodyRangeList
 import org.thoughtcrime.securesms.database.withAttachments
 import org.thoughtcrime.securesms.dependencies.AppDependencies
+import org.thoughtcrime.securesms.github.GitHubAutoReply
 import org.thoughtcrime.securesms.groups.BadGroupIdException
 import org.thoughtcrime.securesms.groups.GroupAccessControl
 import org.thoughtcrime.securesms.groups.GroupId
 import org.thoughtcrime.securesms.jobs.AttachmentDownloadJob
 import org.thoughtcrime.securesms.jobs.DirectoryRefreshJob
+import org.thoughtcrime.securesms.jobs.GitHubAutoReplyJob
 import org.thoughtcrime.securesms.jobs.GroupCallPeekJob
 import org.thoughtcrime.securesms.jobs.GroupV2UpdateSelfProfileKeyJob
 import org.thoughtcrime.securesms.jobs.PaymentLedgerUpdateJob
@@ -169,6 +171,7 @@ object DataMessageProcessor {
 
     var insertResult: InsertResult? = null
     var messageId: MessageId? = null
+    var commandRequestId: Long? = null
     SignalTrace.beginSection("DataMessageProcessor#messageInsert")
     when {
       message.isInvalid -> handleInvalidMessage(context, senderRecipient.id, groupId, envelope.clientTimestamp!!)
@@ -181,8 +184,17 @@ object DataMessageProcessor {
       message.payment != null -> insertResult = handlePayment(context, envelope, metadata, message, senderRecipient.id, receivedTime)
       message.storyContext != null -> insertResult = handleStoryReply(context, envelope, metadata, message, senderRecipient, groupId, receivedTime)
       message.giftBadge != null -> insertResult = handleGiftMessage(context, envelope, metadata, message, senderRecipient, threadRecipient.id, receivedTime)
-      message.isMediaMessage -> insertResult = handleMediaMessage(context, envelope, metadata, message, senderRecipient, threadRecipient, groupId, receivedTime, localMetrics, batchCache)
-      message.body != null -> insertResult = handleTextMessage(context, envelope, metadata, message, senderRecipient, threadRecipient, groupId, receivedTime, localMetrics, batchCache)
+      message.isMediaMessage -> {
+        insertResult = handleMediaMessage(context, envelope, metadata, message, senderRecipient, threadRecipient, groupId, receivedTime, localMetrics, batchCache)
+        // Body ranges alone are still a text-only command. Actual media and quoted requests are not.
+        if (message.attachments.isEmpty() && message.quote == null && message.contact.isEmpty() && message.sticker == null && message.preview.isEmpty()) {
+          commandRequestId = insertResult?.messageId
+        }
+      }
+      message.body != null -> {
+        insertResult = handleTextMessage(context, envelope, metadata, message, senderRecipient, threadRecipient, groupId, receivedTime, localMetrics, batchCache)
+        commandRequestId = insertResult?.messageId
+      }
       message.groupCallUpdate != null -> handleGroupCallUpdateMessage(envelope, senderRecipient.id, groupId)
       message.pollCreate != null -> insertResult = handlePollCreate(context, envelope, metadata, message, senderRecipient, threadRecipient, groupId, receivedTime)
       message.pollTerminate != null -> insertResult = handlePollTerminate(context, envelope, metadata, message, senderRecipient, earlyMessageCacheEntry, threadRecipient, groupId, receivedTime, batchCache)
@@ -190,6 +202,9 @@ object DataMessageProcessor {
       message.pinMessage != null -> insertResult = handlePinMessage(envelope, metadata, message, senderRecipient, threadRecipient, groupId, receivedTime, earlyMessageCacheEntry, batchCache)
       message.unpinMessage != null -> messageId = handleUnpinMessage(envelope, message, senderRecipient, threadRecipient, earlyMessageCacheEntry, batchCache)
       message.adminDelete != null -> messageId = handleAdminRemoteDelete(context, envelope, message, senderRecipient, threadRecipient, earlyMessageCacheEntry, batchCache)
+    }
+    if (commandRequestId != null && !senderRecipient.isSelf && !senderRecipient.isBlocked && GitHubAutoReply.isCommandCandidate(message.body)) {
+      batchCache.addJob(GitHubAutoReplyJob(commandRequestId))
     }
     SignalTrace.endSection()
 
