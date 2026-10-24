@@ -55,8 +55,28 @@ class CommandDocumentTest {
       assertNull(document.render(it) { CommandLinkState() })
     }
     assertFalse(CommandDocument.isCommandCandidate("!groups\n"))
-    assertFalse(CommandDocument.isCommandCandidate("!groups extra"))
     assertTrue(CommandDocument.isCommandCandidate("!groups"))
+  }
+
+  @Test
+  fun `candidate filter supports hashtag aliases and multi-word commands without surrounding whitespace`() {
+    listOf("#example", "#examples", "!example es", "!example español", "!example locale").forEach {
+      assertTrue(CommandDocument.isCommandCandidate(it))
+    }
+    listOf(" !groups", "!groups ", "!groups\n", "!example\tes", "!example\nes", "!example es ", "!", "#", "hello", "!" + "a".repeat(64)).forEach {
+      assertFalse(CommandDocument.isCommandCandidate(it))
+    }
+  }
+
+  @Test
+  fun `multi-word commands match the entire configured trigger and never a prefix`() {
+    val document = CommandDocument.parse("<commands><command><triggers><trigger>!example</trigger></triggers><response>English</response></command><command><triggers><trigger>!example es</trigger><trigger>!Example es</trigger></triggers><response>Spanish</response></command></commands>")
+    assertEquals("English", document.render("!example") { error("No groups") }!!.text)
+    assertEquals("Spanish", document.render("!example es") { error("No groups") }!!.text)
+    assertEquals("Spanish", document.render("!Example es") { error("No groups") }!!.text)
+    listOf("!example extra", "!example es extra", "!example  es", "!example es ", "!EXAMPLE es").forEach {
+      assertNull(document.render(it) { error("No groups") })
+    }
   }
 
   @Test

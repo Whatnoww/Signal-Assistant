@@ -13,6 +13,8 @@ gen/
 out
 tests
 local.properties
+# Local private command configuration; only the sanitized template belongs in this repository.
+/docs/commands/commands.xml
 ant.properties
 .DS_Store
 build.log

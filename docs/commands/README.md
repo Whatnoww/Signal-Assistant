@@ -2,7 +2,11 @@
 
 # GitHub auto replies
 
-Copy `commands.xml` from this directory to your private repository. The seed contains all 46 supplied groups, in their original order. All IDs and auto-update settings start at `0` because real group IDs were not supplied. Known outdated entries use `<outdated>1</outdated>`.
+`commands.template.xml` is the public, sanitized example configuration. It contains fictional commands, placeholder group IDs and placeholder invite links. Copy it to a private deployment configuration and replace the placeholders there.
+
+The local `docs/commands/commands.xml` is private and explicitly Git-ignored. Keep real group lists, command catalogs, responses and credentials out of this application's source repository. Tests use synthetic inline fixtures and the public template only; they must never read the private XML or list its commands. The app obtains its deployed configuration through `RESPONSE_XML`; there is no bundled private catalog.
+
+All responses are configured text. Empty responses send no message, and commands with `<active>0</active>` are disabled. Native formatting tags are demonstrated in the template.
 
 Set these in your untracked `local.properties`, then rebuild:
 
@@ -49,7 +53,7 @@ Category headings use native Signal **bold**, descriptions are plain text and li
 
 ## More commands and formatting
 
-Add another `<command>` under `<commands>`, with one or more exact `<trigger>` values and a `<response>`. Triggers begin with `!`, contain no whitespace and are at most 64 characters. Additional commands require no new receive-path code:
+Add another `<command>` under `<commands>`, with one or more exact `<trigger>` values and a `<response>`. Triggers begin with `!` or `#` and are at most 64 characters. Internal spaces are supported for exact multi-word triggers such as `!example locale`. Leading/trailing whitespace, tabs and line breaks do not match. Matching is case-sensitive; explicit aliases such as `!Example locale` are supported. A configured multi-word trigger does not make prefix matches possible: `!groups extra` still does not match `!groups`. Additional commands require no new receive-path code:
 
 Set `<active>1</active>` to enable a command or `<active>0</active>` to disable it, including all of its trigger aliases. Disabled commands produce no reply, skip group-link checks and cannot publish group-link updates. An omitted tag defaults to enabled for existing XML; an empty or unrecognized value disables the command. Change the value in GitHub without rebuilding the app. It takes effect on the next successful XML refresh; if GitHub is unavailable, the app uses the last cached configuration.
 
@@ -67,4 +71,4 @@ The reply model separates text and formatting from transport; the send path alre
 
 ## Device check
 
-After uploading the XML and configuring/rebuilding the app, send `!groups` from another account to an accepted contact chat or an accepted group this account can post in. Check heading/link styling, the full long message, and the known outdated names. Confirm that phone contacts and accepted Signal-only contacts receive replies, while pending message requests and noncontacts who only share a group do not. Confirm `!groups extra` and a message with surrounding whitespace do not reply. Then set a known group ID and `autoupdate=1`, rotate that group's link through Signal's existing UI, request `!groups` again and check both the reply and the resulting GitHub commit. Repeat with `autoupdate=0` to check that the configured link remains and receives the outdated label.
+After configuring the deployed XML and rebuilding the app, send `!groups` from another account to an accepted contact chat or an accepted group this account can post in. Check heading/link styling, the full long message, and outdated markers using your own configuration. Confirm that phone contacts and accepted Signal-only contacts receive replies, while pending message requests and noncontacts who only share a group do not. Confirm `!groups extra` and a message with surrounding whitespace do not reply. Then set a known group ID and `autoupdate=1`, rotate that group's link through Signal's existing UI, request `!groups` again and check both the reply and the resulting GitHub commit. Repeat with `autoupdate=0` to check that the configured link remains and receives the outdated label.

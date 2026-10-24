@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Whatnoww added file -->
+<!-- Sanitized examples only. Replace placeholders in your private deployment configuration. -->
+<commands version="1">
+  <command>
+    <active>1</active>
+    <triggers>
+      <trigger>!example</trigger>
+      <trigger>#example</trigger>
+    </triggers>
+    <response>
+      <text><b>Example command</b><br/><i>Replace this with your response.</i><br/><code>Example code</code></text>
+    </response>
+  </command>
+  <command>
+    <active>1</active>
+    <triggers>
+      <trigger>!example locale</trigger>
+    </triggers>
+    <response>
+      <text>This is a separate response for an exact multi-word trigger.</text>
+    </response>
+  </command>
+  <command>
+    <active>1</active>
+    <triggers>
+      <trigger>!groups</trigger>
+    </triggers>
+    <response>
+      <text>Example groups</text><br/><br/>
+      <groups>
+        <category name="Example category">
+          <group>
+            <groupid>0</groupid>
+            <description>Example manual group</description>
+            <autoupdate>0</autoupdate>
+            <link>https://signal.group/#REPLACE_WITH_MANUAL_INVITE</link>
+            <outdated>0</outdated>
+          </group>
+          <group>
+            <groupid>__signal_group__v2__!REPLACE_WITH_GROUP_ID_HEX</groupid>
+            <description>Example managed group</description>
+            <autoupdate>1</autoupdate>
+            <link>https://signal.group/#REPLACE_WITH_MANAGED_INVITE</link>
+            <outdated>0</outdated>
+          </group>
+        </category>
+      </groups>
+    </response>
+  </command>
+  <command>
+    <active>0</active>
+    <triggers>
+      <trigger>!disabled-example</trigger>
+    </triggers>
+    <response>
+      <text>This example is disabled.</text>
+    </response>
+  </command>
+</commands>

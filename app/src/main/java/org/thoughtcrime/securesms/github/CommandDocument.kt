@@ -52,7 +52,9 @@ internal class CommandDocument private constructor(private val document: Documen
       return CommandDocument(document)
     }
 
-    fun isCommandCandidate(input: String?): Boolean = input != null && input.startsWith("!") && input.length <= 64 && input.none(Char::isWhitespace)
+    fun isCommandCandidate(input: String?): Boolean = input != null && input.length in 2..64 &&
+      (input.startsWith("!") || input.startsWith("#")) && input.last() != ' ' &&
+      input.none { it.isISOControl() || (it.isWhitespace() && it != ' ') }
   }
 
   fun render(input: String, resolve: (CommandGroup) -> CommandLinkState): CommandReply? {
