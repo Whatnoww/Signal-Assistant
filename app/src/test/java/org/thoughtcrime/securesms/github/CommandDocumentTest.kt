@@ -13,6 +13,42 @@ import org.junit.Test
 
 class CommandDocumentTest {
   @Test
+  fun `active command replies and omitted active tag stays compatible`() {
+    val source = xml()
+    val legacyReply = CommandDocument.parse(source).render("!groups") { CommandLinkState() }
+    assertTrue(legacyReply != null)
+    assertEquals(legacyReply, CommandDocument.parse(source.replaceFirst("<command>", "<command><active> 1 </active>")).render("!groups") { CommandLinkState() })
+  }
+
+  @Test
+  fun `inactive command skips all aliases and never resolves group links`() {
+    val source = xml().replaceFirst("<command>", "<command><active>0</active>")
+      .replace("<trigger>!groups</trigger>", "<trigger>!groups</trigger><trigger>!links</trigger>")
+    val document = CommandDocument.parse(source)
+    listOf("!groups", "!links").forEach { trigger ->
+      assertNull(document.render(trigger) { error("Inactive command must not check group links") })
+    }
+    assertEquals("Other", document.render("!other") { error("No groups") }!!.text)
+  }
+
+  @Test
+  fun `empty and unrecognized active values disable command`() {
+    listOf("", " ", "invalid", "2").forEach { value ->
+      val document = CommandDocument.parse(xml().replaceFirst("<command>", "<command><active>$value</active>"))
+      assertNull(document.render("!groups") { error("Disabled command must not check group links") })
+    }
+  }
+
+  @Test
+  fun `command disabled since rendering cannot publish link updates`() {
+    val document = CommandDocument.parse(xml(id = "group-1", autoUpdate = "1").replaceFirst("<command>", "<command><active>0</active>"))
+    assertFalse(document.applyLinkUpdates(listOf(CommandLinkUpdate("group-1", OLD_LINK, NEW_LINK))))
+    val saved = document.toXml()
+    assertTrue(saved.contains(OLD_LINK))
+    assertTrue(saved.contains("<active>0</active>"))
+  }
+
+  @Test
   fun `only the exact trigger matches`() {
     val document = CommandDocument.parse(xml())
     listOf("!GROUPS", " !groups", "!groups ", "!groups\n", "please !groups", "!groups extra", "!group").forEach {

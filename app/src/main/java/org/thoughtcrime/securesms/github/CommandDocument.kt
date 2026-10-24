@@ -50,7 +50,7 @@ internal class CommandDocument private constructor(private val document: Documen
 
   fun render(input: String, resolve: (CommandGroup) -> CommandLinkState): CommandReply? {
     val command = document.documentElement.children("command").firstOrNull { command ->
-      command.child("triggers")?.children("trigger")?.any { it.textContent == input } == true
+      command.isCommandActive() && command.child("triggers")?.children("trigger")?.any { it.textContent == input } == true
     } ?: return null
     val response = command.child("response") ?: return null
     val renderer = Renderer(resolve)
@@ -66,15 +66,17 @@ internal class CommandDocument private constructor(private val document: Documen
   /** Apply only changes whose ID, old link and opt-in still match the latest GitHub file. */
   fun applyLinkUpdates(updates: List<CommandLinkUpdate>): Boolean {
     var changed = false
-    val groups = document.getElementsByTagName("group")
-    for (i in 0 until groups.length) {
-      val element = groups.item(i) as Element
-      val group = element.asGroup()
-      val update = updates.firstOrNull { it.groupId == group.groupId && it.previousLink == group.link }
-      if (update != null && group.groupId != "0" && group.autoUpdate) {
-        element.child("link")!!.textContent = update.link
-        element.child("outdated")?.textContent = "0"
-        changed = true
+    for (command in document.documentElement.children("command").filter { it.isCommandActive() }) {
+      val groups = command.getElementsByTagName("group")
+      for (i in 0 until groups.length) {
+        val element = groups.item(i) as Element
+        val group = element.asGroup()
+        val update = updates.firstOrNull { it.groupId == group.groupId && it.previousLink == group.link }
+        if (update != null && group.groupId != "0" && group.autoUpdate) {
+          element.child("link")!!.textContent = update.link
+          element.child("outdated")?.textContent = "0"
+          changed = true
+        }
       }
     }
     return changed
@@ -153,6 +155,7 @@ internal class CommandDocument private constructor(private val document: Documen
 private fun Element.children(tag: String): List<Element> = (0 until childNodes.length).mapNotNull { childNodes.item(it) as? Element }.filter { it.tagName == tag }
 private fun Element.child(tag: String): Element? = children(tag).firstOrNull()
 private fun Element.value(tag: String): String = child(tag)?.textContent?.trim().orEmpty()
+private fun Element.isCommandActive(): Boolean = (child("active")?.textContent?.trim() ?: "1") == "1"
 private fun Element.asGroup(): CommandGroup {
   val groupId = value("groupid").ifEmpty { "0" }
   val autoUpdate = value("autoupdate")

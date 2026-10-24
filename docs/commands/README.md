@@ -43,8 +43,11 @@ Category headings use native Signal **bold**, descriptions are plain text and li
 
 Add another `<command>` under `<commands>`, with one or more exact `<trigger>` values and a `<response>`. Triggers begin with `!`, contain no whitespace and are at most 64 characters. Additional commands require no new receive-path code:
 
+Set `<active>1</active>` to enable a command or `<active>0</active>` to disable it, including all of its trigger aliases. Disabled commands produce no reply, skip group-link checks and cannot publish group-link updates. An omitted tag defaults to enabled for existing XML; an empty or unrecognized value disables the command. Change the value in GitHub without rebuilding the app. It takes effect on the next successful XML refresh; if GitHub is unavailable, the app uses the last cached configuration.
+
 ```xml
 <command>
+  <active>1</active>
   <triggers><trigger>!help</trigger><trigger>!commands</trigger></triggers>
   <response><text><b>Commands</b><br/><i>Example</i> and <spoiler>hidden text</spoiler></text></response>
 </command>
