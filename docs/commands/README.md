@@ -18,7 +18,26 @@ ADMIN_ACI=aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee
 
 Use a token with Contents read and write access to that repository. `GITHUB_TOKEN` remains the separate blocklist token. Raw URLs such as `https://raw.githubusercontent.com/OWNER/REPOSITORY/main/commands.xml` and `https://raw.githubusercontent.com/OWNER/REPOSITORY/refs/heads/main/commands.xml` also work; the app converts them to the Contents API. For branch names containing `/`, use the API URL with `?ref=your/branch`. Without `ref`, GitHub's default branch is used.
 
-An incoming message whose entire body is exactly `!groups` receives a reply in the same eligible chat. For 1:1 chats, the recipient must be a registered phone contact or an accepted Signal-only contact (profile sharing enabled), and Signal must consider the message request accepted. Having a group in common or a previous outgoing message alone does not qualify someone as a contact. Hidden/removed contacts, blocked chats, unaccepted groups, inactive groups and announcement groups where self cannot post are skipped. Eligibility is checked before downloading commands and again immediately before sending. The existing automatic group-leaving behavior is unchanged. Case, extra words, leading/trailing spaces and newlines do not match. Attachments, quotes, stories, reactions, edits, duplicates and messages from self do not trigger replies. A missing commands token or URL disables this feature. The XML is fetched on demand with ETags; a validated atomic disk cache provides a fallback when GitHub is unavailable. The message uses the chat's disappearing-message timer and Signal's ordinary sending pipeline, including long-text attachments when necessary.
+An incoming message whose entire body is exactly `!groups` receives a reply in the same eligible chat. With the category browser configured below, `!groups 1`, `!groups 2`, and so on show individual categories. For 1:1 chats, the recipient must be a registered phone contact or an accepted Signal-only contact (profile sharing enabled), and Signal must consider the message request accepted. Having a group in common or a previous outgoing message alone does not qualify someone as a contact. Hidden/removed contacts, blocked chats, unaccepted groups, inactive groups and announcement groups where self cannot post are skipped. Eligibility is checked before downloading commands and again immediately before sending. The existing automatic group-leaving behavior is unchanged. Case, extra words, leading/trailing spaces and newlines do not match. Attachments, quotes, stories, reactions, edits, duplicates and messages from self do not trigger replies. A missing commands token or URL disables this feature. The XML is fetched on demand with ETags; a validated atomic disk cache provides a fallback when GitHub is unavailable. The message uses the chat's disappearing-message timer and Signal's ordinary sending pipeline, including long-text attachments when necessary.
+
+## Browsing group categories
+
+Use `<groups view="categories">` to make `!groups` show a numbered category index instead of every invite link. Configure its heading with native bold formatting:
+
+```xml
+<response>
+  <text><b>Explore public Signal groups</b></text><br/><br/>
+  <groups view="categories">
+    <category name="Music"/>
+  </groups>
+</response>
+```
+
+Each row uses the XML category order and its current number of direct `<group>` entries, for example `1. Music (5 groups)`. Empty categories are included with zero groups. The response ends with instructions to send `!groups <number>`. The index does not resolve or publish invite links.
+
+`!groups 1` renders only the first category, with its bold heading, group descriptions, italic links and outdated-link labels. Only that category's links are checked and eligible for automatic updates. An empty category returns a short empty-state message. Zero, negative, overflowing and out-of-range numbers return guidance to request the index again; non-numeric arguments such as `!groups extra` remain unmatched. Configured aliases support the same numbered browsing, and exact configured multi-word commands keep their existing precedence.
+
+Numbers, counts and numbered replies are generated from the current XML, including after admin category creation, group additions and moves. Do not add separate commands or store numbers and counts in the file. Disabling the parent command disables its index and all generated numbered replies. Existing lists without `view="categories"` retain their full-list behavior.
 
 ## Cache and background edits
 
@@ -71,7 +90,7 @@ Published XML uses line breaks and two-space indentation for structural entries,
 
 `groupid` is the full encoded Signal V2 group ID (`GroupId.toString()`), not a recipient ID, thread ID, master key or the invite URL fragment. The account running this app must be an active member with the group locally available to retrieve its current invite link. The app refreshes that group from Signal before reading the enabled link and password; it never rotates a password or enables a disabled link.
 
-With `autoupdate=1` and a nonzero ID, an enabled current link replaces the configured link in the reply and is written back to GitHub. The publisher refetches the file and changes only entries whose ID, old link and opt-in still match. It includes the current file SHA and retries a concurrent-write conflict once. A failed write leaves the usable reply intact; the next request can try publishing again. This runs when commands are requested, not as a periodic task.
+With `autoupdate=1` and a nonzero ID, an enabled current link replaces the configured link in the reply and is written back to GitHub. The publisher refetches the file and changes only entries whose ID, old link and opt-in still match. It includes the current file SHA and retries a concurrent-write conflict once. A failed write leaves the usable reply intact; the next request can try publishing again. In browser mode, this runs when a numbered category is requested; the index does not check group links. Other full-list commands still check their rendered groups. There is no periodic task.
 
 With `autoupdate=0`, the configured link is retained. If it differs from the current group link, or the link is disabled, the name is shown as `Example group (outdated link):`.
 

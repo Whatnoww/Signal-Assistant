@@ -27,8 +27,8 @@
       <trigger>!groups</trigger>
     </triggers>
     <response>
-      <text>Example groups</text><br/><br/>
-      <groups>
+      <text><b>Explore public Signal groups</b></text><br/><br/>
+      <groups view="categories">
         <category name="Example category">
           <group>
             <groupid>0</groupid>

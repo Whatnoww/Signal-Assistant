@@ -123,5 +123,17 @@ class CommandDocumentAndroidTest {
     assertEquals(saved, document.toXml())
   }
 
+  @Test
+  fun `Android category browser derives index and numbered replies from the same XML`() {
+    val source = """<commands><command><triggers><trigger>!groups</trigger></triggers><response><text><b>Explore public Signal groups</b></text><br/><br/><groups view="categories"><category name="First"/><category name="Music 🎵"><group><groupid>0</groupid><autoupdate>0</autoupdate><description>Example</description><link>https://signal.group/#example</link></group></category></groups></response></command></commands>"""
+    val document = CommandDocument.parse(source, androidFactory())
+    val index = document.render("!groups") { error("Index must not resolve links") }!!
+    assertTrue(index.text.contains("1. First (0 groups)\n2. Music 🎵 (1 group)"))
+    assertEquals(CommandStyleRange(CommandStyle.BOLD, 0, "Explore public Signal groups".length), index.styles.single())
+    val category = document.render("!groups 2") { CommandLinkState() }!!
+    assertEquals("Music 🎵:\n\nExample:\nhttps://signal.group/#example", category.text)
+    assertEquals(category, CommandDocument.parse(document.toXml(), androidFactory()).render("!groups 2") { CommandLinkState() })
+  }
+
   private fun androidFactory(): DocumentBuilderFactory = Class.forName("org.apache.harmony.xml.parsers.DocumentBuilderFactoryImpl").getDeclaredConstructor().newInstance() as DocumentBuilderFactory
 }

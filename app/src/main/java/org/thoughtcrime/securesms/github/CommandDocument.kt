@@ -72,21 +72,48 @@ internal class CommandDocument private constructor(private val document: Documen
 
     private val SURROGATE_REFERENCES = Regex("""<!\[CDATA\[[\s\S]*?]]>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>|&#(x[0-9a-fA-F]+|[0-9]+);&#(x[0-9a-fA-F]+|[0-9]+);""")
     private val STRUCTURAL_TAGS = setOf("commands", "command", "triggers", "groups", "category", "group")
+    private val CATEGORY_NUMBER = Regex("-?[0-9]+")
   }
 
   fun render(input: String, resolve: (CommandGroup) -> CommandLinkState): CommandReply? {
-    val command = document.documentElement.children("command").firstOrNull { command ->
+    val commands = document.documentElement.children("command")
+    val exact = commands.firstOrNull { command ->
       command.isCommandActive() && command.child("triggers")?.children("trigger")?.any { it.textContent == input } == true
-    } ?: return null
+    }
+    val selection = if (exact == null) categorySelection(commands, input) else null
+    val command = exact ?: selection?.command ?: return null
     val response = command.child("response") ?: return null
-    val renderer = Renderer(resolve)
-    renderer.renderChildren(response)
+    val renderer = Renderer(resolve, selection?.trigger ?: input)
+    if (selection == null) {
+      renderer.renderChildren(response)
+    } else {
+      val category = selection.number.toIntOrNull()?.takeIf { it > 0 }?.let { selection.groups.children("category").getOrNull(it - 1) }
+        ?: return CommandReply("That category is not available. Send ${selection.trigger} to see the available categories.", emptyList(), emptyList())
+      renderer.renderCategory(category, showEmptyMessage = true)
+    }
     val text = renderer.text.toString().trimEnd()
     val styles = renderer.styles.mapNotNull { range ->
       val length = minOf(range.length, text.length - range.start)
       if (length > 0) range.copy(length = length) else null
     }
     return CommandReply(text, styles, renderer.linkUpdates)
+  }
+
+  private data class CategorySelection(val command: Element, val groups: Element, val trigger: String, val number: String)
+
+  /** Numbered categories are derived from the active command's current XML, including all aliases. */
+  private fun categorySelection(commands: List<Element>, input: String): CategorySelection? {
+    for (command in commands.filter { it.isCommandActive() }) {
+      val groups = command.child("response")?.descendants("groups")?.singleOrNull { it.getAttribute("view") == "categories" } ?: continue
+      for (trigger in command.child("triggers")?.children("trigger").orEmpty()) {
+        val prefix = "${trigger.textContent} "
+        if (input.startsWith(prefix)) {
+          val number = input.removePrefix(prefix)
+          if (CATEGORY_NUMBER.matches(number)) return CategorySelection(command, groups, trigger.textContent, number)
+        }
+      }
+    }
+    return null
   }
 
   /** Apply only changes whose ID, old link and opt-in still match the latest GitHub file. */
@@ -241,7 +268,7 @@ internal class CommandDocument private constructor(private val document: Documen
     (0 until groups.length).map { groups.item(it) as Element }
   }
 
-  private class Renderer(val resolve: (CommandGroup) -> CommandLinkState) {
+  private class Renderer(val resolve: (CommandGroup) -> CommandLinkState, private val trigger: String) {
     val text = StringBuilder()
     val styles = mutableListOf<CommandStyleRange>()
     val linkUpdates = mutableListOf<CommandLinkUpdate>()
@@ -272,15 +299,32 @@ internal class CommandDocument private constructor(private val document: Documen
           renderChildren(element)
           text.append("\n\n")
         }
-        "groups" -> renderChildren(element)
-        "category" -> {
-          styled(CommandStyle.BOLD) { text.append(element.getAttribute("name").trim().removeSuffix(":")).append(':') }
-          text.append("\n\n")
-          element.children("group").forEach(::renderGroup)
-        }
+        "groups" -> if (element.getAttribute("view") == "categories") renderCategoryIndex(element) else renderChildren(element)
+        "category" -> renderCategory(element)
         // Reserve <image> for a future media sender instead of silently dropping attachments.
         else -> error("Unsupported response tag: ${element.tagName}")
       }
+    }
+
+    private fun renderCategoryIndex(element: Element) {
+      val categories = element.children("category")
+      if (categories.isEmpty()) {
+        text.append("No categories are available yet.")
+        return
+      }
+      categories.forEachIndexed { index, category ->
+        val count = category.children("group").size
+        text.append(index + 1).append(". ").append(category.getAttribute("name").trim().removeSuffix(":"))
+          .append(" (").append(count).append(if (count == 1) " group)" else " groups)").append('\n')
+      }
+      text.append("\nSend ").append(trigger).append(" <number> to view a category.")
+    }
+
+    fun renderCategory(element: Element, showEmptyMessage: Boolean = false) {
+      styled(CommandStyle.BOLD) { text.append(element.getAttribute("name").trim().removeSuffix(":")).append(':') }
+      text.append("\n\n")
+      val groups = element.children("group")
+      if (groups.isEmpty() && showEmptyMessage) text.append("No groups in this category yet.") else groups.forEach(::renderGroup)
     }
 
     private fun renderGroup(element: Element) {
