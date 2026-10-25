@@ -83,7 +83,7 @@ internal class CommandDocument private constructor(private val document: Documen
     val selection = if (exact == null) categorySelection(commands, input) else null
     val command = exact ?: selection?.command ?: return null
     val response = command.child("response") ?: return null
-    val renderer = Renderer(resolve, selection?.trigger ?: input)
+    val renderer = Renderer(resolve)
     if (selection == null) {
       renderer.renderChildren(response)
     } else {
@@ -268,7 +268,7 @@ internal class CommandDocument private constructor(private val document: Documen
     (0 until groups.length).map { groups.item(it) as Element }
   }
 
-  private class Renderer(val resolve: (CommandGroup) -> CommandLinkState, private val trigger: String) {
+  private class Renderer(val resolve: (CommandGroup) -> CommandLinkState) {
     val text = StringBuilder()
     val styles = mutableListOf<CommandStyleRange>()
     val linkUpdates = mutableListOf<CommandLinkUpdate>()
@@ -313,11 +313,11 @@ internal class CommandDocument private constructor(private val document: Documen
         return
       }
       categories.forEachIndexed { index, category ->
+        if (index > 0) text.append('\n')
         val count = category.children("group").size
         text.append(index + 1).append(". ").append(category.getAttribute("name").trim().removeSuffix(":"))
-          .append(" (").append(count).append(if (count == 1) " group)" else " groups)").append('\n')
+          .append(" (").append(count).append(if (count == 1) " group)" else " groups)")
       }
-      text.append("\nSend ").append(trigger).append(" <number> to view a category.")
     }
 
     fun renderCategory(element: Element, showEmptyMessage: Boolean = false) {

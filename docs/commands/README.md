@@ -30,10 +30,12 @@ Use `<groups view="categories">` to make `!groups` show a numbered category inde
   <groups view="categories">
     <category name="Music"/>
   </groups>
+  <br/><br/>
+  <text><i>Send !groups &lt;number&gt; to view a category.</i></text>
 </response>
 ```
 
-Each row uses the XML category order and its current number of direct `<group>` entries, for example `1. Music (5 groups)`. Empty categories are included with zero groups. The response ends with instructions to send `!groups <number>`. The index does not resolve or publish invite links.
+Each row uses the XML category order and its current number of direct `<group>` entries, for example `1. Music (5 groups)`. Empty categories are included with zero groups. Instructions after the index come entirely from the XML: edit or remove the footer `<text>` element to change them. The code appends no default instructions. Use explicit `<br/>` tags for spacing; XML indentation does not create visible line breaks. Literal angle brackets in text must be escaped as `&lt;` and `&gt;`. The footer appears only on the index, not numbered category replies, and its wording is shared by configured trigger aliases. The index does not resolve or publish invite links.
 
 `!groups 1` renders only the first category, with its bold heading, group descriptions, italic links and outdated-link labels. Only that category's links are checked and eligible for automatic updates. An empty category returns a short empty-state message. Zero, negative, overflowing and out-of-range numbers return guidance to request the index again; non-numeric arguments such as `!groups extra` remain unmatched. Configured aliases support the same numbered browsing, and exact configured multi-word commands keep their existing precedence.
 

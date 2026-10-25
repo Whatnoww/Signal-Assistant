@@ -46,6 +46,8 @@
           </group>
         </category>
       </groups>
+      <br/><br/>
+      <text><i>Send !groups &lt;number&gt; to view a category.</i></text>
     </response>
   </command>
   <command>
