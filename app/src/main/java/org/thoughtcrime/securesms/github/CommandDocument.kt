@@ -133,6 +133,71 @@ internal class CommandDocument private constructor(private val document: Documen
     return matches.size
   }
 
+  fun createCategory(name: String) {
+    val response = groupListResponse()
+    if (response.descendants("category").any { it.getAttribute("name").trim() == name }) {
+      throw AdminCommandException("Category $name already exists.")
+    }
+    val lists = response.descendants("groups")
+    if (lists.size > 1) throw AdminCommandException("The !groups response has multiple group lists; use a single list before creating categories.")
+    val list = lists.singleOrNull() ?: document.createElement("groups").also { response.appendChild(it) }
+    list.appendChild(document.createElement("category").apply { setAttribute("name", name) })
+  }
+
+  /** Validate against the latest XML before resolving the current invite link. */
+  fun validateGroupAddition(category: String, description: String, groupId: String) {
+    val response = groupListResponse()
+    requireCategory(response, category)
+    val groups = response.descendants("group")
+    if (groups.any { it.value("groupid") == groupId }) {
+      throw AdminCommandException("This group is already listed. Use !admin group move <category> to move it.")
+    }
+    if (groups.any { it.value("description") == description }) {
+      throw AdminCommandException("A listed group already has the description: $description. Choose a unique name.")
+    }
+  }
+
+  fun addGroup(category: String, description: String, groupId: String, link: String) {
+    validateGroupAddition(category, description, groupId)
+    require(link.startsWith("https://signal.group/#")) { "Expected a Signal invite link" }
+    val target = requireCategory(groupListResponse(), category)
+    target.appendChild(document.createElement("group").apply {
+      setValue("groupid", groupId)
+      setValue("description", description)
+      setValue("autoupdate", "1")
+      setValue("link", link)
+      setValue("outdated", "0")
+    })
+  }
+
+  /** Move the existing node, including any extra metadata, to the end of the target category. */
+  fun moveGroup(category: String, groupId: String): Boolean {
+    val response = groupListResponse()
+    val target = requireCategory(response, category)
+    val matches = response.descendants("group").filter { it.value("groupid") == groupId }
+    if (matches.isEmpty()) throw AdminCommandException("This group is not on the !groups list. Use !admin group add <category> <name> first.")
+    if (matches.size != 1) throw AdminCommandException("This group has multiple entries in !groups; keep a single entry before moving it.")
+    val group = matches.single()
+    if (group.parentNode == target) return false
+    target.appendChild(group)
+    return true
+  }
+
+  private fun groupListResponse(): Element {
+    val commands = document.documentElement.children("command").filter { command ->
+      command.child("triggers")?.children("trigger")?.any { it.textContent == "!groups" } == true
+    }
+    if (commands.size != 1) throw AdminCommandException("Configure exactly one command with the !groups trigger before managing categories.")
+    return commands.single().child("response") ?: throw AdminCommandException("The !groups command has no response to hold categories.")
+  }
+
+  private fun requireCategory(response: Element, name: String): Element {
+    val matches = response.descendants("category").filter { it.getAttribute("name").trim() == name }
+    if (matches.isEmpty()) throw AdminCommandException("Category $name does not exist. Create it with !admin group category create $name.")
+    if (matches.size != 1) throw AdminCommandException("More than one category is named $name; use unique category names.")
+    return matches.single()
+  }
+
   private fun groupElements(): List<Element> = document.documentElement.children("command").flatMap { command ->
     val groups = command.getElementsByTagName("group")
     (0 until groups.length).map { groups.item(it) as Element }
@@ -204,6 +269,10 @@ internal class CommandDocument private constructor(private val document: Documen
 
 private fun Element.children(tag: String): List<Element> = (0 until childNodes.length).mapNotNull { childNodes.item(it) as? Element }.filter { it.tagName == tag }
 private fun Element.child(tag: String): Element? = children(tag).firstOrNull()
+private fun Element.descendants(tag: String): List<Element> {
+  val elements = getElementsByTagName(tag)
+  return (0 until elements.length).map { elements.item(it) as Element }
+}
 private fun Element.value(tag: String): String = child(tag)?.textContent?.trim().orEmpty()
 private fun Element.setValue(tag: String, value: String) {
   val element = child(tag) ?: ownerDocument.createElement(tag).also { appendChild(it) }
