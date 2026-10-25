@@ -53,6 +53,8 @@ Before adding, the app validates the latest XML, refreshes the current group fro
 
 Admin commands operate on disabled commands too. They are independent of XML `<active>` flags, so `!admin enable all` remains available after disabling all replies. ACI reporting responses are handled separately and are unaffected. Each write fetches the latest XML, preserves unrelated entries, uses its SHA, and retries a concurrent-write conflict once. Success replies follow the accepted GitHub write; the in-memory and disk caches are updated immediately. Status reads also refresh the cache. Admin replies do not use cached response text or background edits, and GitHub failures never fall back to a cached success confirmation.
 
+Published XML uses line breaks and two-space indentation for structural entries, including newly created categories and added or moved groups. Reply text, inline spaces, authored line breaks and CDATA remain unchanged. Emoji references split into surrogate pairs by older Android writes are repaired when reading and writing the XML.
+
 ## Group entries
 
 ```xml

@@ -12,6 +12,7 @@ import org.w3c.dom.Node
 import org.xml.sax.SAXException
 import java.io.StringWriter
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
@@ -47,7 +48,7 @@ internal class CommandDocument private constructor(private val document: Documen
       val builder = factory.newDocumentBuilder().apply {
         setEntityResolver { _, _ -> throw SAXException("External entities are not allowed") }
       }
-      val document = xml.byteInputStream(Charsets.UTF_8).use { builder.parse(it) }
+      val document = repairSurrogateReferences(xml).byteInputStream(Charsets.UTF_8).use { builder.parse(it) }
       require(document.documentElement.tagName == "commands") { "Expected <commands> root" }
       return CommandDocument(document)
     }
@@ -55,6 +56,22 @@ internal class CommandDocument private constructor(private val document: Documen
     fun isCommandCandidate(input: String?): Boolean = input != null && input.length in 2..64 &&
       (input.startsWith("!") || input.startsWith("#")) && input.last() != ' ' &&
       input.none { it.isISOControl() || (it.isWhitespace() && it != ' ') }
+
+    // Android's Transformer can emit an emoji as two invalid surrogate references. Repair only
+    // paired references, leaving literal CDATA, comments, processing instructions and escaped text alone.
+    private fun repairSurrogateReferences(xml: String): String = SURROGATE_REFERENCES.replace(xml) { match ->
+      fun value(reference: String): Int? = if (reference.startsWith('x')) reference.drop(1).toIntOrNull(16) else reference.toIntOrNull()
+      val high = value(match.groupValues[1])
+      val low = value(match.groupValues[2])
+      if (high != null && high in 0xD800..0xDBFF && low != null && low in 0xDC00..0xDFFF) {
+        String(Character.toChars(Character.toCodePoint(high.toChar(), low.toChar())))
+      } else {
+        match.value
+      }
+    }
+
+    private val SURROGATE_REFERENCES = Regex("""<!\[CDATA\[[\s\S]*?]]>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>|&#(x[0-9a-fA-F]+|[0-9]+);&#(x[0-9a-fA-F]+|[0-9]+);""")
+    private val STRUCTURAL_TAGS = setOf("commands", "command", "triggers", "groups", "category", "group")
   }
 
   fun render(input: String, resolve: (CommandGroup) -> CommandLinkState): CommandReply? {
@@ -92,9 +109,30 @@ internal class CommandDocument private constructor(private val document: Documen
   }
 
   fun toXml(): String {
+    // Format a copy so serialization never mutates the document being compared or edited.
+    // Generic Transformer indentation would also insert visible newlines into mixed reply text.
+    // Android's DOM cannot clone a Document node; import its children into a fresh document.
+    val formatted = document.implementation.createDocument(null, null, null)
+    for (i in 0 until document.childNodes.length) {
+      formatted.appendChild(formatted.importNode(document.childNodes.item(i), true))
+    }
+    formatStructure(formatted.documentElement, depth = 0)
     val writer = StringWriter()
-    TransformerFactory.newInstance().newTransformer().transform(DOMSource(document), StreamResult(writer))
-    return writer.toString()
+    TransformerFactory.newInstance().newTransformer().apply {
+      setOutputProperty(OutputKeys.ENCODING, "UTF-8")
+      setOutputProperty(OutputKeys.INDENT, "no")
+    }.transform(DOMSource(formatted), StreamResult(writer))
+    return repairSurrogateReferences(writer.toString()).trimEnd() + "\n"
+  }
+
+  private fun formatStructure(element: Element, depth: Int) {
+    val children = (0 until element.childNodes.length).map { element.childNodes.item(it) }
+    children.filterIsInstance<Element>().forEach { formatStructure(it, depth + 1) }
+    if (element.tagName !in STRUCTURAL_TAGS || children.any { it.nodeType == Node.CDATA_SECTION_NODE || (it.nodeType == Node.TEXT_NODE && !it.nodeValue.isBlank()) }) return
+    children.filter { it.nodeType == Node.TEXT_NODE }.forEach(element::removeChild)
+    val content = children.filter { it.nodeType != Node.TEXT_NODE }
+    content.forEach { element.insertBefore(element.ownerDocument.createTextNode("\n" + "  ".repeat(depth + 1)), it) }
+    if (content.isNotEmpty()) element.appendChild(element.ownerDocument.createTextNode("\n" + "  ".repeat(depth)))
   }
 
   /** Includes disabled commands and every alias, so administration can always re-enable them. */

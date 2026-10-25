@@ -107,5 +107,21 @@ class CommandDocumentAndroidTest {
     assertEquals("", reply("!empty-example").text)
   }
 
+  @Test
+  fun `Android writes readable categories and valid emoji without changing mixed response text`() {
+    val source = """<commands><command><triggers><trigger>!groups</trigger></triggers><response><text><b>Heading 😁</b><br/>First <i>line</i> and more</text><br/><br/><groups><category name="Test"><group><groupid>0</groupid><description>Example</description><autoupdate>0</autoupdate><link>https://signal.group/#example</link></group></category></groups></response></command></commands>"""
+    val document = CommandDocument.parse(source, androidFactory())
+    document.createCategory("Music 🎵")
+    document.addGroup("Music 🎵", "New group 🌍", "group-2", "https://signal.group/#new")
+    val expected = document.render("!groups") { CommandLinkState() }
+    val saved = document.toXml()
+    assertTrue(saved.contains("\n          <group>\n            <groupid>group-2</groupid>\n"))
+    // Validate the actual serialized XML directly, without our legacy-reference repair.
+    val dom = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(saved.byteInputStream())
+    assertEquals("New group 🌍", dom.getElementsByTagName("description").item(1).textContent)
+    assertEquals(expected, CommandDocument.parse(saved, androidFactory()).render("!groups") { CommandLinkState() })
+    assertEquals(saved, document.toXml())
+  }
+
   private fun androidFactory(): DocumentBuilderFactory = Class.forName("org.apache.harmony.xml.parsers.DocumentBuilderFactoryImpl").getDeclaredConstructor().newInstance() as DocumentBuilderFactory
 }

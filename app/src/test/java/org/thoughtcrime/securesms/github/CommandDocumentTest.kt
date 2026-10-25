@@ -172,6 +172,68 @@ class CommandDocumentTest {
     assertEquals(CommandStyleRange(CommandStyle.BOLD, 0, 4), reply.styles.single())
   }
 
+  @Test
+  fun `created categories and added groups have structural newlines and consistent indentation`() {
+    val document = CommandDocument.parse(xml())
+    document.createCategory("Music")
+    document.addGroup("Music", "Now playing", "new-group", NEW_LINK)
+    val expectedReply = document.render("!groups") { CommandLinkState() }
+    val saved = document.toXml()
+    assertTrue(saved.contains("</category>\n        <category name=\"Music\">\n          <group>\n            <groupid>new-group</groupid>\n"))
+    assertTrue(saved.contains("            <description>Now playing</description>\n            <autoupdate>1</autoupdate>\n"))
+    assertTrue(saved.contains("            <outdated>0</outdated>\n          </group>\n        </category>\n      </groups>"))
+    assertTrue(saved.endsWith("</commands>\n"))
+    assertEquals(expectedReply, CommandDocument.parse(saved).render("!groups") { CommandLinkState() })
+    assertEquals(saved, document.toXml())
+    assertEquals(saved, CommandDocument.parse(saved).toXml())
+  }
+
+  @Test
+  fun `moving a group reformats its indentation without changing rendered formatting`() {
+    val document = CommandDocument.parse(xml(id = "group-1"))
+    document.createCategory("Music")
+    document.addGroup("Music", "Existing music group", "group-2", NEW_LINK)
+    document.moveGroup("Music", "group-1")
+    val expectedReply = document.render("!groups") { CommandLinkState() }
+    val saved = document.toXml()
+    assertTrue(saved.contains("</group>\n          <group>\n            <groupid>group-1</groupid>"))
+    assertEquals(expectedReply, CommandDocument.parse(saved).render("!groups") { CommandLinkState() })
+  }
+
+  @Test
+  fun `serialization preserves authored text line breaks inline spaces and CDATA literals`() {
+    val source = """
+      <commands><command><triggers><trigger>!groups</trigger></triggers><response><text><b>Heading</b><br/>First line<br/><i>Italic</i> and <b>bold</b>
+      Authored newline</text><br/><br/><groups><category name="Test"><group><groupid>0</groupid><description>Example</description><autoupdate>0</autoupdate><link>$OLD_LINK</link></group></category></groups></response></command>
+      <command><triggers><trigger>!literal</trigger></triggers><response><![CDATA[Literal &#55357;&#56833; and <br/>
+      another line]]></response></command></commands>
+    """.trimIndent()
+    val document = CommandDocument.parse(source)
+    document.createCategory("Music")
+    document.addGroup("Music", "New group", "group-2", NEW_LINK)
+    val restored = CommandDocument.parse(document.toXml())
+    listOf("!groups", "!literal").forEach { trigger ->
+      assertEquals(document.render(trigger) { CommandLinkState() }, restored.render(trigger) { CommandLinkState() })
+    }
+    assertTrue(restored.render("!literal") { CommandLinkState() }!!.text.contains("&#55357;&#56833;"))
+  }
+
+  @Test
+  fun `paired surrogate references from old Android writes recover as emoji without decoding literal text`() {
+    val source = """<commands><!-- literal &#55357;&#56833; --><?example literal="&#55357;&#56833;"?><command><triggers><trigger>!groups</trigger></triggers><response><text>&#55357;&#56833; &#xD83C;&#xDFB5; &amp;#55357;&amp;#56833;</text></response></command></commands>"""
+    val document = CommandDocument.parse(source)
+    assertEquals("😁 🎵 &#55357;&#56833;", document.render("!groups") { CommandLinkState() }!!.text)
+    val saved = document.toXml()
+    assertTrue(saved.contains("<!-- literal &#55357;&#56833; -->"))
+    assertTrue(saved.contains("literal=\"&#55357;&#56833;\""))
+    assertEquals(document.render("!groups") { CommandLinkState() }, CommandDocument.parse(saved).render("!groups") { CommandLinkState() })
+  }
+
+  @Test(expected = org.xml.sax.SAXException::class)
+  fun `unpaired surrogate references remain invalid XML`() {
+    CommandDocument.parse("<commands><command><response>&#55357;</response></command></commands>")
+  }
+
   @Test(expected = IllegalArgumentException::class)
   fun `external entities and doctypes are rejected`() {
     CommandDocument.parse("<!DOCTYPE commands [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]><commands>&xxe;</commands>")
