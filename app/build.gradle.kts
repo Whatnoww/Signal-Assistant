@@ -142,6 +142,8 @@ ktlint {
 val githubToken: String = localProperties?.getProperty("GITHUB_TOKEN") ?: ""
 val githubTokenCommands: String = localProperties?.getProperty("GITHUB_TOKEN_COMMANDS") ?: ""
 val responseXml: String = localProperties?.getProperty("RESPONSE_XML") ?: ""
+val adminAci: String = localProperties?.getProperty("ADMIN_ACI")?.trim().orEmpty()
+require(adminAci.isEmpty() || adminAci.matches(Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))) { "ADMIN_ACI must be a UUID" }
 
 // ktlint only scans convention source dirs, so the shared dirs added to the compile tasks are
 // otherwise skipped. Add them to the base test/androidTest ktlint tasks so ktlintCheck/format cover them.
@@ -325,6 +327,7 @@ android {
     buildConfigField("String", "GITHUB_TOKEN", "\"$githubToken\"")
     buildConfigField("String", "GITHUB_TOKEN_COMMANDS", "\"$githubTokenCommands\"")
     buildConfigField("String", "RESPONSE_XML", "\"$responseXml\"")
+    buildConfigField("String", "ADMIN_ACI", "\"$adminAci\"")
 
     ndk {
       abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")

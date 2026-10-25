@@ -27,7 +27,28 @@ object GitHubAutoReply {
   private val renderedReplies = ConcurrentHashMap<String, Pair<String, CommandReply>>()
   private val refreshingInputs = ConcurrentHashMap<String, Boolean>()
 
-  fun isCommandCandidate(input: String?): Boolean = isConfigured() && CommandDocument.isCommandCandidate(input)
+  fun isCommandCandidate(input: String?): Boolean = isAdminCommand(input) || (isConfigured() && CommandDocument.isCommandCandidate(input))
+
+  fun isAdminCommand(input: String?): Boolean = AdminCommands.isCandidate(input)
+
+  internal fun getAdminReply(context: Context, input: String, senderAci: String?, groupId: String?): CommandReply = synchronized(refreshLock) {
+    AdminCommands(
+      adminAci = BuildConfig.ADMIN_ACI,
+      configured = isConfigured(),
+      repository = ::repository,
+      currentGroupLink = { id -> CommandGroupLinkResolver(context).currentGroupLink(id) },
+      saveSnapshot = { updated ->
+        loadCache(context)
+        cache.replace(updated)
+        renderedReplies.clear()
+        try {
+          writeCache(context, updated)
+        } catch (e: Exception) {
+          Log.w(TAG, "Unable to persist commands after admin operation (${e.javaClass.simpleName}).")
+        }
+      }
+    ).reply(input, senderAci, groupId)
+  }
 
   private fun isConfigured(): Boolean = BuildConfig.RESPONSE_XML.isNotBlank() && BuildConfig.GITHUB_TOKEN_COMMANDS.isNotBlank()
 
@@ -55,7 +76,7 @@ object GitHubAutoReply {
 
   /** Fast path: no GitHub or Signal network requests, including when another job is refreshing. */
   internal fun getCachedReplyFor(context: Context, input: String): CommandReply? {
-    if (!isCommandCandidate(input)) return null
+    if (isAdminCommand(input) || !isCommandCandidate(input)) return null
     loadCache(context)
     val saved = cache.snapshot ?: return null
     return try {
@@ -78,7 +99,7 @@ object GitHubAutoReply {
   fun getResponseFor(context: Context, input: String): String? = getReplyFor(context, input)?.text
 
   internal fun getReplyFor(context: Context, input: String): CommandReply? = synchronized(refreshLock) {
-    if (!isCommandCandidate(input)) return null
+    if (isAdminCommand(input) || !isCommandCandidate(input)) return null
     if (!needsRefresh(input)) return getCachedReplyFor(context, input)
     refreshingInputs[input] = true
     try {

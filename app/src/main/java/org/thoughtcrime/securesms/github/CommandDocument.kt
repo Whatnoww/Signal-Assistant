@@ -97,6 +97,47 @@ internal class CommandDocument private constructor(private val document: Documen
     return writer.toString()
   }
 
+  /** Includes disabled commands and every alias, so administration can always re-enable them. */
+  fun setCommandsActive(trigger: String, enabled: Boolean): Int {
+    val commands = document.documentElement.children("command").filter { command ->
+      trigger == "all" || command.child("triggers")?.children("trigger")?.any { it.textContent == trigger } == true
+    }
+    if (commands.isEmpty()) throw AdminCommandException("No configured command matches $trigger.")
+    commands.forEach { it.setValue("active", if (enabled) "1" else "0") }
+    return commands.size
+  }
+
+  fun listedGroups(groupId: String): List<CommandGroup> = groupElements().map { it.asGroup() }.filter { it.groupId == groupId }
+
+  fun enableGroupAutoUpdate(description: String, groupId: String, state: CommandLinkState) {
+    val matches = groupElements().filter { it.value("description") == description }
+    if (matches.isEmpty()) throw AdminCommandException("No listed group has the description: $description.")
+    if (matches.size != 1) throw AdminCommandException("More than one listed group has that description; use a unique description.")
+    matches.single().apply {
+      setValue("groupid", groupId)
+      setValue("autoupdate", "1")
+      if (state.currentLink != null) {
+        setValue("link", state.currentLink)
+        setValue("outdated", "0")
+      } else if (state.outdated == true) {
+        setValue("outdated", "1")
+      }
+    }
+  }
+
+  fun disableGroupAutoUpdate(groupId: String): Int {
+    val matches = groupElements().filter { it.value("groupid") == groupId }
+    if (matches.isEmpty()) throw AdminCommandException("This group is not on the list. Enable autoupdate with its listed description first.")
+    // Retain both the ID and link so later requests can still detect an outdated link.
+    matches.forEach { it.setValue("autoupdate", "0") }
+    return matches.size
+  }
+
+  private fun groupElements(): List<Element> = document.documentElement.children("command").flatMap { command ->
+    val groups = command.getElementsByTagName("group")
+    (0 until groups.length).map { groups.item(it) as Element }
+  }
+
   private class Renderer(val resolve: (CommandGroup) -> CommandLinkState) {
     val text = StringBuilder()
     val styles = mutableListOf<CommandStyleRange>()
@@ -164,6 +205,10 @@ internal class CommandDocument private constructor(private val document: Documen
 private fun Element.children(tag: String): List<Element> = (0 until childNodes.length).mapNotNull { childNodes.item(it) as? Element }.filter { it.tagName == tag }
 private fun Element.child(tag: String): Element? = children(tag).firstOrNull()
 private fun Element.value(tag: String): String = child(tag)?.textContent?.trim().orEmpty()
+private fun Element.setValue(tag: String, value: String) {
+  val element = child(tag) ?: ownerDocument.createElement(tag).also { appendChild(it) }
+  element.textContent = value
+}
 private fun Element.isCommandActive(): Boolean = (child("active")?.textContent?.trim() ?: "1") == "1"
 private fun Element.asGroup(): CommandGroup {
   val groupId = value("groupid").ifEmpty { "0" }

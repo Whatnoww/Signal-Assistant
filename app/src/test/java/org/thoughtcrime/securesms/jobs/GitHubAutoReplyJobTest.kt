@@ -29,6 +29,7 @@ import org.signal.core.models.recipients.RecipientId
 import org.thoughtcrime.securesms.database.MessageType
 import org.thoughtcrime.securesms.database.RecipientTable.RegisteredState
 import org.thoughtcrime.securesms.database.SignalDatabase
+import org.thoughtcrime.securesms.github.AdminCommands
 import org.thoughtcrime.securesms.github.CommandDocument
 import org.thoughtcrime.securesms.github.CommandReply
 import org.thoughtcrime.securesms.github.CommandStyle
@@ -57,7 +58,7 @@ class GitHubAutoReplyJobTest {
   @Before
   fun setUp() {
     mockkObject(GitHubAutoReply)
-    every { GitHubAutoReply.isCommandCandidate(any()) } answers { CommandDocument.isCommandCandidate(firstArg()) }
+    every { GitHubAutoReply.isCommandCandidate(any()) } answers { AdminCommands.isCandidate(firstArg()) || CommandDocument.isCommandCandidate(firstArg()) }
     every { GitHubAutoReply.getCachedReplyFor(any(), any()) } returns null
     every { GitHubAutoReply.needsRefresh(any()) } returns true
     every { GitHubAutoReply.getReplyFor(any(), any()) } returns reply
@@ -166,6 +167,46 @@ class GitHubAutoReplyJobTest {
     val group = recipients.createGroup(member)
     runJob(insertRequest(member, group.groupId))
     assertEquals(group.recipientId, sentMessages.single().threadRecipient.id)
+  }
+
+  @Test
+  fun `admin command uses stored sender ACI and current group without cached replies or refresh`() {
+    val member = recipients.createRecipient("Admin", profileSharing = false)
+    val group = recipients.createGroup(member)
+    val senderAci = Recipient.resolved(member).requireAci().toString()
+    val input = "!admin group enable autoupdate " + "Long group description ".repeat(4).trim()
+    every { GitHubAutoReply.getAdminReply(any(), input, senderAci, group.groupId.toString()) } returns reply.copy(text = "Enabled autoupdate")
+    runJob(insertRequest(member, group.groupId, input))
+    assertEquals("Enabled autoupdate", sentMessages.single().body)
+    assertEquals(group.recipientId, sentMessages.single().threadRecipient.id)
+    verify(exactly = 1) { GitHubAutoReply.getAdminReply(any(), input, senderAci, group.groupId.toString()) }
+    verify(exactly = 0) { GitHubAutoReply.getCachedReplyFor(any(), any()) }
+    verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
+    verify(exactly = 0) { GitHubAutoReply.needsRefresh(any()) }
+  }
+
+  @Test
+  fun `admin authorization errors return in the requesting group`() {
+    val member = recipients.createRecipient("Other Sender", profileSharing = false)
+    val group = recipients.createGroup(member)
+    val senderAci = Recipient.resolved(member).requireAci().toString()
+    val input = "!admin disable all"
+    every { GitHubAutoReply.getAdminReply(any(), input, senderAci, group.groupId.toString()) } returns reply.copy(text = "Error: only the configured admin ACI can use !admin commands.")
+    runJob(insertRequest(member, group.groupId, input))
+    assertTrue(sentMessages.single().body.startsWith("Error:"))
+    assertEquals(group.recipientId, sentMessages.single().threadRecipient.id)
+    verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
+  }
+
+  @Test
+  fun `blocked group cannot execute admin commands`() {
+    val member = recipients.createRecipient("Admin", profileSharing = false)
+    val group = recipients.createGroup(member)
+    SignalDatabase.recipients.setBlocked(group.recipientId, true, System.currentTimeMillis())
+    Recipient.live(group.recipientId).refresh()
+    runJob(insertRequest(member, group.groupId, "!admin disable all"))
+    verify(exactly = 0) { GitHubAutoReply.getAdminReply(any(), any(), any(), any()) }
+    assertTrue(sentMessages.isEmpty())
   }
 
   @Test
@@ -345,7 +386,7 @@ class GitHubAutoReplyJobTest {
     setContext(RuntimeEnvironment.getApplication())
   }
 
-  private fun insertRequest(sender: RecipientId, groupId: GroupId? = null): Long {
+  private fun insertRequest(sender: RecipientId, groupId: GroupId? = null, body: String = "!groups"): Long {
     return SignalDatabase.messages.insertMessageInbox(
       IncomingMessage(
         type = MessageType.NORMAL,
@@ -354,7 +395,7 @@ class GitHubAutoReplyJobTest {
         serverTimeMillis = 100L,
         receivedTimeMillis = 200L,
         groupId = groupId,
-        body = "!groups",
+        body = body,
         isUnidentified = true
       )
     ).get().messageId

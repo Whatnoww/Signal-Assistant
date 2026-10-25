@@ -22,10 +22,12 @@ internal class CommandGroupLinkResolver(private val lookup: CommandGroupLinkLook
   private val groups = mutableMapOf<String, CommandLinkState>()
   private val links = mutableMapOf<String, CommandLinkState>()
 
+  fun currentGroupLink(groupId: String): CommandLinkState = groups.getOrPut(groupId) { lookup.currentGroupLink(groupId) }
+
   fun resolve(group: CommandGroup): CommandLinkState {
     // A manual entry must never derive an update identity from its link.
     if (group.groupId == "0") return validateLink(group.link)
-    val current = groups.getOrPut(group.groupId) { lookup.currentGroupLink(group.groupId) }
+    val current = currentGroupLink(group.groupId)
     return when {
       current.currentLink != null -> current.copy(outdated = current.currentLink != group.link)
       current.outdated == true -> current

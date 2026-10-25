@@ -48,8 +48,18 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     val recipient = SignalDatabase.threads.getRecipientForThreadId(request.threadId) ?: return
     if (!canReply(recipient, request.threadId)) return
 
-    val cached = GitHubAutoReply.getCachedReplyFor(context, request.body)
-    val reply = cached ?: GitHubAutoReply.getReplyFor(context, request.body) ?: return
+    val isAdmin = GitHubAutoReply.isAdminCommand(request.body)
+    val cached = if (isAdmin) null else GitHubAutoReply.getCachedReplyFor(context, request.body)
+    val reply = if (isAdmin) {
+      GitHubAutoReply.getAdminReply(
+        context,
+        request.body,
+        request.fromRecipient.aci.orElse(null)?.toString(),
+        recipient.groupId.orElse(null)?.takeIf { it.isV2 }?.toString()
+      )
+    } else {
+      cached ?: GitHubAutoReply.getReplyFor(context, request.body) ?: return
+    }
     // Recheck after the network work, in case the request was removed or the chat was blocked/left.
     val latestRequest = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
     if (latestRequest.isRemoteDelete || latestRequest.body != request.body || Recipient.resolved(request.fromRecipient.id).isBlocked) return

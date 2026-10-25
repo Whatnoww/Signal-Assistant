@@ -43,14 +43,19 @@ internal class GitHubCommandsRepository(
 
   fun publish(updates: List<CommandLinkUpdate>): CommandsSnapshot? {
     if (updates.isEmpty()) return null
+    return update("Refresh Signal group invite links") { it.applyLinkUpdates(updates) }
+  }
+
+  /** Reapply the requested operation to the latest document after a concurrent-write conflict. */
+  fun update(message: String, edit: (CommandDocument) -> Boolean): CommandsSnapshot {
     repeat(2) {
       // Fetch again before writing, preserving edits made since the command was rendered.
       val latest = fetch()
       val document = CommandDocument.parse(latest.xml)
-      if (!document.applyLinkUpdates(updates)) return latest
+      if (!edit(document)) return latest
       val xml = document.toXml()
       val json = JSONObject()
-        .put("message", "Refresh Signal group invite links")
+        .put("message", message)
         .put("sha", latest.sha)
         .put("content", Base64.getEncoder().encodeToString(xml.toByteArray(Charsets.UTF_8)))
       url.queryParameter("ref")?.let { json.put("branch", it) }
@@ -64,7 +69,7 @@ internal class GitHubCommandsRepository(
         if (response.code != 409) throw GitHubCommandsHttpException(response.code, "Commands update")
       }
     }
-    throw IOException("Commands file changed concurrently; link update deferred")
+    throw IOException("Commands file changed concurrently; update deferred")
   }
 
   private fun request(): Request.Builder = Request.Builder()
