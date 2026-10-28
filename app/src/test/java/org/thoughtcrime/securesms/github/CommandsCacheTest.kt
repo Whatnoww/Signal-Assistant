@@ -5,6 +5,7 @@
 
 package org.thoughtcrime.securesms.github
 
+import okio.ByteString.Companion.encodeUtf8
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
@@ -95,6 +96,7 @@ class CommandsCacheTest {
   @Test
   fun `content hash detects formatting changes but ignores update bookkeeping`() {
     val reply = CommandReply("hello", emptyList(), emptyList())
+    assertEquals("hello\u0000".encodeUtf8().sha256().hex(), reply.contentHash())
     assertFalse(reply.contentHash() == reply.copy(styles = listOf(CommandStyleRange(CommandStyle.BOLD, 0, 5))).contentHash())
     assertEquals(reply.contentHash(), reply.copy(linkUpdates = listOf(CommandLinkUpdate("id", "old", "new"))).contentHash())
   }

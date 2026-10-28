@@ -6,7 +6,7 @@
 
 The local `docs/commands/commands.xml` is private and explicitly Git-ignored. Keep real group lists, command catalogs, responses and credentials out of this application's source repository. Tests use synthetic inline fixtures and the public template only; they must never read the private XML or list its commands. The app obtains its deployed configuration through `RESPONSE_XML`; there is no bundled private catalog.
 
-All responses are configured text. Empty responses send no message, and commands with `<active>0</active>` are disabled. Native formatting tags are demonstrated in the template.
+Ordinary responses are configured text; `!scan` appends generated results to its configured heading. Empty ordinary responses send no message, and commands with `<active>0</active>` are disabled. Native formatting tags are demonstrated in the template.
 
 Set these in your untracked `local.properties`, then rebuild:
 
@@ -19,6 +19,28 @@ ADMIN_ACI=aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee
 Use a token with Contents read and write access to that repository. `GITHUB_TOKEN` remains the separate blocklist token. Raw URLs such as `https://raw.githubusercontent.com/OWNER/REPOSITORY/main/commands.xml` and `https://raw.githubusercontent.com/OWNER/REPOSITORY/refs/heads/main/commands.xml` also work; the app converts them to the Contents API. For branch names containing `/`, use the API URL with `?ref=your/branch`. Without `ref`, GitHub's default branch is used.
 
 An incoming message whose entire body is exactly `!groups` receives a reply in the same eligible chat. With the category browser configured below, `!groups 1`, `!groups 2`, and so on show individual categories. For 1:1 chats, the recipient must be a registered phone contact or an accepted Signal-only contact (profile sharing enabled), and Signal must consider the message request accepted. Having a group in common or a previous outgoing message alone does not qualify someone as a contact. Hidden/removed contacts, blocked chats, unaccepted groups, inactive groups and announcement groups where self cannot post are skipped. Eligibility is checked before downloading commands and again immediately before sending. The existing automatic group-leaving behavior is unchanged. Case, extra words, leading/trailing spaces and newlines do not match. Attachments, quotes, stories, reactions, edits, duplicates and messages from self do not trigger replies. A missing commands token or URL disables this feature. The XML is fetched on demand with ETags; a validated atomic disk cache provides a fallback when GitHub is unavailable. The message uses the chat's disappearing-message timer and Signal's ordinary sending pipeline, including long-text attachments when necessary.
+
+## Scanning group members
+
+`!scan` works only in eligible Signal V2 group chats and only for a current administrator of that group. Direct chats, ordinary members, pending members and nonmembers receive no response. The configured `ADMIN_ACI` does not grant scan access unless that account is also an administrator in the requesting group. The sender's role is checked before reading commands and again before sending or editing.
+
+Add this entry to your private commands XML:
+
+```xml
+<command>
+  <active>1</active>
+  <triggers><trigger>!scan</trigger></triggers>
+  <response><text><b>Members found on the ACI-Blocklist:</b></text></response>
+</command>
+```
+
+The `<response>` supplies the configurable start text, including native styles. An empty response omits the heading. `<active>0</active>`, `!admin disable !scan`, `!admin enable !scan` and the corresponding `all` commands use the usual controls. Keep the exact `!scan` trigger; the scan behavior is reserved to that trigger.
+
+The first response reads the cached command configuration and cached ACI-Blocklist without an online blocklist check. Each matching full member, including administrators and self, appears on a separate line as `ACI @member`, with a native Signal mention that opens the member's details. Invited, requesting and banned accounts are excluded. No matches produces an explicit empty result. An unpopulated cache is reported as unavailable rather than interpreted as an empty blocklist. The blocklist cache is currently in memory, so it starts unavailable after an app restart. Without a cached command configuration, the configuration must first be downloaded.
+
+Long scans use continuation messages below Signal's inline byte limit so every member mention remains tappable. Background updates edit existing pages, add continuations when necessary and replace obsolete continuations with an empty-result notice. If any original page was deleted or manually edited, the update is skipped.
+
+When either cache needs revalidation, the existing background reply job refreshes the commands XML and ACI-Blocklist, rebuilds the scan from current membership and edits the same reply only if the text, formatting or mentions changed. It waits for the initial reply to send and uses a separate queue so the online blocklist check does not hold up new command replies. The blocklist uses its existing five-minute freshness interval; command configuration uses one minute. A failed refresh retains the last good snapshot. Deleted or manually edited replies are left alone, and a sender who loses their group administrator role receives no edit.
 
 ## Browsing group categories
 

@@ -6,6 +6,7 @@
 package org.thoughtcrime.securesms.github
 
 import okio.ByteString.Companion.encodeUtf8
+import org.thoughtcrime.securesms.database.model.Mention
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -18,11 +19,13 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 /** Text and styles are separate so future media attachments need not change command matching/rendering. */
-internal data class CommandReply(val text: String, val styles: List<CommandStyleRange>, val linkUpdates: List<CommandLinkUpdate>) {
+internal data class CommandReply(val text: String, val styles: List<CommandStyleRange>, val linkUpdates: List<CommandLinkUpdate>, val mentions: List<Mention> = emptyList()) {
   fun contentHash(): String {
     val canonicalStyles = styles.sortedWith(compareBy({ it.start }, { it.length }, { it.style.name }))
       .joinToString(";") { "${it.style}:${it.start}:${it.length}" }
-    return "$text\u0000$canonicalStyles".encodeUtf8().sha256().hex()
+    // Preserve hashes in already queued jobs for replies that have no mentions.
+    val canonicalMentions = if (mentions.isEmpty()) "" else "\u0000" + mentions.sortedBy { it.start }.joinToString(";") { "${it.recipientId}:${it.start}:${it.length}" }
+    return "$text\u0000$canonicalStyles$canonicalMentions".encodeUtf8().sha256().hex()
   }
 }
 internal data class CommandStyleRange(val style: CommandStyle, val start: Int, val length: Int)

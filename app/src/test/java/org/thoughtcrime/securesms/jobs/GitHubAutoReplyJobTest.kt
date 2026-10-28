@@ -26,17 +26,20 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import org.signal.core.models.recipients.RecipientId
+import org.signal.storageservice.storage.protos.groups.Member
+import org.thoughtcrime.securesms.database.GroupTable
 import org.thoughtcrime.securesms.database.MessageType
 import org.thoughtcrime.securesms.database.RecipientTable.RegisteredState
 import org.thoughtcrime.securesms.database.SignalDatabase
+import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.github.AdminCommands
 import org.thoughtcrime.securesms.github.CommandDocument
 import org.thoughtcrime.securesms.github.CommandReply
 import org.thoughtcrime.securesms.github.CommandStyle
 import org.thoughtcrime.securesms.github.CommandStyleRange
 import org.thoughtcrime.securesms.github.GitHubAutoReply
+import org.thoughtcrime.securesms.github.GroupScanCommand
 import org.thoughtcrime.securesms.groups.GroupId
-import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.mms.IncomingMessage
 import org.thoughtcrime.securesms.mms.OutgoingMessage
@@ -62,6 +65,10 @@ class GitHubAutoReplyJobTest {
     every { GitHubAutoReply.getCachedReplyFor(any(), any()) } returns null
     every { GitHubAutoReply.needsRefresh(any()) } returns true
     every { GitHubAutoReply.getReplyFor(any(), any()) } returns reply
+    mockkObject(GroupTable.Companion)
+    every { GroupTable.getCachedBlocklist() } returns emptySet()
+    every { GroupTable.blocklistNeedsRefresh() } returns false
+    every { GroupTable.getBlocklist() } returns emptySet()
     mockkStatic(MessageSender::class)
     every { MessageSender.send(any(), capture(sentMessages), any(), any(), any(), any()) } returns 1L
     every { RemoteConfig.regularDeleteThreshold } returns 86_400L
@@ -71,6 +78,7 @@ class GitHubAutoReplyJobTest {
   @After
   fun tearDown() {
     unmockkObject(GitHubAutoReply)
+    unmockkObject(GroupTable.Companion)
     unmockkStatic(MessageSender::class)
   }
 
@@ -380,6 +388,223 @@ class GitHubAutoReplyJobTest {
     assertEquals("Already refreshed", sentMessages.single().body)
     assertEquals(replyId, sentMessages.single().messageToEdit)
     verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
+  }
+
+  @Test
+  fun `scan in direct chat is silently ignored without reading either cache`() {
+    val contact = recipients.createRecipient("Contact")
+    runJob(insertRequest(contact, body = "!scan"))
+    assertTrue(sentMessages.isEmpty())
+    verify(exactly = 0) { GitHubAutoReply.getCachedReplyFor(any(), any()) }
+    verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
+    verify(exactly = 0) { GroupTable.getCachedBlocklist() }
+  }
+
+  @Test
+  fun `scan from ordinary member or outsider is silently ignored`() {
+    val member = recipients.createRecipient("Member")
+    val outsider = recipients.createRecipient("Outsider")
+    val group = recipients.createGroup(member)
+    demote(group, member)
+    runJob(insertRequest(member, group.groupId, "!scan"))
+    runJob(insertRequest(outsider, group.groupId, "!scan"))
+    assertTrue(sentMessages.isEmpty())
+    verify(exactly = 0) { GitHubAutoReply.getCachedReplyFor(any(), any()) }
+    verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
+    verify(exactly = 0) { GroupTable.getCachedBlocklist() }
+  }
+
+  @Test
+  fun `admin scan uses cached configuration and blocklist before scheduling background refresh`() {
+    val admin = recipients.createRecipient("Admin")
+    val blocked = recipients.createRecipient("Blocked Member")
+    val group = recipients.createGroup(admin, blocked)
+    val aci = Recipient.resolved(blocked).requireAci().toString()
+    val jobs = mutableListOf<Job>()
+    every { GitHubAutoReply.getCachedReplyFor(any(), "!scan") } returns reply
+    every { GitHubAutoReply.getReplyFor(any(), any()) } answers { error("Must send the cached scan first") }
+    every { GroupTable.getCachedBlocklist() } returns setOf(aci)
+    every { GroupTable.getBlocklist() } answers { error("Initial scan must never download the blocklist") }
+    every { MessageSender.send(any(), capture(sentMessages), any(), any(), any(), any()) } answers {
+      SignalDatabase.messages.insertMessageOutbox(secondArg(), thirdArg())
+      thirdArg<Long>()
+    }
+    justRun { AppDependencies.jobManager.add(capture(jobs)) }
+
+    runJob(insertRequest(admin, group.groupId, "!scan"))
+
+    val sent = sentMessages.single()
+    assertEquals("Group Chats\n$aci \uFFFC", sent.body)
+    assertEquals(blocked, sent.mentions.single().recipientId)
+    assertEquals('\uFFFC', sent.body[sent.mentions.single().start])
+    val refresh = jobs.filterIsInstance<GitHubAutoReplyRefreshJob>().single()
+    val serialized = org.thoughtcrime.securesms.jobmanager.JsonJobData.deserialize(refresh.serialize())
+    assertEquals(CommandReply(sent.body, emptyList(), emptyList(), sent.mentions).contentHash(), serialized.getString("previous_hash"))
+    verify(exactly = 0) { GroupTable.getBlocklist() }
+  }
+
+  @Test
+  fun `stale blocklist schedules refresh even with fresh command configuration`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    val jobs = mutableListOf<Job>()
+    every { GitHubAutoReply.getCachedReplyFor(any(), "!scan") } returns reply
+    every { GitHubAutoReply.needsRefresh(any()) } returns false
+    every { GroupTable.blocklistNeedsRefresh() } returns true
+    every { MessageSender.send(any(), capture(sentMessages), any(), any(), any(), any()) } answers {
+      SignalDatabase.messages.insertMessageOutbox(secondArg(), thirdArg())
+      thirdArg<Long>()
+    }
+    justRun { AppDependencies.jobManager.add(capture(jobs)) }
+    runJob(insertRequest(admin, group.groupId, "!scan"))
+    assertEquals(1, sentMessages.size)
+    assertEquals(1, jobs.filterIsInstance<GitHubAutoReplyRefreshJob>().size)
+    verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
+    verify(exactly = 0) { GroupTable.getBlocklist() }
+  }
+
+  @Test
+  fun `disabled scan sends nothing and never reads blocklist`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    every { GitHubAutoReply.getReplyFor(any(), "!scan") } returns null
+    runJob(insertRequest(admin, group.groupId, "!scan"))
+    assertTrue(sentMessages.isEmpty())
+    verify(exactly = 0) { GroupTable.getCachedBlocklist() }
+    verify(exactly = 0) { GroupTable.getBlocklist() }
+  }
+
+  @Test
+  fun `sender demoted during configuration fetch receives no scan`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    every { GitHubAutoReply.getReplyFor(any(), "!scan") } answers {
+      demote(group, admin)
+      reply
+    }
+    runJob(insertRequest(admin, group.groupId, "!scan"))
+    assertTrue(sentMessages.isEmpty())
+    verify(exactly = 0) { GroupTable.getCachedBlocklist() }
+  }
+
+  @Test
+  fun `scan refresh edits original message with new blocklist matches and native mentions`() {
+    val admin = recipients.createRecipient("Admin")
+    val blocked = recipients.createRecipient("Blocked")
+    val group = recipients.createGroup(admin, blocked)
+    val recipient = Recipient.resolved(group.recipientId)
+    val initial = GroupScanCommand.reply(reply, GroupScanCommand.authorizedGroup(recipient, Recipient.resolved(admin))!!)
+    val requestId = insertRequest(admin, group.groupId, "!scan")
+    val replyId = recipients.insertOutgoingMessage(group.recipientId, initial.text)
+    SignalDatabase.messages.markAsSent(replyId)
+    val aci = Recipient.resolved(blocked).requireAci().toString()
+    every { GroupTable.getBlocklist() } answers {
+      every { GroupTable.getCachedBlocklist() } returns setOf(aci)
+      setOf(aci)
+    }
+    val result = scanRefreshJob(requestId, replyId, initial).run()
+    assertTrue(result.isSuccess)
+    val edited = sentMessages.single()
+    assertEquals(replyId, edited.messageToEdit)
+    assertEquals("Group Chats\n$aci \uFFFC", edited.body)
+    assertEquals(blocked, edited.mentions.single().recipientId)
+  }
+
+  @Test
+  fun `unchanged scan refresh produces no edit`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    val initial = GroupScanCommand.reply(reply, SignalDatabase.groups.getGroup(group.groupId).get())
+    val requestId = insertRequest(admin, group.groupId, "!scan")
+    val replyId = recipients.insertOutgoingMessage(group.recipientId, initial.text)
+    SignalDatabase.messages.markAsSent(replyId)
+    assertTrue(scanRefreshJob(requestId, replyId, initial).run().isSuccess)
+    assertTrue(sentMessages.isEmpty())
+    verify(exactly = 1) { GroupTable.getBlocklist() }
+  }
+
+  @Test
+  fun `sender demoted during online blocklist check receives no scan edit`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    val requestId = insertRequest(admin, group.groupId, "!scan")
+    val replyId = recipients.insertOutgoingMessage(group.recipientId)
+    SignalDatabase.messages.markAsSent(replyId)
+    every { GroupTable.getBlocklist() } answers {
+      demote(group, admin)
+      emptySet()
+    }
+    assertTrue(scanRefreshJob(requestId, replyId, reply).run().isSuccess)
+    assertTrue(sentMessages.isEmpty())
+  }
+
+  @Test
+  fun `scan refresh from unauthorized sender never checks online`() {
+    val member = recipients.createRecipient("Member")
+    val group = recipients.createGroup(member)
+    demote(group, member)
+    val requestId = insertRequest(member, group.groupId, "!scan")
+    val replyId = recipients.insertOutgoingMessage(group.recipientId)
+    SignalDatabase.messages.markAsSent(replyId)
+    assertTrue(scanRefreshJob(requestId, replyId, reply).run().isSuccess)
+    assertTrue(sentMessages.isEmpty())
+    verify(exactly = 0) { GroupTable.getBlocklist() }
+    verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
+  }
+
+  @Test
+  fun `scan refresh adds continuation when online results exceed the inline mention limit`() {
+    val admin = recipients.createRecipient("Admin")
+    val blocked = (1..60).map { recipients.createRecipient("Member $it") }
+    val group = recipients.createGroup(admin, *blocked.toTypedArray())
+    val initial = GroupScanCommand.reply(reply, SignalDatabase.groups.getGroup(group.groupId).get())
+    val requestId = insertRequest(admin, group.groupId, "!scan")
+    val replyId = recipients.insertOutgoingMessage(group.recipientId, initial.text)
+    SignalDatabase.messages.markAsSent(replyId)
+    val blocklist = blocked.map { Recipient.resolved(it).requireAci().toString() }.toSet()
+    every { GroupTable.getBlocklist() } answers {
+      every { GroupTable.getCachedBlocklist() } returns blocklist
+      blocklist
+    }
+    assertTrue(scanRefreshJob(requestId, replyId, initial).run().isSuccess)
+    assertEquals(2, sentMessages.size)
+    assertEquals(replyId, sentMessages.first().messageToEdit)
+    assertEquals(0L, sentMessages.last().messageToEdit)
+    assertEquals(blocked.toSet(), sentMessages.flatMap { it.mentions }.map { it.recipientId }.toSet())
+    sentMessages.forEach { assertTrue(it.body.toByteArray(Charsets.UTF_8).size <= 2048) }
+  }
+
+  @Test
+  fun `scan refresh clears obsolete continuation and round trips its message IDs`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    val requestId = insertRequest(admin, group.groupId, "!scan")
+    val replyId = recipients.insertOutgoingMessage(group.recipientId, "Old first page", System.currentTimeMillis())
+    val continuationId = recipients.insertOutgoingMessage(group.recipientId, "Old continuation", System.currentTimeMillis() + 1)
+    SignalDatabase.messages.markAsSent(replyId)
+    SignalDatabase.messages.markAsSent(continuationId)
+    val originalJob = GitHubAutoReplyRefreshJob(requestId, replyId, "old-first-hash", listOf(continuationId), listOf("old-continuation-hash"))
+    val restored = GitHubAutoReplyRefreshJob.Factory().create(originalJob.parameters, originalJob.serialize()).apply {
+      setContext(RuntimeEnvironment.getApplication())
+    }
+    assertTrue(restored.run().isSuccess)
+    assertEquals(listOf(replyId, continuationId), sentMessages.map { it.messageToEdit })
+    assertTrue(sentMessages.last().body.startsWith("No additional group members"))
+    assertTrue(sentMessages.all { it.mentions.isEmpty() })
+  }
+
+  private fun demote(group: RecipientTestRule.TestGroupInfo, member: RecipientId) {
+    val current = SignalDatabase.groups.getGroup(group.groupId).get().requireV2GroupProperties().decryptedGroup
+    val aci = Recipient.resolved(member).requireAci().toByteString()
+    SignalDatabase.groups.update(
+      group.groupId,
+      current.copy(members = current.members.map { if (it.aciBytes == aci) it.copy(role = Member.Role.DEFAULT) else it }),
+      null
+    )
+  }
+
+  private fun scanRefreshJob(requestId: Long, replyId: Long, initial: CommandReply) = GitHubAutoReplyRefreshJob(requestId, replyId, initial.contentHash()).apply {
+    setContext(RuntimeEnvironment.getApplication())
   }
 
   private fun refreshJob(requestId: Long, replyId: Long) = GitHubAutoReplyRefreshJob(requestId, replyId, reply.contentHash()).apply {

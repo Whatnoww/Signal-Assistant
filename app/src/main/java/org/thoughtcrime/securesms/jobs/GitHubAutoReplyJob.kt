@@ -7,6 +7,7 @@ package org.thoughtcrime.securesms.jobs
 
 import android.content.Context
 import org.signal.core.util.logging.Log
+import org.thoughtcrime.securesms.database.GroupTable
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.addStyle
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
@@ -14,6 +15,7 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.github.CommandReply
 import org.thoughtcrime.securesms.github.CommandStyle
 import org.thoughtcrime.securesms.github.GitHubAutoReply
+import org.thoughtcrime.securesms.github.GroupScanCommand
 import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.jobmanager.JsonJobData
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint
@@ -23,6 +25,7 @@ import org.thoughtcrime.securesms.recipients.RecipientUtil
 import org.thoughtcrime.securesms.sms.MessageSender
 import org.thoughtcrime.securesms.util.MessageUtil
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.time.Duration.Companion.seconds
 
 /** Prepares a reply; the usual Signal send jobs handle delivery, retrying and linked-device sync. */
@@ -48,6 +51,8 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     val recipient = SignalDatabase.threads.getRecipientForThreadId(request.threadId) ?: return
     if (!canReply(recipient, request.threadId)) return
 
+    val isScan = request.body == GroupScanCommand.TRIGGER
+    if (isScan && GroupScanCommand.authorizedGroup(recipient, request.fromRecipient) == null) return
     val isAdmin = GitHubAutoReply.isAdminCommand(request.body)
     val cached = if (isAdmin) null else GitHubAutoReply.getCachedReplyFor(context, request.body)
     val reply = if (isAdmin) {
@@ -66,12 +71,26 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     val latestRecipient = Recipient.resolved(recipient.id)
     if (!canReply(latestRecipient, request.threadId)) return
 
-    val outgoing = sendReply(context, reply, latestRecipient, request.threadId) ?: return
-    if (cached != null && GitHubAutoReply.needsRefresh(request.body)) {
+    val shouldRefresh = (cached != null && GitHubAutoReply.needsRefresh(request.body)) || (isScan && GroupTable.blocklistNeedsRefresh())
+    val finalReply = if (isScan) {
+      val group = GroupScanCommand.authorizedGroup(latestRecipient, Recipient.resolved(request.fromRecipient.id)) ?: return
+      GroupScanCommand.reply(reply, group)
+    } else {
+      reply
+    }
+    val replies = if (isScan) GroupScanCommand.pages(finalReply) else listOf(finalReply)
+    val replyIds = mutableListOf<Long>()
+    for (page in replies) {
+      val outgoing = sendReply(context, page, latestRecipient, request.threadId) ?: return
+      if (!shouldRefresh) continue
       val inserted = SignalDatabase.messages.getMessageFor(outgoing.sentTimeMillis, Recipient.self().id)
-      if (inserted != null && inserted.threadId == request.threadId && inserted.isOutgoing) {
-        AppDependencies.jobManager.add(GitHubAutoReplyRefreshJob(requestId, inserted.id, reply.contentHash()))
-      }
+      if (inserted == null || inserted.threadId != request.threadId || !inserted.isOutgoing) return
+      replyIds += inserted.id
+    }
+    if (shouldRefresh && replyIds.isNotEmpty()) {
+      AppDependencies.jobManager.add(
+        GitHubAutoReplyRefreshJob(requestId, replyIds.first(), replies.first().contentHash(), replyIds.drop(1), replies.drop(1).map { it.contentHash() })
+      )
     }
   }
 
@@ -90,6 +109,7 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
   companion object {
     const val KEY = "GitHubAutoReplyJob"
     private val TAG = Log.tag(GitHubAutoReplyJob::class)
+    private val lastSentTimeMillis = AtomicLong()
 
     internal fun canReply(recipient: Recipient, threadId: Long): Boolean {
       if (recipient.isBlocked || recipient.isSelf || recipient.isHidden) return false
@@ -125,10 +145,11 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
       val split = MessageUtil.getSplitMessage(context, reply.text)
       val outgoing = OutgoingMessage(
         threadRecipient = recipient,
-        sentTimeMillis = System.currentTimeMillis(),
+        sentTimeMillis = lastSentTimeMillis.updateAndGet { maxOf(System.currentTimeMillis(), it + 1) },
         body = split.body,
         attachments = split.textSlide.map { listOf(it.asAttachment()) }.orElse(emptyList()),
         bodyRanges = ranges.build(),
+        mentions = reply.mentions,
         expiresIn = recipient.expiresInSeconds.seconds.inWholeMilliseconds,
         isSecure = true,
         messageToEdit = messageToEdit

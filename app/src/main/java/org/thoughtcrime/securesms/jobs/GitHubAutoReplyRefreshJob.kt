@@ -6,9 +6,12 @@
 package org.thoughtcrime.securesms.jobs
 
 import org.signal.core.util.logging.Log
+import org.thoughtcrime.securesms.database.GroupTable
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.MmsMessageRecord
+import org.thoughtcrime.securesms.github.CommandReply
 import org.thoughtcrime.securesms.github.GitHubAutoReply
+import org.thoughtcrime.securesms.github.GroupScanCommand
 import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.jobmanager.JsonJobData
 import org.thoughtcrime.securesms.jobmanager.impl.NetworkConstraint
@@ -22,46 +25,78 @@ class GitHubAutoReplyRefreshJob private constructor(
   parameters: Parameters,
   private val requestId: Long,
   private val replyId: Long,
-  private val previousHash: String
+  private val previousHash: String,
+  private val continuationIds: List<Long>,
+  private val continuationHashes: List<String>
 ) : BaseJob(parameters) {
-  constructor(requestId: Long, replyId: Long, previousHash: String) : this(
+  constructor(requestId: Long, replyId: Long, previousHash: String, continuationIds: List<Long> = emptyList(), continuationHashes: List<String> = emptyList()) : this(
     Parameters.Builder().setQueue("$KEY:$replyId")
       .addConstraint(NetworkConstraint.KEY).setMaxAttempts(Parameters.UNLIMITED)
       .setLifespan(TimeUnit.HOURS.toMillis(1)).build(),
-    requestId, replyId, previousHash
+    requestId, replyId, previousHash, continuationIds, continuationHashes
   )
 
   override fun getFactoryKey(): String = KEY
 
   override fun serialize(): ByteArray? = JsonJobData.Builder()
-    .putLong("request_id", requestId).putLong("reply_id", replyId).putString("previous_hash", previousHash).serialize()
+    .putLong("request_id", requestId).putLong("reply_id", replyId).putString("previous_hash", previousHash)
+    .putLongArray("continuation_ids", continuationIds.toLongArray()).putStringArray("continuation_hashes", continuationHashes.toTypedArray()).serialize()
 
   override fun onRun() {
     val request = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
     if (request.isRemoteDelete || request.isOutgoing || request.fromRecipient.isSelf || request.fromRecipient.isBlocked) return
     val recipient = SignalDatabase.threads.getRecipientForThreadId(request.threadId) ?: return
     if (!GitHubAutoReplyJob.canReply(recipient, request.threadId)) return
+    val isScan = request.body == GroupScanCommand.TRIGGER
+    if (isScan && GroupScanCommand.authorizedGroup(recipient, request.fromRecipient) == null) return
     val original = editableReply(request.threadId) ?: return
     if (original.isPending) throw RetryLaterException()
 
-    val updated = if (GitHubAutoReply.needsRefresh(request.body)) {
+    val configured = if (GitHubAutoReply.needsRefresh(request.body)) {
       GitHubAutoReply.getReplyFor(context, request.body)
     } else {
       GitHubAutoReply.getCachedReplyFor(context, request.body)
     } ?: return
-    if (updated.contentHash() == previousHash) return
+    // This job has its own queue, so online blocklist checks never delay new command replies.
+    if (isScan) GroupTable.getBlocklist()
 
     val latestRequest = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
     if (latestRequest.isRemoteDelete || latestRequest.body != request.body || Recipient.resolved(request.fromRecipient.id).isBlocked) return
     val latestRecipient = Recipient.resolved(recipient.id)
     if (!GitHubAutoReplyJob.canReply(latestRecipient, request.threadId)) return
+    val updated = if (isScan) {
+      val group = GroupScanCommand.authorizedGroup(latestRecipient, Recipient.resolved(request.fromRecipient.id)) ?: return
+      GroupScanCommand.reply(configured, group)
+    } else {
+      configured
+    }
+    if (isScan) {
+      updateScanPages(updated, latestRecipient, request.threadId, request.fromRecipient)
+      return
+    }
+    if (updated.contentHash() == previousHash) return
     val latestReply = editableReply(request.threadId) ?: return
     if (latestReply.isPending || !MessageConstraintsUtil.isValidEditMessageSend(latestReply, System.currentTimeMillis())) return
     GitHubAutoReplyJob.sendReply(context, updated, latestRecipient, request.threadId, messageToEdit = replyId)
   }
 
-  private fun editableReply(threadId: Long): MmsMessageRecord? {
-    val record = SignalDatabase.messages.getMessageRecordOrNull(replyId) as? MmsMessageRecord ?: return null
+  private fun updateScanPages(updated: CommandReply, recipient: Recipient, threadId: Long, sender: Recipient) {
+    val ids = listOf(replyId) + continuationIds
+    val hashes = listOf(previousHash) + continuationHashes
+    val originals = ids.map { editableReply(threadId, it) ?: return }
+    if (originals.any { it.isPending }) throw RetryLaterException()
+    if (originals.any { !MessageConstraintsUtil.isValidEditMessageSend(it, System.currentTimeMillis()) }) return
+    val pages = GroupScanCommand.pages(updated)
+    for (index in 0 until maxOf(pages.size, ids.size)) {
+      val page = pages.getOrNull(index) ?: CommandReply("No additional group members were found on the cached ACI-Blocklist.", emptyList(), emptyList())
+      if (page.contentHash() == hashes.getOrNull(index)) continue
+      if (GroupScanCommand.authorizedGroup(Recipient.resolved(recipient.id), Recipient.resolved(sender.id)) == null) return
+      GitHubAutoReplyJob.sendReply(context, page, recipient, threadId, messageToEdit = ids.getOrNull(index) ?: 0)
+    }
+  }
+
+  private fun editableReply(threadId: Long, messageId: Long = replyId): MmsMessageRecord? {
+    val record = SignalDatabase.messages.getMessageRecordOrNull(messageId) as? MmsMessageRecord ?: return null
     return record.takeIf { it.threadId == threadId && it.isOutgoing && !it.isFailed && !it.isRemoteDelete && it.latestRevisionId == null }
   }
 
@@ -74,7 +109,11 @@ class GitHubAutoReplyRefreshJob private constructor(
   class Factory : Job.Factory<GitHubAutoReplyRefreshJob> {
     override fun create(parameters: Parameters, serializedData: ByteArray?): GitHubAutoReplyRefreshJob {
       val data = JsonJobData.deserialize(serializedData)
-      return GitHubAutoReplyRefreshJob(parameters, data.getLong("request_id"), data.getLong("reply_id"), data.getString("previous_hash"))
+      return GitHubAutoReplyRefreshJob(
+        parameters, data.getLong("request_id"), data.getLong("reply_id"), data.getString("previous_hash"),
+        if (data.hasLongArray("continuation_ids")) data.getLongArray("continuation_ids").toList() else emptyList(),
+        if (data.hasStringArray("continuation_hashes")) data.getStringArray("continuation_hashes").toList() else emptyList()
+      )
     }
   }
 

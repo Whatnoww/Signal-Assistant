@@ -51,6 +51,15 @@
     </response>
   </command>
   <command>
+    <active>1</active>
+    <triggers>
+      <trigger>!scan</trigger>
+    </triggers>
+    <response>
+      <text><b>Members found on the ACI-Blocklist:</b></text>
+    </response>
+  </command>
+  <command>
     <active>0</active>
     <triggers>
       <trigger>!disabled-example</trigger>

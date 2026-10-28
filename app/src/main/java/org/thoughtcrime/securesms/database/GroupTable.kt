@@ -129,7 +129,12 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
         .toSet()
     }
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    /** Read the last downloaded snapshot without refreshing it, even when its TTL has expired. */
+    internal fun getCachedBlocklist(): Set<String>? = cachedBlocklist
+
+    internal fun blocklistNeedsRefresh(): Boolean = cachedBlocklist == null || System.currentTimeMillis() - lastBlocklistFetch >= BLOCKLIST_TTL_MS
+
+    /** Refresh an expired snapshot on a background worker, retaining the last good data on failure. */
     internal fun getBlocklist(): Set<String> {
       val now = System.currentTimeMillis()
       cachedBlocklist?.let { if (now - lastBlocklistFetch < BLOCKLIST_TTL_MS) return it }
