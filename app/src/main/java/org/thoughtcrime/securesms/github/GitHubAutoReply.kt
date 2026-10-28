@@ -79,10 +79,13 @@ object GitHubAutoReply {
   fun invalidateCache() = cache.invalidate()
 
   /** Gateway shares validated snapshots and conflict-safe publication with ordinary commands. */
-  internal fun configurationDocument(context: Context, online: Boolean = false): CommandDocument? {
+  internal fun configurationSnapshot(context: Context, online: Boolean = false): CommandsSnapshot? {
     if (online) synchronized(refreshLock) { refresh(context, force = true) } else loadCache(context)
-    return cache.snapshot?.let { CommandDocument.parse(it.xml) }
+    return cache.snapshot
   }
+
+  internal fun configurationDocument(context: Context, online: Boolean = false): CommandDocument? =
+    configurationSnapshot(context, online)?.let { CommandDocument.parse(it.xml) }
 
   internal fun updateConfiguration(context: Context, edit: (CommandDocument) -> Boolean) = synchronized(refreshLock) {
     val updated = repository().update("Apply Gateway configuration", edit)

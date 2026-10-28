@@ -34,6 +34,7 @@ import org.thoughtcrime.securesms.database.model.Mention
 import org.thoughtcrime.securesms.database.withAttachments
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.github.CommandDocument
+import org.thoughtcrime.securesms.github.CommandsSnapshot
 import org.thoughtcrime.securesms.github.GitHubAutoReply
 import org.thoughtcrime.securesms.groups.GroupId
 import org.thoughtcrime.securesms.groups.GroupManager
@@ -80,6 +81,7 @@ class GatewayIntegrationTest {
     every { GatewayDatabase.get(any()) } returns store
     mockkObject(GitHubAutoReply)
     every { GitHubAutoReply.configurationDocument(any(), any()) } answers { CommandDocument.parse(xml) }
+    every { GitHubAutoReply.configurationSnapshot(any(), any()) } answers { CommandsSnapshot(xml, xml, null) }
     mockkObject(GroupTable.Companion)
     every { GroupTable.getCachedBlocklist() } answers { cachedBlocklist }
     every { GroupTable.getBlocklist(any()) } answers { cachedBlocklist = onlineBlocklist; onlineBlocklist }
@@ -645,7 +647,7 @@ class GatewayIntegrationTest {
     assertEquals(30000L, pollBackoff(result))
     verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), source.masterKey, any()) }
     verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), room.masterKey, any()) }
-    verify(exactly = 0) { GitHubAutoReply.configurationDocument(any(), true) }
+    verify(exactly = 0) { GitHubAutoReply.configurationSnapshot(any(), true) }
     verify(exactly = 0) { GroupTable.getBlocklist(any()) }
     assertTrue(jobs.isEmpty())
     assertNotEquals(GatewayWorkJob(1).parameters.queue, job.parameters.queue)
@@ -740,6 +742,134 @@ class GatewayIntegrationTest {
     justRun { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
     assertTrue(job.run().isSuccess)
     assertEquals(GatewayPhase.APPROVING, store.request(request.id)!!.phase)
+  }
+
+  @Test fun `unchanged room updates neither rediscover all sources nor wake waiting applicants`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup()
+    val room = recipients.createGroup(applicant)
+    val request = waitingForResponse(source, room, applicant, System.currentTimeMillis() - 20000)
+    jobs.clear()
+    GatewayRuntime.work(context, 0, room.groupId.toString(), emptyList(), 0)
+    assertTrue(jobs.isEmpty())
+    assertEquals(GatewayPhase.WAITING_FOR_RESPONSE, store.request(request.id)!!.phase)
+    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
+    verify(exactly = 0) { GitHubAutoReply.configurationSnapshot(any(), true) }
+  }
+
+  @Test fun `waiting work uses committed pending state without forcing network refreshes`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup()
+    val room = recipients.createGroup(applicant)
+    val request = waitingForResponse(source, room, applicant, System.currentTimeMillis() - 20000)
+    val state = SignalDatabase.groups.requireGroup(source.groupId).requireV2GroupProperties().decryptedGroup
+    SignalDatabase.groups.update(source.groupId, state.copy(requestingMembers = listOf(
+      DecryptedRequestingMember(aciBytes = Recipient.resolved(applicant).requireAci().toByteString(), timestamp = 1)
+    )), null)
+    GatewayRuntime.work(context, request.id, "", emptyList(), 0)
+    assertEquals(GatewayPhase.WAITING_FOR_RESPONSE, store.request(request.id)!!.phase)
+    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
+    verify(exactly = 0) { GitHubAutoReply.configurationSnapshot(any(), true) }
+  }
+
+  @Test fun `external source approval still wakes and resolves the affected review`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup(applicant)
+    val room = recipients.createGroup(applicant)
+    val request = waitingForResponse(source, room, applicant, System.currentTimeMillis() - 20000)
+    jobs.clear()
+    GatewayRuntime.work(context, 0, source.groupId.toString(), emptyList(), 0)
+    val work = jobs.filterIsInstance<GatewayWorkJob>().first { JsonJobData.deserialize(it.serialize()).getLong("request") == request.id }
+    work.setContext(context)
+    assertTrue(work.run().isSuccess)
+    assertEquals("externally_approved", store.request(request.id)!!.data.getString("reason"))
+  }
+
+  @Test fun `a queued reply cannot notify administrators after a committed room departure`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val room = recipients.createGroup(applicant)
+    val request = waitingForResponse(room, room, applicant, System.currentTimeMillis() - 20000)
+    val aci = Recipient.resolved(applicant).requireAci()
+    store.saveSession(room.groupId.toString(), aci.toString(), store.session(room.groupId.toString(), aci.toString()).put("present", true))
+    val reply = incoming(applicant, room.groupId, "My answer", System.currentTimeMillis())
+    val state = SignalDatabase.groups.requireGroup(room.groupId).requireV2GroupProperties().decryptedGroup
+    SignalDatabase.groups.update(room.groupId, state.copy(members = state.members.filterNot { it.aciBytes == aci.toByteString() }), null)
+    observe(reply)
+    assertEquals("unplanned_gateway_departure", store.request(request.id)!!.data.getString("reason"))
+    assertTrue(sent.isEmpty())
+  }
+
+  @Test fun `published configuration parsing is reused only for the same accepted revision`() {
+    val first = CommandsSnapshot(xml, "performance-test-first", null)
+    every { GitHubAutoReply.configurationSnapshot(any(), any()) } returns first
+    val cached = GatewayRuntime.configuration(context)
+    assertSame(cached, GatewayRuntime.configuration(context))
+    val next = CommandsSnapshot(xml.replace("<paused>0</paused>", "<paused>1</paused>"), "performance-test-next", null)
+    every { GitHubAutoReply.configurationSnapshot(any(), any()) } returns next
+    assertTrue(GatewayRuntime.configuration(context)!!.paused)
+    assertNotSame(cached, GatewayRuntime.configuration(context))
+  }
+
+  @Test fun `group conversion caching follows native content and never bypasses a requested refresh`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    val platform = SignalGatewayPlatform(context, store)
+    val id = group.groupId.toString()
+    val initial = platform.group(id, false)
+    assertSame(initial, platform.group(id, false))
+    demote(group, admin)
+    val changed = platform.group(id, false)
+    assertFalse(Recipient.resolved(admin).requireAci().toString() in changed.admins)
+    assertNotSame(initial, changed)
+    every { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) } answers { demote(group, recipients.self) }
+    assertFalse(platform.group(id, true).botAdmin)
+    verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), group.masterKey, any()) }
+  }
+
+  @Test fun `source mutations refresh the target once when it is the source itself`() {
+    val admin = recipients.createRecipient("Admin")
+    val applicant = recipients.createRecipient("Applicant")
+    val group = recipients.createGroup(admin)
+    configureSource(group)
+    val id = group.groupId.toString()
+    update(id, "groupid", id); update(id, "enabled", "1"); update(id, "admin", "1")
+    val state = SignalDatabase.groups.requireGroup(group.groupId).requireV2GroupProperties().decryptedGroup
+    SignalDatabase.groups.update(group.groupId, state.copy(requestingMembers = listOf(
+      DecryptedRequestingMember(aciBytes = Recipient.resolved(applicant).requireAci().toByteString(), timestamp = 1)
+    )), null)
+    val config = GatewayConfiguration.parse(CommandDocument.parse(xml))
+    val request = store.intake(config.groups.getValue(id), Recipient.resolved(applicant).requireAci().toString(), 1, config.defaults, 100)
+    store.save(request, request.transition(GatewayPhase.APPROVING))
+    mockkStatic(GatewayGroupActions::class)
+    every { GatewayGroupActions.apply(any(), any(), any(), any(), any()) } answers { arg<Runnable>(4).run(); null }
+
+    SignalGatewayPlatform(context, store).mutate(store.request(request.id)!!, GatewayMutation.APPROVE, Recipient.resolved(admin).requireAci().toString())
+
+    verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), group.masterKey, any()) }
+    verify(exactly = 1) { GitHubAutoReply.configurationSnapshot(any(), true) }
+  }
+
+  @Test fun `urgent work keeps room serialization and its priority across delayed retries`() {
+    jobs.clear()
+    val admission = GatewayWorkJob(1, 0, "room")
+    val reply = GatewayWorkJob(2, true, "room")
+    val departure = GatewayWorkJob("room", listOf("applicant"))
+    assertEquals(admission.parameters.queue, reply.parameters.queue)
+    assertEquals(reply.parameters.queue, departure.parameters.queue)
+    assertTrue(queuePriority(reply) > queuePriority(admission))
+    assertEquals(queuePriority(reply), queuePriority(departure))
+    val delayed = GatewayWorkJob(1, 1000, "room", urgent = true)
+    val restored = GatewayWorkJob.Factory().create(delayed.parameters, delayed.serialize()).also { it.setContext(context) }
+    assertTrue(restored.run().isSuccess)
+    assertEquals(queuePriority(reply), queuePriority(jobs.filterIsInstance<GatewayWorkJob>().single()))
+  }
+
+  @Test fun `persisted work without a priority flag remains readable after upgrade`() {
+    val job = GatewayWorkJob(1)
+    val legacy = JsonJobData.Builder().putLong("request", 1).putString("group", "").putStringArray("removed", emptyArray())
+      .putLong("message", 0).putBoolean("timer", false).putString("room", "").putBoolean("intake", false).serialize()
+    val restored = GatewayWorkJob.Factory().create(job.parameters, legacy)
+    assertFalse(JsonJobData.deserialize(restored.serialize()).getBoolean("urgent"))
   }
 
   @Test fun `text replies quoting the prompt or another message satisfy screening and notify against the answer`() {
@@ -876,6 +1006,7 @@ class GatewayIntegrationTest {
   private fun observe(messageId: Long) = GatewayRuntime.work(context, 0, "", emptyList(), messageId)
 
   private fun pollBackoff(result: Job.Result): Long = Job.Result::class.java.getDeclaredMethod("getBackoffInterval").apply { isAccessible = true }.invoke(result) as Long
+  private fun queuePriority(job: Job): Int = Job.Parameters::class.java.getDeclaredMethod("getQueuePriority").apply { isAccessible = true }.invoke(job.parameters) as Int
 
   private fun image(quoted: Boolean = false): Attachment = PointerAttachment(
     contentType = "image/jpeg", transferState = AttachmentTable.TRANSFER_PROGRESS_PENDING, size = 0, fileName = "photo.jpg",

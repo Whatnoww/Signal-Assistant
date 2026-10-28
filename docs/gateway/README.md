@@ -157,6 +157,21 @@ At most two expensive Gateway workers run together; busy work yields without
 blocking a worker thread. Network retries use separate wakeups so they cannot
 hold the room queue ahead of a manual departure or another request.
 
+Replies, departures and existing-review continuations take priority over new
+admissions within the same serialized room queue. Confirmed admissions send the
+spam prompt in the same worker pass. Room updates do not rediscover every source;
+source discovery schedules intake only for new or unfinished admissions, and
+unchanged waiting reviews are not woken by unrelated membership updates.
+
+Receipt confirmation, ordinary waiting and display work use committed native group
+state and the accepted XML snapshot without online refreshes. Gateway configuration
+is parsed once per published XML revision. Native group conversion is reused only
+within a worker and only while the entire local group snapshot is unchanged.
+Membership mutations and elapsed screening deadlines still revalidate current
+state online; permission/conflict guards and approval blocklist checks remain in
+place. The configured 30-second discovery fallback remains unchanged. Request-ID
+lookups query a single row rather than loading all active tracking.
+
 The separate SQLCipher file is `signal-assistant-gateway.db`, schema version 1.
 There are no Gateway tables or migrations in Signal's primary database. Tracking
 holds active work, session ownership, pending transport metadata, cooldowns and
@@ -221,7 +236,7 @@ No repository credentials, deployment XML or FCM values are included in these
 examples or changed by Gateway configuration commands.
 
 Verified on 2026-10-28: `:Signal-Android:assemblePlayProdRelease` succeeded and the
-focused unit suite passed 335 tests, with no failures, errors
+focused unit suite passed 347 tests, with no failures, errors
 or skips. `git diff --check` passed. This is build/unit validation; it does not
 replace the live-device checks above.
 

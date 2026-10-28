@@ -40,10 +40,12 @@ internal interface GatewayPlatform {
 
 internal class GatewayEngine(private val store: GatewayStore, private val platform: GatewayPlatform) {
   fun intake(sourceId: String) {
-    val config = platform.configuration(true) ?: return
+    // Native events and the fallback poll already commit the discovered group state.
+    // Intake only records work; membership mutations perform their own fresh checks.
+    val config = platform.configuration(false) ?: return
     val source = config.groups[sourceId] ?: return
     if (config.isPaused(source)) return
-    val state = platform.group(sourceId, true)
+    val state = platform.group(sourceId, false)
     if (!state.active) return
     state.requests.forEach { (aci, generation) ->
       if (store.session(source.destination, aci).optBoolean("cleaning")) return@forEach
@@ -51,21 +53,24 @@ internal class GatewayEngine(private val store: GatewayStore, private val platfo
       val previous = store.requests().firstOrNull { it.source == sourceId && it.aci == aci && !it.active }
       if (previous != null && (generation == 0L || previous.generation == generation)) return@forEach
       val request = store.intakeUnlessCleaning(source, aci, generation, config.defaults, platform.now()) ?: return@forEach
-      platform.schedule(request.id, platform.now())
+      if (request.phase == GatewayPhase.INTAKE) platform.schedule(request.id, platform.now())
     }
   }
 
   fun step(id: Long) {
     var request = store.request(id) ?: return
-    val config = platform.configuration(true) ?: return
+    val due = deadlineDue(request, platform.now())
+    val config = platform.configuration(request.phase == GatewayPhase.INTAKE || due) ?: return
     val source = config.groups[request.source] ?: run { store.setPaused(request, true, platform.now()); return }
     val now = platform.now()
     val paused = config.isPaused(source) || source.destination != request.room
     store.setPaused(request, paused, now)
     request = store.request(id) ?: return
     if (paused) return
-    val state = platform.group(request.source, true)
-    val room = if (request.room == request.source) state else platform.group(request.room, true)
+    val decision = request.phase in setOf(GatewayPhase.APPROVING, GatewayPhase.DENYING)
+    val refresh = request.phase == GatewayPhase.INTAKE || due
+    val state = platform.group(request.source, refresh || decision && request.source == request.room)
+    val room = if (request.room == request.source) state else platform.group(request.room, refresh || decision)
     if (!state.active || !room.active) return
 
     val session = store.session(request.room, request.aci)
@@ -127,8 +132,12 @@ internal class GatewayEngine(private val store: GatewayStore, private val platfo
         }
         // An administrator may claim a decision while native admission is running.
         // Its newer state must survive completion of this earlier operation.
-        store.save(admitting, admitting.transition(GatewayPhase.WAITING_FOR_MEMBERSHIP))
-        platform.schedule(id, now)
+        if (store.save(admitting, admitting.transition(GatewayPhase.WAITING_FOR_MEMBERSHIP))) {
+          // Confirmed membership can prompt immediately, without going to the end
+          // of a room's backlog of other applicants and duplicate update jobs.
+          if (request.aci in platform.group(request.room, false).members) step(id)
+          else platform.schedule(id, now)
+        }
       }
       GatewayPhase.ADMITTING -> {
         if (request.aci !in room.members && request.aci !in room.invites) {
@@ -193,6 +202,14 @@ internal class GatewayEngine(private val store: GatewayStore, private val platfo
       )
       GatewayPhase.FINISHED -> Unit
     }
+  }
+
+  private fun deadlineDue(request: GatewayRequest, now: Long): Boolean = when (request.phase) {
+    GatewayPhase.WAITING_FOR_RESPONSE -> now >= request.data.getLong("promptAt") +
+      request.data.getLong(if (request.data.optBoolean("reminded")) "removalMillis" else "reminderMillis")
+    GatewayPhase.WAITING_FOR_MEMBERSHIP -> request.data.has("admissionAt") &&
+      now >= request.data.getLong("admissionAt") + request.data.getLong("admissionMillis")
+    else -> false
   }
 
   fun answer(room: String, aci: String, messageId: Long, messageTime: Long) {

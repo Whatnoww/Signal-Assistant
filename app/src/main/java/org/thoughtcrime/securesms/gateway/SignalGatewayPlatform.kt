@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import org.signal.core.models.ServiceId.ACI
 import org.signal.storageservice.storage.protos.groups.Member
+import org.signal.storageservice.storage.protos.groups.local.DecryptedGroup
 import org.thoughtcrime.securesms.database.GroupTable
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.Mention
@@ -22,8 +23,10 @@ import org.thoughtcrime.securesms.mms.QuoteModel
 import org.thoughtcrime.securesms.recipients.Recipient
 
 internal class SignalGatewayPlatform(private val context: Context, private val store: GatewayStore) : GatewayPlatform {
+  private data class Snapshot(val group: DecryptedGroup, val active: Boolean, val me: String, val state: GatewayGroupState)
+  private val snapshots = mutableMapOf<String, Snapshot>()
   override fun now(): Long = System.currentTimeMillis()
-  override fun configuration(online: Boolean): GatewayConfiguration? = GitHubAutoReply.configurationDocument(context, online)?.let(GatewayConfiguration::parse)?.also {
+  override fun configuration(online: Boolean): GatewayConfiguration? = GatewayRuntime.configuration(context, online)?.also {
     if (online && it.groups.values.any { source -> !it.isPaused(source) }) it.requireWorkflowTemplates()
   }
 
@@ -35,19 +38,23 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
       record = SignalDatabase.groups.requireGroup(groupId)
     }
     val group = record.requireV2GroupProperties().decryptedGroup
+    val me = Recipient.self().requireAci().toString()
+    val name = record.title ?: id
+    // Reuse only conversion of an unchanged local snapshot, never a permission TTL.
+    // A fresh read above always contacts Signal; conflict rebases change the snapshot.
+    snapshots[id]?.takeIf { it.group == group && it.active == record.isActive && it.me == me && it.state.name == name }?.let { return it.state }
     val members = group.members.mapNotNull { ACI.parseOrNull(it.aciBytes)?.toString() }.toSet()
     val admins = group.members.filter { it.role == Member.Role.ADMINISTRATOR }.mapNotNull { ACI.parseOrNull(it.aciBytes)?.toString() }.toSet()
-    val me = Recipient.self().requireAci().toString()
     val botAdmin = me in admins
     return GatewayGroupState(
-      id, record.title ?: id, members, admins,
+      id, name, members, admins,
       group.requestingMembers.mapNotNull { member -> ACI.parseOrNull(member.aciBytes)?.toString()?.let { it to member.timestamp } }.toMap(),
       group.pendingMembers.mapNotNull { ACI.parseOrNull(it.serviceIdBytes)?.toString() }.toSet(),
       group.bannedMembers.mapNotNull { ACI.parseOrNull(it.serviceIdBytes)?.toString() }.toSet(),
       record.isActive && me in members,
       record.isActive && me in members && (!record.isAnnouncementGroup || botAdmin), botAdmin,
       botAdmin || (me in members && record.membershipAdditionAccessControl == GroupAccessControl.ALL_MEMBERS), !record.isAnnouncementGroup
-    )
+    ).also { snapshots[id] = Snapshot(group, record.isActive, me, it) }
   }
 
   override fun blocklist(): Set<String>? {
@@ -63,7 +70,7 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
     if (config.isPaused(source) || source.destination != request.room) throw GatewayPausedException()
     group(request.source, true)
     val targetId = if (operation in setOf(GatewayMutation.ADD, GatewayMutation.CLEANUP)) request.room else request.source
-    group(targetId, true)
+    if (targetId != request.source) group(targetId, true)
     val applicant = Recipient.externalPush(ACI.parseOrThrow(request.aci))
     val result = GatewayGroupActions.apply(context, GroupId.parseOrThrow(targetId).requireV2(), applicant, operation.name) {
       // Runs under the native group lock and again after each conflict rebase.
@@ -144,12 +151,12 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
   override fun notify(requests: List<GatewayRequest>, messageId: Long): Long {
     val first = requests.first()
     val config = configuration(false) ?: error("Configuration is unavailable.")
-    val room = group(first.room, true)
+    val room = group(first.room, false)
     require(room.canPost)
     val all = store.requests().filter { it.room == first.room && it.aci == first.aci && it.active && config.groups[it.source]?.let { source -> !config.isPaused(source) } == true }
     val ping = requests.flatMap { request ->
       val source = config.groups[request.source]
-      if (source?.mentionAdmins == true && !config.isPaused(source)) group(request.source, true).admins else emptySet()
+      if (source?.mentionAdmins == true && !config.isPaused(source)) group(request.source, false).admins else emptySet()
     }.toSet().intersect(room.members) - Recipient.self().requireAci().toString()
     val adminsText = GatewayText(ping.joinToString(" ") { "\uFFFC" }, ping.mapIndexed { index, aci -> Mention(Recipient.externalPush(ACI.parseOrThrow(aci)).id, index * 2, 1) })
     val known = config.groups.values.filter { it.publiclyListed }.filter { policy ->
@@ -212,7 +219,10 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
     return GatewaySendState(if (!message.isPending && !message.isFailed) confirmed ?: store.confirmedAt(messageId) ?: message.dateSent else null, message.isFailed || message.isRemoteDelete)
   }
 
-  override fun schedule(id: Long, at: Long) { AppDependencies.jobManager.add(GatewayWorkJob.at(id, store.request(id)?.room.orEmpty(), at)) }
+  override fun schedule(id: Long, at: Long) {
+    val request = store.request(id) ?: return
+    AppDependencies.jobManager.add(GatewayWorkJob.at(id, request.room, at, request.phase != GatewayPhase.INTAKE))
+  }
   override fun cleaned(room: String) { GatewayRuntime.groupChanged(room, emptyList()) }
   override fun promptTimestamp(request: GatewayRequest): Long? = store.outgoing("review:${request.id}:prompt:0")?.second
   override fun replayAnswer(messageId: Long) {

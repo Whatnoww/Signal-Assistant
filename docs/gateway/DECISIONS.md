@@ -151,6 +151,11 @@ configuration and verification notes are in [README.md](README.md).
 
 - Use persistent background jobs and bounded concurrency. No UI/receive-thread
   networking, long-lived sleeping threads, or blocking database transactions.
+- Reuse accepted configuration and committed native snapshots for receipts,
+  display and ordinary waiting. Keep fresh checks at membership actions and
+  screening deadlines. Prioritize replies/departures and ongoing-review work over
+  new admissions without breaking room serialization; do not rediscover all
+  source requests when only the Gateway room changed.
 - Only one terminal decision may win per source-request generation. Unknown remote
   outcomes must be reconciled before retrying, not converted into opposite actions.
 - Use the designated primary bot instance for Gateway mutations.

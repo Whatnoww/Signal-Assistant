@@ -26,6 +26,7 @@ object GatewayRuntime {
   private val pendingAssistantSends = java.util.concurrent.ConcurrentHashMap.newKeySet<Long>()
   @Volatile private var observedConfiguration: GatewayConfiguration? = null
   @Volatile private var watchedGroups: Set<String>? = null
+  @Volatile private var parsedConfiguration: Pair<String, GatewayConfiguration>? = null
 
   /** Receive paths only consult this immutable routing snapshot, never XML or SQL. */
   fun observes(groupId: String): Boolean = watchedGroups?.contains(groupId) ?: true
@@ -48,8 +49,13 @@ object GatewayRuntime {
     document.document.documentElement.direct("gateway")?.direct("paused")?.textContent?.trim() == "1"
   } ?: false
 
-  internal fun configuration(context: Context, online: Boolean = false): GatewayConfiguration? =
-    GitHubAutoReply.configurationDocument(context, online)?.let(GatewayConfiguration::parse)
+  internal fun configuration(context: Context, online: Boolean = false): GatewayConfiguration? {
+    val snapshot = GitHubAutoReply.configurationSnapshot(context, online) ?: return null
+    parsedConfiguration?.takeIf { it.first == snapshot.sha }?.let { return it.second }
+    return GatewayConfiguration.parse(org.thoughtcrime.securesms.github.CommandDocument.parse(snapshot.xml)).also {
+      parsedConfiguration = snapshot.sha to it
+    }
+  }
 
   @JvmStatic fun preservesContact(context: Context, recipientId: Long, timestamp: Long): Boolean {
     if (!context.getDatabasePath(GatewayDatabase.NAME).exists()) return false
@@ -127,7 +133,7 @@ object GatewayRuntime {
         id
       }
       pendingAssistantSends -= timestamp
-      requestId?.let { AppDependencies.jobManager.add(GatewayWorkJob(it, 0, store.request(it)?.room.orEmpty())) }
+      requestId?.let { id -> store.request(id)?.let { AppDependencies.jobManager.add(GatewayWorkJob(id, 0, it.room, urgent = true)) } }
     } catch (e: Exception) {
       // The native message is already sent. Tracking failure cannot retry it or
       // convert it to a failed Signal message; startup reconciles the receipt.
@@ -150,7 +156,7 @@ object GatewayRuntime {
     val invocation = store.outgoingInvocation(message.dateSent)
     store.forgetPrivateSend(message.toRecipient.id.toLong(), message.dateSent)
     if (outgoing.first == 0L) { store.forgetTimestamp(message.dateSent); store.releaseIfIdle(invocation) }
-    else AppDependencies.jobManager.add(GatewayWorkJob(outgoing.first, 0, store.request(outgoing.first)?.room.orEmpty()))
+    else store.request(outgoing.first)?.let { AppDependencies.jobManager.add(GatewayWorkJob(it.id, 0, it.room, urgent = true)) }
     pendingAssistantSends -= message.dateSent
   }
 
@@ -225,6 +231,11 @@ object GatewayRuntime {
       val aci = message.fromRecipient.aci.orElse(null)?.toString() ?: return
       val active = store.requests().filter { it.room == room && it.aci == aci && it.active && config.groups[it.source]?.let { source -> !config.isPaused(source) } == true }
       if (config.paused || config.groups[room]?.throttle == true || active.isEmpty()) return
+      if (store.session(room, aci).optBoolean("present") && aci !in platform.group(room, false).members) {
+        store.finishDeparture(room, aci)
+        active.forEach { platform.schedule(it.id, platform.now()) }
+        return
+      }
       val mms = message as? org.thoughtcrime.securesms.database.model.MmsMessageRecord
       // Link-preview thumbnails are stored separately from the message's slide deck.
       val media = mms?.linkPreviews?.isNotEmpty() == true || mms?.slideDeck?.slides?.any { !org.thoughtcrime.securesms.util.MediaUtil.isLongTextType(it.contentType) } == true
@@ -243,8 +254,18 @@ object GatewayRuntime {
       return
     }
     if (groupId.isNotBlank()) {
-      if (!config.paused) config.groups.values.filter { it.id == groupId || it.destination == groupId }.forEach { AppDependencies.jobManager.add(GatewayWorkJob.intake(it.id)) }
-      store.requests().filter { it.source == groupId || it.room == groupId }.forEach { platform.schedule(it.id, platform.now()) }
+      // A room-membership update is not a change to every source's join-request list.
+      if (!config.paused) config.groups[groupId]?.takeIf { !config.isPaused(it) }?.let { AppDependencies.jobManager.add(GatewayWorkJob.intake(it.id)) }
+      val affected = store.requests().filter { it.source == groupId || it.room == groupId }
+      if (affected.isEmpty()) return
+      val changed = platform.group(groupId, false)
+      affected.forEach { request ->
+        val waiting = request.phase == GatewayPhase.WAITING_FOR_RESPONSE || request.phase == GatewayPhase.WAITING_FOR_DECISION && request.data.optBoolean("notified")
+        val sourceResolved = request.source == groupId && changed.requests[request.aci] != request.generation &&
+          !(request.source == request.room && request.data.optBoolean("provisional") && request.aci in changed.members)
+        val departed = request.room == groupId && store.session(request.room, request.aci).optBoolean("present") && request.aci !in changed.members
+        if (!waiting || sourceResolved || departed) platform.schedule(request.id, platform.now())
+      }
     } else {
       // Startup recovery: no periodic permission/blocklist polling.
       if (!config.paused) config.groups.values.filter { it.enabled }.forEach { AppDependencies.jobManager.add(GatewayWorkJob.intake(it.id)) }

@@ -3,6 +3,7 @@ package org.thoughtcrime.securesms.gateway
 
 import android.app.Application
 import android.content.ContentValues
+import android.database.Cursor
 import androidx.sqlite.db.SupportSQLiteDatabase
 import net.zetetic.database.sqlcipher.SQLiteDatabase
 import net.zetetic.database.sqlcipher.SQLiteOpenHelper
@@ -65,14 +66,18 @@ internal class GatewayStore(private val db: SupportSQLiteDatabase) {
 
   fun requests(): List<GatewayRequest> = db.query("SELECT * FROM request ORDER BY id").use { cursor ->
     buildList {
-      while (cursor.moveToNext()) add(GatewayRequest(
-        cursor.getLong(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getLong(4),
-        GatewayPhase.valueOf(cursor.getString(5)), cursor.getLong(6), JSONObject(cursor.getString(7))
-      ))
+      while (cursor.moveToNext()) add(readRequest(cursor))
     }
   }
 
-  fun request(id: Long): GatewayRequest? = requests().firstOrNull { it.id == id }
+  private fun readRequest(cursor: Cursor) = GatewayRequest(
+    cursor.getLong(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getLong(4),
+    GatewayPhase.valueOf(cursor.getString(5)), cursor.getLong(6), JSONObject(cursor.getString(7))
+  )
+
+  fun request(id: Long): GatewayRequest? = db.query("SELECT * FROM request WHERE id=?", arrayOf(id)).use {
+    if (it.moveToFirst()) readRequest(it) else null
+  }
 
   fun intake(source: GatewayGroup, aci: String, generation: Long, defaults: GatewayDefaults, now: Long): GatewayRequest = transaction {
     requests().firstOrNull { it.source == source.id && it.aci == aci && it.generation == generation } ?: run {

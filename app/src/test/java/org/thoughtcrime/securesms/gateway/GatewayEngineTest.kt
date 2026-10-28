@@ -154,7 +154,13 @@ class GatewayEngineTest {
       platform.groups[room] = platform.groups.getValue("room").copy(id = room)
       platform.addSource(policy)
       val id = start(policy.id)
-      repeat(steps) { engine.step(id) }
+      when (phase) {
+        GatewayPhase.INTAKE -> Unit
+        GatewayPhase.WAITING_FOR_MEMBERSHIP -> { platform.invitationOnly = true; engine.step(id); platform.invitationOnly = false }
+        GatewayPhase.PROMPTING -> engine.step(id)
+        GatewayPhase.WAITING_FOR_RESPONSE -> prompted(id)
+        else -> error("Unexpected fixture phase")
+      }
       assertEquals(phase, store.request(id)!!.phase)
 
       engine.decide(room, "applicant", store.request(id)!!.number, "admin", true)
@@ -189,7 +195,7 @@ class GatewayEngineTest {
   }
 
   @Test fun `early approval losing human permission resumes screening without inventing a reply`() {
-    val id = start(); engine.step(id); engine.step(id)
+    val id = start(); engine.step(id)
     assertEquals(GatewayPhase.PROMPTING, store.request(id)!!.phase)
     engine.decide("room", "applicant", store.request(id)!!.number, "admin", true)
     val group = platform.groups.getValue("source")
@@ -454,8 +460,8 @@ class GatewayEngineTest {
 
   @Test fun `a fast response survives a pending native receipt and restart`() {
     val id = start()
-    engine.step(id); engine.step(id)
     platform.pendingReceipt = true
+    engine.step(id)
     engine.answer("room", "applicant", 78, platform.clock + 1)
     assertEquals(78L, store.request(id)!!.data.getLong("deferredReplyId"))
     platform.pendingReceipt = false
@@ -469,8 +475,8 @@ class GatewayEngineTest {
 
   @Test fun `a reply before a queued prompt actually sends cannot satisfy that future prompt`() {
     val id = start()
-    engine.step(id); engine.step(id)
     platform.pendingReceipt = true
+    engine.step(id)
     val earlierReply = platform.clock + 1
     engine.answer("room", "applicant", 78, earlierReply)
     platform.clock += 100
@@ -509,6 +515,36 @@ class GatewayEngineTest {
     assertEquals("approved", store.request(id)!!.data.getString("reason"))
   }
 
+  @Test fun `confirmed admission sends its prompt before yielding to another applicant`() {
+    val id = start()
+    platform.scheduled.clear()
+    engine.step(id)
+    assertEquals(GatewayPhase.PROMPTING, store.request(id)!!.phase)
+    assertEquals(1, platform.sends.count { it.second == "spam" })
+    assertFalse(platform.scheduled.any { it.first == id && it.second <= platform.clock })
+  }
+
+  @Test fun `receipt confirmation and unchanged waiting work perform no online lookups`() {
+    val id = start(); engine.step(id)
+    platform.configReads.clear(); platform.groupReads.clear()
+    engine.step(id)
+    repeat(10) { engine.step(id) }
+    assertEquals(GatewayPhase.WAITING_FOR_RESPONSE, store.request(id)!!.phase)
+    assertTrue(platform.configReads.none { it })
+    assertTrue(platform.groupReads.none { it.second })
+    assertEquals(1, platform.sends.count { it.second == "spam" })
+  }
+
+  @Test fun `repeated discovery does not reschedule applicants already being reviewed`() {
+    val id = start(); prompted(id)
+    platform.scheduled.clear(); platform.configReads.clear(); platform.groupReads.clear()
+    repeat(10) { engine.intake("source") }
+    assertTrue(platform.scheduled.isEmpty())
+    assertTrue(platform.configReads.none { it })
+    assertTrue(platform.groupReads.none { it.second })
+    assertEquals(GatewayPhase.WAITING_FOR_RESPONSE, store.request(id)!!.phase)
+  }
+
   private class FakePlatform(source: GatewayGroup) : GatewayPlatform {
     var clock = 100000L
     var config = GatewayConfiguration(true, false, GatewayDefaults(), mapOf(source.id to source, "room" to GatewayGroup("room", "Room", false)), emptyMap(), emptyMap())
@@ -525,14 +561,17 @@ class GatewayEngineTest {
     val fields = mutableListOf<Pair<String, Map<String, String>>>()
     val notifications = mutableListOf<List<Long>>()
     val outgoing = mutableMapOf<String, Long>()
+    val scheduled = mutableListOf<Pair<Long, Long>>()
+    val configReads = mutableListOf<Boolean>()
+    val groupReads = mutableListOf<Pair<String, Boolean>>()
     init { addSource(source); groups["room"] = state("room", emptyMap()) }
     fun addSource(source: GatewayGroup) { config = config.copy(groups = config.groups + (source.id to source)); groups[source.id] = state(source.id, mapOf("applicant" to 1L)) }
     private fun state(id: String, requests: Map<String, Long>) = GatewayGroupState(id, id, setOf("bot"), setOf("admin", "bot"), requests, emptySet(), emptySet(), true, true, true, true)
     override fun now() = clock
-    override fun configuration(online: Boolean) = config
-    override fun group(id: String, fresh: Boolean): GatewayGroupState { onGroup(id); return groups.getValue(id) }
+    override fun configuration(online: Boolean): GatewayConfiguration { configReads += online; return config }
+    override fun group(id: String, fresh: Boolean): GatewayGroupState { groupReads += id to fresh; onGroup(id); return groups.getValue(id) }
     override fun blocklist(): Set<String>? { onBlocklist(); return blocked }
-    override fun schedule(id: Long, at: Long) = Unit
+    override fun schedule(id: Long, at: Long) { scheduled += id to at }
     override fun sendState(messageId: Long) = if (pendingReceipt) GatewaySendState() else GatewaySendState(clock)
     override fun promptTimestamp(request: GatewayRequest): Long? = if (outgoing.containsKey("${request.id}:prompt")) clock else null
     override fun replayAnswer(messageId: Long) { replayed += messageId }
