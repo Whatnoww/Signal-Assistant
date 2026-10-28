@@ -89,11 +89,15 @@ class GitHubAutoReplyRefreshJob private constructor(
     if (originals.any { it.isPending }) throw RetryLaterException()
     if (originals.any { !MessageConstraintsUtil.isValidEditMessageSend(it, System.currentTimeMillis()) }) return
     val pages = GroupScanCommand.pages(updated)
+    val initialAudience = org.thoughtcrime.securesms.gateway.GatewayAudience.forMessage(context, replyId)
+      ?: org.thoughtcrime.securesms.gateway.GatewayAudience.scan(GroupScanCommand.authorizedGroup(Recipient.resolved(recipient.id), Recipient.resolved(sender.id)) ?: return)
     for (index in 0 until maxOf(pages.size, ids.size)) {
       val page = pages.getOrNull(index) ?: CommandReply("No additional group members were found on the cached ACI-Blocklist.", emptyList(), emptyList())
       if (page.contentHash() == hashes.getOrNull(index)) continue
       if (GroupScanCommand.authorizedGroup(Recipient.resolved(recipient.id), Recipient.resolved(sender.id)) == null) return
-      GitHubAutoReplyJob.sendReply(context, page, recipient, threadId, messageToEdit = ids.getOrNull(index) ?: 0)
+      val audience = ids.getOrNull(index)?.let { org.thoughtcrime.securesms.gateway.GatewayAudience.forMessage(context, it) }
+        ?: initialAudience
+      GitHubAutoReplyJob.sendReply(context, page, recipient, threadId, messageToEdit = ids.getOrNull(index) ?: 0, audience = audience)
     }
   }
 

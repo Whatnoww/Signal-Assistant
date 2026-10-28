@@ -355,6 +355,7 @@ class GatewayEngineTest {
     val first = start(); prompted(first)
     val second = start("second"); prompted(second)
     platform.groups["room"] = platform.groups.getValue("room").copy(members = setOf("bot"))
+    engine.departed("room", "applicant", manual = true)
     engine.step(first)
     assertFalse(store.request(first)!!.active); assertFalse(store.request(second)!!.active)
     engine.intake("source")
@@ -372,6 +373,62 @@ class GatewayEngineTest {
     assertTrue(store.request(second)!!.active)
     assertFalse(platform.mutations.any { it.second == GatewayMutation.CLEANUP })
     assertTrue("applicant" in platform.groups.getValue("room").members)
+  }
+
+  @Test fun `voluntary or unknown departure denies each shared source review and cannot resume screening`() {
+    platform.addSource(source.copy(id = "second"))
+    val first = start(); prompted(first)
+    val second = start("second"); prompted(second)
+    platform.groups["room"] = platform.groups.getValue("room").copy(members = setOf("bot"))
+    engine.step(first)
+    GatewayEngine(store, platform).step(second)
+    assertEquals("spam_test_failed_departure", store.request(first)!!.data.getString("reason"))
+    assertEquals("spam_test_failed_departure", store.request(second)!!.data.getString("reason"))
+    assertEquals(2, platform.mutations.count { it.second == GatewayMutation.DENY })
+    val prompts = platform.sends.count { it.second == "spam" }
+    platform.clock += source.removalMillis(GatewayDefaults())
+    engine.answer("room", "applicant", 123, platform.clock)
+    engine.step(first)
+    assertEquals(prompts, platform.sends.count { it.second == "spam" })
+    assertTrue(platform.notifications.isEmpty())
+  }
+
+  @Test fun `departure honours admin disabled and permission loss without source mutation`() {
+    val id = start(); prompted(id)
+    platform.config = platform.config.copy(groups = platform.config.groups + (source.id to source.copy(admin = false)))
+    platform.groups["room"] = platform.groups.getValue("room").copy(members = setOf("bot"))
+    engine.step(id)
+    assertTrue(store.request(id)!!.data.getString("reason").contains("manual action required"))
+    assertFalse(platform.mutations.any { it.second == GatewayMutation.DENY })
+    assertTrue("applicant" in platform.groups.getValue("source").requests)
+  }
+
+  @Test fun `departure denial persists across restart and retries after bot permissions return`() {
+    val id = start(); prompted(id)
+    platform.groups["room"] = platform.groups.getValue("room").copy(members = setOf("bot"))
+    platform.groups["source"] = platform.groups.getValue("source").copy(botAdmin = false)
+    engine.step(id)
+    assertEquals(GatewayPhase.DENYING, store.request(id)!!.phase)
+    assertTrue(store.request(id)!!.data.getBoolean("departed"))
+    platform.groups["source"] = platform.groups.getValue("source").copy(botAdmin = true)
+    GatewayEngine(store, platform).step(id)
+    assertEquals("spam_test_failed_departure", store.request(id)!!.data.getString("reason"))
+  }
+
+  @Test fun `a delayed departure event cannot deny a newer request generation`() {
+    val old = start(); prompted(old)
+    val departureAt = platform.clock + 1
+    platform.clock += 2
+    platform.groups["source"] = platform.groups.getValue("source").copy(requests = mapOf("applicant" to 2L))
+    platform.groups["room"] = platform.groups.getValue("room").copy(members = setOf("bot"))
+    val fresh = start()
+    engine.departed("room", "applicant", before = departureAt)
+    assertEquals(GatewayPhase.DENYING, store.request(old)!!.phase)
+    assertEquals(GatewayPhase.INTAKE, store.request(fresh)!!.phase)
+    platform.departureTime = departureAt
+    engine.step(fresh)
+    assertEquals(GatewayPhase.PROMPTING, store.request(fresh)!!.phase)
+    assertFalse(platform.mutations.any { it.first == fresh && it.second == GatewayMutation.DENY })
   }
 
   @Test fun `pre-existing Gateway members are never owned or cleaned up`() {
@@ -552,6 +609,7 @@ class GatewayEngineTest {
     var blocked: Set<String>? = emptySet()
     var invitationOnly = false
     var pendingReceipt = false
+    var departureTime: Long? = null
     var onGroup: (String) -> Unit = {}
     var onBlocklist: () -> Unit = {}
     var onMutation: (GatewayRequest, GatewayMutation) -> Unit = { _, _ -> }
@@ -568,6 +626,7 @@ class GatewayEngineTest {
     fun addSource(source: GatewayGroup) { config = config.copy(groups = config.groups + (source.id to source)); groups[source.id] = state(source.id, mapOf("applicant" to 1L)) }
     private fun state(id: String, requests: Map<String, Long>) = GatewayGroupState(id, id, setOf("bot"), setOf("admin", "bot"), requests, emptySet(), emptySet(), true, true, true, true)
     override fun now() = clock
+    override fun departureAt(room: String, aci: String) = departureTime ?: clock
     override fun configuration(online: Boolean): GatewayConfiguration { configReads += online; return config }
     override fun group(id: String, fresh: Boolean): GatewayGroupState { groupReads += id to fresh; onGroup(id); return groups.getValue(id) }
     override fun blocklist(): Set<String>? { onBlocklist(); return blocked }

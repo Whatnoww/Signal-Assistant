@@ -29,6 +29,22 @@ class GatewayStoreTest {
     assertEquals(GatewayPhase.APPROVING, store.request(request.id)!!.phase)
   }
 
+  @Test fun `failed restricted sends retain their audience without stranding an unused cooldown`() {
+    assertEquals(0L, store.reserveCooldown("scan", 10, 100, 1000))
+    store.reserveOutgoing("first", 0, "audience:{}", 100, 10)
+    store.reserveOutgoing("second", 0, "audience:{}", 101, 10)
+    store.markAudienceFailed(100)
+    store.releaseIfIdle(10)
+    assertTrue(store.reserveCooldown("scan", 11, 200, 1000) > 0)
+    store.markAudienceFailed(101)
+    store.releaseIfIdle(10)
+    assertEquals(0L, store.reserveCooldown("scan", 11, 200, 1000))
+    assertEquals("audience:{}", store.outgoingRequest(100)!!.second)
+    store.bindMessage(100, 50)
+    store.recordAck(100, 300)
+    assertEquals(300L, store.confirmedAt(50))
+  }
+
   @Test fun `manual finish suppresses rediscovery until native request is gone`() {
     val request = intake()
     store.finishDeparture("room", "applicant")

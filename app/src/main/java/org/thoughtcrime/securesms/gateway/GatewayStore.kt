@@ -162,11 +162,11 @@ internal class GatewayStore(private val db: SupportSQLiteDatabase) {
     }
   }
 
-  fun finishDeparture(room: String, aci: String) = transaction {
+  fun finishDeparture(room: String, aci: String, before: Long = Long.MAX_VALUE) = transaction {
     val session = session(room, aci)
     if (session.optBoolean("cleaning")) return@transaction
     val removing = session.optLong("removingRequest")
-    requests().filter { it.room == room && it.aci == aci && it.active }.forEach {
+    requests().filter { it.room == room && it.aci == aci && it.active && it.data.optLong("created") <= before }.forEach {
       val reason = when {
         it.id == removing && it.phase == GatewayPhase.DENYING -> session.optString("removingOutcome", "denied")
         removing != 0L -> "gateway_departure_after_source_decision; source request unchanged"
@@ -174,7 +174,7 @@ internal class GatewayStore(private val db: SupportSQLiteDatabase) {
       }
       finish(it, reason)
     }
-    saveSession(room, aci, session.put("owned", false).put("present", false))
+    if (requests().none { it.room == room && it.aci == aci && it.active }) saveSession(room, aci, session.put("owned", false).put("present", false))
   }
 
   fun claimCleanup(request: GatewayRequest): Boolean = transaction {
@@ -224,7 +224,7 @@ internal class GatewayStore(private val db: SupportSQLiteDatabase) {
   }
   fun releaseCooldown(invocation: Long) { db.delete("cooldown", "invocation=? AND consumed=0", arrayOf(invocation)) }
   fun releaseIfIdle(invocation: Long) {
-    val pending = db.query("SELECT 1 FROM outgoing WHERE invocation=? LIMIT 1", arrayOf(invocation)).use { it.moveToFirst() }
+    val pending = db.query("SELECT 1 FROM outgoing WHERE invocation=? AND NOT (kind LIKE 'audience:%' AND confirmed_at=-1) LIMIT 1", arrayOf(invocation)).use { it.moveToFirst() }
     if (!pending) releaseCooldown(invocation)
   }
 
@@ -261,6 +261,8 @@ internal class GatewayStore(private val db: SupportSQLiteDatabase) {
   }
   fun outgoingMessage(sentAt: Long): Long = db.query("SELECT message_id FROM outgoing WHERE sent_at=?", arrayOf(sentAt)).use { if (it.moveToFirst()) it.getLong(0) else 0 }
   fun bindRecipient(sentAt: Long, recipient: Long) { db.execSQL("UPDATE outgoing SET recipient=? WHERE sent_at=?", arrayOf(recipient, sentAt)) }
+  fun setAudience(sentAt: Long, metadata: String) { db.execSQL("UPDATE outgoing SET kind=? WHERE sent_at=?", arrayOf(metadata, sentAt)) }
+  fun bindMessage(sentAt: Long, messageId: Long) { db.execSQL("UPDATE outgoing SET message_id=? WHERE sent_at=?", arrayOf(messageId, sentAt)) }
   fun matchesOutgoing(sentAt: Long, recipient: Long, messageId: Long): Boolean = db.query("SELECT recipient,message_id FROM outgoing WHERE sent_at=?", arrayOf(sentAt)).use {
     it.moveToFirst() && (recipient == 0L || it.getLong(0) == 0L || it.getLong(0) == recipient) && (messageId == 0L || it.getLong(1) == 0L || it.getLong(1) == messageId)
   }
@@ -272,14 +274,15 @@ internal class GatewayStore(private val db: SupportSQLiteDatabase) {
   fun confirmedAt(messageId: Long): Long? = db.query("SELECT confirmed_at FROM outgoing WHERE message_id=?", arrayOf(messageId)).use {
     if (it.moveToFirst()) it.getLong(0).takeIf { time -> time > 0 } else null
   }
-  fun recordAck(timestamp: Long, now: Long) { db.execSQL("UPDATE outgoing SET confirmed_at=? WHERE sent_at=? AND confirmed_at=0", arrayOf(now, timestamp)) }
+  fun recordAck(timestamp: Long, now: Long) { db.execSQL("UPDATE outgoing SET confirmed_at=? WHERE sent_at=? AND confirmed_at<=0", arrayOf(now, timestamp)) }
+  fun markAudienceFailed(timestamp: Long) { db.execSQL("UPDATE outgoing SET confirmed_at=-1 WHERE sent_at=? AND confirmed_at<=0 AND kind LIKE 'audience:%'", arrayOf(timestamp)) }
   fun confirmOutgoing(timestamp: Long, now: Long): Long? = transaction {
     val record = db.query("SELECT request_id,invocation FROM outgoing WHERE sent_at=?", arrayOf(timestamp)).use {
       if (it.moveToFirst()) it.getLong(0) to it.getLong(1) else null
     } ?: return@transaction null
-    db.execSQL("UPDATE outgoing SET confirmed_at=? WHERE sent_at=? AND confirmed_at=0", arrayOf(now, timestamp))
+    db.execSQL("UPDATE outgoing SET confirmed_at=? WHERE sent_at=? AND confirmed_at<=0", arrayOf(now, timestamp))
     if (record.second != 0L) consumeCooldown(record.second, now)
-    if (record.first == 0L) db.delete("outgoing", "sent_at=?", arrayOf(timestamp))
+    if (record.first == 0L) db.delete("outgoing", "sent_at=? AND kind NOT LIKE 'audience:%'", arrayOf(timestamp))
     record.first.takeIf { it != 0L }
   }
   fun forgetTimestamp(timestamp: Long) {

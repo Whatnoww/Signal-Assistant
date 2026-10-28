@@ -716,6 +716,18 @@ class GroupsV2StateProcessor private constructor(
     groupSendEndorsements: ReceivedGroupSendEndorsements?
   ) {
     val previousGroupState = groupStateDiff.previousGroupState
+    val gatewayManualRemovals = mutableSetOf<String>()
+    groupStateDiff.serverHistory.filter { it.revision <= updatedGroupState.revision }.sortedBy { it.revision }.forEach { entry ->
+      val change = entry.change ?: return@forEach
+      val editor = ACI.parseOrNull(change.editorServiceIdBytes)?.takeUnless { it == ACI.UNKNOWN || it == serviceIds.aci }
+      (change.deleteMembers + change.deletePendingMembers.map { it.serviceIdBytes }).forEach removed@{ bytes ->
+        val removed = ACI.parseOrNull(bytes) ?: return@removed
+        if (removed == serviceIds.aci) return@removed
+        if (editor != null && editor != removed) gatewayManualRemovals += removed.toString()
+        else gatewayManualRemovals -= removed.toString()
+      }
+      change.newMembers.forEach { member -> ACI.parseOrNull(member.aciBytes)?.let { gatewayManualRemovals -= it.toString() } }
+    }
 
     if (groupSendEndorsements != null) {
       Log.i(TAG, "$logPrefix Updating send endorsements")
@@ -764,12 +776,12 @@ class GroupsV2StateProcessor private constructor(
 
       if (groupId == null) {
         Log.w(TAG, "$logPrefix Group create failed, trying to update")
-        SignalDatabase.groups.update(groupMasterKey, updatedGroupState, groupSendEndorsements, terminatorRecipientId, selfAuthoredTitle)
+        SignalDatabase.groups.update(groupMasterKey, updatedGroupState, groupSendEndorsements, terminatorRecipientId, selfAuthoredTitle, gatewayManualRemovals)
       }
 
       updatedGroupState.avatar.isNotEmpty()
     } else {
-      SignalDatabase.groups.update(groupMasterKey, updatedGroupState, groupSendEndorsements, terminatorRecipientId, selfAuthoredTitle)
+      SignalDatabase.groups.update(groupMasterKey, updatedGroupState, groupSendEndorsements, terminatorRecipientId, selfAuthoredTitle, gatewayManualRemovals)
 
       updatedGroupState.avatar != previousGroupState.avatar
     }

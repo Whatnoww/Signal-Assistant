@@ -89,9 +89,10 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
       reply
     }
     val replies = if (isScan) GroupScanCommand.pages(finalReply) else listOf(finalReply)
+    val audience = if (isScan) org.thoughtcrime.securesms.gateway.GatewayAudience.scan(GroupScanCommand.authorizedGroup(latestRecipient, Recipient.resolved(request.fromRecipient.id)) ?: return) else null
     val replyIds = mutableListOf<Long>()
     for (page in replies) {
-      val outgoing = sendReply(context, page, latestRecipient, request.threadId, invocation = requestId, ownerRecovery = ownerRecovery) ?: return
+      val outgoing = sendReply(context, page, latestRecipient, request.threadId, invocation = requestId, ownerRecovery = ownerRecovery, audience = audience) ?: return
       if (!shouldRefresh) continue
       val inserted = SignalDatabase.messages.getMessageFor(outgoing.sentTimeMillis, Recipient.self().id)
       if (inserted == null || inserted.threadId != request.threadId || !inserted.isOutgoing) return
@@ -137,7 +138,7 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
 
     internal fun nextSentTimeMillis(): Long = lastSentTimeMillis.updateAndGet { maxOf(System.currentTimeMillis(), it + 1) }
 
-    internal fun sendReply(context: Context, reply: CommandReply, recipient: Recipient, threadId: Long, messageToEdit: Long = 0, timestamp: Long = nextSentTimeMillis(), quote: org.thoughtcrime.securesms.mms.QuoteModel? = null, invocation: Long = 0, ownerRecovery: Boolean = false): OutgoingMessage? {
+    internal fun sendReply(context: Context, reply: CommandReply, recipient: Recipient, threadId: Long, messageToEdit: Long = 0, timestamp: Long = nextSentTimeMillis(), quote: org.thoughtcrime.securesms.mms.QuoteModel? = null, invocation: Long = 0, ownerRecovery: Boolean = false, audience: org.thoughtcrime.securesms.gateway.GatewayAudience? = null): OutgoingMessage? {
       if (reply.text.isBlank()) return null
       if (reply.text.toByteArray(Charsets.UTF_8).size > MessageUtil.MAX_TOTAL_BODY_SIZE_BYTES) {
         Log.w(TAG, "Command reply exceeds Signal's maximum message size.")
@@ -167,8 +168,10 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
         messageToEdit = messageToEdit,
         outgoingQuote = quote
       )
+      audience?.let { org.thoughtcrime.securesms.gateway.GatewayAudience.reserve(context, it, timestamp, invocation) }
       org.thoughtcrime.securesms.gateway.GatewayRuntime.prepareSend(context, recipient, timestamp, invocation, ownerRecovery)
-      MessageSender.send(context, outgoing, threadId, MessageSender.SendType.SIGNAL, null, null)
+      if (audience == null) MessageSender.send(context, outgoing, threadId, MessageSender.SendType.SIGNAL, null, null)
+      else MessageSender.sendAssistantGroupReply(context, outgoing, threadId, audience.encode())
       return outgoing
     }
   }

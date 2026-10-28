@@ -917,9 +917,10 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     decryptedGroup: DecryptedGroup,
     groupSendEndorsements: ReceivedGroupSendEndorsements?,
     terminatorRecipientId: RecipientId? = null,
-    selfAuthoredTitle: Boolean = false
+    selfAuthoredTitle: Boolean = false,
+    gatewayManualRemovals: Set<String> = emptySet()
   ) {
-    update(GroupId.v2(groupMasterKey), decryptedGroup, groupSendEndorsements, terminatorRecipientId, selfAuthoredTitle)
+    update(GroupId.v2(groupMasterKey), decryptedGroup, groupSendEndorsements, terminatorRecipientId, selfAuthoredTitle, gatewayManualRemovals)
   }
 
   @JvmOverloads
@@ -928,7 +929,8 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     decryptedGroup: DecryptedGroup,
     receivedGroupSendEndorsements: ReceivedGroupSendEndorsements?,
     terminatorRecipientId: RecipientId? = null,
-    selfAuthoredTitle: Boolean = false
+    selfAuthoredTitle: Boolean = false,
+    gatewayManualRemovals: Set<String> = emptySet()
   ) {
     val groupRecipientId: RecipientId = recipients.getOrInsertFromGroupId(groupId)
     val existingGroup: Optional<GroupRecord> = getGroup(groupId)
@@ -973,6 +975,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     var groupSendEndorsementRecords: GroupSendEndorsementRecords? = receivedGroupSendEndorsements?.toGroupSendEndorsementRecords() ?: getGroupSendEndorsements(groupId)
     var blocklistChange: DecryptedGroupChange? = null
     var gatewayDepartures: List<String> = emptyList()
+    var gatewayJoins: List<String> = emptyList()
     val gatewayChanged = existingGroup.orElse(null)?.takeIf { it.hasV2GroupProperties }?.requireV2GroupProperties()?.decryptedGroup != decryptedGroup
 
     val addedMembers: Collection<RecipientId> = if (existingGroup.isPresent && existingGroup.get().hasV2GroupProperties) {
@@ -980,6 +983,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
       val removed: List<ServiceId> = DecryptedGroupUtil.removedMembersServiceIdList(change)
       gatewayDepartures = (change.deleteMembers + change.deletePendingMembers.map { it.serviceIdBytes })
         .mapNotNull { ACI.parseOrNull(it)?.toString() }
+      gatewayJoins = change.addedMemberAcis().map { it.toString() }
 
       // Whatnoww - Capture join requests and new members for reporting after the group update commits.
       Log.i(JOIN_TAG, "Group $groupId revision ${decryptedGroup.revision}: newPending=${change.newPendingMembers.size}, newRequest=${change.newRequestingMembers.size}, newMembers=${change.newMembers.size}")
@@ -1043,7 +1047,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
 
     // Whatnoww added - Send against the committed group state and keep network calls off the update thread.
     if (gatewayChanged) writableDatabase.runPostSuccessfulTransaction {
-      org.thoughtcrime.securesms.gateway.GatewayRuntime.groupChanged(groupId.toString(), gatewayDepartures)
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.groupChanged(groupId.toString(), gatewayDepartures, gatewayDepartures.filter { it in gatewayManualRemovals }, gatewayJoins)
     }
     blocklistChange?.let { change ->
       writableDatabase.runPostSuccessfulTransaction {

@@ -57,9 +57,14 @@ class GitHubAutoReplyJobTest {
 
   private val sentMessages = mutableListOf<OutgoingMessage>()
   private val reply = CommandReply("Group Chats", emptyList(), emptyList())
+  private lateinit var gatewayDb: org.thoughtcrime.securesms.testing.JdbcSqliteDatabase
 
   @Before
   fun setUp() {
+    gatewayDb = org.thoughtcrime.securesms.testing.JdbcSqliteDatabase.createInMemory()
+    org.thoughtcrime.securesms.gateway.GatewayStore.createSchema(gatewayDb)
+    mockkObject(org.thoughtcrime.securesms.gateway.GatewayDatabase.Companion)
+    every { org.thoughtcrime.securesms.gateway.GatewayDatabase.get(any()) } returns org.thoughtcrime.securesms.gateway.GatewayStore(gatewayDb)
     mockkObject(GitHubAutoReply)
     // This suite verifies the legacy reply/scan path. Do not read the deployment
     // XML or open Gateway's Android SQLCipher store from the host JVM.
@@ -74,12 +79,17 @@ class GitHubAutoReplyJobTest {
     every { GroupTable.getBlocklist(any()) } returns emptySet()
     mockkStatic(MessageSender::class)
     every { MessageSender.send(any(), capture(sentMessages), any(), any(), any(), any()) } returns 1L
+    every { MessageSender.sendAssistantGroupReply(any(), any(), any(), any()) } answers {
+      MessageSender.send(firstArg(), secondArg(), thirdArg(), MessageSender.SendType.SIGNAL, null, null)
+    }
     every { RemoteConfig.regularDeleteThreshold } returns 86_400L
     every { RemoteConfig.adminDeleteThreshold } returns 86_400L
   }
 
   @After
   fun tearDown() {
+    unmockkObject(org.thoughtcrime.securesms.gateway.GatewayDatabase.Companion)
+    gatewayDb.close()
     unmockkObject(GitHubAutoReply)
     unmockkObject(GroupTable.Companion)
     unmockkStatic(MessageSender::class)

@@ -90,11 +90,17 @@ public final class PushGroupSendJob extends PushSendJob {
 
   private static final String KEY_MESSAGE_ID        = "message_id";
   private static final String KEY_FILTER_RECIPIENTS = "filter_recipient";
+  private static final String KEY_ASSISTANT_AUDIENCE = "assistant_audience";
 
   private final long             messageId;
   private final Set<RecipientId> filterRecipients;
+  private final String assistantAudience;
 
   public PushGroupSendJob(long messageId, @NonNull RecipientId destination, @NonNull Set<RecipientId> filterRecipients, boolean hasMedia, boolean isScheduledSend) {
+    this(messageId, destination, filterRecipients, hasMedia, isScheduledSend, "");
+  }
+
+  public PushGroupSendJob(long messageId, @NonNull RecipientId destination, @NonNull Set<RecipientId> filterRecipients, boolean hasMedia, boolean isScheduledSend, @NonNull String assistantAudience) {
     this(new Job.Parameters.Builder()
              .setQueue(isScheduledSend ? destination.toScheduledSendQueueKey() : destination.toQueueKey(hasMedia))
              .addConstraint(NetworkConstraint.KEY)
@@ -102,15 +108,16 @@ public final class PushGroupSendJob extends PushSendJob {
              .setLifespan(TimeUnit.DAYS.toMillis(1))
              .setMaxAttempts(Parameters.UNLIMITED)
              .build(),
-         messageId, filterRecipients);
+         messageId, filterRecipients, assistantAudience);
 
   }
 
-  private PushGroupSendJob(@NonNull Job.Parameters parameters, long messageId, @NonNull Set<RecipientId> filterRecipients) {
+  private PushGroupSendJob(@NonNull Job.Parameters parameters, long messageId, @NonNull Set<RecipientId> filterRecipients, @NonNull String assistantAudience) {
     super(parameters);
 
     this.messageId        = messageId;
     this.filterRecipients = filterRecipients;
+    this.assistantAudience = assistantAudience;
   }
 
   @WorkerThread
@@ -120,6 +127,13 @@ public final class PushGroupSendJob extends PushSendJob {
                              @NonNull RecipientId destination,
                              @NonNull Set<RecipientId> filterAddresses,
                              boolean isScheduledSend)
+  {
+    enqueue(context, jobManager, messageId, destination, filterAddresses, isScheduledSend, "");
+  }
+
+  @WorkerThread
+  public static void enqueue(@NonNull Context context, @NonNull JobManager jobManager, long messageId, @NonNull RecipientId destination,
+                             @NonNull Set<RecipientId> filterAddresses, boolean isScheduledSend, @NonNull String assistantAudience)
   {
     try {
       if (!SignalDatabase.recipients().containsId(destination)) {
@@ -159,7 +173,7 @@ public final class PushGroupSendJob extends PushSendJob {
       boolean hasMedia            = attachmentUploadIds.size() > 0;
       boolean addHardDependencies = hasMedia && !isScheduledSend;
 
-      jobManager.add(new PushGroupSendJob(messageId, destination, filterAddresses, hasMedia, isScheduledSend),
+      jobManager.add(new PushGroupSendJob(messageId, destination, filterAddresses, hasMedia, isScheduledSend, assistantAudience),
                      attachmentUploadIds,
                      addHardDependencies ? destination.toQueueKey() : null);
 
@@ -174,6 +188,7 @@ public final class PushGroupSendJob extends PushSendJob {
   public @Nullable byte[] serialize() {
     return new JsonJobData.Builder().putLong(KEY_MESSAGE_ID, messageId)
                                     .putString(KEY_FILTER_RECIPIENTS, RecipientId.toSerializedList(filterRecipients))
+                                    .putString(KEY_ASSISTANT_AUDIENCE, assistantAudience)
                                     .serialize();
   }
 
@@ -263,6 +278,15 @@ public final class PushGroupSendJob extends PushSendJob {
         return;
       }
 
+      if (!assistantAudience.isEmpty()) {
+        Set<RecipientId> allowed = org.thoughtcrime.securesms.gateway.GatewayAudience.targets(context, assistantAudience, groupRecipient);
+        target = target.stream().filter(r -> allowed.contains(r.getId())).collect(Collectors.toList());
+        if (target.isEmpty()) {
+          database.markAsSentFailed(messageId);
+          org.thoughtcrime.securesms.gateway.GatewayRuntime.failed(context, messageId);
+          return;
+        }
+      }
       List<SendMessageResult> results = deliver(message, originalEditedMessage, groupRecipient, groupRecord.get(), target);
       processGroupMessageResults(context, messageId, threadId, groupRecipient, message, results, target, skipped, existingNetworkFailures, existingIdentityMismatches);
       ConversationShortcutRankingUpdateJob.enqueueForOutgoingIfNecessary(groupRecipient);
@@ -419,7 +443,8 @@ public final class PushGroupSendJob extends PushSendJob {
         }
 
         SignalServiceDataMessage groupMessage = groupMessageBuilder.build();
-        SignalServiceEditMessage editMessage = originalEditedMessage != null ? new SignalServiceEditMessage(originalEditedMessage.getDateSent(), groupMessage)
+        long editTarget = org.thoughtcrime.securesms.gateway.GatewayAudience.editTarget(assistantAudience, originalEditedMessage != null ? originalEditedMessage.getDateSent() : 0);
+        SignalServiceEditMessage editMessage = editTarget > 0 ? new SignalServiceEditMessage(editTarget, groupMessage)
                                                                              : null;
 
         Log.i(TAG, JobLogger.format(this, "Beginning message send."));
@@ -535,8 +560,6 @@ public final class PushGroupSendJob extends PushSendJob {
       if (message.getStoryType().isStory()) {
         AppDependencies.getExpireStoriesManager().scheduleIfNecessary();
       }
-      // Whatnoww added
-      markAllThreadsReadAfterSend();
     } else if (!existingIdentityMismatches.isEmpty()) {
       Log.w(TAG, "Failing because there were " + existingIdentityMismatches.size() + " identity mismatches.");
       database.markAsSentFailed(messageId);
@@ -604,7 +627,7 @@ public final class PushGroupSendJob extends PushSendJob {
       String           raw     = data.getStringOrDefault(KEY_FILTER_RECIPIENTS, "");
       Set<RecipientId> filters = raw != null ? new HashSet<>(RecipientId.fromSerializedList(raw)) : Collections.emptySet();
 
-      return new PushGroupSendJob(parameters, data.getLong(KEY_MESSAGE_ID), filters);
+      return new PushGroupSendJob(parameters, data.getLong(KEY_MESSAGE_ID), filters, data.getStringOrDefault(KEY_ASSISTANT_AUDIENCE, ""));
     }
   }
 }

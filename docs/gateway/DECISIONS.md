@@ -92,9 +92,11 @@ configuration and verification notes are in [README.md](README.md).
 
 ## Departures and generations
 
-- Stop handling after any unplanned Gateway departure, whether known manual removal,
-  voluntary leave or unknown cause. Cancel/disable associated work, keep the reason
-  where known, and perform no source-group action because of that departure.
+- A voluntary Gateway leave fails screening. Unknown departures also claim denial,
+  as explicitly selected in the later review. Preserve `admin=0`, pause/throttle
+  and current native permissions; never claim a source denial that did not occur.
+  A proven human administrator removal retains local manual-finish semantics and
+  does not mutate source membership. Stop prompts/notifications/timers in either case.
 - Do not re-add for the same old native source request.
 - A genuinely new source request may start a new Gateway operation. Missing history
   or an uncertain snapshot difference is not sufficient proof of a new generation.
@@ -133,6 +135,18 @@ configuration and verification notes are in [README.md](README.md).
   defaults). Use persistent, bounded background work; skip pause/throttle, avoid
   routine GitHub/blocklist downloads, and respect server/network/Android delays.
   This is request discovery, not a continuous permission/blocklist cache poll.
+- Include other locally known bot-admin groups in the discovery fallback for the
+  existing ACI-Blocklist checks, even without Gateway screening configured. Record
+  discovered Gateway intake in the same pass. Honor the shared XML freshness window
+  so manual configuration updates become visible in quiet groups.
+- Group help uses a public base followed by restricted per-role edits and an
+  owner edit when the owner is a member. Group scan results are admin-only.
+  Use native sender keys where possible and native individual-send fallback when
+  necessary, explicitly accepted for the single-recipient owner stage. Revalidate
+  recipients and preserve their original cap across retries. Edits target the
+  public base so viewers can skip other roles' versions.
+- Remove global read-all cleanup after sends. Do not replace it with query/index
+  changes or another global read-all job. Native last-seen updates remain unchanged.
 - Initial prompt-response defaults are reminder 72 hours and removal 96 hours.
 - Start grace periods on successful prompt sending, not merely local queuing and
   not an assumption that the applicant received/read the message.

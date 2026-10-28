@@ -27,6 +27,10 @@ object GatewayRuntime {
   @Volatile private var observedConfiguration: GatewayConfiguration? = null
   @Volatile private var watchedGroups: Set<String>? = null
   @Volatile private var parsedConfiguration: Pair<String, GatewayConfiguration>? = null
+  private data class Departure(val at: Long, val manual: Boolean)
+  private val departures = java.util.concurrent.ConcurrentHashMap<String, Departure>()
+  internal fun manualDeparture(room: String, aci: String) = departures["$room:$aci"]?.manual == true
+  internal fun departureAt(room: String, aci: String) = departures["$room:$aci"]?.at ?: System.currentTimeMillis()
 
   /** Receive paths only consult this immutable routing snapshot, never XML or SQL. */
   fun observes(groupId: String): Boolean = watchedGroups?.contains(groupId) ?: true
@@ -94,7 +98,7 @@ object GatewayRuntime {
     val request = store.request(outgoing.first)
     val source = request?.let { config?.groups?.get(it.source) }
     val stopped = outgoing.second == "cancelled-review" || paused(context) || request != null && (source == null || config?.isPaused(source) == true || source.destination != request.room ||
-      !request.active && outgoing.second in setOf("spam", "spam_reminder", "administrator_notification"))
+      (!request.active || request.data.optBoolean("departed")) && outgoing.second in setOf("spam", "spam_reminder", "administrator_notification"))
     if (!stopped) return true
     store.transaction {
       val invocation = store.outgoingInvocation(timestamp)
@@ -155,7 +159,11 @@ object GatewayRuntime {
     val outgoing = store.outgoingRequest(message.dateSent) ?: return
     val invocation = store.outgoingInvocation(message.dateSent)
     store.forgetPrivateSend(message.toRecipient.id.toLong(), message.dateSent)
-    if (outgoing.first == 0L) { store.forgetTimestamp(message.dateSent); store.releaseIfIdle(invocation) }
+    if (outgoing.first == 0L) {
+      if (!outgoing.second.startsWith(GatewayAudience.PREFIX)) store.forgetTimestamp(message.dateSent)
+      else store.markAudienceFailed(message.dateSent)
+      store.releaseIfIdle(invocation)
+    }
     else store.request(outgoing.first)?.let { AppDependencies.jobManager.add(GatewayWorkJob(it.id, 0, it.room, urgent = true)) }
     pendingAssistantSends -= message.dateSent
   }
@@ -184,11 +192,16 @@ object GatewayRuntime {
     } catch (e: Exception) { Log.w("Gateway", "Media bookkeeping deferred (${e.javaClass.simpleName}).") }
   }
 
-  @JvmStatic fun groupChanged(groupId: String, removed: List<String>) {
-    if (observes(groupId)) AppDependencies.jobManager.add(GatewayWorkJob(groupId, removed))
+  @JvmStatic @JvmOverloads fun groupChanged(groupId: String, removed: List<String>, manual: List<String> = emptyList(), joined: List<String> = emptyList()) {
+    if (!observes(groupId)) return
+    val at = System.currentTimeMillis()
+    joined.forEach { departures.remove("$groupId:$it") }
+    removed.forEach { departures["$groupId:$it"] = Departure(at, it in manual) }
+    departures.entries.removeIf { it.value.at < at - java.util.concurrent.TimeUnit.DAYS.toMillis(1) }
+    AppDependencies.jobManager.add(GatewayWorkJob(groupId, removed, manual, at))
   }
 
-  fun work(context: Context, requestId: Long, groupId: String, removed: List<String>, messageId: Long, intake: Boolean = false) {
+  fun work(context: Context, requestId: Long, groupId: String, removed: List<String>, messageId: Long, intake: Boolean = false, manual: List<String> = emptyList(), eventAt: Long = System.currentTimeMillis()) {
     if (!SignalStore.account.isPrimaryDevice) return
     val config = configuration(context, requestId == 0L && groupId.isBlank() && messageId == 0L)
     if (config?.configured != true && !context.getDatabasePath(GatewayDatabase.NAME).exists()) return
@@ -208,16 +221,16 @@ object GatewayRuntime {
         }
       }
     }
-    // Departure suppression precedes pause handling and survives process restart.
-    removed.forEach { store.finishDeparture(groupId, it) }
+    val platform = SignalGatewayPlatform(context, store)
+    val engine = GatewayEngine(store, platform)
+    // Capture departures durably even while paused; source actions still revalidate policy.
+    if (eventAt > 0) removed.forEach { engine.departed(groupId, it, it in manual, eventAt) }
     if (config?.configured != true) {
       store.requests().filter { it.active }.forEach { store.setPaused(it, true, System.currentTimeMillis()) }
       return
     }
     if (requestId == 0L && groupId.isBlank() && messageId == 0L) GatewayRequestPollJob.schedule(config)
     watchedGroups = config.groups.values.filter { it.enabled }.flatMap { listOf(it.id, it.destination) }.toSet() + store.requests().flatMap { listOf(it.source, it.room) }
-    val platform = SignalGatewayPlatform(context, store)
-    val engine = GatewayEngine(store, platform)
     if (intake) { engine.intake(groupId); return }
     if (requestId != 0L) {
       engine.step(requestId)
@@ -232,7 +245,7 @@ object GatewayRuntime {
       val active = store.requests().filter { it.room == room && it.aci == aci && it.active && config.groups[it.source]?.let { source -> !config.isPaused(source) } == true }
       if (config.paused || config.groups[room]?.throttle == true || active.isEmpty()) return
       if (store.session(room, aci).optBoolean("present") && aci !in platform.group(room, false).members) {
-        store.finishDeparture(room, aci)
+        engine.departed(room, aci, manualDeparture(room, aci), departureAt(room, aci))
         active.forEach { platform.schedule(it.id, platform.now()) }
         return
       }

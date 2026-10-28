@@ -140,9 +140,10 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
       "externally_resolved" -> "No longer pending; resolved or cancelled outside Gateway"
       else -> reason.replace('_', ' ')
     })
-    values["operation_status"] = GatewayText(reason.replace('_', ' '))
-    values["gateway_status"] = GatewayText(reason.replace('_', ' '))
-    values["safe_reason"] = GatewayText(reason.replace('_', ' '))
+    val description = if (reason == "spam_test_failed_departure") "Denied: spam test failed after leaving Gateway." else reason.replace('_', ' ')
+    values["operation_status"] = GatewayText(description)
+    values["gateway_status"] = GatewayText(description)
+    values["safe_reason"] = GatewayText(description)
     values["source_requests_status"] = GatewayText("Source requests are reconciled separately.")
     val reply = template(response, values)
     return sendOnce("review:${request.id}:$key", request.id, response, Recipient.externalGroupExact(GroupId.parseOrThrow(request.room)), reply, quoteId).first()
@@ -176,10 +177,10 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
     return sendOnce("review-batch:${first.room}:${first.aci}:$messageId", first.id, "administrator_notification", Recipient.externalGroupExact(GroupId.parseOrThrow(first.room)), reply, messageId).first()
   }
 
-  fun sendOnce(key: String, requestId: Long, kind: String, recipient: Recipient, reply: CommandReply, quoteId: Long? = null, invocation: Long = 0): List<Long> {
+  fun sendOnce(key: String, requestId: Long, kind: String, recipient: Recipient, reply: CommandReply, quoteId: Long? = null, invocation: Long = 0, audience: GatewayAudience? = null, messageToEdit: Long = 0, paginate: Boolean = true): List<Long> {
     require(!recipient.isBlocked && !recipient.isHidden && !recipient.isSelf)
     if (recipient.isGroup) require(group(recipient.requireGroupId().toString(), false).canPost)
-    return GroupScanCommand.pages(reply).mapIndexed { index, page ->
+    return (if (paginate) GroupScanCommand.pages(reply) else listOf(reply)).mapIndexed { index, page ->
       val pageKey = "$key:$index"
       val existing = store.outgoing(pageKey)
       val timestamp = existing?.second ?: GitHubAutoReplyJob.nextSentTimeMillis().also { store.reserveOutgoing(pageKey, requestId, kind, it, invocation) }
@@ -195,7 +196,7 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
         QuoteModel(it.dateSent, it.fromRecipient.id, it.body, false, null, SignalDatabase.mentions.getMentionsForMessage(it.id), QuoteModel.Type.NORMAL, null)
       } else null
       val threadId = SignalDatabase.threads.getOrCreateThreadIdFor(recipient)
-      requireNotNull(GitHubAutoReplyJob.sendReply(context, page, recipient, threadId, timestamp = timestamp, quote = quote))
+      requireNotNull(GitHubAutoReplyJob.sendReply(context, page, recipient, threadId, timestamp = timestamp, quote = quote, audience = audience, messageToEdit = messageToEdit))
       val inserted = requireNotNull(SignalDatabase.messages.getMessageFor(timestamp, Recipient.self().id))
       store.outgoingInserted(pageKey, inserted.id)
       inserted.id
@@ -224,6 +225,8 @@ internal class SignalGatewayPlatform(private val context: Context, private val s
     AppDependencies.jobManager.add(GatewayWorkJob.at(id, request.room, at, request.phase != GatewayPhase.INTAKE))
   }
   override fun cleaned(room: String) { GatewayRuntime.groupChanged(room, emptyList()) }
+  override fun manualDeparture(room: String, aci: String) = GatewayRuntime.manualDeparture(room, aci)
+  override fun departureAt(room: String, aci: String) = GatewayRuntime.departureAt(room, aci)
   override fun promptTimestamp(request: GatewayRequest): Long? = store.outgoing("review:${request.id}:prompt:0")?.second
   override fun replayAnswer(messageId: Long) {
     val room = SignalDatabase.messages.getMessageRecordOrNull(messageId)?.let { SignalDatabase.threads.getRecipientForThreadId(it.threadId)?.groupId?.orElse(null)?.toString() }.orEmpty()

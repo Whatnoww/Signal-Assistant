@@ -1363,6 +1363,37 @@ class GroupsV2StateProcessorTest {
   }
 
   @Test
+  fun `signed human administrator removal supplies Gateway departure attribution`() {
+    val applicant = ACI.from(UUID.randomUUID())
+    given {
+      localState(revision = 1, members = selfAndOthers + member(applicant), active = true)
+      expectTableUpdate = true
+    }
+    justRun { groupTable.update(any<GroupMasterKey>(), any<DecryptedGroup>(), anyNullable<ReceivedGroupSendEndorsements>(), anyNullable<RecipientId>(), eq(false), eq(setOf(applicant.toString()))) }
+    val result = processor.updateLocalGroupToRevision(
+      targetRevision = 2, timestamp = 0,
+      signedGroupChange = DecryptedGroupChange(revision = 2, editorServiceIdBytes = otherAci.toByteString(), deleteMembers = listOf(applicant.toByteString()))
+    )
+    assertThat(result.updateStatus).isEqualTo(GroupUpdateResult.UpdateStatus.GROUP_UPDATED)
+    verify { groupTable.update(masterKey, result.latestServer!!, null, null, false, setOf(applicant.toString())) }
+  }
+
+  @Test
+  fun `signed applicant leave is not attributed to a human administrator removal`() {
+    val applicant = ACI.from(UUID.randomUUID())
+    given {
+      localState(revision = 1, members = selfAndOthers + member(applicant), active = true)
+      expectTableUpdate = true
+    }
+    val result = processor.updateLocalGroupToRevision(
+      targetRevision = 2, timestamp = 0,
+      signedGroupChange = DecryptedGroupChange(revision = 2, editorServiceIdBytes = applicant.toByteString(), deleteMembers = listOf(applicant.toByteString()))
+    )
+    assertThat(result.updateStatus).isEqualTo(GroupUpdateResult.UpdateStatus.GROUP_UPDATED)
+    verify { groupTable.update(masterKey, result.latestServer!!, null, null, false, emptySet()) }
+  }
+
+  @Test
   fun `when local state is a full member, then page from local revision without requesting joined at revision`() {
     given {
       localState(

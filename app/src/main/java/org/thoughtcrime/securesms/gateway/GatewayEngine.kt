@@ -36,6 +36,8 @@ internal interface GatewayPlatform {
   fun cleaned(room: String) {}
   fun promptTimestamp(request: GatewayRequest): Long? = null
   fun replayAnswer(messageId: Long) {}
+  fun manualDeparture(room: String, aci: String): Boolean = false
+  fun departureAt(room: String, aci: String): Long = now()
 }
 
 internal class GatewayEngine(private val store: GatewayStore, private val platform: GatewayPlatform) {
@@ -75,11 +77,16 @@ internal class GatewayEngine(private val store: GatewayStore, private val platfo
 
     val session = store.session(request.room, request.aci)
     if (session.optBoolean("present") && request.aci !in room.members && !session.optBoolean("cleaning")) {
-      store.finishDeparture(request.room, request.aci)
+      departed(request.room, request.aci, platform.manualDeparture(request.room, request.aci), platform.departureAt(request.room, request.aci))
       request = store.request(id) ?: return
     }
     if (!request.active) {
       finishWork(request, state, room)
+      return
+    }
+    if (request.data.optBoolean("departed") && !source.admin) {
+      store.finish(request, "spam_test_failed_departure; source request pending; manual action required")
+      platform.schedule(id, now)
       return
     }
 
@@ -210,6 +217,25 @@ internal class GatewayEngine(private val store: GatewayStore, private val platfo
     GatewayPhase.WAITING_FOR_MEMBERSHIP -> request.data.has("admissionAt") &&
       now >= request.data.getLong("admissionAt") + request.data.getLong("admissionMillis")
     else -> false
+  }
+
+  fun departed(room: String, aci: String, manual: Boolean = false, before: Long = Long.MAX_VALUE) {
+    val session = store.session(room, aci)
+    if (session.optBoolean("cleaning")) return
+    if (store.requests().none { it.room == room && it.aci == aci && it.active && it.data.optLong("created") <= before }) return
+    if (manual || session.optLong("removingRequest") != 0L) {
+      store.finishDeparture(room, aci, before)
+    } else store.transaction {
+      store.requests().filter { it.room == room && it.aci == aci && it.active && it.data.optLong("created") <= before }.forEach { request ->
+        store.save(request, request.transition(GatewayPhase.DENYING) {
+          it.put("departed", true).put("outcome", "spam_test_failed_departure")
+          it.remove("actor"); it.remove("decisionFrom")
+        })
+      }
+      if (store.requests().none { it.room == room && it.aci == aci && it.active && !it.data.optBoolean("departed") }) {
+        store.saveSession(room, aci, session.put("present", false).put("owned", false))
+      }
+    }
   }
 
   fun answer(room: String, aci: String, messageId: Long, messageTime: Long) {

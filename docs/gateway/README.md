@@ -52,6 +52,13 @@ The exact command-family triggers `!gateway`, `!groupid`, `!approve`, `!deny` an
 unrelated command matching stays exact. Keep public help wording public: replace
 old static privileged-command listings with the scoped XML help sections.
 Approval and denial help are separate so disabling one family hides that command.
+Group help first posts the public response, then sends edits only to the viewers
+authorized for each set of additional commands. The owner receives a final edit
+when present in the group. Different administrator roles can require separate
+recipient batches. Every restricted edit targets the original public timestamp,
+so a viewer need not have received another role's intermediate edit. DM help keeps
+its existing caller-specific response. Configuration confirmations name the
+accepted setting and show its old and new values privately.
 Gateway XML writes use two spaces per nesting level and put structural settings
 on separate lines. Authored spam text, response formatting and inline spaces are
 preserved.
@@ -65,16 +72,20 @@ its current administrator role; source administration alone is insufficient.
 
 Native group-state updates still trigger intake immediately after commit. As a
 fallback for quiet groups, one persistent background job refreshes enabled source
-groups from Signal every 30 seconds between passes. Configure the universal
+groups and other locally known groups administered by the bot from Signal every
+30 seconds between passes. Other groups retain the existing ACI-Blocklist checks;
+they do not acquire Gateway screening merely by being polled. Configure the universal
 default with `<joinpollseconds>30</joinpollseconds>` under `<gateway><defaults>`;
 `0` disables the fallback, and enabled intervals range from 15 to 3600 seconds.
 An omitted value uses 30 seconds. Paused/throttled sources and rooms are skipped.
 This is a target cadence: network latency, Android background scheduling and
 server backoff can delay a pass, so it is not a hard real-time guarantee.
 
-The fallback uses accepted cached XML and performs no routine GitHub or blocklist
-refresh. It discovers pending-request generations and hands new/retryable intake
-to the existing workflow. Actual decisions retain their fresh authorization and
+The fallback uses accepted cached XML for group discovery and does not force a
+blocklist download. New/retryable Gateway intake is recorded during the refresh
+pass. The shared XML freshness window also checks for manual configuration changes
+without forcing a download on every group check. Each pass logs counts for checked
+groups, native pending requests and newly discovered reviews. Actual decisions retain their fresh authorization and
 blocklist checks. One polling worker runs separately from immediate Gateway work;
 it yields through persistent JobManager retry scheduling rather than sleeping.
 Native group-lock contention retries Gateway commands/work after one second;
@@ -118,12 +129,17 @@ In same-group mode, admission consumes the native join request and gives ordinar
 full membership before screening. Approval confirms the local review; denial,
 blocklist rejection and unanswered expiration remove that provisional member.
 Approval makes membership permanent, including when another source still uses
-this room. A removal from such a shared room also ends its remaining reviews
+this room. A bot-initiated removal from such a shared room also ends its remaining reviews
 without mutating their other source requests. Signal provides no quarantine role.
 
-Any unplanned departure ends the room's associated reviews. It is not attributed
-to a particular human when the snapshot cannot prove the actor. The old native
-request generation remains suppressed. A proven new request can start again.
+An applicant leaving Gateway, including a departure whose actor cannot be
+established, fails screening and claims denial for their active source reviews.
+Source `admin=0`, pause/throttle and current bot permissions remain authoritative;
+when denial cannot be performed, the audit describes the remaining manual action.
+An administrator removal established from authenticated Group V2 change history
+still ends reviews locally without source membership changes. A snapshot alone
+does not prove a human removal. The old native request generation remains
+suppressed. A proven new request can start again.
 Bot cleanup and source-decision removals carry durable correlation state. If a
 restart leaves an interrupted admission with neither membership nor invitation,
 Gateway ends that uncertain attempt locally and leaves the source request alone.
@@ -211,6 +227,23 @@ download. Refreshed results are rebuilt with current authorization and edited on
 while the original replies remain eligible. Group scans preserve the previous
 cache-first, forced-refresh, native-mention and pagination behavior.
 
+Group scan results and refreshed pages are delivered only to their administrator
+audience. Restricted replies persist an initial recipient cap and recheck current
+roles immediately before transport; losing a role can shrink an audience, and an
+empty audience never becomes a broadcast. Native sender-key fanout is used where
+eligible, with Signal's normal individual-send fallback, including one-recipient
+owner edits. The group sender key remains shared group cryptographic state; this
+controls delivery rather than creating a separate private conversation. Audience
+metadata stays in Gateway's existing outgoing tracking while the native message
+exists; no Signal database schema migration is introduced.
+
+The old global mark-all-conversations-read hook has been removed from successful
+group and individual sends. In the supplied log, the sender-key transmission
+completed in roughly 0.7 seconds while post-send cleanup occupied several more
+seconds, including a 3.6-second update that marked zero messages. No replacement
+read-all job or Signal database query/index change is used. Sending alone updates
+last-seen metadata; it does not guarantee that earlier incoming messages become read.
+
 ## Code map and verification
 
 | Component | Responsibility |
@@ -236,7 +269,7 @@ No repository credentials, deployment XML or FCM values are included in these
 examples or changed by Gateway configuration commands.
 
 Verified on 2026-10-28: `:Signal-Android:assemblePlayProdRelease` succeeded and the
-focused unit suite passed 347 tests, with no failures, errors
+focused unit suite passed 397 tests, with no failures, errors
 or skips. `git diff --check` passed. This is build/unit validation; it does not
 replace the live-device checks above.
 

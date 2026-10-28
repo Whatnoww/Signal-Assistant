@@ -11,6 +11,7 @@ import org.thoughtcrime.securesms.database.model.Mention
 import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.github.AdminCommands
 import org.thoughtcrime.securesms.github.CommandReply
+import org.thoughtcrime.securesms.github.CommandDocument
 import org.thoughtcrime.securesms.github.GitHubAutoReply
 import org.thoughtcrime.securesms.github.GroupScanCommand
 import org.thoughtcrime.securesms.groups.GroupId
@@ -71,26 +72,15 @@ internal object GatewayController {
     }
     if (body in helpAliases) {
       val ordinary = document.render(body) { org.thoughtcrime.securesms.github.CommandLinkState() } ?: return true
-      val scopes = mutableListOf("public")
-      if (AdminCommands.isAuthorized(BuildConfig.ADMIN_ACI, aci)) scopes += "owner"
       if (recipient.isGroup) {
-        val id = recipient.requireGroupId().toString()
-        val state = platform.group(id, false)
+        val state = platform.group(recipient.requireGroupId().toString(), false)
         if (!state.active || !state.canPost) return true
-        if (aci in state.admins) {
-          if (available("!groupid")) scopes += "group-admin"
-          if (available("!scan")) scopes += "group-scan"
-          if (available("!gateway") && config.groups[id]?.throttle != true) {
-            if (config.groups[id] != null) scopes += "source-admin"
-            if (config.groups.values.any { it.destination == id }) scopes += "gateway-admin"
-          }
-        }
-        if (store.requests().any { it.room == id && it.active && config.groups[it.source]?.let { source -> !config.isPaused(source) } == true && aci in platform.group(it.source, false).admins }) {
-          scopes += "review-admin"
-          if (available("!approve")) scopes += "review-approve"
-          if (available("!deny")) scopes += "review-deny"
-        }
-      } else if (available("!scan") && knownAdminGroups(sender).isNotEmpty()) scopes += "dm-group-admin"
+        val public = concatenate(listOf(ordinary) + listOfNotNull(config.help["public"]))
+        val root = platform.sendOnce("help:$messageId", 0, "help", recipient, public, paginate = false).single()
+        AppDependencies.jobManager.add(org.thoughtcrime.securesms.jobs.GatewayHelpJob(messageId, root))
+        return true
+      }
+      val scopes = helpScopes(context, recipient, aci, config, document, platform)
       val combined = concatenate(listOf(ordinary) + scopes.mapNotNull(config.help::get))
       if (combined.text.isNotBlank()) platform.sendOnce("help:$messageId", 0, "help", recipient, combined)
       return true
@@ -156,6 +146,7 @@ internal object GatewayController {
           platform.sendOnce("command:$messageId", 0, "gateway_status", sender, details)
         }
         is GatewayCommand.Set -> {
+          var changeDescription = ""
           GitHubAutoReply.updateConfiguration(context) { document ->
             val latest = GatewayConfiguration.parse(document)
             if (command.field == "deletemedia") {
@@ -175,6 +166,7 @@ internal object GatewayController {
             }
             GatewayConfiguration.set(document, groupId, command.field, command.value)
             val updated = GatewayConfiguration.parse(document).groups.getValue(groupId)
+            changeDescription = configurationChange(policy, updated, command.field)
             if (updated.enabled) {
               require(updated.destination != groupId || updated.admin) { "Same-group screening requires admin=1. Disable Gateway before switching source administrative actions off." }
               latest.requireWorkflowTemplates()
@@ -187,7 +179,7 @@ internal object GatewayController {
             require(aci in platform.group(groupId, true).admins) { "Your administrator role changed." }
             true
           }
-          dm(platform, sender, messageId, "dm_status", "Gateway configuration updated.")
+          dm(platform, sender, messageId, "dm_status", changeDescription)
           GatewayWorkJob.recover()
         }
         else -> Unit
@@ -204,6 +196,58 @@ internal object GatewayController {
   private fun dm(platform: SignalGatewayPlatform, sender: Recipient, id: Long, template: String, text: String) {
     val values = listOf("gateway_status", "operation_status", "safe_reason").associateWith { GatewayText(text) }
     platform.sendOnce("command:$id", 0, template, sender, platform.template(template, values))
+  }
+
+  internal fun helpScopes(context: Context, recipient: Recipient, aci: String, config: GatewayConfiguration, document: CommandDocument, platform: SignalGatewayPlatform): Set<String> {
+    fun available(trigger: String) = document.render(trigger) { org.thoughtcrime.securesms.github.CommandLinkState() } != null
+    val scopes = linkedSetOf("public")
+    if (AdminCommands.isAuthorized(BuildConfig.ADMIN_ACI, aci)) scopes += "owner"
+    if (recipient.isGroup) {
+      val id = recipient.requireGroupId().toString()
+      val state = platform.group(id, false)
+      if (!state.active || !state.canPost) return emptySet()
+      if (aci in state.admins) {
+        if (available("!groupid")) scopes += "group-admin"
+        if (available("!scan")) scopes += "group-scan"
+        if (available("!gateway") && config.groups[id]?.throttle != true) {
+          if (config.groups[id] != null) scopes += "source-admin"
+          if (config.groups.values.any { it.destination == id }) scopes += "gateway-admin"
+        }
+      }
+      val store = GatewayDatabase.get(context.applicationContext as android.app.Application)
+      if (store.requests().any { it.room == id && it.active && config.groups[it.source]?.let { source -> !config.isPaused(source) } == true && aci in platform.group(it.source, false).admins }) {
+        scopes += "review-admin"
+        if (available("!approve")) scopes += "review-approve"
+        if (available("!deny")) scopes += "review-deny"
+      }
+    } else if (available("!scan") && knownAdminGroups(Recipient.externalPush(org.signal.core.models.ServiceId.ACI.parseOrThrow(aci))).isNotEmpty()) scopes += "dm-group-admin"
+    return scopes
+  }
+
+  private fun configurationChange(before: GatewayGroup, after: GatewayGroup, field: String): String {
+    fun value(group: GatewayGroup): String = when (field) {
+      "enabled" -> if (group.enabled) "enabled" else "disabled"
+      "admin" -> if (group.admin) "enabled" else "disabled"
+      "deletemedia" -> if (group.deleteMedia) "enabled" else "disabled"
+      "mentionadmins" -> if (group.mentionAdmins) "enabled" else "disabled"
+      "groupid" -> group.destination.ifBlank { "not configured" }
+      "spamtext" -> group.spamText ?: "universal default"
+      "reminderhours" -> group.reminderHours?.let { "$it hours" } ?: "universal default"
+      "removalhours" -> group.removalHours?.let { "$it hours" } ?: "universal default"
+      else -> error("Unsupported Gateway setting")
+    }
+    val label = when (field) {
+      "enabled" -> "Gateway processing"
+      "admin" -> "Source administrative actions"
+      "deletemedia" -> "Media deletion"
+      "mentionadmins" -> "Administrator mentions"
+      "groupid" -> "Gateway destination"
+      "spamtext" -> "Spam question"
+      "reminderhours" -> "Reminder period"
+      "removalhours" -> "Removal period"
+      else -> error("Unsupported Gateway setting")
+    }
+    return "${after.name}\n$label: ${value(before)} → ${value(after)}"
   }
 
   fun knownAdminGroups(sender: Recipient): List<GroupRecord> = SignalDatabase.groups.getGroups().use { reader ->

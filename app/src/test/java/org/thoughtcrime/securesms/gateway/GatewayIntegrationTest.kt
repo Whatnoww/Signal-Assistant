@@ -45,6 +45,7 @@ import org.thoughtcrime.securesms.jobs.GatewayDmScanRefreshJob
 import org.thoughtcrime.securesms.jobs.GatewayWorkJob
 import org.thoughtcrime.securesms.jobs.GatewayRequestPollJob
 import org.thoughtcrime.securesms.jobs.GatewayCommandJob
+import org.thoughtcrime.securesms.jobs.GatewayHelpJob
 import org.thoughtcrime.securesms.jobmanager.JsonJobData
 import org.thoughtcrime.securesms.linkpreview.LinkPreview
 import org.thoughtcrime.securesms.mms.IncomingMessage
@@ -82,6 +83,7 @@ class GatewayIntegrationTest {
     mockkObject(GitHubAutoReply)
     every { GitHubAutoReply.configurationDocument(any(), any()) } answers { CommandDocument.parse(xml) }
     every { GitHubAutoReply.configurationSnapshot(any(), any()) } answers { CommandsSnapshot(xml, xml, null) }
+    every { GitHubAutoReply.refreshConfigurationIfDue(any()) } returns false
     mockkObject(GroupTable.Companion)
     every { GroupTable.getCachedBlocklist() } answers { cachedBlocklist }
     every { GroupTable.getBlocklist(any()) } answers { cachedBlocklist = onlineBlocklist; onlineBlocklist }
@@ -93,7 +95,13 @@ class GatewayIntegrationTest {
       sent += message
       recipients.insertOutgoingMessage(message, thirdArg())
     }
+    every { MessageSender.sendAssistantGroupReply(any(), any(), any(), any()) } answers {
+      val message = secondArg<OutgoingMessage>()
+      sent += message
+      recipients.insertOutgoingMessage(message, thirdArg())
+    }
     every { AppDependencies.jobManager.add(any<Job>()) } answers { jobs += firstArg<Job>() }
+    every { AppDependencies.application } returns context
     every { RemoteConfig.adminDeleteThreshold } returns 86400L
     every { RemoteConfig.regularDeleteThreshold } returns 86400L
   }
@@ -209,10 +217,12 @@ class GatewayIntegrationTest {
     assertFalse(sent.last().body.contains("Gateway source controls"))
     assertFalse(sent.last().body.contains("!scan"))
     GatewayController.handle(context, incoming(admin, group.groupId, "!help", 101))
+    runHelpEdits()
     assertTrue(sent.last().body.contains("Gateway source controls"))
     assertTrue(sent.last().body.contains("!scan"))
     update(group.groupId.toString(), "throttle", "1")
     GatewayController.handle(context, incoming(admin, group.groupId, "!help", 102))
+    runHelpEdits()
     assertFalse(sent.last().body.contains("Gateway source controls"))
     assertTrue(sent.last().body.contains("!scan"))
   }
@@ -467,7 +477,8 @@ class GatewayIntegrationTest {
     xml = xml.replace("__signal_group__v2__!REPLACE_WITH_GATEWAY_ID_HEX", room.groupId.toString())
     acceptConfigurationWrites()
     GatewayController.handle(context, incoming(admin, room.groupId, "!help"))
-    assertTrue(sent.single().body.contains("!gateway deletemedia"))
+    runHelpEdits()
+    assertTrue(sent.last().body.contains("!gateway deletemedia"))
     GatewayController.handle(context, incoming(admin, room.groupId, "!gateway", 101))
     assertEquals(admin, sent.last().threadRecipient.id)
     assertTrue(sent.last().body.contains("Media deletion in Gateway review room: disabled"))
@@ -485,6 +496,7 @@ class GatewayIntegrationTest {
     }
     update(room.groupId.toString(), "throttle", "1")
     GatewayController.handle(context, incoming(admin, room.groupId, "!help", 106))
+    runHelpEdits()
     assertFalse(sent.last().body.contains("!gateway deletemedia"))
   }
 
@@ -635,7 +647,7 @@ class GatewayIntegrationTest {
     assertEquals(1, sent.size)
   }
 
-  @Test fun `request polling refreshes only enabled sources without online XML or blocklist checks`() {
+  @Test fun `request polling covers sources and other bot-admin groups without forced XML or blocklist checks`() {
     val applicant = recipients.createRecipient("Applicant")
     val source = recipients.createGroup()
     val room = recipients.createGroup(applicant)
@@ -646,7 +658,7 @@ class GatewayIntegrationTest {
     assertTrue(result.isRetry)
     assertEquals(30000L, pollBackoff(result))
     verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), source.masterKey, any()) }
-    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), room.masterKey, any()) }
+    verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), room.masterKey, any()) }
     verify(exactly = 0) { GitHubAutoReply.configurationSnapshot(any(), true) }
     verify(exactly = 0) { GroupTable.getBlocklist(any()) }
     assertTrue(jobs.isEmpty())
@@ -667,12 +679,43 @@ class GatewayIntegrationTest {
       )), null)
     }
     assertTrue(GatewayRequestPollJob().also { it.setContext(context) }.run().isRetry)
-    val intake = jobs.filterIsInstance<GatewayWorkJob>().first { JsonJobData.deserialize(it.serialize()).getBoolean("intake") }
-    justRun { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
-    intake.setContext(context)
-    assertTrue(intake.run().isSuccess)
     assertEquals(1L, store.requests().single().number)
     assertEquals(Recipient.resolved(applicant).requireAci().toString(), store.requests().single().aci)
+  }
+
+  @Test fun `polling discovers pending members in a bot-admin group without Gateway configuration or chat traffic`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val group = recipients.createGroup()
+    val state = SignalDatabase.groups.requireGroup(group.groupId).requireV2GroupProperties().decryptedGroup
+    every { GroupManager.forceSanityUpdateFromServer(any(), group.masterKey, any()) } answers {
+      SignalDatabase.groups.update(group.groupId, state.copy(requestingMembers = listOf(
+        DecryptedRequestingMember(aciBytes = Recipient.resolved(applicant).requireAci().toByteString(), timestamp = 123)
+      )), null)
+    }
+    assertTrue(GatewayRequestPollJob().also { it.setContext(context) }.run().isRetry)
+    verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), group.masterKey, any()) }
+    assertEquals(1, SignalDatabase.groups.requireGroup(group.groupId).requireV2GroupProperties().decryptedGroup.requestingMembers.size)
+    assertTrue(store.requests().isEmpty())
+    assertTrue(sent.isEmpty())
+  }
+
+  @Test fun `committed native join changes start Gateway intake without an applicant chat message`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup()
+    val room = recipients.createGroup()
+    configureSource(source)
+    update(source.groupId.toString(), "enabled", "1"); update(source.groupId.toString(), "groupid", room.groupId.toString())
+    GatewayRuntime.configurationAccepted(context)
+    jobs.clear()
+    val state = SignalDatabase.groups.requireGroup(source.groupId).requireV2GroupProperties().decryptedGroup
+    SignalDatabase.groups.update(source.groupId, state.copy(requestingMembers = listOf(
+      DecryptedRequestingMember(aciBytes = Recipient.resolved(applicant).requireAci().toByteString(), timestamp = 55)
+    )), null)
+    val event = jobs.filterIsInstance<GatewayWorkJob>().first { JsonJobData.deserialize(it.serialize()).getString("group") == source.groupId.toString() }
+    event.setContext(context); assertTrue(event.run().isSuccess)
+    val intake = jobs.filterIsInstance<GatewayWorkJob>().first { JsonJobData.deserialize(it.serialize()).getBoolean("intake") }
+    intake.setContext(context); assertTrue(intake.run().isSuccess)
+    assertEquals(55L, store.requests().single().generation)
   }
 
   @Test fun `polling stops for emergency pause source throttle and explicit polling disable`() {
@@ -685,14 +728,15 @@ class GatewayIntegrationTest {
     assertTrue(job.run().isSuccess)
     xml = xml.replace("<paused>1</paused>", "<paused>0</paused>")
     update(source.groupId.toString(), "throttle", "1")
-    assertTrue(job.run().isSuccess)
+    assertTrue(job.run().isRetry)
+    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), source.masterKey, any()) }
     update(source.groupId.toString(), "throttle", "0")
     val document = CommandDocument.parse(xml)
     val defaults = document.document.documentElement.direct("gateway")!!.direct("defaults")!!
     (defaults.direct("joinpollseconds") ?: document.document.createElement("joinpollseconds").also(defaults::appendChild)).textContent = "0"
     xml = document.toXml()
     assertTrue(job.run().isSuccess)
-    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
+    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), source.masterKey, any()) }
   }
 
   @Test fun `one unavailable source does not block other request refreshes and restored jobs use current timing`() {
@@ -795,7 +839,8 @@ class GatewayIntegrationTest {
     val state = SignalDatabase.groups.requireGroup(room.groupId).requireV2GroupProperties().decryptedGroup
     SignalDatabase.groups.update(room.groupId, state.copy(members = state.members.filterNot { it.aciBytes == aci.toByteString() }), null)
     observe(reply)
-    assertEquals("unplanned_gateway_departure", store.request(request.id)!!.data.getString("reason"))
+    assertEquals(GatewayPhase.DENYING, store.request(request.id)!!.phase)
+    assertTrue(store.request(request.id)!!.data.getBoolean("departed"))
     assertTrue(sent.isEmpty())
   }
 
@@ -808,6 +853,97 @@ class GatewayIntegrationTest {
     every { GitHubAutoReply.configurationSnapshot(any(), any()) } returns next
     assertTrue(GatewayRuntime.configuration(context)!!.paused)
     assertNotSame(cached, GatewayRuntime.configuration(context))
+  }
+
+  @Test fun `help is public first and its admin edit has a durable recipient cap and public edit target`() {
+    val admin = recipients.createRecipient("Admin")
+    val member = recipients.createRecipient("Member")
+    val group = recipients.createGroup(admin, member)
+    configureSource(group)
+    demote(group, member)
+    GatewayController.handle(context, incoming(member, group.groupId, "!help"))
+    val public = sent.single()
+    assertFalse(public.body.contains("!gateway"))
+    runHelpEdits()
+    val edit = sent.last()
+    assertTrue(edit.body.contains("!gateway"))
+    val message = SignalDatabase.messages.getMessageFor(edit.sentTimeMillis, Recipient.self().id)!!
+    GatewayAudience.prepareReceipts(context, message.id)
+    val metadata = GatewayAudience.metadata(context, message.id)
+    assertEquals(public.sentTimeMillis, GatewayAudience.editTarget(metadata, 999))
+    assertEquals(setOf(admin), GatewayAudience.targets(context, metadata, Recipient.resolved(group.recipientId)))
+    assertEquals(setOf(admin), SignalDatabase.groupReceipts.getGroupReceiptInfo(message.id).map { it.recipientId }.toSet())
+    store.confirmOutgoing(edit.sentTimeMillis, System.currentTimeMillis())
+    assertEquals(metadata, GatewayAudience.metadata(context, message.id))
+    val native = org.thoughtcrime.securesms.jobs.PushGroupSendJob(message.id, group.recipientId, emptySet(), false, false, metadata)
+    val restored = org.thoughtcrime.securesms.jobs.PushGroupSendJob.Factory().create(native.parameters, native.serialize())
+    assertEquals(metadata, JsonJobData.deserialize(restored.serialize()).getString("assistant_audience"))
+    demote(group, admin)
+    assertTrue(GatewayAudience.targets(context, metadata, Recipient.resolved(group.recipientId)).isEmpty())
+  }
+
+  @Test fun `scan audiences exclude members and never expand when a new administrator appears`() {
+    val admin = recipients.createRecipient("Admin")
+    val member = recipients.createRecipient("Member")
+    val group = recipients.createGroup(admin, member)
+    demote(group, member)
+    val initial = SignalDatabase.groups.requireGroup(group.groupId)
+    val audience = GatewayAudience.scan(initial)
+    assertEquals(setOf(Recipient.resolved(admin).requireAci().toString()), audience.acis)
+    val state = initial.requireV2GroupProperties().decryptedGroup
+    SignalDatabase.groups.update(group.groupId, state.copy(members = state.members.map { it.copy(role = Member.Role.ADMINISTRATOR) }), null)
+    assertEquals(setOf(admin), GatewayAudience.targets(context, audience.encode(), Recipient.resolved(group.recipientId)))
+    assertTrue(GatewayAudience.targets(context, audience.copy(acis = emptySet()).encode(), Recipient.resolved(group.recipientId)).isEmpty())
+  }
+
+  @Test fun `owner edit references the public help base even when the owner did not receive the admin edit`() {
+    val admin = recipients.createRecipient("Admin")
+    val owner = recipients.createRecipient("Owner")
+    val member = recipients.createRecipient("Member")
+    val group = recipients.createGroup(admin, owner, member)
+    configureSource(group)
+    demote(group, member); demote(group, owner)
+    val ownerAci = Recipient.resolved(owner).requireAci().toString()
+    mockkObject(org.thoughtcrime.securesms.github.AdminCommands.Companion)
+    try {
+      every { org.thoughtcrime.securesms.github.AdminCommands.isAuthorized(any(), ownerAci) } returns true
+      GatewayController.handle(context, incoming(member, group.groupId, "!help"))
+      val public = sent.single()
+      runHelpEdits()
+      assertEquals(3, sent.size)
+      val adminMessage = SignalDatabase.messages.getMessageFor(sent[1].sentTimeMillis, Recipient.self().id)!!
+      val ownerMessage = SignalDatabase.messages.getMessageFor(sent[2].sentTimeMillis, Recipient.self().id)!!
+      val metadata = GatewayAudience.metadata(context, ownerMessage.id)
+      assertEquals(setOf(owner), GatewayAudience.targets(context, metadata, Recipient.resolved(group.recipientId)))
+      assertTrue(sent[2].body.contains("!admin disable all"))
+      // Native outbox reconstruction links to the preceding local revision. The
+      // restricted wire edit deliberately targets the public timestamp instead.
+      assertEquals(adminMessage.id, SignalDatabase.messages.getOutgoingMessage(ownerMessage.id).messageToEdit)
+      assertEquals(public.sentTimeMillis, GatewayAudience.editTarget(metadata, adminMessage.dateSent))
+    } finally { unmockkObject(org.thoughtcrime.securesms.github.AdminCommands.Companion) }
+  }
+
+  @Test fun `Gateway change confirmations describe the accepted setting and preserve multiline spam text`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    configureSource(group)
+    acceptConfigurationWrites()
+    GatewayController.handle(context, incoming(admin, group.groupId, "!gateway mentionadmins disable"))
+    assertTrue(sent.last().body.contains("Administrator mentions: enabled → disabled"))
+    GatewayController.handle(context, incoming(admin, group.groupId, "!gateway spamtext First line\nSecond line <&>", 101))
+    assertTrue(sent.last().body.contains("Spam question: Please tell us briefly why you would like to join this group. → First line\nSecond line <&>"))
+    assertEquals("First line\nSecond line <&>", GatewayConfiguration.parse(CommandDocument.parse(xml)).groups.getValue(group.groupId.toString()).spamText)
+  }
+
+  @Test fun `a busy native group defers a restricted send instead of dropping its audience check`() {
+    val admin = recipients.createRecipient("Admin")
+    val group = recipients.createGroup(admin)
+    val audience = GatewayAudience.scan(SignalDatabase.groups.requireGroup(group.groupId))
+    every { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) } throws org.signal.core.util.groups.GroupChangeBusyException("Busy")
+    val error = assertThrows(org.thoughtcrime.securesms.transport.RetryLaterException::class.java) {
+      GatewayAudience.targets(context, audience.encode(), Recipient.resolved(group.recipientId))
+    }
+    assertEquals(1000L, error.backoff)
   }
 
   @Test fun `group conversion caching follows native content and never bypasses a requested refresh`() {
@@ -1004,6 +1140,14 @@ class GatewayIntegrationTest {
   }
 
   private fun observe(messageId: Long) = GatewayRuntime.work(context, 0, "", emptyList(), messageId)
+
+  private fun runHelpEdits() {
+    val job = jobs.filterIsInstance<GatewayHelpJob>().last()
+    val root = JsonJobData.deserialize(job.serialize()).getLong("root")
+    SignalDatabase.messages.markAsSent(root)
+    job.setContext(context)
+    assertTrue(job.run().isSuccess)
+  }
 
   private fun pollBackoff(result: Job.Result): Long = Job.Result::class.java.getDeclaredMethod("getBackoffInterval").apply { isAccessible = true }.invoke(result) as Long
   private fun queuePriority(job: Job): Int = Job.Parameters::class.java.getDeclaredMethod("getQueuePriority").apply { isAccessible = true }.invoke(job.parameters) as Int

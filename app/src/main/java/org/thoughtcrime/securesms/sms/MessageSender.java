@@ -220,6 +220,22 @@ public class MessageSender {
                           @Nullable final String metricId,
                           @Nullable final MessageTable.InsertListener insertListener)
   {
+    return send(context, message, threadId, sendType, metricId, insertListener, "");
+  }
+
+  public static long sendAssistantGroupReply(@NonNull Context context, @NonNull OutgoingMessage message, long threadId, @NonNull String audience) {
+    if (!message.getThreadRecipient().isPushV2Group() || audience.isEmpty()) throw new IllegalArgumentException("A scoped group reply requires an audience.");
+    return send(context, message, threadId, SendType.SIGNAL, null, null, audience);
+  }
+
+  private static long send(final Context context,
+                           final OutgoingMessage message,
+                           final long threadId,
+                           @NonNull SendType sendType,
+                           @Nullable final String metricId,
+                           @Nullable final MessageTable.InsertListener insertListener,
+                           @NonNull String assistantAudience)
+  {
     Log.i(TAG, "Sending media message to " + message.getThreadRecipient().getId() + ", thread: " + threadId);
     try {
       ThreadTable  threadTable = SignalDatabase.threads();
@@ -229,6 +245,8 @@ public class MessageSender {
       Recipient    recipient         = message.getThreadRecipient();
       InsertResult insertResult      = database.insertMessageOutbox(applyUniversalExpireTimerIfNecessary(context, recipient, message, allocatedThreadId), allocatedThreadId, sendType != SendType.SIGNAL, insertListener);
       long         messageId         = insertResult.getMessageId();
+
+      if (!assistantAudience.isEmpty()) org.thoughtcrime.securesms.gateway.GatewayAudience.prepareReceipts(context, messageId, assistantAudience);
 
 
       if (message.getThreadRecipient().isGroup()) {
@@ -241,7 +259,8 @@ public class MessageSender {
         SignalLocalMetrics.IndividualMessageSend.onInsertedIntoDatabase(messageId, metricId);
       }
 
-      sendMessageInternal(context, recipient, sendType, messageId, insertResult.getQuoteAttachmentId(), Collections.emptyList());
+      if (assistantAudience.isEmpty()) sendMessageInternal(context, recipient, sendType, messageId, insertResult.getQuoteAttachmentId(), Collections.emptyList());
+      else sendGroupPush(context, recipient, messageId, Collections.emptySet(), Collections.emptyList(), assistantAudience);
       onMessageSent();
       threadTable.update(allocatedThreadId, true, true);
 
@@ -546,7 +565,7 @@ public class MessageSender {
 
   public static void resendGroupMessage(@NonNull Context context, @NonNull MessageRecord messageRecord, @NonNull Set<RecipientId> filterRecipientIds) {
     if (!messageRecord.isMms()) throw new AssertionError("Not Group");
-    sendGroupPush(context, messageRecord.getToRecipient(), messageRecord.getId(), filterRecipientIds, Collections.emptyList());
+    sendGroupPush(context, messageRecord.getToRecipient(), messageRecord.getId(), filterRecipientIds, Collections.emptyList(), org.thoughtcrime.securesms.gateway.GatewayAudience.metadata(context, messageRecord.getId()));
     onMessageSent();
   }
 
@@ -586,7 +605,9 @@ public class MessageSender {
                                                    .map(it -> it.attachmentId)
                                                    .orElse(null);
 
-    sendMessageInternal(context, recipient, sendType, messageId, quoteAttachmentId, Collections.emptyList());
+    String audience = recipient.isPushV2Group() ? org.thoughtcrime.securesms.gateway.GatewayAudience.metadata(context, messageId) : "";
+    if (audience.isEmpty()) sendMessageInternal(context, recipient, sendType, messageId, quoteAttachmentId, Collections.emptyList());
+    else sendGroupPush(context, recipient, messageId, Collections.emptySet(), Collections.emptyList(), audience);
 
     onMessageSent();
   }
@@ -647,13 +668,17 @@ public class MessageSender {
 
   @WorkerThread
   private static void sendGroupPush(@NonNull Context context, @NonNull Recipient recipient, long messageId, @NonNull Set<RecipientId> filterRecipientIds, @NonNull Collection<String> uploadJobIds) {
+    sendGroupPush(context, recipient, messageId, filterRecipientIds, uploadJobIds, "");
+  }
+
+  private static void sendGroupPush(@NonNull Context context, @NonNull Recipient recipient, long messageId, @NonNull Set<RecipientId> filterRecipientIds, @NonNull Collection<String> uploadJobIds, @NonNull String assistantAudience) {
     JobManager jobManager = AppDependencies.getJobManager();
 
     if (uploadJobIds.size() > 0) {
-      Job groupSend = new PushGroupSendJob(messageId, recipient.getId(), filterRecipientIds, !uploadJobIds.isEmpty(), false);
+      Job groupSend = new PushGroupSendJob(messageId, recipient.getId(), filterRecipientIds, !uploadJobIds.isEmpty(), false, assistantAudience);
       jobManager.add(groupSend, uploadJobIds, uploadJobIds.isEmpty() ? null : recipient.getId().toQueueKey());
     } else {
-      PushGroupSendJob.enqueue(context, jobManager, messageId, recipient.getId(), filterRecipientIds, false);
+      PushGroupSendJob.enqueue(context, jobManager, messageId, recipient.getId(), filterRecipientIds, false, assistantAudience);
     }
   }
 

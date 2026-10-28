@@ -58,6 +58,7 @@ object GitHubAutoReply {
   private fun repository() = GitHubCommandsRepository(BuildConfig.RESPONSE_XML, BuildConfig.GITHUB_TOKEN_COMMANDS, client)
 
   fun refreshFromGithub(context: Context): Boolean = synchronized(refreshLock) { refresh(context, force = true) }
+  internal fun refreshConfigurationIfDue(context: Context): Boolean = synchronized(refreshLock) { refresh(context) }
 
   private fun refresh(context: Context, force: Boolean = false): Boolean {
     if (!isConfigured()) return false

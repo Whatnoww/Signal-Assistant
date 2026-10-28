@@ -203,8 +203,6 @@ class IndividualSendJobV2Test {
     every { RemoteConfig.defaultMaxBackoff } returns 60_000L
 
     mockkObject(PushSendJob.Companion)
-    // Whatnoww added
-    every { PushSendJob.markAllThreadsReadAfterSend() } just runs
     every { PushSendJob.markAttachmentsUploaded(any<Long>(), any<OutgoingMessage>()) } just runs
     every { PushSendJob.notifyMediaMessageDeliveryFailed(any(), any<Long>()) } just runs
 
@@ -360,9 +358,8 @@ class IndividualSendJobV2Test {
     coVerifyOrder {
       messageService.sendMessage(any(), any(), any(), any(), any(), any(), any(), any())
       messages.markAsSent(messageId, true)
-      PushSendJob.markAllThreadsReadAfterSend()
     }
-    verify(exactly = 1) { PushSendJob.markAllThreadsReadAfterSend() }
+    verify(exactly = 0) { threads.setAllThreadsRead() }
   }
 
   @Test
@@ -725,7 +722,7 @@ class IndividualSendJobV2Test {
 
     assertThat(result.isRetry).isTrue()
     // Whatnoww added
-    verify(exactly = 0) { PushSendJob.markAllThreadsReadAfterSend() }
+    verify(exactly = 0) { threads.setAllThreadsRead() }
   }
 
   @Test
