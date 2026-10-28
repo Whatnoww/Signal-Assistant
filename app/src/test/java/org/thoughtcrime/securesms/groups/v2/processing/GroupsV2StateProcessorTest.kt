@@ -180,6 +180,8 @@ class GroupsV2StateProcessorTest {
       justRun { profileAndMessageHelper.storeMessage(any(), any(), any()) }
       justRun { profileAndMessageHelper.persistLearnedProfileKeys(any<ProfileKeySet>()) }
       justRun { profileAndMessageHelper.stopAllTypingForGroup() }
+      // State-processing tests isolate JW admission/profile-sharing side effects.
+      justRun { profileAndMessageHelper.setProfileSharing(any(), any(), any()) }
     }
 
     data.serverState?.let { serverState ->
