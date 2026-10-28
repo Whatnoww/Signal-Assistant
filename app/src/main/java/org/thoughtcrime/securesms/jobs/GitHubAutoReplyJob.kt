@@ -7,7 +7,6 @@ package org.thoughtcrime.securesms.jobs
 
 import android.content.Context
 import org.signal.core.util.logging.Log
-import org.thoughtcrime.securesms.database.GroupTable
 import org.thoughtcrime.securesms.database.SignalDatabase
 import org.thoughtcrime.securesms.database.model.addStyle
 import org.thoughtcrime.securesms.database.model.databaseprotos.BodyRangeList
@@ -71,7 +70,7 @@ class GitHubAutoReplyJob private constructor(parameters: Parameters, private val
     val latestRecipient = Recipient.resolved(recipient.id)
     if (!canReply(latestRecipient, request.threadId)) return
 
-    val shouldRefresh = (cached != null && GitHubAutoReply.needsRefresh(request.body)) || (isScan && GroupTable.blocklistNeedsRefresh())
+    val shouldRefresh = isScan || (cached != null && GitHubAutoReply.needsRefresh(request.body))
     val finalReply = if (isScan) {
       val group = GroupScanCommand.authorizedGroup(latestRecipient, Recipient.resolved(request.fromRecipient.id)) ?: return
       GroupScanCommand.reply(reply, group)

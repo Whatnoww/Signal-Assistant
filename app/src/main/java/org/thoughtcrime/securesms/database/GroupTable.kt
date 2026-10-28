@@ -7,6 +7,7 @@ import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import androidx.core.content.contentValuesOf
+import okhttp3.CacheControl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.ByteString
@@ -132,15 +133,15 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     /** Read the last downloaded snapshot without refreshing it, even when its TTL has expired. */
     internal fun getCachedBlocklist(): Set<String>? = cachedBlocklist
 
-    internal fun blocklistNeedsRefresh(): Boolean = cachedBlocklist == null || System.currentTimeMillis() - lastBlocklistFetch >= BLOCKLIST_TTL_MS
-
-    /** Refresh an expired snapshot on a background worker, retaining the last good data on failure. */
-    internal fun getBlocklist(): Set<String> {
+    /** Scans force an online check; ordinary lookups retain the TTL and last good data on failure. */
+    internal fun getBlocklist(forceRefresh: Boolean = false): Set<String> {
       val now = System.currentTimeMillis()
-      cachedBlocklist?.let { if (now - lastBlocklistFetch < BLOCKLIST_TTL_MS) return it }
+      cachedBlocklist?.let { if (!forceRefresh && now - lastBlocklistFetch < BLOCKLIST_TTL_MS) return it }
 
       return try {
-        val request = Request.Builder().url(ACI_BLOCKLIST).build()
+        val request = Request.Builder().url(ACI_BLOCKLIST)
+          .apply { if (forceRefresh) cacheControl(CacheControl.FORCE_NETWORK) }
+          .build()
         val response = blocklistClient.newCall(request).execute()
         response.use {
           if (!it.isSuccessful) throw java.io.IOException("HTTP ${it.code}")

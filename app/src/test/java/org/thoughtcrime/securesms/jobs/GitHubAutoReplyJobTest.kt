@@ -67,8 +67,7 @@ class GitHubAutoReplyJobTest {
     every { GitHubAutoReply.getReplyFor(any(), any()) } returns reply
     mockkObject(GroupTable.Companion)
     every { GroupTable.getCachedBlocklist() } returns emptySet()
-    every { GroupTable.blocklistNeedsRefresh() } returns false
-    every { GroupTable.getBlocklist() } returns emptySet()
+    every { GroupTable.getBlocklist(any()) } returns emptySet()
     mockkStatic(MessageSender::class)
     every { MessageSender.send(any(), capture(sentMessages), any(), any(), any(), any()) } returns 1L
     every { RemoteConfig.regularDeleteThreshold } returns 86_400L
@@ -424,7 +423,7 @@ class GitHubAutoReplyJobTest {
     every { GitHubAutoReply.getCachedReplyFor(any(), "!scan") } returns reply
     every { GitHubAutoReply.getReplyFor(any(), any()) } answers { error("Must send the cached scan first") }
     every { GroupTable.getCachedBlocklist() } returns setOf(aci)
-    every { GroupTable.getBlocklist() } answers { error("Initial scan must never download the blocklist") }
+    every { GroupTable.getBlocklist(any()) } answers { error("Initial scan must never download the blocklist") }
     every { MessageSender.send(any(), capture(sentMessages), any(), any(), any(), any()) } answers {
       SignalDatabase.messages.insertMessageOutbox(secondArg(), thirdArg())
       thirdArg<Long>()
@@ -440,27 +439,26 @@ class GitHubAutoReplyJobTest {
     val refresh = jobs.filterIsInstance<GitHubAutoReplyRefreshJob>().single()
     val serialized = org.thoughtcrime.securesms.jobmanager.JsonJobData.deserialize(refresh.serialize())
     assertEquals(CommandReply(sent.body, emptyList(), emptyList(), sent.mentions).contentHash(), serialized.getString("previous_hash"))
-    verify(exactly = 0) { GroupTable.getBlocklist() }
+    verify(exactly = 0) { GroupTable.getBlocklist(any()) }
   }
 
   @Test
-  fun `stale blocklist schedules refresh even with fresh command configuration`() {
+  fun `every scan schedules refresh even with fresh caches`() {
     val admin = recipients.createRecipient("Admin")
     val group = recipients.createGroup(admin)
     val jobs = mutableListOf<Job>()
     every { GitHubAutoReply.getCachedReplyFor(any(), "!scan") } returns reply
     every { GitHubAutoReply.needsRefresh(any()) } returns false
-    every { GroupTable.blocklistNeedsRefresh() } returns true
     every { MessageSender.send(any(), capture(sentMessages), any(), any(), any(), any()) } answers {
       SignalDatabase.messages.insertMessageOutbox(secondArg(), thirdArg())
       thirdArg<Long>()
     }
     justRun { AppDependencies.jobManager.add(capture(jobs)) }
-    runJob(insertRequest(admin, group.groupId, "!scan"))
-    assertEquals(1, sentMessages.size)
-    assertEquals(1, jobs.filterIsInstance<GitHubAutoReplyRefreshJob>().size)
+    repeat(2) { runJob(insertRequest(admin, group.groupId, "!scan", timestamp = 100L + it)) }
+    assertEquals(2, sentMessages.size)
+    assertEquals(2, jobs.filterIsInstance<GitHubAutoReplyRefreshJob>().size)
     verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
-    verify(exactly = 0) { GroupTable.getBlocklist() }
+    verify(exactly = 0) { GroupTable.getBlocklist(any()) }
   }
 
   @Test
@@ -471,7 +469,7 @@ class GitHubAutoReplyJobTest {
     runJob(insertRequest(admin, group.groupId, "!scan"))
     assertTrue(sentMessages.isEmpty())
     verify(exactly = 0) { GroupTable.getCachedBlocklist() }
-    verify(exactly = 0) { GroupTable.getBlocklist() }
+    verify(exactly = 0) { GroupTable.getBlocklist(any()) }
   }
 
   @Test
@@ -498,7 +496,7 @@ class GitHubAutoReplyJobTest {
     val replyId = recipients.insertOutgoingMessage(group.recipientId, initial.text)
     SignalDatabase.messages.markAsSent(replyId)
     val aci = Recipient.resolved(blocked).requireAci().toString()
-    every { GroupTable.getBlocklist() } answers {
+    every { GroupTable.getBlocklist(any()) } answers {
       every { GroupTable.getCachedBlocklist() } returns setOf(aci)
       setOf(aci)
     }
@@ -520,7 +518,7 @@ class GitHubAutoReplyJobTest {
     SignalDatabase.messages.markAsSent(replyId)
     assertTrue(scanRefreshJob(requestId, replyId, initial).run().isSuccess)
     assertTrue(sentMessages.isEmpty())
-    verify(exactly = 1) { GroupTable.getBlocklist() }
+    verify(exactly = 1) { GroupTable.getBlocklist(forceRefresh = true) }
   }
 
   @Test
@@ -530,7 +528,7 @@ class GitHubAutoReplyJobTest {
     val requestId = insertRequest(admin, group.groupId, "!scan")
     val replyId = recipients.insertOutgoingMessage(group.recipientId)
     SignalDatabase.messages.markAsSent(replyId)
-    every { GroupTable.getBlocklist() } answers {
+    every { GroupTable.getBlocklist(any()) } answers {
       demote(group, admin)
       emptySet()
     }
@@ -548,7 +546,7 @@ class GitHubAutoReplyJobTest {
     SignalDatabase.messages.markAsSent(replyId)
     assertTrue(scanRefreshJob(requestId, replyId, reply).run().isSuccess)
     assertTrue(sentMessages.isEmpty())
-    verify(exactly = 0) { GroupTable.getBlocklist() }
+    verify(exactly = 0) { GroupTable.getBlocklist(any()) }
     verify(exactly = 0) { GitHubAutoReply.getReplyFor(any(), any()) }
   }
 
@@ -562,7 +560,7 @@ class GitHubAutoReplyJobTest {
     val replyId = recipients.insertOutgoingMessage(group.recipientId, initial.text)
     SignalDatabase.messages.markAsSent(replyId)
     val blocklist = blocked.map { Recipient.resolved(it).requireAci().toString() }.toSet()
-    every { GroupTable.getBlocklist() } answers {
+    every { GroupTable.getBlocklist(any()) } answers {
       every { GroupTable.getCachedBlocklist() } returns blocklist
       blocklist
     }
@@ -611,13 +609,13 @@ class GitHubAutoReplyJobTest {
     setContext(RuntimeEnvironment.getApplication())
   }
 
-  private fun insertRequest(sender: RecipientId, groupId: GroupId? = null, body: String = "!groups"): Long {
+  private fun insertRequest(sender: RecipientId, groupId: GroupId? = null, body: String = "!groups", timestamp: Long = 100L): Long {
     return SignalDatabase.messages.insertMessageInbox(
       IncomingMessage(
         type = MessageType.NORMAL,
         from = sender,
-        sentTimeMillis = 100L,
-        serverTimeMillis = 100L,
+        sentTimeMillis = timestamp,
+        serverTimeMillis = timestamp,
         receivedTimeMillis = 200L,
         groupId = groupId,
         body = body,

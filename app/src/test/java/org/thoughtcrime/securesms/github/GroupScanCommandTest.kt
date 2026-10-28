@@ -47,7 +47,7 @@ class GroupScanCommandTest {
   fun setUp() {
     mockkObject(GroupTable.Companion)
     every { GroupTable.getCachedBlocklist() } returns emptySet()
-    every { GroupTable.getBlocklist() } answers { error("Rendering a scan must not download the blocklist") }
+    every { GroupTable.getBlocklist(any()) } answers { error("Rendering a scan must not download the blocklist") }
   }
 
   @After
@@ -88,7 +88,7 @@ class GroupScanCommandTest {
     result.mentions.forEach { assertEquals("\uFFFC", result.text.substring(it.start, it.start + it.length)) }
     val displayed = MentionUtil.updateBodyAndMentionsWithDisplayNames(RuntimeEnvironment.getApplication(), result.text, result.mentions)
     assertTrue(displayed.body.toString().contains("@Blocked Member"))
-    verify(exactly = 0) { GroupTable.getBlocklist() }
+    verify(exactly = 0) { GroupTable.getBlocklist(any()) }
   }
 
   @Test

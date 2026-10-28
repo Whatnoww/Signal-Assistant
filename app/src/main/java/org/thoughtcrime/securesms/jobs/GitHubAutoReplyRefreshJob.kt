@@ -58,7 +58,7 @@ class GitHubAutoReplyRefreshJob private constructor(
       GitHubAutoReply.getCachedReplyFor(context, request.body)
     } ?: return
     // This job has its own queue, so online blocklist checks never delay new command replies.
-    if (isScan) GroupTable.getBlocklist()
+    if (isScan) GroupTable.getBlocklist(forceRefresh = true)
 
     val latestRequest = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
     if (latestRequest.isRemoteDelete || latestRequest.body != request.body || Recipient.resolved(request.fromRecipient.id).isBlocked) return
