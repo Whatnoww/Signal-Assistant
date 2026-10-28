@@ -24,14 +24,13 @@ internal object GroupScanCommand {
   }
 
   /** The XML response is the heading; membership and blocklist matches are never cached as replies. */
-  fun reply(heading: CommandReply, group: GroupRecord): CommandReply {
+  fun reply(heading: CommandReply, group: GroupRecord, blocklist: Set<String>? = GroupTable.getCachedBlocklist()): CommandReply {
     val text = StringBuilder(heading.text)
     val mentions = mutableListOf<Mention>()
     fun startLine() {
       if (text.isNotEmpty()) text.append('\n')
     }
 
-    val blocklist = GroupTable.getCachedBlocklist()
     if (blocklist == null) {
       startLine()
       text.append("The ACI-Blocklist cache is not available yet.")

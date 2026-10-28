@@ -120,6 +120,8 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
       ACI_BLOCKLIST_REPORT_GROUP
     )
 
+    internal fun aciReportingGroups(): Set<String> = ACI_REPORTING_GROUPS.toSet()
+
     // Whatnoww added - The blocklist separates ACIs with commas and line breaks.
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun parseBlocklist(body: String): Set<String> {
@@ -970,10 +972,14 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     val groupMembers = getV2GroupMembers(decryptedGroup, true)
     var groupSendEndorsementRecords: GroupSendEndorsementRecords? = receivedGroupSendEndorsements?.toGroupSendEndorsementRecords() ?: getGroupSendEndorsements(groupId)
     var blocklistChange: DecryptedGroupChange? = null
+    var gatewayDepartures: List<String> = emptyList()
+    val gatewayChanged = existingGroup.orElse(null)?.takeIf { it.hasV2GroupProperties }?.requireV2GroupProperties()?.decryptedGroup != decryptedGroup
 
     val addedMembers: Collection<RecipientId> = if (existingGroup.isPresent && existingGroup.get().hasV2GroupProperties) {
       val change = GroupChangeReconstruct.reconstructGroupChange(existingGroup.get().requireV2GroupProperties().decryptedGroup, decryptedGroup)
       val removed: List<ServiceId> = DecryptedGroupUtil.removedMembersServiceIdList(change)
+      gatewayDepartures = (change.deleteMembers + change.deletePendingMembers.map { it.serviceIdBytes })
+        .mapNotNull { ACI.parseOrNull(it)?.toString() }
 
       // Whatnoww - Capture join requests and new members for reporting after the group update commits.
       Log.i(JOIN_TAG, "Group $groupId revision ${decryptedGroup.revision}: newPending=${change.newPendingMembers.size}, newRequest=${change.newRequestingMembers.size}, newMembers=${change.newMembers.size}")
@@ -1036,6 +1042,9 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
     }
 
     // Whatnoww added - Send against the committed group state and keep network calls off the update thread.
+    if (gatewayChanged) writableDatabase.runPostSuccessfulTransaction {
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.groupChanged(groupId.toString(), gatewayDepartures)
+    }
     blocklistChange?.let { change ->
       writableDatabase.runPostSuccessfulTransaction {
         blocklistExecutor.execute {
@@ -1076,6 +1085,7 @@ class GroupTable(context: Context?, databaseHelper: SignalDatabase?) :
       }
     }
 
+    if (org.thoughtcrime.securesms.gateway.GatewayRuntime.paused(context)) return
     if (change.newRequestingMembers.isNotEmpty()) {
       val blocklist = getBlocklist()
       for (requestingMember in change.newRequestingMembers) {

@@ -176,6 +176,10 @@ class IndividualSendJobV2 private constructor(parameters: Parameters, private va
       Log.w(TAG, "${logPrefix(message.sentTimeMillis)} Message was already sent. Ignoring.")
       return Result.success()
     }
+    if (!org.thoughtcrime.securesms.gateway.GatewayRuntime.maySend(context, message.sentTimeMillis, message.threadRecipient.id.toLong(), messageId)) {
+      SignalDatabase.messages.markAsSentFailed(messageId)
+      return Result.success()
+    }
 
     val threadId = messageRecord.threadId
     val originalEditedMessage = if (message.messageToEdit > 0) {
@@ -191,7 +195,9 @@ class IndividualSendJobV2 private constructor(parameters: Parameters, private va
 
     val recipient = message.threadRecipient.fresh().validated(message.sentTimeMillis).getOrElse { return it }
 
-    RecipientUtil.shareProfileIfFirstSecureMessage(message.threadRecipient)
+    if (!org.thoughtcrime.securesms.gateway.GatewayRuntime.preservesContact(context, message.threadRecipient.id.toLong(), message.sentTimeMillis)) {
+      RecipientUtil.shareProfileIfFirstSecureMessage(message.threadRecipient)
+    }
 
     val dataMessage = message.toDataMessage().getOrElse { error ->
       Log.w(TAG, "${logPrefix(message.sentTimeMillis)} Failed to create a data message! Reason: $error")
@@ -227,7 +233,9 @@ class IndividualSendJobV2 private constructor(parameters: Parameters, private va
           SignalDatabase.pendingPniSignatureMessages.insertIfNecessary(recipient.id, message.sentTimeMillis, syntheticResult)
         }
 
+        org.thoughtcrime.securesms.gateway.GatewayRuntime.acknowledged(context, message.threadRecipient.id.toLong(), message.sentTimeMillis, messageId)
         SignalDatabase.messages.markAsSent(messageId, success.sentSealedSender)
+        org.thoughtcrime.securesms.gateway.GatewayRuntime.sent(context, message.threadRecipient.id.toLong(), message.sentTimeMillis, messageId)
         PushSendJob.markAttachmentsUploaded(messageId, message)
 
         SignalDatabase.threads.updateSilently(threadId, false)
@@ -490,6 +498,7 @@ class IndividualSendJobV2 private constructor(parameters: Parameters, private va
   override fun onFailure() {
     SignalLocalMetrics.IndividualMessageSend.cancel(messageId)
     SignalDatabase.messages.markAsSentFailed(messageId)
+    org.thoughtcrime.securesms.gateway.GatewayRuntime.failed(context, messageId)
     PushSendJob.notifyMediaMessageDeliveryFailed(context, messageId)
   }
 

@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import org.thoughtcrime.securesms.gateway.GatewayConfiguration
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -133,6 +134,24 @@ class CommandDocumentAndroidTest {
     val category = document.render("!groups 2") { CommandLinkState() }!!
     assertEquals("Music 🎵:\n\nExample:\nhttps://signal.group/#example", category.text)
     assertEquals(category, CommandDocument.parse(document.toXml(), androidFactory()).render("!groups 2") { CommandLinkState() })
+  }
+
+  @Test
+  fun `Android writes indented Gateway settings without changing templates or authored question text`() {
+    val template = listOf(File("docs/gateway/gateway.template.xml"), File("../docs/gateway/gateway.template.xml")).first { it.exists() }.readText()
+    val document = CommandDocument.parse(template, androidFactory())
+    GatewayConfiguration.set(document, "__signal_group__v2__!REPLACE_WITH_SOURCE_ID_HEX", "spamtext", "A & B < C 🔎\nWhy join?")
+    GatewayConfiguration.ensureRoom(document, "new-room", "New review room")
+    val expected = GatewayConfiguration.parse(document)
+    val reply = document.render("!groups") { CommandLinkState() }
+    val saved = document.toXml()
+    assertTrue(saved.contains("\n        <gateway>\n          <groupid>new-room</groupid>\n"))
+    assertTrue(saved.contains("\n    <responses>\n      <message id=\"greeting\">\n        <text>"))
+    assertTrue(saved.contains("\n    <help>\n      <section scope=\"public\">\n        <text>"))
+    val restored = CommandDocument.parse(saved, androidFactory())
+    assertEquals(expected, GatewayConfiguration.parse(restored))
+    assertEquals(reply, restored.render("!groups") { CommandLinkState() })
+    assertEquals(saved, restored.toXml())
   }
 
   private fun androidFactory(): DocumentBuilderFactory = Class.forName("org.apache.harmony.xml.parsers.DocumentBuilderFactoryImpl").getDeclaredConstructor().newInstance() as DocumentBuilderFactory

@@ -61,7 +61,7 @@ Each row uses the XML category order and its current number of direct `<group>` 
 
 `!groups 1` renders only the first category, with its bold heading, group descriptions, italic links and outdated-link labels. Only that category's links are checked and eligible for automatic updates. An empty category returns a short empty-state message. Zero, negative, overflowing and out-of-range numbers return guidance to request the index again; non-numeric arguments such as `!groups extra` remain unmatched. Configured aliases support the same numbered browsing, and exact configured multi-word commands keep their existing precedence.
 
-Numbers, counts and numbered replies are generated from the current XML, including after admin category creation, group additions and moves. Do not add separate commands or store numbers and counts in the file. Disabling the parent command disables its index and all generated numbered replies. Existing lists without `view="categories"` retain their full-list behavior.
+Numbers, counts and numbered replies are generated from the current XML, including after admin category creation, group additions and moves. Silent groups are excluded from counts and replies. Categories containing only silent groups are omitted, and numbered selection uses that same visible category order; genuinely empty categories retain the existing zero-group behavior. Do not add separate commands or store numbers and counts in the file. Disabling the parent command disables its index and all generated numbered replies. Existing lists without `view="categories"` retain their full-list behavior and also omit silent groups.
 
 ## Cache and background edits
 
@@ -108,11 +108,24 @@ Published XML uses line breaks and two-space indentation for structural entries,
     <autoupdate>1</autoupdate>
     <link>https://signal.group/#YOUR_INVITE</link>
     <outdated>0</outdated>
+    <silent>0</silent>
   </group>
 </category>
 ```
 
 `groupid` is the full encoded Signal V2 group ID (`GroupId.toString()`), not a recipient ID, thread ID, master key or the invite URL fragment. The account running this app must be an active member with the group locally available to retrieve its current invite link. The app refreshes that group from Signal before reading the enabled link and password; it never rotates a password or enables a disabled link.
+
+Set `<silent>1</silent>` on a normal group entry to keep it out of public group
+lists while retaining its ID, metadata and Gateway functionality. Missing or `0`
+means public; other values are invalid. Silent entries never trigger public link
+lookups, and their names, links and counts are not included in list replies.
+Owner status marks these entries `[silent]`, and existing owner XML edits preserve
+the flag. An invite link is optional for a silent group; a provided link must
+still use the normal Signal invite format. See [Gateway configuration](../gateway/README.md)
+for a complete unlisted-source example and its review-room visibility.
+Install the updated app before adding silent entries to the normal list, since
+older builds ignore the new flag. Visibility updates follow the existing XML
+cache and refresh behavior.
 
 With `autoupdate=1` and a nonzero ID, an enabled current link replaces the configured link in the reply and is written back to GitHub. The publisher refetches the file and changes only entries whose ID, old link and opt-in still match. It includes the current file SHA and retries a concurrent-write conflict once. A failed write leaves the usable reply intact; the next request can try publishing again. In browser mode, this runs when a numbered category is requested; the index does not check group links. Other full-list commands still check their rendered groups. There is no periodic task.
 
@@ -136,7 +149,7 @@ Set `<active>1</active>` to enable a command or `<active>0</active>` to disable 
 </command>
 ```
 
-Supported response tags are `<text>`, `<br/>`, `<p>`, `<b>`/`<bold>`/`<strong>`, `<i>`/`<italic>`/`<em>`, `<s>`/`<strikethrough>`, `<code>`/`<mono>`, `<spoiler>`, `<groups>` and `<category name="…">`. Nested styles use UTF-16 offsets as required by Signal. Use XML escapes such as `&amp;` in text. Existing plain responses and CDATA remain plain text. Formatting tags inside CDATA are literal text.
+Supported response tags are `<text>`, `<br/>`, `<p>`, `<b>`/`<bold>`/`<strong>`, `<i>`/`<italic>`/`<em>`, `<s>`/`<strikethrough>`, `<code>`/`<mono>`, `<spoiler>`, `<groups>`, `<group>` and `<category name="…">`. Nested styles use UTF-16 offsets as required by Signal. Use XML escapes such as `&amp;` in text. Existing plain responses and CDATA remain plain text. Formatting tags inside CDATA are literal text.
 
 The reply model separates text and formatting from transport; the send path already builds an attachment list for long messages. A future image implementation can add media descriptors and downloads there. `<image src="…"/>` is reserved and currently causes the response to be rejected; image sending is not enabled by this change. Unknown tags fail explicitly so content is never silently omitted.
 

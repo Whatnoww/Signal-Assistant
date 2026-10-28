@@ -43,6 +43,7 @@ class GitHubAutoReplyRefreshJob private constructor(
     .putLongArray("continuation_ids", continuationIds.toLongArray()).putStringArray("continuation_hashes", continuationHashes.toTypedArray()).serialize()
 
   override fun onRun() {
+    if (org.thoughtcrime.securesms.gateway.GatewayRuntime.paused(context)) return
     val request = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
     if (request.isRemoteDelete || request.isOutgoing || request.fromRecipient.isSelf || request.fromRecipient.isBlocked) return
     val recipient = SignalDatabase.threads.getRecipientForThreadId(request.threadId) ?: return
@@ -61,6 +62,7 @@ class GitHubAutoReplyRefreshJob private constructor(
     if (isScan) GroupTable.getBlocklist(forceRefresh = true)
 
     val latestRequest = SignalDatabase.messages.getMessageRecordOrNull(requestId) ?: return
+    if (org.thoughtcrime.securesms.gateway.GatewayRuntime.paused(context)) return
     if (latestRequest.isRemoteDelete || latestRequest.body != request.body || Recipient.resolved(request.fromRecipient.id).isBlocked) return
     val latestRecipient = Recipient.resolved(recipient.id)
     if (!GitHubAutoReplyJob.canReply(latestRecipient, request.threadId)) return

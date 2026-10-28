@@ -27,7 +27,9 @@ object GitHubAutoReply {
   private val renderedReplies = ConcurrentHashMap<String, Pair<String, CommandReply>>()
   private val refreshingInputs = ConcurrentHashMap<String, Boolean>()
 
-  fun isCommandCandidate(input: String?): Boolean = isAdminCommand(input) || (isConfigured() && CommandDocument.isCommandCandidate(input))
+  fun isCommandCandidate(input: String?): Boolean = isAdminCommand(input) ||
+    (input != null && org.thoughtcrime.securesms.gateway.GatewayCommand.candidate(input)) ||
+    (isConfigured() && CommandDocument.isCommandCandidate(input))
 
   fun isAdminCommand(input: String?): Boolean = AdminCommands.isCandidate(input)
 
@@ -41,6 +43,7 @@ object GitHubAutoReply {
         loadCache(context)
         cache.replace(updated)
         renderedReplies.clear()
+        org.thoughtcrime.securesms.gateway.GatewayRuntime.configurationAccepted(context)
         try {
           writeCache(context, updated)
         } catch (e: Exception) {
@@ -61,7 +64,10 @@ object GitHubAutoReply {
     loadCache(context)
     return try {
       val changed = cache.refresh(force) { previous -> repository().fetch(previous) }
-      if (changed) writeCache(context, cache.snapshot!!)
+      if (changed) {
+        org.thoughtcrime.securesms.gateway.GatewayRuntime.configurationAccepted(context)
+        writeCache(context, cache.snapshot!!)
+      }
       changed
     } catch (e: Exception) {
       Log.w(TAG, "Unable to refresh commands; retaining cache (${failureDetail(e)}).")
@@ -71,6 +77,23 @@ object GitHubAutoReply {
 
   /** Keep the last good response, but force the next background check to revalidate it. */
   fun invalidateCache() = cache.invalidate()
+
+  /** Gateway shares validated snapshots and conflict-safe publication with ordinary commands. */
+  internal fun configurationDocument(context: Context, online: Boolean = false): CommandDocument? {
+    if (online) synchronized(refreshLock) { refresh(context, force = true) } else loadCache(context)
+    return cache.snapshot?.let { CommandDocument.parse(it.xml) }
+  }
+
+  internal fun updateConfiguration(context: Context, edit: (CommandDocument) -> Boolean) = synchronized(refreshLock) {
+    val updated = repository().update("Apply Gateway configuration", edit)
+    loadCache(context)
+    cache.replace(updated)
+    renderedReplies.clear()
+    org.thoughtcrime.securesms.gateway.GatewayRuntime.configurationAccepted(context)
+    try { writeCache(context, updated) } catch (e: Exception) {
+      Log.w(TAG, "Gateway configuration was published but its disk cache could not be saved (${e.javaClass.simpleName}).")
+    }
+  }
 
   internal fun needsRefresh(input: String): Boolean = refreshingInputs.containsKey(input) || cache.needsRefresh() || renderedReplies[input]?.first != cache.snapshot?.sha
 
@@ -139,7 +162,7 @@ object GitHubAutoReply {
       val json = JSONObject(cacheFile(context).openRead().bufferedReader(Charsets.UTF_8).use { it.readText() })
       if (json.getString("source") != BuildConfig.RESPONSE_XML) return null
       val xml = json.getString("xml")
-      CommandDocument.parse(xml)
+      org.thoughtcrime.securesms.gateway.GatewayConfiguration.parse(CommandDocument.parse(xml))
       CommandsSnapshot(xml, json.getString("sha"), json.optString("etag").takeIf { it.isNotBlank() })
     } catch (e: Exception) {
       null

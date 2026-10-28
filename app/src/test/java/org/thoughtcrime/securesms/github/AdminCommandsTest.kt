@@ -63,10 +63,19 @@ class AdminCommandsTest {
   }
 
   @Test
-  fun `direct messages and missing repository configuration report errors without network`() {
-    assertTrue(handler().reply("!admin disable all", ADMIN_ACI, null).text.contains("group chat"))
+  fun `group-specific direct commands and missing repository configuration report errors without network`() {
+    assertTrue(handler().reply("!admin group status", ADMIN_ACI, null).text.contains("group chat"))
     assertTrue(handler(configured = false).reply("!admin disable all", ADMIN_ACI, GROUP_ID).text.contains("configure RESPONSE_XML"))
     assertEquals(0, repositories)
+  }
+
+  @Test
+  fun `owner can emergency pause and recover through direct messages`() {
+    assertTrue(handler().reply("!admin disable all", ADMIN_ACI, null).text.startsWith("Disabled all"))
+    assertTrue(org.thoughtcrime.securesms.gateway.GatewayConfiguration.parse(CommandDocument.parse(remoteXml)).paused)
+    assertTrue(handler().reply("!admin enable all", ADMIN_ACI, null).text.startsWith("Enabled all"))
+    assertFalse(org.thoughtcrime.securesms.gateway.GatewayConfiguration.parse(CommandDocument.parse(remoteXml)).paused)
+    assertEquals(2, puts)
   }
 
   @Test

@@ -36,6 +36,7 @@
             <autoupdate>0</autoupdate>
             <link>https://signal.group/#REPLACE_WITH_MANUAL_INVITE</link>
             <outdated>0</outdated>
+            <silent>0</silent>
           </group>
           <group>
             <groupid>__signal_group__v2__!REPLACE_WITH_GROUP_ID_HEX</groupid>
@@ -43,6 +44,7 @@
             <autoupdate>1</autoupdate>
             <link>https://signal.group/#REPLACE_WITH_MANAGED_INVITE</link>
             <outdated>0</outdated>
+            <silent>0</silent>
           </group>
         </category>
       </groups>

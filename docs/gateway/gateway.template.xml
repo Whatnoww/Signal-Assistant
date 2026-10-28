@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Merge these sections into the private commands XML. Do not replace its existing commands.
+     Keep one command per family and one canonical group entry per Group V2 ID.
+     Replace example IDs. All booleans below are explicit. No credentials belong here. -->
+<commands version="1">
+  <gateway>
+    <paused>0</paused>
+    <defaults>
+      <spamtext>Please tell us briefly why you would like to join this group.</spamtext>
+      <reminderhours>72</reminderhours>
+      <removalhours>96</removalhours>
+      <admissionhours>96</admissionhours>
+      <scancooldowns><dmminutes>15</dmminutes><groupminutes>0</groupminutes></scancooldowns>
+    </defaults>
+    <responses>
+      <message id="greeting"><text>{applicant}, welcome to Gateway.</text></message>
+      <message id="status"><text>{applicant}<br/>Group: {source_name}<br/>{gateway_status}</text></message>
+      <message id="gateway_status"><text>{gateway_status}</text></message>
+      <message id="error"><text>Gateway: {safe_reason}</text></message>
+      <message id="permission_error"><text>{applicant}: the required current administrator permission is unavailable. The request remains open for manual action or a later authorized attempt.</text></message>
+      <message id="spam_reminder"><text>{applicant}: please answer the question for {source_name} before the screening period ends.</text></message>
+      <message id="timeout"><text>{applicant}<br/>Group: {source_name}<br/>Screening expired.<br/>Result: {confirmed_action}</text></message>
+      <message id="blocklist_rejection"><text>{applicant}<br/>Group: {source_name}<br/>Reason: ACI-Blocklist<br/>Result: {confirmed_action}</text></message>
+      <message id="approval"><text>{applicant}<br/>Group: {source_name}<br/>Result: Approved</text></message>
+      <message id="denial"><text>{applicant}<br/>Group: {source_name}<br/>Result: Denied</text></message>
+      <message id="manual_finish"><text>{applicant}<br/>Group: {source_name}<br/>Gateway review finished following a departure from this room. Any remaining source-group action is left to its administrators.</text></message>
+      <message id="administrator_notification"><text>{admins}<br/>{applicant} has completed Gateway screening.<br/><br/>Requested groups:<br/>{requested_groups}<br/><br/>Known memberships in configured groups:<br/>{known_memberships}<br/><br/>{decision_commands}</text></message>
+      <message id="dm_status"><text>{operation_status}</text></message>
+      <message id="groupid"><text>{group_name}<br/><br/>Group ID:<br/>{group_id}</text></message>
+      <message id="dm_delivery_failure"><text>The private response could not be sent.</text></message>
+      <message id="scan"><text><b>ACI-Blocklist scan</b><br/><br/>{scan_results}<br/><br/>{cooldown_status}</text></message>
+      <message id="scan_cooldown"><text>You can scan again in {remaining_minutes} minutes.</text></message>
+      <message id="scan_wait"><text>You can run another DM scan in {minutes} minutes.</text></message>
+      <message id="scan_ready"><text>You may scan again now.</text></message>
+      <message id="scan_no_groups"><text>No locally known groups show you as an administrator.</text></message>
+    </responses>
+    <help>
+      <section scope="public"><text>Use !groups to browse configured public groups.</text></section>
+      <section scope="group-admin"><text>!groupid — receive this group's ID privately.</text></section>
+      <section scope="group-scan"><text>!scan — check this group's members against the ACI-Blocklist.</text></section>
+      <section scope="source-admin"><text>Gateway source controls (results by DM):<br/>!gateway<br/>!gateway enable / disable<br/>!gateway group &lt;groupID&gt;<br/>!gateway admin enable / disable<br/>!gateway mentionadmins enable / disable<br/>!gateway spamtext &lt;text&gt;<br/>!gateway reminder &lt;hours|default&gt;<br/>!gateway removal &lt;hours|default&gt;</text></section>
+      <section scope="gateway-admin"><text>Gateway room controls:<br/>!gateway deletemedia enable<br/>!gateway deletemedia disable</text></section>
+      <section scope="review-admin"><text>For requests to groups you administer, select the applicant with a native Signal mention. You may approve before the applicant answers.</text></section>
+      <section scope="review-approve"><text>!approve @user [number]</text></section>
+      <section scope="review-deny"><text>!deny @user [number]</text></section>
+      <section scope="dm-group-admin"><text>!scan — scan all locally known groups you currently administer. The configured DM cooldown applies.</text></section>
+      <section scope="owner"><text>Owner controls:<br/>!admin disable all<br/>!admin enable all<br/>!admin gateway throttle &lt;groupID&gt; enable / disable</text></section>
+    </help>
+    <!-- Destination-room policy belongs to the room. Private rooms are not public membership listings. -->
+    <privategroups>
+      <group>
+        <groupid>__signal_group__v2__!REPLACE_WITH_GATEWAY_ID_HEX</groupid>
+        <description>Gateway review room</description>
+        <silent>1</silent>
+        <gateway>
+          <enabled>0</enabled>
+          <groupid>__signal_group__v2__!REPLACE_WITH_GATEWAY_ID_HEX</groupid>
+          <admin>0</admin>
+          <deletemedia>0</deletemedia>
+          <mentionadmins>0</mentionadmins>
+          <throttle>0</throttle>
+        </gateway>
+      </group>
+    </privategroups>
+  </gateway>
+  <!-- Keep your existing !groups command; add the nested gateway block to each canonical source entry. -->
+  <command>
+    <active>1</active>
+    <triggers><trigger>!groups</trigger></triggers>
+    <response><groups><category name="Example">
+      <group>
+        <groupid>__signal_group__v2__!REPLACE_WITH_SOURCE_ID_HEX</groupid>
+        <description>Signal Community</description>
+        <autoupdate>1</autoupdate>
+        <link>https://signal.group/#REPLACE_WITH_LINK</link>
+        <outdated>0</outdated>
+        <silent>0</silent>
+        <gateway>
+          <enabled>0</enabled>
+          <groupid>__signal_group__v2__!REPLACE_WITH_GATEWAY_ID_HEX</groupid>
+          <admin>0</admin>
+          <spamtext>Please tell us briefly why you would like to join this group.</spamtext>
+          <deletemedia>0</deletemedia>
+          <mentionadmins>1</mentionadmins>
+          <throttle>0</throttle>
+          <!-- Optional overrides: reminderhours, removalhours, admissionhours. Omit to use defaults. -->
+        </gateway>
+      </group>
+    </category>
+    <!-- These are ordinary source groups. The silent flag excludes their entries
+         and this category from public replies while Gateway stays configurable. -->
+    <category name="Unlisted groups">
+      <group>
+        <groupid>__signal_group__v2__!REPLACE_WITH_SILENT_SOURCE_ID_HEX</groupid>
+        <description>Unlisted source group</description>
+        <autoupdate>0</autoupdate>
+        <silent>1</silent>
+        <!-- A public invite link is optional for a silent group. -->
+        <gateway>
+          <enabled>0</enabled>
+          <groupid>__signal_group__v2__!REPLACE_WITH_GATEWAY_ID_HEX</groupid>
+          <admin>0</admin>
+          <deletemedia>0</deletemedia>
+          <mentionadmins>1</mentionadmins>
+          <throttle>0</throttle>
+        </gateway>
+      </group>
+    </category></groups></response>
+  </command>
+  <!-- Argument parsing uses these exact family triggers as enable/disable switches. -->
+  <command><active>1</active><triggers><trigger>!gateway</trigger></triggers><response><text>Gateway controls</text></response></command>
+  <command><active>1</active><triggers><trigger>!approve</trigger></triggers><response><text>Approve a Gateway request</text></response></command>
+  <command><active>1</active><triggers><trigger>!deny</trigger></triggers><response><text>Deny a Gateway request</text></response></command>
+  <command><active>1</active><triggers><trigger>!groupid</trigger></triggers><response><text>Group ID</text></response></command>
+  <command><active>1</active><triggers><trigger>!scan</trigger></triggers><response><text><b>Members found on the ACI-Blocklist:</b></text></response></command>
+  <command><active>1</active><triggers><trigger>!help</trigger><trigger>!list</trigger><trigger>!command</trigger><trigger>!commands</trigger></triggers><response><text><b>Signal Assistant commands</b></text></response></command>
+</commands>

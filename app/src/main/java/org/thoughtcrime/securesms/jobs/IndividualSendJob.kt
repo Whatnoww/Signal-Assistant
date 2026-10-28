@@ -84,11 +84,17 @@ class IndividualSendJob private constructor(parameters: Parameters, private val 
       warn(TAG, message.sentTimeMillis.toString(), "Message $messageId was already sent. Ignoring.")
       return
     }
+    if (!org.thoughtcrime.securesms.gateway.GatewayRuntime.maySend(context, message.sentTimeMillis, message.threadRecipient.id.toLong(), messageId)) {
+      SignalDatabase.messages.markAsSentFailed(messageId)
+      return
+    }
 
     try {
       log(TAG, message.sentTimeMillis.toString(), "Sending message: $messageId, Recipient: ${message.threadRecipient.id}, Thread: $threadId, Attachments: ${buildAttachmentString(message.attachments)}, Editing: ${originalEditedMessage?.dateSent ?: "N/A"}")
 
-      RecipientUtil.shareProfileIfFirstSecureMessage(message.threadRecipient)
+      if (!org.thoughtcrime.securesms.gateway.GatewayRuntime.preservesContact(context, message.threadRecipient.id.toLong(), message.sentTimeMillis)) {
+        RecipientUtil.shareProfileIfFirstSecureMessage(message.threadRecipient)
+      }
 
       val recipient = message.threadRecipient.fresh()
       val profileKey = recipient.profileKey
@@ -106,7 +112,9 @@ class IndividualSendJob private constructor(parameters: Parameters, private val 
         throw RetryLaterException()
       }
 
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.acknowledged(context, message.threadRecipient.id.toLong(), message.sentTimeMillis, messageId)
       SignalDatabase.messages.markAsSent(messageId)
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.sent(context, message.threadRecipient.id.toLong(), message.sentTimeMillis, messageId)
       markAttachmentsUploaded(messageId, message)
       SignalDatabase.messages.markUnidentified(messageId, unidentified)
 
@@ -185,6 +193,7 @@ class IndividualSendJob private constructor(parameters: Parameters, private val 
   override fun onFailure() {
     SignalLocalMetrics.IndividualMessageSend.cancel(messageId)
     SignalDatabase.messages.markAsSentFailed(messageId)
+    org.thoughtcrime.securesms.gateway.GatewayRuntime.failed(context, messageId)
     notifyMediaMessageDeliveryFailed(context, messageId)
   }
 

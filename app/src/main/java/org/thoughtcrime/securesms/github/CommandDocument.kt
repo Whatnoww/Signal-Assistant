@@ -36,12 +36,12 @@ internal enum class CommandStyle {
   MONOSPACE,
   SPOILER
 }
-internal data class CommandGroup(val groupId: String, val description: String, val autoUpdate: Boolean, val link: String, val outdated: Boolean)
+internal data class CommandGroup(val groupId: String, val description: String, val autoUpdate: Boolean, val link: String, val outdated: Boolean, val silent: Boolean = false)
 internal data class CommandLinkState(val currentLink: String? = null, val outdated: Boolean? = null)
 internal data class CommandLinkUpdate(val groupId: String, val previousLink: String, val link: String)
 
 /** The XML is also retained as a DOM so publishing link changes preserves unrelated commands and tags. */
-internal class CommandDocument private constructor(private val document: Document) {
+internal class CommandDocument private constructor(internal val document: Document) {
   companion object {
     fun parse(xml: String, factory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()): CommandDocument {
       // Android's DOM factory does not support the JAXP DTD-disabling feature flags.
@@ -74,7 +74,10 @@ internal class CommandDocument private constructor(private val document: Documen
     }
 
     private val SURROGATE_REFERENCES = Regex("""<!\[CDATA\[[\s\S]*?]]>|<!--[\s\S]*?-->|<\?[\s\S]*?\?>|&#(x[0-9a-fA-F]+|[0-9]+);&#(x[0-9a-fA-F]+|[0-9]+);""")
-    private val STRUCTURAL_TAGS = setOf("commands", "command", "triggers", "groups", "category", "group")
+    private val STRUCTURAL_TAGS = setOf(
+      "commands", "command", "triggers", "groups", "category", "group",
+      "gateway", "defaults", "scancooldowns", "privategroups", "responses", "message", "help", "section"
+    )
     private val CATEGORY_NUMBER = Regex("-?[0-9]+")
   }
 
@@ -90,7 +93,7 @@ internal class CommandDocument private constructor(private val document: Documen
     if (selection == null) {
       renderer.renderChildren(response)
     } else {
-      val category = selection.number.toIntOrNull()?.takeIf { it > 0 }?.let { selection.groups.children("category").getOrNull(it - 1) }
+      val category = selection.number.toIntOrNull()?.takeIf { it > 0 }?.let { selection.groups.publicCategories().getOrNull(it - 1) }
         ?: return CommandReply("That category is not available. Send ${selection.trigger} to see the available categories.", emptyList(), emptyList())
       renderer.renderCategory(category, showEmptyMessage = true)
     }
@@ -304,33 +307,36 @@ internal class CommandDocument private constructor(private val document: Documen
         }
         "groups" -> if (element.getAttribute("view") == "categories") renderCategoryIndex(element) else renderChildren(element)
         "category" -> renderCategory(element)
+        "group" -> renderGroup(element)
         // Reserve <image> for a future media sender instead of silently dropping attachments.
         else -> error("Unsupported response tag: ${element.tagName}")
       }
     }
 
     private fun renderCategoryIndex(element: Element) {
-      val categories = element.children("category")
+      val categories = element.publicCategories()
       if (categories.isEmpty()) {
         text.append("No categories are available yet.")
         return
       }
       categories.forEachIndexed { index, category ->
         if (index > 0) text.append('\n')
-        val count = category.children("group").size
+        val count = category.publicGroups().size
         text.append(index + 1).append(". ").append(category.getAttribute("name").trim().removeSuffix(":"))
           .append(" (").append(count).append(if (count == 1) " group)" else " groups)")
       }
     }
 
     fun renderCategory(element: Element, showEmptyMessage: Boolean = false) {
+      if (element.children("group").isNotEmpty() && element.publicGroups().isEmpty()) return
       styled(CommandStyle.BOLD) { text.append(element.getAttribute("name").trim().removeSuffix(":")).append(':') }
       text.append("\n\n")
-      val groups = element.children("group")
+      val groups = element.publicGroups()
       if (groups.isEmpty() && showEmptyMessage) text.append("No groups in this category yet.") else groups.forEach(::renderGroup)
     }
 
     private fun renderGroup(element: Element) {
+      if (element.isSilentGroup()) return
       val group = element.asGroup()
       val state = resolve(group)
       val canUpdate = group.autoUpdate && group.groupId != "0" && state.currentLink != null
@@ -364,12 +370,22 @@ private fun Element.setValue(tag: String, value: String) {
   element.textContent = value
 }
 private fun Element.isCommandActive(): Boolean = (child("active")?.textContent?.trim() ?: "1") == "1"
+internal fun Element.isSilentGroup(): Boolean {
+  val flags = children("silent")
+  require(flags.size <= 1) { "Group must have at most one silent setting" }
+  val value = flags.singleOrNull()?.textContent?.trim() ?: return false
+  require(value == "0" || value == "1") { "silent must be 0 or 1" }
+  return value == "1"
+}
+private fun Element.publicGroups(): List<Element> = children("group").filterNot { it.isSilentGroup() }
+private fun Element.publicCategories(): List<Element> = children("category").filter { it.children("group").isEmpty() || it.publicGroups().isNotEmpty() }
 private fun Element.asGroup(): CommandGroup {
   val groupId = value("groupid").ifEmpty { "0" }
   val autoUpdate = value("autoupdate")
   require(autoUpdate == "0" || autoUpdate == "1") { "autoupdate must be 0 or 1" }
   val description = value("description")
   val link = value("link")
-  require(description.isNotBlank() && link.startsWith("https://signal.group/#")) { "Group requires a description and a Signal invite link" }
-  return CommandGroup(groupId, description, autoUpdate == "1", link, value("outdated") == "1")
+  val silent = isSilentGroup()
+  require(description.isNotBlank() && (link.startsWith("https://signal.group/#") || silent && link.isEmpty())) { "Group requires a description and a Signal invite link (optional for silent groups)" }
+  return CommandGroup(groupId, description, autoUpdate == "1", link, value("outdated") == "1", silent)
 }

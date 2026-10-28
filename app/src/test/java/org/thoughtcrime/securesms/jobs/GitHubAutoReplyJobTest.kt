@@ -61,6 +61,9 @@ class GitHubAutoReplyJobTest {
   @Before
   fun setUp() {
     mockkObject(GitHubAutoReply)
+    // This suite verifies the legacy reply/scan path. Do not read the deployment
+    // XML or open Gateway's Android SQLCipher store from the host JVM.
+    every { GitHubAutoReply.configurationDocument(any(), any()) } returns CommandDocument.parse("<commands/>")
     every { GitHubAutoReply.isCommandCandidate(any()) } answers { AdminCommands.isCandidate(firstArg()) || CommandDocument.isCommandCandidate(firstArg()) }
     every { GitHubAutoReply.getCachedReplyFor(any(), any()) } returns null
     every { GitHubAutoReply.needsRefresh(any()) } returns true

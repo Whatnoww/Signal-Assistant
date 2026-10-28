@@ -36,7 +36,8 @@ internal class GitHubCommandsRepository(
       val json = JSONObject(response.body.string())
       require(json.getString("encoding") == "base64") { "Expected a base64-encoded commands file" }
       val xml = Base64.getMimeDecoder().decode(json.getString("content")).toString(Charsets.UTF_8)
-      CommandDocument.parse(xml) // Never replace a good cache with an invalid download.
+      // Validate Gateway too, retaining the last valid snapshot on a bad online edit.
+      org.thoughtcrime.securesms.gateway.GatewayConfiguration.parse(CommandDocument.parse(xml))
       return CommandsSnapshot(xml, json.getString("sha"), response.header("ETag"))
     }
   }
@@ -53,6 +54,7 @@ internal class GitHubCommandsRepository(
       val latest = fetch()
       val document = CommandDocument.parse(latest.xml)
       if (!edit(document)) return latest
+      org.thoughtcrime.securesms.gateway.GatewayConfiguration.parse(document)
       val xml = document.toXml()
       val json = JSONObject()
         .put("message", message)

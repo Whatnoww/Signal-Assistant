@@ -15,12 +15,12 @@ internal class AdminCommands(
 ) {
   fun reply(input: String, senderAci: String?, groupId: String?): CommandReply {
     if (!isAuthorized(adminAci, senderAci)) return plain("Error: only the configured admin ACI can use !admin commands.")
-    if (groupId == null) return plain("Error: send admin commands in a Signal V2 group chat.")
     val command = try {
       parse(input)
     } catch (e: IllegalArgumentException) {
       return plain("Error: ${e.message}")
     }
+    if (groupId == null && command !is AdminCommand.SetActive && command !is AdminCommand.CreateCategory) return plain("Error: send group admin commands in a Signal V2 group chat.")
     if (!configured) return plain("Error: configure RESPONSE_XML and GITHUB_TOKEN_COMMANDS before using admin commands.")
 
     var addLink: String? = null
@@ -28,34 +28,35 @@ internal class AdminCommands(
       val source = repository()
       if (command == AdminCommand.GroupStatus) {
         val snapshot = source.fetch()
-        val groups = CommandDocument.parse(snapshot.xml).listedGroups(groupId)
+        val groups = CommandDocument.parse(snapshot.xml).listedGroups(requireNotNull(groupId))
         saveSnapshot(snapshot)
         plain(
           if (groups.isEmpty()) {
             "This group is not on the list. Autoupdate is not configured."
           } else {
-            "This group is on the list:\n" + groups.joinToString("\n") { "${it.description}: autoupdate ${if (it.autoUpdate) "enabled (1)" else "disabled (0)"}." }
+            "This group is on the list:\n" + groups.joinToString("\n") { "${it.description}${if (it.silent) " [silent]" else ""}: autoupdate ${if (it.autoUpdate) "enabled (1)" else "disabled (0)"}." }
           }
         )
       } else {
         // Resolve once even if GitHub requires a conflict retry.
-        val state = if (command is AdminCommand.EnableGroup) currentGroupLink(groupId) else CommandLinkState()
+        val state = if (command is AdminCommand.EnableGroup) currentGroupLink(requireNotNull(groupId)) else CommandLinkState()
         var confirmation = ""
         val snapshot = source.update("Apply Signal admin command") { document ->
           val before = document.toXml()
           confirmation = when (command) {
             is AdminCommand.SetActive -> {
               val count = document.setCommandsActive(command.trigger, command.enabled)
+              if (command.trigger == "all") org.thoughtcrime.securesms.gateway.GatewayConfiguration.setPaused(document, !command.enabled)
               val action = if (command.enabled) "Enabled" else "Disabled"
               if (command.trigger == "all") "$action all $count configured commands." else "$action ${command.trigger} and its aliases."
             }
             is AdminCommand.EnableGroup -> {
-              document.enableGroupAutoUpdate(command.description, groupId, state)
+              document.enableGroupAutoUpdate(command.description, requireNotNull(groupId), state)
               "Enabled autoupdate for ${command.description} (1) and saved this group's ID. " +
                 if (state.currentLink != null) "The listed link is up to date." else "Warning: the current invite link is unavailable; the configured link was retained."
             }
             AdminCommand.DisableGroup -> {
-              document.disableGroupAutoUpdate(groupId)
+              document.disableGroupAutoUpdate(requireNotNull(groupId))
               "Disabled autoupdate for this group (0). Its ID and link were retained for outdated-link detection."
             }
             is AdminCommand.CreateCategory -> {
@@ -63,9 +64,9 @@ internal class AdminCommands(
               "Created category ${command.name}."
             }
             is AdminCommand.AddGroup -> {
-              document.validateGroupAddition(command.category, command.description, groupId)
+              document.validateGroupAddition(command.category, command.description, requireNotNull(groupId))
               val link = addLink ?: run {
-                val current = currentGroupLink(groupId)
+                val current = currentGroupLink(requireNotNull(groupId))
                 val resolved = current.currentLink ?: throw AdminCommandException(
                   if (current.outdated == true) {
                     "This group's invite link is disabled. Enable it in Signal before adding the group."
@@ -75,11 +76,11 @@ internal class AdminCommands(
                 )
                 resolved.also { addLink = it }
               }
-              document.addGroup(command.category, command.description, groupId, link)
+              document.addGroup(command.category, command.description, requireNotNull(groupId), link)
               "Added ${command.description} as the last entry in ${command.category}. Autoupdate is enabled (1) and the current invite link was saved."
             }
             is AdminCommand.MoveGroup -> {
-              if (document.moveGroup(command.category, groupId)) {
+              if (document.moveGroup(command.category, requireNotNull(groupId))) {
                 "Moved this group to the last entry in ${command.category}."
               } else {
                 "This group is already in ${command.category}."

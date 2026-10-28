@@ -204,7 +204,14 @@ object DataMessageProcessor {
       message.adminDelete != null -> messageId = handleAdminRemoteDelete(context, envelope, message, senderRecipient, threadRecipient, earlyMessageCacheEntry, batchCache)
     }
     if (commandRequestId != null && !senderRecipient.isSelf && !senderRecipient.isBlocked && GitHubAutoReply.isCommandCandidate(message.body)) {
-      batchCache.addJob(GitHubAutoReplyJob(commandRequestId))
+      val body = message.body.orEmpty()
+      if (org.thoughtcrime.securesms.gateway.GatewayCommand.candidate(body) || body in org.thoughtcrime.securesms.gateway.GatewayController.helpAliases || body == "!scan" && groupId == null) {
+        batchCache.addJob(org.thoughtcrime.securesms.jobs.GatewayCommandJob(commandRequestId))
+      } else batchCache.addJob(GitHubAutoReplyJob(commandRequestId))
+    }
+    if (groupId != null && org.thoughtcrime.securesms.gateway.GatewayRuntime.observes(groupId.toString()) && insertResult != null && !senderRecipient.isSelf && !senderRecipient.isBlocked &&
+      message.storyContext == null && !message.isStoryReaction && (message.isMediaMessage || message.body != null)) {
+      batchCache.addJob(org.thoughtcrime.securesms.jobs.GatewayWorkJob(insertResult.messageId, true, groupId.toString()))
     }
     SignalTrace.endSection()
 

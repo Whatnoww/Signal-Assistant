@@ -303,6 +303,9 @@ final class GroupManagerV2 {
   @SuppressWarnings("UnusedReturnValue")
   final class GroupEditor extends LockOwner {
 
+    // Gateway preconditions must be checked again after every conflict rebase.
+    Runnable gatewayPrecondition;
+
     private final GroupId.V2                   groupId;
     private final GroupTable.V2GroupProperties v2GroupProperties;
     private final GroupMasterKey               groupMasterKey;
@@ -449,11 +452,18 @@ final class GroupManagerV2 {
     @NonNull GroupManager.GroupActionResult denyRequests(@NonNull Collection<RecipientId> recipientIds)
         throws GroupChangeFailedException, GroupInsufficientRightsException, IOException, GroupNotAMemberException
     {
+      return denyRequests(recipientIds, true);
+    }
+
+    @WorkerThread
+    @NonNull GroupManager.GroupActionResult denyRequests(@NonNull Collection<RecipientId> recipientIds, boolean ban)
+        throws GroupChangeFailedException, GroupInsufficientRightsException, IOException, GroupNotAMemberException
+    {
       Set<ACI> uuids = recipientIds.stream()
                                    .map(r -> Recipient.resolved(r).requireAci())
                                    .collect(Collectors.toSet());
 
-      return commitChangeWithConflictResolution(selfAci, groupOperations.createRefuseGroupJoinRequest(uuids, true, v2GroupProperties.getDecryptedGroup().bannedMembers));
+      return commitChangeWithConflictResolution(selfAci, groupOperations.createRefuseGroupJoinRequest(uuids, ban, v2GroupProperties.getDecryptedGroup().bannedMembers));
     }
 
     @WorkerThread
@@ -681,6 +691,7 @@ final class GroupManagerV2 {
 
       for (int attempt = 0; attempt < 5; attempt++) {
         try {
+          if (gatewayPrecondition != null) gatewayPrecondition.run();
           return commitChange(change, allowWhenBlocked, sendToMembers);
         } catch (GroupPatchNotAcceptedException e) {
           if (change.addMembers.size() > 0 && !refetchedAddMemberCredentials) {

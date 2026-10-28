@@ -296,6 +296,9 @@ public final class JobManagerFactories {
       put(SendPaymentsActivatedJob.KEY,                new SendPaymentsActivatedJob.Factory());
       put(GitHubAutoReplyJob.KEY,                      new GitHubAutoReplyJob.Factory());
       put(GitHubAutoReplyRefreshJob.KEY,               new GitHubAutoReplyRefreshJob.Factory());
+      put(GatewayWorkJob.KEY,                          new GatewayWorkJob.Factory());
+      put(GatewayCommandJob.KEY,                       new GatewayCommandJob.Factory());
+      put(GatewayDmScanRefreshJob.KEY,                  new GatewayDmScanRefreshJob.Factory());
       put(SendReadReceiptJob.KEY,                      new SendReadReceiptJob.Factory());
       put(SendRetryReceiptJob.KEY,                     new SendRetryReceiptJob.Factory());
       put(SendViewedReceiptJob.KEY,                    new SendViewedReceiptJob.Factory());

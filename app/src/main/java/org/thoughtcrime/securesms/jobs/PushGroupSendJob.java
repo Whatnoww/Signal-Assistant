@@ -212,6 +212,10 @@ public final class PushGroupSendJob extends PushSendJob {
       log(TAG, String.valueOf(message.getSentTimeMillis()), "Message " + messageId + " was already sent. Ignoring.");
       return;
     }
+    if (!org.thoughtcrime.securesms.gateway.GatewayRuntime.maySend(context, message.getSentTimeMillis(), message.getThreadRecipient().getId().toLong(), messageId)) {
+      database.markAsSentFailed(messageId);
+      return;
+    }
 
     Recipient groupRecipient = message.getThreadRecipient().resolve();
 
@@ -282,6 +286,7 @@ public final class PushGroupSendJob extends PushSendJob {
   @Override
   public void onFailure() {
     SignalDatabase.messages().markAsSentFailed(messageId);
+    org.thoughtcrime.securesms.gateway.GatewayRuntime.failed(context, messageId);
   }
 
   private List<SendMessageResult> deliver(OutgoingMessage message, @Nullable MessageRecord originalEditedMessage, @NonNull Recipient groupRecipient, @NonNull GroupRecord groupRecord, @NonNull List<Recipient> destinations)
@@ -504,7 +509,9 @@ public final class PushGroupSendJob extends PushSendJob {
       }
     }
     if (existingNetworkFailures.isEmpty() && existingIdentityMismatches.isEmpty()) {
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.acknowledged(context, message.getThreadRecipient().getId().toLong(), message.getSentTimeMillis(), messageId);
       database.markAsSent(messageId);
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.sent(context, message.getThreadRecipient().getId().toLong(), message.getSentTimeMillis(), messageId);
 
       markAttachmentsUploaded(messageId, message);
 

@@ -82,6 +82,10 @@ class AdminDeleteSendJob private constructor(
   }
 
   override fun run(): Result {
+    if (!org.thoughtcrime.securesms.gateway.GatewayRuntime.mayDelete(context, messageId)) {
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.deleteFinished(context, messageId)
+      return Result.success()
+    }
     if (!SignalStore.account.isRegistered) {
       Log.w(TAG, "Not registered. Skipping.")
       return Result.failure()
@@ -159,6 +163,7 @@ class AdminDeleteSendJob private constructor(
 
     if (existingNetworkFailures.isEmpty() && existingIdentityMismatches.isEmpty() && recipientIds.isEmpty()) {
       SignalDatabase.messages.markAsSentAdminDelete(messageId)
+      org.thoughtcrime.securesms.gateway.GatewayRuntime.deleteFinished(context, messageId)
       return Result.success()
     } else if (existingIdentityMismatches.isNotEmpty()) {
       Log.w(TAG, "Failing because there were ${existingIdentityMismatches.size} identity mismatches.")
@@ -170,6 +175,7 @@ class AdminDeleteSendJob private constructor(
   }
 
   override fun onFailure() {
+    org.thoughtcrime.securesms.gateway.GatewayRuntime.deleteFinished(context, messageId)
     Log.w(TAG, "Failed to send admin delete to all recipients! ${initialRecipientCount - recipientIds.size} /  $initialRecipientCount. Marking remaining non-identity mismatched failures as network failure.")
     val message = SignalDatabase.messages.getMessageRecordOrNull(messageId)
     if (message == null) {

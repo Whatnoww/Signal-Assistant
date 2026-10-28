@@ -231,6 +231,7 @@ public class ApplicationContext extends Application implements AppForegroundObse
               .addNonBlocking(SealedSenderConstraint::refreshAndRotateIfNeeded)
               .addNonBlocking(StorageSyncHelper::scheduleRoutineSync)
               .addNonBlocking(this::beginJobLoop)
+              .addNonBlocking(org.thoughtcrime.securesms.jobs.GatewayWorkJob::recover)
               .addNonBlocking(EmojiSource::refresh)
               .addNonBlocking(() -> AppDependencies.getGiphyMp4Cache().onAppStart(this))
               .addNonBlocking(AppDependencies::getBillingApi)
