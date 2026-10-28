@@ -9,13 +9,13 @@ import android.database.Cursor;
 
 import net.zetetic.database.sqlcipher.SQLiteStatement;
 
+import org.signal.core.models.recipients.RecipientId;
 import org.signal.core.util.logging.Log;
 import org.thoughtcrime.securesms.attachments.Attachment;
 import org.thoughtcrime.securesms.database.model.GroupRecord;
 import org.thoughtcrime.securesms.database.whatsapp.WaDbOpenHelper;
 import org.thoughtcrime.securesms.mms.MmsException;
 import org.thoughtcrime.securesms.recipients.Recipient;
-import org.signal.core.models.recipients.RecipientId;
 
 import java.io.IOException;
 import java.util.HashSet;
