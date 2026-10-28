@@ -128,6 +128,11 @@ configuration and verification notes are in [README.md](README.md).
 
 ## Time, DM responses and cooldowns
 
+- Retain event-driven join detection and add a configurable source-state refresh
+  fallback, initially 30 seconds between passes (`joinpollseconds` in universal
+  defaults). Use persistent, bounded background work; skip pause/throttle, avoid
+  routine GitHub/blocklist downloads, and respect server/network/Android delays.
+  This is request discovery, not a continuous permission/blocklist cache poll.
 - Initial prompt-response defaults are reminder 72 hours and removal 96 hours.
 - Start grace periods on successful prompt sending, not merely local queuing and
   not an assumption that the applicant received/read the message.

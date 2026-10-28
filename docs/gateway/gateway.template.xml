@@ -10,6 +10,7 @@
       <reminderhours>72</reminderhours>
       <removalhours>96</removalhours>
       <admissionhours>96</admissionhours>
+      <joinpollseconds>30</joinpollseconds>
       <scancooldowns><dmminutes>15</dmminutes><groupminutes>0</groupminutes></scancooldowns>
     </defaults>
     <responses>

@@ -10,6 +10,7 @@ import org.thoughtcrime.securesms.dependencies.AppDependencies
 import org.thoughtcrime.securesms.github.GitHubAutoReply
 import org.thoughtcrime.securesms.jobs.AdminDeleteSendJob
 import org.thoughtcrime.securesms.jobs.GatewayWorkJob
+import org.thoughtcrime.securesms.jobs.GatewayRequestPollJob
 import org.thoughtcrime.securesms.keyvalue.SignalStore
 import org.thoughtcrime.securesms.recipients.Recipient
 import org.thoughtcrime.securesms.util.MessageConstraintsUtil
@@ -40,6 +41,7 @@ object GatewayRuntime {
     val requests = store.requests()
     watchedGroups = configuredGroups + requests.flatMap { listOf(it.source, it.room) }
     requests.forEach { request -> store.setPaused(request, current.groups[request.source]?.let { current.isPaused(it) || it.destination != request.room } ?: true, System.currentTimeMillis()) }
+    GatewayRequestPollJob.schedule(current)
     GatewayWorkJob.recover()
   }
   internal fun paused(context: Context): Boolean = GitHubAutoReply.configurationDocument(context)?.let { document ->
@@ -206,6 +208,7 @@ object GatewayRuntime {
       store.requests().filter { it.active }.forEach { store.setPaused(it, true, System.currentTimeMillis()) }
       return
     }
+    if (requestId == 0L && groupId.isBlank() && messageId == 0L) GatewayRequestPollJob.schedule(config)
     watchedGroups = config.groups.values.filter { it.enabled }.flatMap { listOf(it.id, it.destination) }.toSet() + store.requests().flatMap { listOf(it.source, it.room) }
     val platform = SignalGatewayPlatform(context, store)
     val engine = GatewayEngine(store, platform)

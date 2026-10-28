@@ -39,7 +39,7 @@ class GatewayWorkJob private constructor(
       } catch (e: Exception) {
         if ((e is IOException || e is org.signal.core.util.groups.GroupChangeBusyException) && e !is org.signal.core.util.groups.GroupNotAMemberException && e !is org.signal.core.util.groups.GroupInsufficientRightsException) {
           // Release the room queue; removals and other requests must remain runnable.
-          wakeAfter(30_000)
+          wakeAfter(if (e is org.signal.core.util.groups.GroupChangeBusyException) 1_000 else 30_000)
         } else if (e !is org.thoughtcrime.securesms.gateway.GatewayPausedException) throw e
       } finally { GatewayRuntime.releaseWork() }
     }
@@ -59,7 +59,10 @@ class GatewayWorkJob private constructor(
     const val KEY = "GatewayWorkJob"
     private fun parameters(queue: String, delay: Long = 0): Parameters = Parameters.Builder().setQueue("$KEY:$queue")
       .addConstraint(NetworkConstraint.KEY).setInitialDelay(delay).setLifespan(TimeUnit.DAYS.toMillis(3651)).setMaxAttempts(Parameters.UNLIMITED)
-      .apply { if (queue.startsWith("timer:")) setMaxInstancesForQueue(1) }.build()
+      .apply {
+        if (queue.startsWith("timer:")) setMaxInstancesForQueue(1)
+        if (queue.startsWith("intake:")) setMaxInstancesForQueue(2) // One running plus one fresh snapshot after a burst.
+      }.build()
     internal fun at(requestId: Long, room: String, at: Long): GatewayWorkJob {
       val delay = maxOf(0, at - System.currentTimeMillis())
       return if (delay == 0L) GatewayWorkJob(requestId, 0, room) else GatewayWorkJob(parameters("timer:$requestId:$at", delay), requestId, "", emptyList(), 0, true, room)

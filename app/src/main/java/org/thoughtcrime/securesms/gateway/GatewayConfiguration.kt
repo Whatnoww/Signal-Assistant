@@ -14,7 +14,8 @@ internal data class GatewayDefaults(
   val removalHours: Long = 96,
   val admissionHours: Long = 96,
   val dmScanMinutes: Long = 15,
-  val groupScanMinutes: Long = 0
+  val groupScanMinutes: Long = 0,
+  val joinPollSeconds: Long = 30
 )
 
 internal data class GatewayGroup(
@@ -65,7 +66,10 @@ internal data class GatewayConfiguration(
         removalHours = defaults.hours("removalhours") ?: fallback.removalHours,
         admissionHours = defaults.hours("admissionhours") ?: fallback.admissionHours,
         dmScanMinutes = defaults?.direct("scancooldowns").minutes("dmminutes") ?: fallback.dmScanMinutes,
-        groupScanMinutes = defaults?.direct("scancooldowns").minutes("groupminutes") ?: fallback.groupScanMinutes
+        groupScanMinutes = defaults?.direct("scancooldowns").minutes("groupminutes") ?: fallback.groupScanMinutes,
+        joinPollSeconds = defaults?.value("joinpollseconds")?.let { value ->
+          requireNotNull(value.toLongOrNull()?.takeIf { it == 0L || it in 15L..3600L }) { "joinpollseconds must be 0 or between 15 and 3600 seconds." }
+        } ?: fallback.joinPollSeconds
       )
       require(times.reminderHours < times.removalHours) { "Reminder must precede removal." }
       val groups = linkedMapOf<String, GatewayGroup>()

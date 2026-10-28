@@ -28,6 +28,16 @@ class GatewayConfigurationTest {
     assertEquals(96L, config.defaults.admissionHours)
     assertEquals(15L, config.defaults.dmScanMinutes)
     assertEquals(0L, config.defaults.groupScanMinutes)
+    assertEquals(30L, config.defaults.joinPollSeconds)
+  }
+
+  @Test fun `join polling interval supports an explicit off switch and bounded seconds`() {
+    listOf(0L, 15L, 30L, 60L, 3600L).forEach { seconds ->
+      assertEquals(seconds, GatewayConfiguration.parse(document(defaults = "<joinpollseconds>$seconds</joinpollseconds>")).defaults.joinPollSeconds)
+    }
+    listOf("-1", "1", "14", "3601", "true", "").forEach { value ->
+      assertThrows(IllegalArgumentException::class.java) { GatewayConfiguration.parse(document(defaults = "<joinpollseconds>$value</joinpollseconds>")) }
+    }
   }
 
   @Test fun `same-group admin disabled suspends work without falling back to a cached admin-enabled policy`() {

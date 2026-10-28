@@ -21,6 +21,7 @@ import org.robolectric.annotation.Config
 import org.signal.core.models.recipients.RecipientId
 import org.signal.storageservice.storage.protos.groups.Member
 import org.signal.storageservice.storage.protos.groups.local.DecryptedRequestingMember
+import org.signal.network.exceptions.NonSuccessfulResponseCodeException
 import org.thoughtcrime.securesms.attachments.Attachment
 import org.thoughtcrime.securesms.attachments.Cdn
 import org.thoughtcrime.securesms.attachments.PointerAttachment
@@ -41,6 +42,9 @@ import org.thoughtcrime.securesms.jobmanager.Job
 import org.thoughtcrime.securesms.jobs.AdminDeleteSendJob
 import org.thoughtcrime.securesms.jobs.GatewayDmScanRefreshJob
 import org.thoughtcrime.securesms.jobs.GatewayWorkJob
+import org.thoughtcrime.securesms.jobs.GatewayRequestPollJob
+import org.thoughtcrime.securesms.jobs.GatewayCommandJob
+import org.thoughtcrime.securesms.jobmanager.JsonJobData
 import org.thoughtcrime.securesms.linkpreview.LinkPreview
 import org.thoughtcrime.securesms.mms.IncomingMessage
 import org.thoughtcrime.securesms.mms.OutgoingMessage
@@ -629,6 +633,115 @@ class GatewayIntegrationTest {
     assertEquals(1, sent.size)
   }
 
+  @Test fun `request polling refreshes only enabled sources without online XML or blocklist checks`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup()
+    val room = recipients.createGroup(applicant)
+    waitingForResponse(source, room, applicant, System.currentTimeMillis() - 20000)
+    jobs.clear()
+    val job = GatewayRequestPollJob().also { it.setContext(context) }
+    val result = job.run()
+    assertTrue(result.isRetry)
+    assertEquals(30000L, pollBackoff(result))
+    verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), source.masterKey, any()) }
+    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), room.masterKey, any()) }
+    verify(exactly = 0) { GitHubAutoReply.configurationDocument(any(), true) }
+    verify(exactly = 0) { GroupTable.getBlocklist(any()) }
+    assertTrue(jobs.isEmpty())
+    assertNotEquals(GatewayWorkJob(1).parameters.queue, job.parameters.queue)
+  }
+
+  @Test fun `request polling discovers a server join without a received group event`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup()
+    val room = recipients.createGroup(applicant)
+    configureSource(source)
+    update(source.groupId.toString(), "groupid", room.groupId.toString())
+    update(source.groupId.toString(), "enabled", "1")
+    val current = SignalDatabase.groups.requireGroup(source.groupId).requireV2GroupProperties().decryptedGroup
+    every { GroupManager.forceSanityUpdateFromServer(any(), source.masterKey, any()) } answers {
+      SignalDatabase.groups.update(source.groupId, current.copy(requestingMembers = listOf(
+        DecryptedRequestingMember(aciBytes = Recipient.resolved(applicant).requireAci().toByteString(), timestamp = 1)
+      )), null)
+    }
+    assertTrue(GatewayRequestPollJob().also { it.setContext(context) }.run().isRetry)
+    val intake = jobs.filterIsInstance<GatewayWorkJob>().first { JsonJobData.deserialize(it.serialize()).getBoolean("intake") }
+    justRun { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
+    intake.setContext(context)
+    assertTrue(intake.run().isSuccess)
+    assertEquals(1L, store.requests().single().number)
+    assertEquals(Recipient.resolved(applicant).requireAci().toString(), store.requests().single().aci)
+  }
+
+  @Test fun `polling stops for emergency pause source throttle and explicit polling disable`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup()
+    val room = recipients.createGroup(applicant)
+    waitingForResponse(source, room, applicant, System.currentTimeMillis() - 20000)
+    val job = GatewayRequestPollJob().also { it.setContext(context) }
+    xml = xml.replace("<paused>0</paused>", "<paused>1</paused>")
+    assertTrue(job.run().isSuccess)
+    xml = xml.replace("<paused>1</paused>", "<paused>0</paused>")
+    update(source.groupId.toString(), "throttle", "1")
+    assertTrue(job.run().isSuccess)
+    update(source.groupId.toString(), "throttle", "0")
+    val document = CommandDocument.parse(xml)
+    val defaults = document.document.documentElement.direct("gateway")!!.direct("defaults")!!
+    (defaults.direct("joinpollseconds") ?: document.document.createElement("joinpollseconds").also(defaults::appendChild)).textContent = "0"
+    xml = document.toXml()
+    assertTrue(job.run().isSuccess)
+    verify(exactly = 0) { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
+  }
+
+  @Test fun `one unavailable source does not block other request refreshes and restored jobs use current timing`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val first = recipients.createGroup()
+    val second = recipients.createGroup()
+    val room = recipients.createGroup(applicant)
+    waitingForResponse(first, room, applicant, System.currentTimeMillis() - 20000)
+    waitingForResponse(second, room, applicant, System.currentTimeMillis() - 20000)
+    every { GroupManager.forceSanityUpdateFromServer(any(), first.masterKey, any()) } throws java.io.IOException("Unavailable")
+    val job = GatewayRequestPollJob()
+    val restored = GatewayRequestPollJob.Factory().create(job.parameters, job.serialize()).also { it.setContext(context) }
+    val result = restored.run()
+    assertTrue(result.isRetry)
+    assertEquals(30000L, pollBackoff(result))
+    verify(exactly = 1) { GroupManager.forceSanityUpdateFromServer(any(), second.masterKey, any()) }
+  }
+
+  @Test fun `polling honours a current interval change and server retry after`() {
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup()
+    val room = recipients.createGroup(applicant)
+    waitingForResponse(source, room, applicant, System.currentTimeMillis() - 20000)
+    val document = CommandDocument.parse(xml)
+    val defaults = document.document.documentElement.direct("gateway")!!.direct("defaults")!!
+    (defaults.direct("joinpollseconds") ?: document.document.createElement("joinpollseconds").also(defaults::appendChild)).textContent = "60"
+    xml = document.toXml()
+    val job = GatewayRequestPollJob().also { it.setContext(context) }
+    assertEquals(60000L, pollBackoff(job.run()))
+    every { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) } throws NonSuccessfulResponseCodeException(429, "Rate limited", "", mapOf("Retry-After" to "120"))
+    assertEquals(120000L, pollBackoff(job.run()))
+  }
+
+  @Test fun `approval command retries a busy native group promptly without losing the decision`() {
+    val admin = recipients.createRecipient("Source admin")
+    val applicant = recipients.createRecipient("Applicant")
+    val source = recipients.createGroup(admin)
+    val room = recipients.createGroup(admin, applicant)
+    val request = waitingForResponse(source, room, applicant, System.currentTimeMillis() - 20000)
+    val id = incoming(admin, room.groupId, "!approve \uFFFC 1", mentions = listOf(Mention(applicant, 9, 1)))
+    every { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) } throws org.signal.core.util.groups.GroupChangeBusyException("Busy")
+    val job = GatewayCommandJob(id).also { it.setContext(context) }
+    val result = job.run()
+    assertTrue(result.isRetry)
+    assertEquals(1000L, pollBackoff(result))
+    assertEquals(GatewayPhase.WAITING_FOR_RESPONSE, store.request(request.id)!!.phase)
+    justRun { GroupManager.forceSanityUpdateFromServer(any(), any(), any()) }
+    assertTrue(job.run().isSuccess)
+    assertEquals(GatewayPhase.APPROVING, store.request(request.id)!!.phase)
+  }
+
   @Test fun `text replies quoting the prompt or another message satisfy screening and notify against the answer`() {
     listOf(true, false).forEachIndexed { index, quotingPrompt ->
       val applicant = recipients.createRecipient("Applicant $index")
@@ -761,6 +874,8 @@ class GatewayIntegrationTest {
   }
 
   private fun observe(messageId: Long) = GatewayRuntime.work(context, 0, "", emptyList(), messageId)
+
+  private fun pollBackoff(result: Job.Result): Long = Job.Result::class.java.getDeclaredMethod("getBackoffInterval").apply { isAccessible = true }.invoke(result) as Long
 
   private fun image(quoted: Boolean = false): Attachment = PointerAttachment(
     contentType = "image/jpeg", transferState = AttachmentTable.TRANSFER_PROGRESS_PENDING, size = 0, fileName = "photo.jpg",

@@ -63,6 +63,23 @@ processing is enabled. Status also shows the effective room media policy.
 Source administrators must use those commands in the destination room and hold
 its current administrator role; source administration alone is insufficient.
 
+Native group-state updates still trigger intake immediately after commit. As a
+fallback for quiet groups, one persistent background job refreshes enabled source
+groups from Signal every 30 seconds between passes. Configure the universal
+default with `<joinpollseconds>30</joinpollseconds>` under `<gateway><defaults>`;
+`0` disables the fallback, and enabled intervals range from 15 to 3600 seconds.
+An omitted value uses 30 seconds. Paused/throttled sources and rooms are skipped.
+This is a target cadence: network latency, Android background scheduling and
+server backoff can delay a pass, so it is not a hard real-time guarantee.
+
+The fallback uses accepted cached XML and performs no routine GitHub or blocklist
+refresh. It discovers pending-request generations and hands new/retryable intake
+to the existing workflow. Actual decisions retain their fresh authorization and
+blocklist checks. One polling worker runs separately from immediate Gateway work;
+it yields through persistent JobManager retry scheduling rather than sleeping.
+Native group-lock contention retries Gateway commands/work after one second;
+network failures keep the existing longer retry. Intake bursts are coalesced.
+
 Gateway configuration, status and group IDs are sent by DM. The scoped transport
 does not add/remove contacts, hide recipients or enable profile sharing for a
 noncontact. Existing contacts retain their state. No routine group acknowledgement
@@ -204,7 +221,7 @@ No repository credentials, deployment XML or FCM values are included in these
 examples or changed by Gateway configuration commands.
 
 Verified on 2026-10-28: `:Signal-Android:assemblePlayProdRelease` succeeded and the
-focused unit suite passed 317 tests, with no failures, errors
+focused unit suite passed 335 tests, with no failures, errors
 or skips. `git diff --check` passed. This is build/unit validation; it does not
 replace the live-device checks above.
 

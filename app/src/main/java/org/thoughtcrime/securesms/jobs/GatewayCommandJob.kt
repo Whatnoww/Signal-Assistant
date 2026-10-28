@@ -26,7 +26,9 @@ class GatewayCommandJob private constructor(parameters: Parameters, private val 
       org.thoughtcrime.securesms.gateway.GatewayRuntime.releaseUnsentInvocation(context, messageId)
     }
   }
-  override fun onShouldRetry(e: Exception) = e is org.thoughtcrime.securesms.transport.RetryLaterException
+  override fun onShouldRetry(e: Exception) = e is org.thoughtcrime.securesms.transport.RetryLaterException || e is org.signal.core.util.groups.GroupChangeBusyException
+  override fun getNextRunAttemptBackoff(pastAttemptCount: Int, exception: Exception): Long =
+    if (exception is org.signal.core.util.groups.GroupChangeBusyException) 1_000 else super.getNextRunAttemptBackoff(pastAttemptCount, exception)
   override fun onFailure() { Log.w(Log.tag(GatewayCommandJob::class), "Gateway command could not be completed.") }
   class Factory : Job.Factory<GatewayCommandJob> {
     override fun create(parameters: Parameters, serializedData: ByteArray?) = GatewayCommandJob(parameters, JsonJobData.deserialize(serializedData).getLong("message"))
