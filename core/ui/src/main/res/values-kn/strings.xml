@@ -12,7 +12,7 @@
     <!-- Sheet describing step 2 on how to give permissions by tapping permissions in their settings -->
     <string name="PermissionDeniedBottomSheet__2_tap_permissions">"2. ಅನುಮತಿಗಳು ಅನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ"</string>
     <!-- Sheet describing step 3 on how to give permissions for photos and videos in settings where %s will be replaced with an image of a checked button -->
-    <string name="PermissionDeniedBottomSheet__3_allow_permission">"3. %1$s ಫೋಟೋಗಳು ಮತ್ತು ವೀಡಿಯೊಗಳು ಅನುಮತಿಗೆ ಅನುವು ಮಾಡಿಕೊಡಿ"</string>
+    <string name="PermissionDeniedBottomSheet__3_allow_permission">"3. %1$s ಫೋಟೋ ಮತ್ತು ವೀಡಿಯೊ ಅನುಮತಿಗೆ ಅನುವು ಮಾಡಿಕೊಡಿ"</string>
     <!-- Label for button at the bottom of the sheet which opens the system permission settings -->
     <string name="PermissionDeniedBottomSheet__settings">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
     <!-- Title for dialog shown when a required permission has not been granted -->
@@ -37,7 +37,7 @@
     <!-- Accessibility label for a close (X) icon button that dismisses the current screen, dialog, banner, or menu -->
     <string name="CloseButton__content_description">ಮುಚ್ಚಿ</string>
     <!-- Accessibility label for a button displayed in the toolbar to return to the previous screen. -->
-    <string name="DefaultTopAppBar__navigate_up_content_description">ಮೇಲಕ್ಕೆ ಹೋಗಿ</string>
+    <string name="DefaultTopAppBar__navigate_up_content_description">ಮೇಲಕ್ಕೆ ನ್ಯಾವಿಗೇಟ್ ಮಾಡಿ</string>
 
     <!-- Menu option that adds a sticker to the user\'s favorite stickers. -->
     <string name="StickerFavorites__add_to_favorites">ಮೆಚ್ಚಿನವುಗಳಿಗೆ ಸೇರಿಸಿ</string>
@@ -46,66 +46,66 @@
     <!-- Title of the confirmation dialog shown before removing a sticker from the user\'s favorite stickers. -->
     <string name="StickerFavorites__remove_from_favorites_question">ಮೆಚ್ಚಿನವುಗಳಿಂದ ತೆಗೆದುಹಾಕಬೇಕೇ?</string>
     <!-- Body of the confirmation dialog shown before removing a sticker from the user\'s favorite stickers. -->
-    <string name="StickerFavorites__you_cant_send_it_or_add_it_to_favorites_again">You can\'t send it or add it to Favorites again unless you have the pack installed, a link, or sticker message.</string>
+    <string name="StickerFavorites__you_cant_send_it_or_add_it_to_favorites_again">ನೀವು ಆ ಪ್ಯಾಕ್ ಅನ್ನು ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿಕೊಂಡಿರದಿದ್ದರೆ ಅಥವಾ ನಿಮ್ಮ ಬಳಿ ಲಿಂಕ್ ಅಥವಾ ಸ್ಟಿಕ್ಕರ್ ಮೆಸೇಜ್ ಇಲ್ಲದಿದ್ದರೆ, ನೀವು ಅದನ್ನು ಮತ್ತೆ ಕಳುಹಿಸಲು ಅಥವಾ ಮೆಚ್ಚಿನವುಗಳಿಗೆ ಸೇರಿಸಲು ಸಾಧ್ಯವಾಗುವುದಿಲ್ಲ.</string>
     <!-- Button in the confirmation dialog that removes a sticker from the user\'s favorite stickers. Verb, imperative. -->
     <string name="StickerFavorites__remove">ತೆಗೆದುಹಾಕಿ</string>
     <!-- Text shown when no preference label has been selected -->
-    <string name="preferences__none">None</string>
-    <string name="preferences_off">Off</string>
-    <string name="preferences_on">On</string>
-    <string name="ExpireTimerSettingsFragment__set">Set</string>
-    <string name="CustomExpireTimerSelectorView__seconds">seconds</string>
-    <string name="CustomExpireTimerSelectorView__minutes">minutes</string>
-    <string name="CustomExpireTimerSelectorView__hours">hours</string>
-    <string name="CustomExpireTimerSelectorView__days">days</string>
-    <string name="CustomExpireTimerSelectorView__weeks">weeks</string>
+    <string name="preferences__none">ಯಾವುದೂ ಇಲ್ಲ</string>
+    <string name="preferences_off">ಆಫ಼್</string>
+    <string name="preferences_on">ಆನ್</string>
+    <string name="ExpireTimerSettingsFragment__set">ಸೆಟ್ ಮಾಡಿ</string>
+    <string name="CustomExpireTimerSelectorView__seconds">ಸೆಕೆಂಡುಗಳು</string>
+    <string name="CustomExpireTimerSelectorView__minutes">ನಿಮಿಷಗಳು</string>
+    <string name="CustomExpireTimerSelectorView__hours">ಗಂಟೆಗಳು</string>
+    <string name="CustomExpireTimerSelectorView__days">ದಿನಗಳು</string>
+    <string name="CustomExpireTimerSelectorView__weeks">ವಾರಗಳು</string>
     <!-- expiration -->
-    <string name="expiration_off">Off</string>
+    <string name="expiration_off">ಆಫ಼್</string>
 
     <plurals name="expiration_seconds">
-        <item quantity="one">%1$d second</item>
-        <item quantity="other">%1$d seconds</item>
+        <item quantity="one">%1$d ಸೆಕೆಂಡು</item>
+        <item quantity="other">%1$d ಸೆಕೆಂಡುಗಳು</item>
     </plurals>
 
-    <string name="expiration_seconds_abbreviated">%1$ds</string>
+    <string name="expiration_seconds_abbreviated">%1$dಸೆ</string>
 
     <plurals name="expiration_minutes">
-        <item quantity="one">%1$d minute</item>
-        <item quantity="other">%1$d minutes</item>
+        <item quantity="one">%1$dನಿಮಿಷ</item>
+        <item quantity="other">%1$dನಿಮಿಷಗಳು</item>
     </plurals>
 
-    <string name="expiration_minutes_abbreviated">%1$dm</string>
+    <string name="expiration_minutes_abbreviated">%1$dನಿ</string>
 
     <plurals name="expiration_hours">
-        <item quantity="one">%1$d hour</item>
-        <item quantity="other">%1$d hours</item>
+        <item quantity="one">%1$d ಗಂಟೆ</item>
+        <item quantity="other">%1$d ಗಂಟೆಗಳು</item>
     </plurals>
 
-    <string name="expiration_hours_abbreviated">%1$dh</string>
+    <string name="expiration_hours_abbreviated">%1$dಗಂ</string>
 
     <plurals name="expiration_days">
-        <item quantity="one">%1$d day</item>
-        <item quantity="other">%1$d days</item>
+        <item quantity="one">%1$d ದಿನ</item>
+        <item quantity="other">%1$d ದಿನಗಳು</item>
     </plurals>
 
-    <string name="expiration_days_abbreviated">%1$dd</string>
+    <string name="expiration_days_abbreviated">%1$dದಿ</string>
 
     <plurals name="expiration_weeks">
-        <item quantity="one">%1$d week</item>
-        <item quantity="other">%1$d weeks</item>
+        <item quantity="one">%1$d ವಾರ</item>
+        <item quantity="other">%1$d ವಾರಗಳು</item>
     </plurals>
 
-    <string name="expiration_weeks_abbreviated">%1$dw</string>
+    <string name="expiration_weeks_abbreviated">%1$dವಾ</string>
     <string name="expiration_combined">%1$s %2$s</string>
 
     <!-- LearnMoreTextView -->
-    <string name="LearnMoreTextView_learn_more">Learn more</string>
+    <string name="LearnMoreTextView_learn_more">ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ</string>
 
-    <string name="SpanUtil__read_more">Read more</string>
+    <string name="SpanUtil__read_more">ಇನ್ನಷ್ಟು ಓದಿ</string>
 
     <!-- Dialogs -->
     <!-- Content description for the button in a time picker dialog that switches from the clock face to typing the time -->
-    <string name="Dialogs__switch_to_text_input">Switch to text input</string>
+    <string name="Dialogs__switch_to_text_input">ಪಠ್ಯ ಇನ್‌ಪುಟ್‌ಗೆ ಬದಲಿಸಿ</string>
     <!-- Content description for the button in a time picker dialog that switches from typing the time back to the clock face -->
-    <string name="Dialogs__switch_to_clock">Switch to clock</string>
+    <string name="Dialogs__switch_to_clock">ಗಡಿಯಾರ ಮೋಡ್‌ಗೆ ಬದಲಿಸಿ</string>
 </resources>
