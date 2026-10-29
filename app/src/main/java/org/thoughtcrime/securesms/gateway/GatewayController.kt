@@ -206,6 +206,7 @@ internal object GatewayController {
       val id = recipient.requireGroupId().toString()
       val state = platform.group(id, false)
       if (!state.active || !state.canPost) return emptySet()
+      if ("owner" in scopes) scopes += "owner-group"
       if (aci in state.admins) {
         if (available("!groupid")) scopes += "group-admin"
         if (available("!scan")) scopes += "group-scan"

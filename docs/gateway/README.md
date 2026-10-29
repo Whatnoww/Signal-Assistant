@@ -59,6 +59,16 @@ recipient batches. Every restricted edit targets the original public timestamp,
 so a viewer need not have received another role's intermediate edit. DM help keeps
 its existing caller-specific response. Configuration confirmations name the
 accepted setting and show its old and new values privately.
+
+Owner help lists every implemented `!admin` control: command and emergency
+toggles, category creation, Gateway throttle, group status, autoupdate and list
+addition/movement. The XML `owner` section contains controls usable in both DM
+and groups; `owner-group` contains controls that require the current group and
+appears only in the owner's group edit. Neither section is visible to ordinary
+group administrators. Existing uploaded XML must replace its abbreviated
+`owner` section and add `owner-group` from the template to display the complete
+catalogue. App updates do not overwrite configured help wording.
+
 Gateway XML writes use two spaces per nesting level and put structural settings
 on separate lines. Authored spam text, response formatting and inline spaces are
 preserved.

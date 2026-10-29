@@ -45,7 +45,12 @@
       <section scope="review-approve"><text>!approve @user [number]</text></section>
       <section scope="review-deny"><text>!deny @user [number]</text></section>
       <section scope="dm-group-admin"><text>!scan — scan all locally known groups you currently administer. The configured DM cooldown applies.</text></section>
-      <section scope="owner"><text>Owner controls:<br/>!admin disable all<br/>!admin enable all<br/>!admin gateway throttle &lt;groupID&gt; enable / disable</text></section>
+      <section scope="owner">
+        <text>Owner controls (DM or group):<br/>!admin disable all<br/>!admin enable all<br/>!admin disable &lt;trigger&gt;<br/>!admin enable &lt;trigger&gt;<br/>!admin group category create &lt;category&gt;<br/>!admin gateway throttle &lt;groupID&gt; enable<br/>!admin gateway throttle &lt;groupID&gt; disable<br/><br/>The all controls pause/resume Assistant automation; ACI-Blocklist reporting remains available. Trigger controls also affect the command's aliases. Gateway throttle pauses only the specified group's Gateway functionality.</text>
+      </section>
+      <section scope="owner-group">
+        <text>Owner controls for the current group:<br/>!admin group status<br/>!admin group enable autoupdate &lt;description&gt;<br/>!admin group disable autoupdate<br/>!admin group add &lt;category&gt; &lt;name&gt;<br/>!admin group move &lt;category&gt;<br/><br/>Create the category before adding or moving a group. Quote category names containing spaces when adding a group, for example:<br/>!admin group add "Live Music" My group</text>
+      </section>
     </help>
     <!-- Destination-room policy belongs to the room. Private rooms are not public membership listings. -->
     <privategroups>

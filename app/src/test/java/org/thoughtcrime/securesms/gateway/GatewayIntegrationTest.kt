@@ -864,9 +864,11 @@ class GatewayIntegrationTest {
     GatewayController.handle(context, incoming(member, group.groupId, "!help"))
     val public = sent.single()
     assertFalse(public.body.contains("!gateway"))
+    assertFalse(public.body.contains("!admin"))
     runHelpEdits()
     val edit = sent.last()
     assertTrue(edit.body.contains("!gateway"))
+    assertFalse(edit.body.contains("!admin"))
     val message = SignalDatabase.messages.getMessageFor(edit.sentTimeMillis, Recipient.self().id)!!
     GatewayAudience.prepareReceipts(context, message.id)
     val metadata = GatewayAudience.metadata(context, message.id)
@@ -915,11 +917,42 @@ class GatewayIntegrationTest {
       val ownerMessage = SignalDatabase.messages.getMessageFor(sent[2].sentTimeMillis, Recipient.self().id)!!
       val metadata = GatewayAudience.metadata(context, ownerMessage.id)
       assertEquals(setOf(owner), GatewayAudience.targets(context, metadata, Recipient.resolved(group.recipientId)))
-      assertTrue(sent[2].body.contains("!admin disable all"))
+      listOf(
+        "!admin disable all", "!admin enable all", "!admin disable <trigger>", "!admin enable <trigger>",
+        "!admin group category create <category>", "!admin gateway throttle <groupID> enable", "!admin gateway throttle <groupID> disable",
+        "!admin group status", "!admin group enable autoupdate <description>", "!admin group disable autoupdate",
+        "!admin group add <category> <name>", "!admin group move <category>"
+      ).forEach { command -> assertTrue("Owner group help is missing $command", sent[2].body.contains(command)) }
+      assertFalse(sent[0].body.contains("!admin"))
+      assertFalse(sent[1].body.contains("!admin"))
+      assertTrue(sent[2].body.contains("!admin group add \"Live Music\" My group"))
       // Native outbox reconstruction links to the preceding local revision. The
       // restricted wire edit deliberately targets the public timestamp instead.
       assertEquals(adminMessage.id, SignalDatabase.messages.getOutgoingMessage(ownerMessage.id).messageToEdit)
       assertEquals(public.sentTimeMillis, GatewayAudience.editTarget(metadata, adminMessage.dateSent))
+    } finally { unmockkObject(org.thoughtcrime.securesms.github.AdminCommands.Companion) }
+  }
+
+  @Test fun `owner DM help includes all global controls and omits controls requiring a group`() {
+    val owner = recipients.createRecipient("Owner")
+    val ownerAci = Recipient.resolved(owner).requireAci().toString()
+    mockkObject(org.thoughtcrime.securesms.github.AdminCommands.Companion)
+    try {
+      every { org.thoughtcrime.securesms.github.AdminCommands.isAuthorized(any(), ownerAci) } returns true
+      GatewayController.helpAliases.forEachIndexed { index, alias ->
+        GatewayController.handle(context, incoming(owner, body = alias, timestamp = 100L + index))
+        val reply = sent.last().body
+        listOf(
+          "!admin disable all", "!admin enable all", "!admin disable <trigger>", "!admin enable <trigger>",
+          "!admin group category create <category>", "!admin gateway throttle <groupID> enable", "!admin gateway throttle <groupID> disable"
+        ).forEach { command -> assertTrue("Owner DM $alias is missing $command", reply.contains(command)) }
+        listOf("!admin group status", "!admin group enable autoupdate", "!admin group disable autoupdate", "!admin group add", "!admin group move")
+          .forEach { command -> assertFalse("Owner DM $alias shows group-only command $command", reply.contains(command)) }
+        assertEquals(owner, sent.last().threadRecipient.id)
+      }
+      val member = recipients.createRecipient("Member")
+      GatewayController.handle(context, incoming(member, body = "!help"))
+      assertFalse(sent.last().body.contains("!admin"))
     } finally { unmockkObject(org.thoughtcrime.securesms.github.AdminCommands.Companion) }
   }
 
